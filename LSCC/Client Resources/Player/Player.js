@@ -168,7 +168,6 @@ mp.events.add("ShowHandcuffTooltip", () => {
 
 mp.events.add('setPing', (pingtoset) => {
     ping = pingtoset;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.ping = ${ping}`);
 })
 
 let lastWeapon = 2725352035;
@@ -590,7 +589,6 @@ mp.events.add("OneSecondEvent", () => {
         global.UpdateStatsVars(mp.players.local);
     }
     if(mp.storage.data.menu.monitoring == true){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.fps = ${global.FPS}`);
         mp.events.callRemote("RequestPlayerPing");
     }
 
@@ -1892,9 +1890,9 @@ mp.events.add('render', () => {
 
                     if(global.ServerUI != null)
                     {
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
+                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
+                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
+                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
                     }
 
                     if(derbyCounting)
@@ -1951,19 +1949,19 @@ mp.events.add('render', () => {
                     if(global.chaseTimeCur >= global.chaseTimeMax || global.chaseTimeCur <= -1)
                     {
                         global.chaseRunning = false;
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
                     }
                     else {
-                        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
+                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
                         if(global.collisionTime > 0)
                         {
-                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
-                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.collisionTime}`);
+                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
+                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.collisionTime}`);
                         }
                         else 
                         {
-                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
-                            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.chaseTimeMax - global.chaseTimeCur}`);
+                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
+                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.chaseTimeMax - global.chaseTimeCur}`);
                         }
                     }
                 }
@@ -3697,7 +3695,7 @@ mp.events.add(
     },
 
     "HideChaseTimer": () => {
-        if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
         global.chaseRunning = false;
     },
 
@@ -3746,7 +3744,7 @@ mp.events.add(
 
     "InitChaseTimer": () => {
         
-        if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
 
         if(derbyText == null)
         {
@@ -4119,30 +4117,7 @@ function setStorageDataVars(){
         mp.storage.data.chat.pagesize = 18;
         mp.storage.data.chat.fontsizenew = 1.0;
     }
-    if(mp.storage.data.chat.timestamp !== undefined){    
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = ${mp.storage.data.chat.timestamp.toString()}`);
-    }
-    else{
-        mp.storage.data.chat.timestamp = false;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.timestamps = false;`);
-    }
-    if(mp.storage.data.menu.loadingscreens === undefined){
-        mp.storage.data.menu.loadingscreens = true;
-    }
-    if(mp.storage.data.chat.pagesize !== undefined){    
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = ${mp.storage.data.chat.pagesize}`);
-    }
-    else{
-        mp.storage.data.chat.pagesize = 18;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.pageSize = 18;`);
-    }
-    if(mp.storage.data.chat.fontsizenew !== undefined){    
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = ${mp.storage.data.chat.fontsizenew}`);
-    }
-    else{
-        mp.storage.data.chat.fontsizenew = 1.0;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.fontSize = 1.0;`);
-    }
+
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;
     }
@@ -4162,7 +4137,6 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ChatAccessibility == undefined){
         mp.storage.data.menu.ChatAccessibility = false;
     }
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${mp.storage.data.menu.ChatAccessibility.toString()}`);
 
     if(mp.storage.data.menu.XMRAutoPlay == undefined){
         mp.storage.data.menu.XMRAutoPlay = true;
@@ -4214,15 +4188,6 @@ function setStorageDataVars(){
         mp.players.local.EventMusic = true;
     }
 
-    if(mp.storage.data.menu.monitoring !== undefined){
-        if(global.ServerUI != undefined && global.ServerUI != null)
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${mp.storage.data.menu.monitoring}`);
-    }
-    else{
-        mp.storage.data.menu.monitoring = false;
-        if(global.ServerUI != undefined && global.ServerUI != null)
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = false;`);
-    }
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
         //mp.storage.data.menu.VoiceMode = false;
@@ -4233,13 +4198,6 @@ function setStorageDataVars(){
         mp.events.callRemote("SetVoiceMode", 0, false);
     }
 
-    if(mp.storage.data.menu.tooltips !== undefined){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = ${mp.storage.data.menu.tooltips.toString()}`);
-    }
-    else{
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.tooltips.enabled = true`);
-        mp.storage.data.menu.tooltips = true;
-    }
 
     mp.events.callLocal("LoadCrosshair");
 

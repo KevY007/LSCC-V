@@ -48,23 +48,6 @@ mp.events.add("RestartMenu", () => {
     global.ServerUI = null;
   }
 
-  //global.ServerUI = mp.browsers.new("package://ServerUI/index.html");
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
-
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.options = [
-        { name: "Sessions", value: 2 },
-        { name: "Admin", value: 1 },
-        { name: "Admin Records", value: 3 },
-        { name: "Incoming Damages", value: 4 },
-        { name: "Outgoing Damages", value: 5 },
-      ];`);
-  if (global.ServerUI)
-    global.ServerUI.execute(
-      `gm.$refs.mainMenu.$refs.logsTab.filterType = {name: "Admin Records", value: 3};`
-    );
-
   mp.events.callLocal("MenuToggleTyping", false);
 });
 
@@ -108,9 +91,6 @@ mp.events.add(
 );
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
-  //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('profiles', ${profileData});`);
-  //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.$refs.states.setCrosshair('selectedProfile', '${activeProfile}');`);
-
   eval(`var realProfileData = ${profileData}`);
   eval(`var realActiveProfile = '${activeProfile}'`);
 
@@ -124,7 +104,6 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
       realActiveProfile
     );
   ActiveCrosshairProfileUUID = activeProfile;
-
 });
 
 var MenuClans = [];
@@ -216,69 +195,6 @@ mp.events.add("mainmenu_clan_my_clan_setting_update", (settingID, value) => {
   mp.events.callRemote("Clan_OnRequestChangeSetting", settingID, numValue);
 });
 
-mp.events.add("Menu_RemoveClanMember", (memberID) => {
-  if (global.ServerUI)
-    global.ServerUI.execute(`
-        if(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID})){
-            gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.splice(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.indexOf(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID})), 1);
-        }
-    `);
-});
-mp.events.add(
-  "Menu_UpdateClanMember",
-  (memberID, memberName, memberTier, memberLevel) => {
-    if (global.ServerUI)
-      global.ServerUI.execute(`
-        if(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID})){
-            gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members[gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.indexOf(gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.find(m => m.id == ${memberID}))] = {
-                id: ${memberID},
-                name: '${memberName}',
-                level: ${memberLevel},
-                tier: ${memberTier}
-            }
-        }
-
-    `);
-  }
-);
-
-mp.events.add(
-  "Menu_InitClanSettings",
-  (clanAccess, copchasePartnering, forceTag) => {
-    if (global.ServerUI)
-      global.ServerUI.execute(`
-        gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.copchasePartnering = ${copchasePartnering.toString()};   
-        gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.forceClanTag = ${forceTag.toString()};    
-        gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.clanAccess = "${clanAccess}";   
-    `);
-  }
-);
-mp.events.add("Menu_UpdateClanSetting", (type, value) => {
-  switch (type) {
-    case "access": {
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.clanAccess = "${value}";`
-        );
-      break;
-    }
-    case "partnering": {
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.copchasePartnering = ${value.toString()};`
-        );
-      break;
-    }
-    case "forcetag": {
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.settingsTab.forceClanTag = ${value.toString()};`
-        );
-      break;
-    }
-  }
-});
-
 mp.events.add("Menu_SetClanMembers", (membersData) => {
   var membersDataJSON = JSON.parse(membersData);
   for (let i = 0; i < membersDataJSON.length; i++) {
@@ -297,28 +213,6 @@ mp.events.add("Menu_SetClanMembers", (membersData) => {
   }
   if (global.ServerUI)
     global.ServerUI.call("mainmenu_my_clan_members_set", membersDataJSON);
-});
-
-mp.events.add(
-  "Menu_AddClanMember",
-  (memberID, memberName, memberTier, memberLevel, isOnline) => {
-    if (global.ServerUI)
-      global.ServerUI
-        .execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members.push(
-        {
-            id: ${memberID},
-            name: '${memberName}',
-            level: ${memberLevel},
-            tier: ${memberTier},
-            online: ${isOnline.toString()}
-        });`);
-  }
-);
-mp.events.add("Menu_ClearClanMembers", () => {
-  if (global.ServerUI)
-    global.ServerUI.execute(
-      `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.$refs.membersTab.members = [];`
-    );
 });
 
 mp.events.add("Menu_DisableClanCreatorLoading", () => {
@@ -350,26 +244,8 @@ mp.events.add("mainmenu_clan_create", (cname, tag, desc) => {
   mp.events.callRemote("OnRequestCreateClan", cname, tag, desc);
 });
 mp.events.add("UpdateMenuClanTab", () => {
-  if (global.ServerUI)
-    global.ServerUI.execute(
-      `gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`
-    );
-  setTimeout(() => {
-    mp.events.callRemote("Menu_RequestClansList");
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable(
-          "ClanName"
-        )}"`
-      );
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable(
-          "ClanCreated"
-        )}"`
-      );
-    mp.events.callRemote("Menu_InitializeMyClanTab");
-  }, 100);
+  mp.events.callRemote("Menu_RequestClansList");
+  mp.events.callRemote("Menu_InitializeMyClanTab");
 });
 
 mp.events.add("render", () => {
@@ -388,10 +264,7 @@ mp.events.add("ForceCloseMenu", () => {
   if (global.menuToggled == true) {
     ToggleMenu();
   }
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm._pStores.globals.isMainMenuOpen = false;`);
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.enabled = false;`);
+  if (global.ServerUI) global.ServerUI.call("mainmenu_toggle", false);
 });
 
 mp.events.add(
@@ -489,14 +362,6 @@ mp.events.add(
           }`,
         },
       ]);
-
-    // `gm.$refs.mainMenu.$refs.profileTab.$refs.statsTab.stats = {
-    //     {
-    //         icon: "fa-crosshairs",
-    //         title: "Kills",
-    //         value: 15,
-    //       },
-    // }`
   }
 );
 
@@ -514,12 +379,21 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
   // store inventory play wiki settings profile clans
   switch (tab) {
     case "clan":
-      if(global.ServerUI){
-        global.ServerUI.call("mainmenu_clan_my_clan_public_set", mp.players.local.getVariable("ClanPublic")); // Public value 1 == public | 0 == invite-only
-        global.ServerUI.call("mainmenu_clan_my_clan_force_tag_set", mp.players.local.getVariable("ForceClanTag"));
-        global.ServerUI.call("mainmenu_clan_my_clan_copchase_partnering_set", mp.players.local.getVariable("ClanPartnering"));
+      if (global.ServerUI) {
+        global.ServerUI.call(
+          "mainmenu_clan_my_clan_public_set",
+          mp.players.local.getVariable("ClanPublic")
+        ); // Public value 1 == public | 0 == invite-only
+        global.ServerUI.call(
+          "mainmenu_clan_my_clan_force_tag_set",
+          mp.players.local.getVariable("ForceClanTag")
+        );
+        global.ServerUI.call(
+          "mainmenu_clan_my_clan_copchase_partnering_set",
+          mp.players.local.getVariable("ClanPartnering")
+        );
       }
-   
+
       mp.events.callRemote("Menu_RequestClansList");
       //mp.events.callRemote("Menu_OnRequestClansPage", 0, 20);
       mp.events.callRemote("Menu_InitializeMyClanTab");
@@ -605,32 +479,7 @@ function ToggleMenu() {
       mp.events.callRemote("RequestCrosshairProfiles");
     }
 
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.playTab.privateRoom = undefined;`
-      );
-
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        "gm.$refs.mainMenu.$refs.logsTab.isLoading = false;"
-      );
-
     if (global.menuToggled) {
-      //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`);
-      //mp.events.callRemote("Menu_RequestClansList");
-      //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable("ClanName")}"`);
-      //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable("ClanCreated")}"`);
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.profileTab.name = '${mp.players.local.name}'`
-        );
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.profileTab.createdAt = '${mp.players.local.getVariable(
-            "RegisterDate"
-          )}'`
-        );
-
       // Testing for now, loads all clan data such as members, clan kills, etc.
 
       if (FirstTimeMenuOpen) {
@@ -1273,10 +1122,7 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
     mp.players.local.EventMusic = value;
   } else if (id == 16) {
     mp.storage.data.menu.monitoring = value;
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.hud.$refs.topRight.$refs.info.monitorEnabled = ${value}`
-      );
+
   } else if (id == 17) {
     mp.storage.data.menu.VoiceMode = value;
     mp.events.callRemote("SetVoiceMode", value, true);
@@ -1300,10 +1146,6 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
     changeMdcBind(value);
   } else if (id == 25) {
     mp.storage.data.menu.Speedo = value;
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.hud.$refs.bottomRight.$refs.speedo.enabled = ${value};`
-      );
   } else if (id == 26) {
     mp.storage.data.radiotoggle = value;
     global.radioToggle = value;
@@ -1323,10 +1165,7 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
       global.ServerUI.call("hud_voiceactivity_toggle", value.toString());
   } else if (id == 32) {
     mp.storage.data.menu.ChatAccessibility = value;
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.hud.$refs.base.$refs.chat.api.accessibilityMode = ${value.toString()}`
-      );
+
   } else if (id == 33) {
     mp.storage.data.menu.ShowDamageIndicator = value;
   }
@@ -1454,50 +1293,10 @@ mp.events.add("RequestJoinMinigame", (ID) => {
 
 mp.events.add("MenuSelectVehicle", (model, team) => {
   mp.events.callRemote("MenuSelectedVehicle", model, team);
-
-  if (team == 1) {
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehiclePolice = "${model}"`
-      );
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehiclePolice = "${model}"`
-      );
-  } else {
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.inventoryTab.$refs.vehiclesTab.selectedVehicleFugitive = "${model}"`
-      );
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.selectedVehicleFugitive = "${model}"`
-      );
-  }
 });
 
 mp.events.add("MenuSelectLoadout", (name, team) => {
   mp.events.callRemote("MenuSelectedLoadout", name, team);
-
-  if (team == 1) {
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutPolice = "${name}"`
-      );
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutPolice = "${name}"`
-      );
-  } else {
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${name}"`
-      );
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.inventoryTab.$refs.loadoutsTab.selectedLoadoutFugitive = "${name}"`
-      );
-  }
 });
 
 function minigameNameToID(name) {
@@ -1514,72 +1313,7 @@ function minigameNameToID(name) {
 }
 
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
-  //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.minigamesTab.games = [];`);
 
-  let menuItems = JSON.parse(arenas);
-  for (let i = 0; i < menuItems.length; i++) {
-    let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
-    insertString += `"id": ${menuItems[i][0] + 69420}, `;
-    insertString += `"name": "${menuItems[i][1]}", `;
-    insertString += `"image": "${menuItems[i][2]}", `;
-    insertString += `"players": ${menuItems[i][3]}, `;
-    insertString += `"maxplayers": ${menuItems[i][4]}, `;
-    if (menuItems[i][5].length > 1)
-      insertString += `"type": ${minigameNameToID(menuItems[i][5])}, `;
-    insertString += `"joinFunction":"RequestJoinMinigame"`;
-    if (menuItems[i][6].length > 1)
-      insertString += `"description": "${menuItems[i][6]}", `;
-
-    insertString += "});";
-
-    if (global.ServerUI) global.ServerUI.execute(insertString);
-  }
-
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms.push({
-        id: 6969,
-        type: 4,
-        name: "Freeroam",
-        image:
-        "package://Artwork/Freeroam.png",
-        players: ${menuItems[0][3]},
-        maxplayers: 1000,
-        joinFunction: "RequestJoinMinigame",
-    });`);
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms.push({
-        id: 6970,
-        type: 3,
-        name: "Derby",
-        image:
-        "package://Artwork/Derby.jpg",
-        players: ${menuItems[1][3]},
-        maxplayers: 20,
-        joinFunction: "RequestJoinMinigame",
-    });`);
-
-  if (currentMinigame !== -1) {
-    if (currentMinigame !== -3 && currentMinigame !== -4) {
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.playTab.currentRoom = ${
-            currentMinigame + 69420
-          };`
-        );
-    } else {
-      if (currentMinigame === -3)
-        if (global.ServerUI)
-          global.ServerUI.execute(
-            `gm.$refs.mainMenu.$refs.playTab.currentRoom = 6969;`
-          );
-
-      if (currentMinigame === -4)
-        if (global.ServerUI)
-          global.ServerUI.execute(
-            `gm.$refs.mainMenu.$refs.playTab.currentRoom = 6970;`
-          );
-    }
-  }
 });
 
 mp.events.add("UpdateMenuItemsTab", (itemsData) => {
@@ -1609,69 +1343,14 @@ mp.events.add("UpdateMenuItemsTab", (itemsData) => {
 mp.events.add(
   "AddMenuItem",
   (name, type, owned, price, description, max, id, image) => {
-    if (global.ServerUI)
-      global.ServerUI
-        .execute(`gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.push({
-        id: ${id},
-        name: "${name}",
-        image: "${image}",
-        owned: ${owned},
-        cost: ${price},
-        max: ${max},
-        description: "${description}"
-    });`);
-    if (global.ServerUI)
-      global.ServerUI
-        .execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.push({
-        id: ${id},
-        name: "${name}",
-        image: "${image}",
-        owned: ${owned},
-        cost: ${price},
-        max: ${max},
-        description: "${description}"
-    });`);
+    
   }
 );
 mp.events.add("UpdateMaxMenuItem", (id, max) => {
-  if (global.ServerUI)
-    global.ServerUI.execute(`
-        if(gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
-            gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}).max = ${max};
-        }
-        else{
-            console.log("Failed to find item of type ${id} in the menu!");
-        }
-    `);
-  if (global.ServerUI)
-    global.ServerUI.execute(`
-    if(gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
-        gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}).max = ${max};
-    }
-    else{
-        console.log("Failed to find item of type ${id} in the menu!");
-    }
-`);
+  
 });
 mp.events.add("UpdateMenuItem", (id, owned) => {
-  if (global.ServerUI)
-    global.ServerUI.execute(`
-        if(gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
-            gm.$refs.mainMenu.$refs.inventoryTab.$refs.itemsTab.items.find(i => i.id == ${id}).owned = ${owned};
-        }
-        else{
-            console.log("Failed to find item of type ${id} in the menu!");
-        }
-    `);
-  if (global.ServerUI)
-    global.ServerUI.execute(`
-    if(gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}) != undefined){
-        gm.$refs.mainMenu.$refs.storeTab.$refs.itemsTab.items.find(i => i.id == ${id}).owned = ${owned};
-    }
-    else{
-        console.log("Failed to find item of type ${id} in the menu!");
-    }
-`);
+  
 });
 // called by menu:
 mp.events.add("menu_buyNamechange", (id) => {
@@ -1691,24 +1370,10 @@ mp.events.add("MenuCustomizeVehicle", (model, teamID) => {
 });
 mp.events.add("menu_store_redeem", (code) => {
   mp.events.callRemote("Menu_OnCodeRedeem", code);
-  if (global.ServerUI)
-    global.ServerUI.execute(
-      `gm.$refs.mainMenu.$refs.storeTab.$refs.dpTab.isRedeeming = true;`
-    );
 });
 mp.events.add("menu_store_redeem_result", (success, message) => {
   if (!global.ServerUI) return;
 
-  if (global.ServerUI)
-    global.ServerUI
-      .execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.dpTab.redeemResponse = {
-        success:${success.toString()},
-        message:"${message}"
-    }`);
-  if (global.ServerUI)
-    global.ServerUI.execute(
-      `gm.$refs.mainMenu.$refs.storeTab.$refs.dpTab.isRedeeming = false;`
-    );
 });
 
 mp.events.add(
@@ -1790,12 +1455,6 @@ mp.events.add(
 mp.events.add(
   "UpdateMenuVehicles",
   (vehicles, currentCopCar, currentFugiCar) => {
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.storeTab.$refs.vehiclesTab.vehicles = [];`
-      );
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.police.selectedModel = "${currentCopCar}";`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.vehiclesTab.$refs.fugitive.selectedModel = "${currentFugiCar}";`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
@@ -1830,12 +1489,7 @@ mp.events.add(
 mp.events.add(
   "UpdateMenuLoadouts",
   (loadouts, currentCopLoadout, currentFugiLoadout) => {
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.loadouts = [];`
-      );
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.police.selectedLoadout = "${(currentCopLoadout == "?" ? "Default" : currentCopLoadout)}";`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.storeTab.$refs.loadoutsTab.$refs.fugitive.selectedLoadout = "${(currentFugiLoadout == "?" ? "Default" : currentFugiLoadout)}";`);
+
 
     // Loadout Data
     // Name, Locked, Background, Requirements, Weapons
@@ -1871,8 +1525,6 @@ mp.events.add(
 );
 
 mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms = [];`);
 
   // Lobby Data
   // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
@@ -1960,8 +1612,7 @@ mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
 });
 
 mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
-  if (global.ServerUI)
-    global.ServerUI.execute(`gm.$refs.mainMenu.$refs.playTab.rooms = [];`);
+
 
   // Lobby Data
   // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
@@ -1982,71 +1633,8 @@ mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
       joinFunction: "PutPlayerInLobby",
       owner: ownerName === "null" ? "" : ownerName,
     });
-
-    // let insertString = `gm.$refs.mainMenu.$refs.playTab.rooms.push({`;
-    // insertString += `"id": ${menuItems[i][0]}, `;
-    // insertString += `"name": "${menuItems[i][1]}", `;
-    // insertString += `"image": "${menuItems[i][2]}", `;
-    // insertString += `"type": ${(menuItems[i][3] === "Standard" ? 0 : 1)}, `;
-    // if(menuItems[i][4].length > 1) insertString += `"password": "${menuItems[i][4]}", `;
-    // insertString += `"players": ${menuItems[i][5]}, `;
-    // insertString += `"maxplayers": ${menuItems[i][6]},`;
-    // insertString += `"joinFunction":"PutPlayerInLobby",`,
-    // insertString += `"owner":${ownerName}`;
-    // //if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
-    // insertString += "});";
-
-    //if(global.ServerUI) global.ServerUI.execute(insertString);
   }
   if (global.ServerUI)
     global.ServerUI.call("mainmenu_play_rooms_set", play_rooms);
 
-  if (currentLobby >= 1)
-    if (global.ServerUI)
-      global.ServerUI.execute(
-        `gm.$refs.mainMenu.$refs.playTab.currentRoom = ${currentLobby};`
-      );
 });
-/*
-mp.events.add("UpdateMenuLobbies", (lobbies, currentLobby) => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.lobbiesTab.lobbies = [];`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.lobbiesTab.currentLobby = ${currentLobby};`);
-
-    // Lobby Data
-    // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
-    let menuItems = JSON.parse(lobbies);
-    for(let i = 0; i < menuItems.length; i++)
-    {
-        let insertString = `gm.$refs.mainMenu.$refs.lobbiesTab.lobbies.push({`;
-        insertString += `"id": ${menuItems[i][0]}, `;
-        insertString += `"name": "${menuItems[i][1]}", `;
-        insertString += `"background": "${menuItems[i][2]}", `;
-        insertString += `"gamemode": "${menuItems[i][3]}", `;
-        if(menuItems[i][4].length > 1) insertString += `"password": "${menuItems[i][4]}", `;
-        insertString += `"players": ${menuItems[i][5]}, `;
-        insertString += `"maxplayers": ${menuItems[i][6]}`;
-        if(menuItems[i][7].length > 1) insertString += `, "description": "${menuItems[i][7]}"`;
-        insertString += "});";
-
-        if(global.ServerUI) global.ServerUI.execute(insertString);
-    }
-});
-*/
-
-// mp.events.add("SaveCrosshair", (crData) => {
-//     mp.storage.data.menu.CrosshairData = crData;
-//     if(global.ServerUI) global.ServerUI.execute(`gm.crosshair.layers = ${crData}`);
-
-//     mp.storage.flush();
-// });
-// mp.events.add("LoadCrosshair", () => {
-//     if (mp.storage.data.menu.CrosshairData !== undefined) {
-//         if(global.ServerUI) global.ServerUI.execute(`gm.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-//         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = ${mp.storage.data.menu.CrosshairData}`);
-//     }
-//     else {
-//         mp.storage.data.menu.CrosshairData = "[]";
-//         if(global.ServerUI) global.ServerUI.execute(`gm.crosshair.layers = []`);
-//         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.settingsTab.settings.$refs.crosshair.layers = []`);
-//     }
-// });

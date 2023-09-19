@@ -49,7 +49,6 @@ mp.events.add("addDailyChallenge", (id, desc, rXP, rPts, expireDate, completed, 
     DailyChallenges.push(c);
 });
 mp.events.add("clearDailyChallenges", () => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories = []`);
     DailyChallenges = [];
 })
 
@@ -93,8 +92,6 @@ let weekChalProg = 0;
 let weekChalUnix = 0;
 
 mp.events.add("addChallengesToMenu", (weekChallengeProgress, weekChallengeUnix) => {
-    let json = `gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories = [`;
-    let chstr = "";   
     weekChalProg = Number(weekChallengeProgress);
     weekChalUnix = Number(weekChallengeUnix);
 
@@ -140,15 +137,10 @@ mp.events.add("advanceChallenge", (arrayID, cht, chi, chp) => {
         if(!chunlock) return;
 
         DailyChallenges.find(a => a.type == cht && a.item == chi).progress = chp;
-        
-        if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.description == "${chunlock.description}") != null){
-            gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.description == "${chunlock.description}").progress = ${chp};
-        }`);
+
     }
     else{ // weekly
-        if(global.ServerUI) global.ServerUI.execute(`if(gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.name == "Daily Challenge 7-day streak") != null){
-            gm.$refs.mainMenu.$refs.profileTab.$refs.challengesTab.categories[${arrayID}].challenges.find(chNig => chNig.name == "Daily Challenge 7-day streak").progress = ${chp};
-        }`);
+
     }
 });
 
@@ -214,7 +206,6 @@ mp.events.add("unlockAchievement", (achievementName) => {
     if(!achunlock) return;
 
     achunlock.unlocked = true;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.profileTab.$refs.achievementsTab.achievements.find(a => a.name === "${achievementName}").unlocked = true`);
 
     let rewardstr = "";
     if(achunlock.rewardXP > 0) rewardstr += `+${achunlock.rewardXP} XP`;

@@ -104,10 +104,7 @@ mp.events.add("StartTutorial", () => {
                 You will now be sent to the <strong>Character Creator</strong> to create your appearance. Have fun!"
             }
         ];
-        // if(global.ServerUI) global.ServerUI.execute(`
-        // gm.$refs.helpers.$refs.tutorial.pages = ${JSON.stringify(TutorialQuestions)};
-        // gm.$refs.helpers.$refs.tutorial.enabled = true;
-        // `);
+
         if(global.ServerUI) global.ServerUI.call('auth_tutorial_start', TutorialQuestions);
         
         setTimeout(() => {

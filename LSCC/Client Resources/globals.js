@@ -914,13 +914,12 @@ const boneData = [
 function activateChat(toggle){
     if(global.ServerUI == null) return;
     if(global.menuToggled){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(false);`);
+        global.ServerUI.call('chat:show', false);
         return;
     }
 
     global.ServerUI.call('chat:show', toggle);
     mp.gui.chat.show(toggle);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggle(${toggle.toString()})`);
 };
 function AddCustomVehiclesToSpawner(){
     if(global.ServerUI != null){
@@ -928,15 +927,7 @@ function AddCustomVehiclesToSpawner(){
         let modelsList = ["lspdunm", "polbufac", "huntley2", "lspdvic", "prevolter", "m3e46", "pscout", "impala",
         "shegrangerold", "shergauntlet", "polbisonf", "gresleyh", "tulip2", "golfmk6", "bcso2slick", "bcat", "police3slick",
         "fibexecutioner", "police3umk"];
-
-        for(let i = 0 ; i < modelsList.length; i++){
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.menus.$refs.vehicleSpawner.vehicles.push({
-                model: "${modelsList[i]}",
-                hash: "${modelsList[i]}",
-                type: 25,
-                image: "package://Artwork/Vehicles/${modelsList[i]}.png",
-            });`);
-        }
+        return;
     }
 }
 function calcDist(v1, v2) {

@@ -14,10 +14,6 @@ mp.events.add('render', () => {
                 const vehicle = mp.players.local.vehicle; // the only serverside call is to set the fuel
                 currentVehicleFuel = vehicle.getVariable("Fuel");  // fuel is set e.g. when it reaches 0, or the player exits vehicle
                 vehicleRemoteID = vehicle.remoteId;
-
-                if(global.ServerUI){
-                    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.enabled = true;`);
-                }
            }
 
         }
@@ -34,7 +30,6 @@ function HandleFuel(){
     if(!mp.players.exists(mp.players.local) || !mp.players.local.vehicle || player.seat != -1 || player.getVariable("Team") != 0){
         wasInVehicle = false;
         fuelFrameCount = 0;
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.bottomRight.$refs.fuelStatus.enabled = false;`);
         mp.events.callRemote("UpdateVehicleFuel", currentVehicleFuel, vehicleRemoteID);
         return;
     }

@@ -166,12 +166,9 @@ mp.events.add('showLoginBrowser', (state) => {
                   mp.events.callRemote("requestQuickLoginForgotUsernameData"); // If 'Remember Me' is checked, auto-login the user.
                 }
 
-                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.inventoryTab.items = [];`);
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
-                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.authSuccess = true;`);
-                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.stop();`);
                 if(!mp.players.local || !mp.players.exists(mp.players.local)) return;
                 mp.game.graphics.transitionFromBlurred(1000);
 
@@ -201,32 +198,25 @@ mp.events.add('showLoginBrowser', (state) => {
 
 mp.events.add("login_ShowInvalidInfo", (toggle) => {
     if(global.ServerUI && global.ServerUI.active){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "The login credentials are invalid!");
         mp.gui.cursor.show(true, true);
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.login.loginError = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_ShowAccountExists", (toggle) => {
     if(global.ServerUI && global.ServerUI.active){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "That username is already taken!");
         mp.gui.cursor.show(true, true);
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
     }
 });
 mp.events.add("login_MaxAccountLimit", (toggle) => {
     if(global.ServerUI && global.ServerUI.active){
-        if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
         mp.events.callLocal("HUDError", "You've reached the maximum accounts limit! (2 accounts)");
         mp.gui.cursor.show(true, true);
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.$refs.register.usernameAlreadyExists = ${toggle.toString()}`);
         // TO-DO: Add a message that max account limit has been reached!
     }
 });
 mp.events.add("login_ForceStopLoading", () => {
   if(global.ServerUI && global.ServerUI.active){
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.gui.cursor.show(true, true);
   }
 });
@@ -294,7 +284,6 @@ mp.events.add('auth_register', (username, email, password, confirmPass) => {
   if(password === confirmPass)
     mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
   else{
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = false;`);
     mp.events.callLocal("HUDError", "The passwords do not match!");
   }
 
@@ -318,17 +307,10 @@ mp.events.add('sendAutoLoginDataToBrowser', (data) => {
         }
     }, 500);
 });
-mp.events.add('sendForgotUsernameToBrowser', (data) => {
-    setTimeout(() => {
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.login.possibleUsernames = ${data}`);
-    }, 500);
-
-});
 
 mp.events.add('auth_quick_login', () => {
     if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
     
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.api.isLoading = true;`);
     mp.events.callRemote("OnAutoLoginAttempt", quickLoginUsername);
 });
 
@@ -342,10 +324,6 @@ mp.events.add("hideMDC", () => {
     if(global.MDC_DOM == null) return;
     global.MDCActive = false;
     global.MDC_DOM.active = false;
-});
-
-mp.events.add("login_StopMusic", () => {
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.auth.$refs.panel.stop();`);
 });
 
 var passwordChangeDialogInterval = null;
