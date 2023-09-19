@@ -1212,23 +1212,29 @@ function LockLSPDHQ(lock){
 }
 
 // Disable radar and nametags if player is in interior
-let lastInterior = 0;
+
+let wasInInterior = false;
 mp.events.add('render', () => { 
   let interior = mp.game.invoke("0x2107BA504071A6BB", mp.players.local.handle); 
-  if(lastInterior == interior) return;
+  let interiorGroup = mp.game.invoke("0xE4A84ABF135EF91A", interior);
+  let isInInterior = (interior !== 0 && interiorGroup !== 11);
+  if(wasInInterior == isInInterior) return;
 
-  if(interior === 0){
+  if(isInInterior == false){
+    mp.gui.chat.push("INT G:" + interiorGroup.toString());
+    wasInInterior = false;
     mp.gui.chat.push('!{green}[INTERIOR] !{white}Radar & nametags re-enabled!');
     mp.game.ui.displayRadar(true);
     if(mp.storage.data.menu?.nametags && global)
       global.renderNametags = mp.storage.data.menu.nametags;
   }
   else{
+    mp.gui.chat.push("INT G:" + interiorGroup.toString());
+    wasInInterior = true;
     mp.gui.chat.push('!{red}[INTERIOR] !{white}Radar & nametags disabled!');
     mp.game.ui.displayRadar(false);
     if(global)
       global.renderNametags = false;
   }
 
-  lastInterior = interior;
 });

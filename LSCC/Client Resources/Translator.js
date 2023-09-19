@@ -53,14 +53,14 @@ function updateUILanguage(){
     if(!global.ServerUI) return;
     if(global.ServerUI === undefined || global.ServerUI === null) return;
 
-    //switch(CURRENT_LANGUAGE){
-    //    default: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
-    //    case 0: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("en")`); break;
-    //    case 1: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("es")`); break;
-    //    case 2: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("fr")`); break;
-    //    case 3: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("hr")`); break;
-    //    case 4: if(global.ServerUI) global.ServerUI.execute(`gm.$refs.helpers.setLocale("vi")`); break;
-    //}
+    switch(CURRENT_LANGUAGE){
+        default: if(global.ServerUI) global.ServerUI.call('set_locale', 'en'); break;
+        case 0: if(global.ServerUI) global.ServerUI.call('set_locale', 'en'); break;
+        case 1: if(global.ServerUI) global.ServerUI.call('set_locale', 'es'); break;
+        case 2: if(global.ServerUI) global.ServerUI.call('set_locale', 'fr'); break;
+        case 3: if(global.ServerUI) global.ServerUI.call('set_locale', 'hr'); break;
+        case 4: if(global.ServerUI) global.ServerUI.call('set_locale', 'vi'); break;
+    }
 }
 mp.events.add("Translator:UpdateNametagMessagesManual", () => {
     updateNametagsMessages();
