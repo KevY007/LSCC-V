@@ -1042,21 +1042,21 @@ function updateMenuSettingsTab() {
       mp.storage.data.menu.ShowDamageIndicator
     );
 
-    global.ServerUI.call(
-      "mainmenu_setting_value_set",
-      69420,
-      global.showCustomCrosshair
-    );
-    global.ServerUI.call(
-      "mainmenu_setting_value_set",
-      69421,
-      global.alwaysShowCustomCrosshair
-    );
-    global.ServerUI.call(
-      "mainmenu_setting_value_set",
-      69422,
-      global.showCustomCrosshairInSniper
-    );
+    // global.ServerUI.call(
+    //   "mainmenu_setting_value_set",
+    //   69420,
+    //   global.showCustomCrosshair
+    // );
+    // global.ServerUI.call(
+    //   "mainmenu_setting_value_set",
+    //   69421,
+    //   global.alwaysShowCustomCrosshair
+    // );
+    // global.ServerUI.call(
+    //   "mainmenu_setting_value_set",
+    //   69422,
+    //   global.showCustomCrosshairInSniper
+    // );
   }
 }
 
