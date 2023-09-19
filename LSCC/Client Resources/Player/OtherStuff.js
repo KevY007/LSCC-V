@@ -1210,3 +1210,25 @@ function LockLSPDHQ(lock){
 
   LSPDHQLocked = lock;
 }
+
+// Disable radar and nametags if player is in interior
+let lastInterior = 0;
+mp.events.add('render', () => { 
+  let interior = mp.game.invoke("0x2107BA504071A6BB", mp.players.local.handle); 
+  if(lastInterior == interior) return;
+
+  if(interior === 0){
+    mp.gui.chat.push('!{green}[INTERIOR] !{white}Radar & nametags re-enabled!');
+    mp.game.ui.displayRadar(true);
+    if(mp.storage.data.menu?.nametags && global)
+      global.renderNametags = mp.storage.data.menu.nametags;
+  }
+  else{
+    mp.gui.chat.push('!{red}[INTERIOR] !{white}Radar & nametags disabled!');
+    mp.game.ui.displayRadar(false);
+    if(global)
+      global.renderNametags = false;
+  }
+
+  lastInterior = interior;
+});
