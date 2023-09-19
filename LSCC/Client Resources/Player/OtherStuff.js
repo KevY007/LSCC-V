@@ -1217,7 +1217,7 @@ let wasInInterior = false;
 mp.events.add('render', () => { 
   let interior = mp.game.invoke("0x2107BA504071A6BB", mp.players.local.handle); 
   let interiorGroup = mp.game.invoke("0xE4A84ABF135EF91A", interior);
-  let isInInterior = (interior !== 0 && interiorGroup !== 11);
+  let isInInterior = (interior !== 0 && interiorGroup !== 11 && interiorGroup !== 10 && interiorGroup !== 1);
   if(wasInInterior == isInInterior) return;
 
   if(isInInterior == false){
