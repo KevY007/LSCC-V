@@ -103,6 +103,9 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
       realProfileData,
       realActiveProfile
     );
+
+  mp.events.callRemote('ServerConsoleOutput', `Profile Data (p1): ${JSON.stringify(realProfileData)}`);
+  mp.events.callRemote('ServerConsoleOutput', `Active Profile (p2): ${realActiveProfile}`);
   ActiveCrosshairProfileUUID = activeProfile;
 });
 
@@ -960,21 +963,6 @@ function updateMenuSettingsTab() {
       "mainmenu_setting_value_set",
       17,
       mp.storage.data.menu.VoiceMode.toString()
-    );
-    global.ServerUI.call(
-      "mainmenu_setting_value_set",
-      18,
-      mp.storage.data.menu.ActiveChatOpacity
-    );
-    global.ServerUI.call(
-      "mainmenu_setting_value_set",
-      19,
-      mp.storage.data.menu.InactiveChatOpacity
-    );
-    global.ServerUI.call(
-      "mainmenu_setting_value_set",
-      20,
-      mp.storage.data.menu.ShowInactiveChat
     );
     global.ServerUI.call(
       "mainmenu_setting_value_set",

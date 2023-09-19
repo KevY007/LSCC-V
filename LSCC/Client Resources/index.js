@@ -329,7 +329,7 @@ mp.events.add("hideMDC", () => {
 var passwordChangeDialogInterval = null;
 
 mp.events.add("showPasswordChangeDialog", (reason) => {
-  passwordChangeDialogInterval = setInterval(() => {
+  passwordChangeDialogInterval = setTimeout(() => {
     if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
     if(global.ServerUI) global.ServerUI.call('hud_minilist', false);
     if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", false);

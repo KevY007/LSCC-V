@@ -199,6 +199,13 @@ namespace RNC
                  .AddOption("message", ApplicationCommandOptionType.String, "Message to send", isRequired: true)
                  .Build(), PMCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                 .WithName("changepassword")
+                 .WithDescription("Changes a player's password - they'll be prompted to enter a new one when they login!")
+                 .AddOption("target", ApplicationCommandOptionType.String, "Who's password to change", isRequired: true)
+                 .AddOption("password", ApplicationCommandOptionType.String, "Temporary password", isRequired: true)
+                 .Build(), ChangePasswordCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
@@ -219,6 +226,69 @@ namespace RNC
             }
 
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
+        }
+
+        private static async Task ChangePasswordCommandHandler(SocketSlashCommand command)
+        {
+
+            string name = command.Data.Options.ElementAt(0).Value.ToString();
+            string newpass = command.Data.Options.ElementAt(1).Value.ToString();
+
+            int aLevel = GetIngameAdminLevel(command.User);
+
+            int aSQLID = await GetIngameSQLID(command.User);
+            if (command.User.Id == 1027945798069133443 || command.User.Id == 922461597866295397) aSQLID = 1;
+
+            if (aSQLID == -1)
+            {
+                await command.RespondAsync("**[!]** You must link your Discord & RnC account to use this!");
+                return;
+            }
+            if (aLevel < 2)
+            {
+                await command.RespondAsync("**[!]** You must be a level 2+ admin to use this!");
+                return;
+            }
+            using (MainDatabase dbcontext = ContextFactory.CreateContext())
+            {
+                Account tpAcc = await dbcontext.Accounts.AsQueryable().FirstOrDefaultAsync(p => p.Username.Equals(name, StringComparison.OrdinalIgnoreCase) == true);
+                if ((tpAcc != null) == false)
+                {
+                    await command.RespondAsync("**[!]** There's no account with that name.");
+                    return;
+                }
+
+                if (tpAcc.Admin > aLevel)
+                {
+                    await command.RespondAsync("**[!]** Target's admin level is higher than yours!");
+                    return;
+                }
+                string salt = AccountManager.GenSalt();
+                string password = AccountManager.Crypt(newpass, salt);
+                tpAcc.Salt = salt;
+                tpAcc.Password = password;
+                tpAcc.ForcePasswordChange = true;
+                await dbcontext.SaveChangesAsync();
+                await command.RespondAsync($":white_check_mark: **You've successfully changed {name}'s password!**");
+                lock (RAGE.Entities.Players)
+                {
+                    NAPI.Task.Run(async () =>
+                    {
+                        Player target = RAGE.Entities.Players.All.Find(a => a.Name.Equals(name, StringComparison.OrdinalIgnoreCase) == true && EPlayer.LoggedIn(a));
+                        if (target != null)
+                        {
+                            target.SendChatMessage(Translator.Translate(target, "PASSWORD_CHANGED", newpass));
+                            //EPlayer.Notify(target, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
+                        }
+
+                        // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:changepass:{name}"); } catch { }
+                        Logs.LogAdmin(aSQLID, $"Changed player {tpAcc.Username}'s password.");
+
+                        EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] !{{#FFFFFF}}[DC] {command.User.Username} has changed {tpAcc.Username}'s password.");
+
+                    }, 50);
+                }
+            }
         }
 
         private static async Task PMCommandHandler(SocketSlashCommand command)

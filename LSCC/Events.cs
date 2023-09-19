@@ -3790,6 +3790,7 @@ namespace RNC
                     {
                         _target.Password = password;
                         _target.Salt = salt;
+                        _target.ForcePasswordChange = false;
                     }
 
                     await context.SaveChangesAsync();
