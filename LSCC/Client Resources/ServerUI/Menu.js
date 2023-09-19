@@ -514,23 +514,12 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
   // store inventory play wiki settings profile clans
   switch (tab) {
     case "clan":
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.clansTab.$refs.clansList.clans = [];`
-        );
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.name = "${mp.players.local.getVariable(
-            "ClanName"
-          )}"`
-        );
-      if (global.ServerUI)
-        global.ServerUI.execute(
-          `gm.$refs.mainMenu.$refs.clansTab.$refs.myClan.createdAt = "${mp.players.local.getVariable(
-            "ClanCreated"
-          )}"`
-        );
-
+      if(global.ServerUI){
+        global.ServerUI.call("mainmenu_clan_my_clan_public_set", mp.players.local.getVariable("ClanPublic")); // Public value 1 == public | 0 == invite-only
+        global.ServerUI.call("mainmenu_clan_my_clan_force_tag_set", mp.players.local.getVariable("ForceClanTag"));
+        global.ServerUI.call("mainmenu_clan_my_clan_copchase_partnering_set", mp.players.local.getVariable("ClanPartnering"));
+      }
+   
       mp.events.callRemote("Menu_RequestClansList");
       //mp.events.callRemote("Menu_OnRequestClansPage", 0, 20);
       mp.events.callRemote("Menu_InitializeMyClanTab");

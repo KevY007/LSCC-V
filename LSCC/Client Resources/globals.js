@@ -69,17 +69,16 @@ function UpdateStatsVars(entity, all = true){
                   tier: player.getVariable("ClanTier"),
                   name:player.getVariable("ClanName"),
                   createdAt:player.getVariable("ClanCreated"),
-                  tagEnabled:player.getVariable("ForceClanTag"),
-                  tag:player.getVariable("ClanTag"),
-                  copchasePartnering:(player.getVariable("ClanPartnering")),
-                  public:player.getVariable("ClanPublic") // Public value 1 == public | 0 == invite-only
+                  tag:player.getVariable("ClanTag")
                 }
               };
               global.ServerUI.call("set_user", user_object);
 
-              
+              global.ServerUI.call("mainmenu_clan_my_clan_public_set", player.getVariable("ClanPublic")); // Public value 1 == public | 0 == invite-only
+              global.ServerUI.call("mainmenu_clan_my_clan_force_tag_set", player.getVariable("ForceClanTag"));
+              global.ServerUI.call("mainmenu_clan_my_clan_copchase_partnering_set", player.getVariable("ClanPartnering"));
                 
-                if(all === true){            
+              if(all === true){            
                     if(global.CommandsDataJSON){
                         let allowedCommands = global.CommandsDataJSON.filter(cmd => cmd.Admin <= mp.players.local.getVariable("Admin"));
                         allowedCommands.sort(function(a, b){
