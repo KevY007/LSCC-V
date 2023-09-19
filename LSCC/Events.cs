@@ -8764,12 +8764,14 @@ namespace RNC
 
 
             player.ResetData("_currentlySwappingSeats");
+            /*
             foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
             {
                 if (p == null || !player.Exists) continue;
 
                 Commands.cmd_specoff(p);
             }
+            */
             player.SetData("Killstreak", 0);
             player.ResetData("AttachedComponents");
 
