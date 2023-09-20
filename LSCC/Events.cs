@@ -4131,11 +4131,6 @@ namespace RNC
                         acc.WeaponComponents = NAPI.Util.ToJson(wepItems);
                     }
 
-                    if (EPlayer.GetAccount(player).MOTD != null && !EPlayer.GetAccount(player).MOTD.Equals("none"))
-                    {
-                        MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
-                        Main.DisplayMOTD(player, motdToShow);
-                    }
 
                     player.SendChatMessage(Translate(player, "LAST_LOGIN", EPlayer.GetAccount(player).LastLogin.ToString()));
                     EPlayer.GetAccount(player).LastLogin = DateTime.Now;
@@ -4144,6 +4139,12 @@ namespace RNC
                         player.SendChatMessage(Translate(player, "LAST_SESSION_HOURS", (EPlayer.GetAccount(player).LastSessionMins / 60.0).ToString("N1")));
                     else
                         player.SendChatMessage(Translate(player, "LAST_SESSION_MINUTES", (EPlayer.GetAccount(player).LastSessionMins).ToString("N1")));
+
+                    if (EPlayer.GetAccount(player).MOTD != null && !EPlayer.GetAccount(player).MOTD.Equals("none"))
+                    {
+                        MOTDData motdToShow = NAPI.Util.FromJson<MOTDData>(EPlayer.GetAccount(player).MOTD);
+                        Main.DisplayMOTD(player, motdToShow);
+                    }
                 });
 
 

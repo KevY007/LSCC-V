@@ -231,6 +231,12 @@ namespace RNC
                 .AddOption("code", ApplicationCommandOptionType.String, "Verification code - use /link in-game", isRequired: true)
                 .Build(), LinkCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("unlink")
+                .WithDescription("Unlink a player's RnC account from their Discord account")
+                .AddOption("username", ApplicationCommandOptionType.String, "Target player username", isRequired: true)
+                .Build(), UnlinkCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
@@ -252,7 +258,65 @@ namespace RNC
 
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
         }
+        private static async Task UnlinkCommandHandler(SocketSlashCommand command)
+        {
+            int aLevel = GetIngameAdminLevel(command.User);
+            int aSQL = await GetIngameSQLID(command.User);
+            if (aSQL == -1)
+            {
+                await command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                return;
+            }
+            if(aLevel < 1)
+            {
+                await command.RespondAsync("**[!]** You must be a Moderator or higher to use this!");
+                return;
+            }
 
+            string username = command.Data.Options.ElementAt(0).Value.ToString();
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                Account target = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username));
+                if (target == null)
+                {
+                    await RespondAlert(command, "**[!]** An account with that username could not be found!", EmbedType.Error);
+                    return;
+                }
+                if (target.DiscordID == null)
+                {
+                    await RespondAlert(command, "**[!]** That RnC account isn't linked to any Discord account!", EmbedType.Error);
+                    return;
+                }
+
+                target.DiscordID = null;
+                MOTDData motd = new MOTDData()
+                {
+                    AdminName = $"@{command.User.Username}",
+                    Message = $"Your RnC account has been un-linked from your Discord account by @{command.User.Username} ({aSQL})!",
+                    PostedOn = DateTime.Now.ToString("g")
+                };
+                target.MOTD = NAPI.Util.ToJson(motd);
+                await context.SaveChangesAsync();
+
+                await command.RespondAsync($":white_check_mark: **You successfully un-linked {target.Username}'s Discord account from their in-game account.**");
+                NAPI.Task.Run(() =>
+                {
+                    Logs.LogAdmin(aSQL, $"Unverified ${target.Username}'s Discord account.");
+
+                    Player player = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if (player == null)
+                    {
+                        return;
+                    }
+
+                    EPlayer.GetAccount(player).DiscordID =  null;
+                    EPlayer.Save(player, true);
+                    player.SendChatMessage(Translator.Translate(player, "UNVERIFIED_BY_ADMIN"));
+
+                }, 50);
+
+            }
+        }
         private static async Task LinkCommandHandler(SocketSlashCommand command)
         {
             string username = command.Data.Options.ElementAt(0).Value.ToString();
