@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Principal;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -95,6 +96,16 @@ namespace RNC
             }
 
             await channel.SendMessageAsync("", false, embed(message, type));
+        }
+        public static async Task RespondAlert(SocketSlashCommand command, string message, EmbedType type = EmbedType.Info)
+        {
+            var channel = client.GetChannel(gameChatChannelId) as IMessageChannel;
+            if (channel == null)
+            {
+                Console.WriteLine($"[Discord] Game chat channel not found!");
+                return;
+            }
+            await command.RespondAsync(null, new Embed[] { embed(message, type) });
         }
         private static async Task SlashCommandHandler(SocketSlashCommand command)
         {
@@ -213,6 +224,13 @@ namespace RNC
                  .AddOption("level", ApplicationCommandOptionType.Integer, "Staff level", isRequired: true)
                  .Build(), SetStaffCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("link")
+                .WithDescription("Links your Discord & RnC account for some special benefits")
+                .AddOption("username", ApplicationCommandOptionType.String, "Your username", isRequired: true)
+                .AddOption("code", ApplicationCommandOptionType.String, "Verification code - use /link in-game", isRequired: true)
+                .Build(), LinkCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
@@ -233,6 +251,83 @@ namespace RNC
             }
 
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
+        }
+
+        private static async Task LinkCommandHandler(SocketSlashCommand command)
+        {
+            string username = command.Data.Options.ElementAt(0).Value.ToString();
+            string code = command.Data.Options.ElementAt(1).Value.ToString();
+
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                Account target = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username));
+                if(target == null)
+                {
+                    await RespondAlert(command, "An account with that username could not be found!", EmbedType.Error);
+                    return;
+                }
+                if (target.DiscordID != null)
+                {
+                    await RespondAlert(command, "That RnC account is already linked to another Discord account!", EmbedType.Error);
+                    return;
+                }
+                Account _verifiedCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.DiscordID == command.User.Id.ToString());
+                if(_verifiedCheck != null)
+                {
+                    await RespondAlert(command, $"Your Discord account is already linked to another RnC account! ({_verifiedCheck.Username})", EmbedType.Error);
+                    return;
+                }
+                if(target.DiscordCode != code)
+                {
+                    await RespondAlert(command, $"The code you provided is invalid! Please check in-game by using **/link**!", EmbedType.Error);
+                    return;
+                }
+
+                bool givePerks = !target.UsedDiscordPerks;
+                NAPI.Task.Run(() =>
+                {
+                    Player player = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if(player == null)
+                    {
+                        Task.Run(async () => await RespondAlert(command, "You must be in-game to link your account!", EmbedType.Error));                      
+                        return;
+                    }
+
+                    EPlayer.GetAccount(player).DiscordID = command.User.Id.ToString();
+                    EPlayer.GetAccount(player).UsedDiscordPerks = true;
+                    EPlayer.Save(player, true);
+
+                    if (givePerks)
+                    {
+                        player.SendChatMessage(Translator.Translate(player, "VERIFIED_MSG_1"));
+
+                        EPlayer.GrantXP(player, 10);
+                        EPlayer.GivePoints(player, 13);
+                        EPlayer.UnlockAchievement(player, "discord_verify");
+
+                        Task.Run(async () =>
+                        {
+                            await EPlayer.UnlockLoadout(target, player, "Negotiator", 0);
+                            await EPlayer.UnlockLoadout(target, player, "Negotiator", 1);
+                            await EPlayer.UnlockVehicle(target, player, "superd", 0);
+                        });
+                    }
+                    else
+                    {
+                        player.SendChatMessage(Translator.Translate(player, "VERIFIED_OLD_MSG_1"));
+                        player.SendChatMessage(Translator.Translate(player, "VERIFIED_OLD_MSG_2"));
+                    }
+
+                    Task.Run(async () =>
+                    {
+                        target.DiscordID = command.User.Id.ToString();
+                        target.UsedDiscordPerks = true;
+                        await context.SaveChangesAsync();
+
+                        await RespondAlert(command, $"You successfully linked your Discord account to your RnC account: {target.Username}", EmbedType.Success);
+                    });
+                }, 50);
+            }
         }
 
         private static async Task SetStaffCommandHandler(SocketSlashCommand command)
