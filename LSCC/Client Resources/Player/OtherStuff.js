@@ -1214,27 +1214,47 @@ function LockLSPDHQ(lock){
 // Disable radar and nametags if player is in interior
 
 let wasInInterior = false;
+let isInCopchaseCheck = false;
+let sentInteriorHideMessage = false;
+mp.events.add('TwoSecondsEvent', () => {
+  if(mp.players.local.getVariable("Team") >= 0){
+    if(!isInCopchaseCheck) isInCopchaseCheck = true;
+  }
+  else{
+    if(isInCopchaseCheck){
+      isInCopchaseCheck = false;
+
+      mp.game.ui.displayRadar(true);
+      if(mp.storage.data.menu?.nametags && global)
+        global.renderNametags = mp.storage.data.menu.nametags;
+    }
+  }
+});
 mp.events.add('render', () => { 
+  if(!isInCopchaseCheck) return;
+
   let interior = mp.game.invoke("0x2107BA504071A6BB", mp.players.local.handle); 
   let interiorGroup = mp.game.invoke("0xE4A84ABF135EF91A", interior);
   let isInInterior = (interior !== 0 && interiorGroup !== 11 && interiorGroup !== 10 && interiorGroup !== 1);
   if(wasInInterior == isInInterior) return;
 
   if(isInInterior == false){
-    mp.gui.chat.push("INT G:" + interiorGroup.toString());
     wasInInterior = false;
-    mp.gui.chat.push('!{green}[INTERIOR] !{white}Radar & nametags re-enabled!');
     mp.game.ui.displayRadar(true);
     if(mp.storage.data.menu?.nametags && global)
       global.renderNametags = mp.storage.data.menu.nametags;
   }
   else{
-    mp.gui.chat.push("INT G:" + interiorGroup.toString());
     wasInInterior = true;
-    mp.gui.chat.push('!{red}[INTERIOR] !{white}Radar & nametags disabled!');
     mp.game.ui.displayRadar(false);
     if(global)
       global.renderNametags = false;
+
+      if(!sentInteriorHideMessage){
+        sentInteriorHideMessage = true;
+        mp.gui.chat.push("!{green}[>] !{white}Radar & nametags are disabled inside interiors; be careful and plan your approach!");
+      }
   }
 
 });
+ 
