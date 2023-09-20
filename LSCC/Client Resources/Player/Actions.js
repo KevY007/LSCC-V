@@ -5,6 +5,17 @@ var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 let maxActionTime = 0;
 
+function initiateActionTimer(startTime){
+    maxActionTime = startTime;
+}
+
+function startActionTimer(message, timeInSeconds){
+    if(global.ServerUI) global.ServerUI.call('notification_send', message, 'info', time*1000, 'action_timer');
+}
+function stopActionTimer(){
+    if(global.ServerUI) global.ServerUI.call('notification_dismiss', 'action_timer');
+}
+
 
 mp.events.add("StartPlayerAction", (action, time) => {
     if(mp.players.local.getVariable("Wounded") > 0){
@@ -39,7 +50,7 @@ mp.events.add("StopPlayerActions", () => {
     actionTime = 0;
     maxActionTime = 0;
     actionInterval = null;
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    stopActionTimer();
 })
 
 function PainkillerAction(){
@@ -65,7 +76,7 @@ function PainkillerAction(){
             mp.events.callRemote("OnPlayerActionTick");
             if(actionTime <= 0){
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+                stopActionTimer();
                 clearInterval(actionInterval);
             }
             else{
@@ -85,22 +96,15 @@ function PainkillerAction(){
     }, 1000);   
 }
 
-function initiateActionTimer(startTime){
-    maxActionTime = startTime;
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.maxtime = ${startTime}`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.actionbar.fugitive = ${(mp.players.local.getVariable("Team") == 0 ? true : false)}`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = true;`);
-}
-
 function MedkitAction(){
     if(mp.players.local == null || mp.players.local.handle == null) return;
-    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0, 8.0, 0.0, -1, 0.0, false, false, false);
 
-    initiateActionTimer(actionTime);
     if(mp.players.local.getVariable("Wounded") > 0){
         return;
     }
+    mp.events.callRemote("play_anim", "amb@medic@standing@kneel@enter", "enter", 0, 8.0, 0.0, -1, 0.0, false, false, false);
+    initiateActionTimer(actionTime);
+    startActionTimer("Using medkit...", actionTime);
 
     actionInterval = setInterval(() => {
 
@@ -114,8 +118,7 @@ function MedkitAction(){
             if(actionTime <= 0){
                 mp.events.callRemote("clear_anim");
                 mp.events.callRemote("FinishPlayerAction", actionType);
-                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-                //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+                stopActionTimer();
                 clearInterval(actionInterval);
             }
             else{
@@ -347,6 +350,7 @@ mp.events.add("BeginReviving", () => {
     reviveTime = 7;
     isReviving = true;
     initiateActionTimer(reviveTime);
+    startActionTimer("Reviving player...", reviveTime);
     clearInterval(reviveTimer);
     reviveTimer = setInterval(() => {
         if(mp.players.local == null || !mp.players.exists(mp.players.local)){ stopCuffing(69); return; }
@@ -369,15 +373,11 @@ mp.events.add("BeginReviving", () => {
         reviveTime--;
         if(reviveTime <= 0)
         {
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+            stopActionTimer();
             finishCuffing();
             mp.events.callRemote("FinishRevive", reviveTarget);
             clearInterval(reviveTimer);
             return;
-        }
-        else{
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - reviveTime) == 0 ? 0 : (maxActionTime - reviveTime))}`);
         }
     }, 1000);
 });
@@ -390,7 +390,7 @@ function stopReviving(reason){
     reviveTarget = null;
 
     mp.events.callRemote("StopReviving");
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    stopActionTimer();
 
     switch(reason){
         case 1:{
@@ -437,6 +437,7 @@ mp.events.add("BeginCuffing", (target) => {
     global.disableSprint = true;
 
     initiateActionTimer(cuffTimeLeft);
+    startActionTimer("Handcuffing player...", cuffTimeLeft);
     
     if(global.cuffInterval != null) clearInterval(global.cuffInterval);
 
@@ -467,12 +468,8 @@ mp.events.add("BeginCuffing", (target) => {
 
         cuffTimeLeft--;
         if(cuffTimeLeft <= 0){
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
+            stopActionTimer();
             finishCuffing();
-        }
-        else{
-            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = ${((maxActionTime - cuffTimeLeft) == 0 ? 0 : (maxActionTime - cuffTimeLeft))}`);
         }
     }, 1000);
 });
@@ -480,8 +477,7 @@ mp.events.add("BeginCuffing", (target) => {
 mp.events.add("forceStopCuffing", () => {
     stopCuffing(69);
     mp.events.callRemote("clear_anim");
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.time = 0;`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    stopActionTimer();
     mp.events.callLocal("StopPlayerActions");
 });
 
@@ -494,7 +490,7 @@ function stopCuffing(reason){ // if unsuccessful / force stopped
     global.cuffInterval = null;
     global.cuffTarget = null;
 
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.actionBar.enabled = false;`);
+    stopActionTimer();
 
     mp.events.callRemote("StopCuffing");
 
@@ -534,23 +530,14 @@ mp.events.add("startLockpicking", (donorLevel) => {
         rangePos = getRandomInt(0, 180);
     }
     while(rangePos+rangeSize >= 180);
-
-    // if(global.ServerUI) global.ServerUI.execute(`
-    //     gm.$refs.hud.$refs.base.$refs.quickAction.rangeLocation = ${rangePos};
-    //     gm.$refs.hud.$refs.base.$refs.quickAction.range = ${rangeSize};
-        
-    //     gm.$refs.hud.$refs.base.$refs.quickAction.enabled = true;
-    // `);
 });
 
 // true = success ; false = fail
 mp.events.add("stopLockpicking", () => {
-    global.isLockpicking = false;
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
+    global.isLockpicking = false;  
 });
 mp.events.add("sendLockpickResult", (result) => {
     global.isLockpicking = false;
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.quickAction.enabled = false;`);   
     mp.events.callRemote("onLockpickAttempt", result); 
 });
 mp.events.add("lockpick_vehicleAlarm", (veh, isLockpickPlayer, isSuccess) => {
