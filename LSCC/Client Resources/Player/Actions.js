@@ -10,7 +10,7 @@ function initiateActionTimer(startTime){
 }
 
 function startActionTimer(message, timeInSeconds){
-    if(global.ServerUI) global.ServerUI.call('notification_send', message, 'info', time*1000, 'action_timer');
+    if(global.ServerUI) global.ServerUI.call('notification_send', message, 'info', timeInSeconds*1000, 'action_timer');
 }
 function stopActionTimer(){
     if(global.ServerUI) global.ServerUI.call('notification_dismiss', 'action_timer');
