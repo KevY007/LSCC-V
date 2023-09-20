@@ -1890,9 +1890,10 @@ mp.events.add('render', () => {
 
                     if(global.ServerUI != null)
                     {
-                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
-                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Derby Time";`);
-                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${derbyTimeCur};`);
+
+                        if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, true);                
+                        let timeDisplay = new Date(derbyTimeCur * 1000).toISOString().substring(14, 19);
+                        if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 9, timeDisplay);
                     }
 
                     if(derbyCounting)
@@ -1943,25 +1944,6 @@ mp.events.add('render', () => {
                         if(mp.players.local.isInAnyVehicle(false))
                         {
                             mp.players.local.vehicle.freezePosition(false);
-                        }
-                    }
-
-                    if(global.chaseTimeCur >= global.chaseTimeMax || global.chaseTimeCur <= -1)
-                    {
-                        global.chaseRunning = false;
-                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
-                    }
-                    else {
-                        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = ${mp.storage.data.menu.gameProgress};`);
-                        if(global.collisionTime > 0)
-                        {
-                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Collisions";`);
-                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.collisionTime}`);
-                        }
-                        else 
-                        {
-                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.title = "Time Left";`);
-                            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.time = ${global.chaseTimeMax - global.chaseTimeCur}`);
                         }
                     }
                 }
@@ -3695,7 +3677,7 @@ mp.events.add(
     },
 
     "HideChaseTimer": () => {
-        //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+        if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, false);
         global.chaseRunning = false;
     },
 
@@ -3743,8 +3725,8 @@ mp.events.add(
     },
 
     "InitChaseTimer": () => {
-        
-        //if(global.ServerUI != null) if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.gameProgress.enabled = false;`);
+          
+        if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, true);
 
         if(derbyText == null)
         {

@@ -1178,6 +1178,14 @@ mp.events.add('browserDomReady', (browser) => {
             value: "N/A",
             color: "#34d399"
         });
+        miniHUD_items.push({ 
+            id:9,
+            enabled:false,
+            name: "copchase_time",
+            icon: "fa-clock",
+            value: "00:00",
+            color: "#fb923c"
+        });
         global.ServerUI.call('hud_minilist_items_set', miniHUD_items);
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
@@ -1368,6 +1376,25 @@ mp.events.add("UpdateRateEvent", () => {
         {
             miniHUDVars["zone"] = global.zoneName;
             if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 8, miniHUDVars["zone"]);
+        }
+
+        if(global.chaseTimeCur >= global.chaseTimeMax || global.chaseTimeCur <= -1)
+        {
+            global.chaseRunning = false;
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, false);
+        }
+        else {
+            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, mp.storage.data.menu.gameProgress);
+            if(global.collisionTime > 0)
+            {
+                let timeDisplay = new Date(global.collisionTime * 1000).toISOString().substring(14, 19);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 9, timeDisplay);
+            }
+            else 
+            {
+                let timeDisplay = new Date((global.chaseTimeMax - global.chaseTimeCur) * 1000).toISOString().substring(14, 19);
+                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 9, timeDisplay);
+            }
         }
 
         if(global.currentJailTime >= 1)
