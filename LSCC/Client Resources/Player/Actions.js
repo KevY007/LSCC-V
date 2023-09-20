@@ -59,7 +59,7 @@ function PainkillerAction(){
     if(mp.players.local.getVariable("Wounded") > 0) return;
 
     if(!mp.players.local.isInAnyVehicle(true))
-        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 0, 8.0, 0.0, -1, 0.0, false, false, false);
+        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt2", 48, 8.0, 0.0, -1, 0.0, false, false, false);
 
     actionInterval = setInterval(() => {
 
@@ -85,7 +85,7 @@ function PainkillerAction(){
                 if(!mp.players.local.isInAnyVehicle(true))
                 {
                     if(actionTime == 39){
-                        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 0, 8.0, 0.0, -1, 0.0, false, false, false);
+                        mp.events.callRemote("play_anim", "mini@sprunk", "plyr_buy_drink_pt3", 48, 8.0, 0.0, -1, 0.0, false, false, false);
                     }
                     if(actionTime == 38){            
                         mp.events.callRemote("clear_anim");

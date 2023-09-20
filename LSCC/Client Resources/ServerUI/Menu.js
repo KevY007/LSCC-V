@@ -38,6 +38,7 @@ if (
   mp.storage.data.menu.ShowVoiceActivity = true;
   mp.storage.data.menu.ChatAccessibility = false;
   mp.storage.data.menu.ShowDamageIndicator = true;
+  mp.storage.data.menu.digitalHPAR = true;
 
   mp.storage.flush();
 }
@@ -761,6 +762,14 @@ function updateMenuSettingsTab() {
             description: "Toggle permanently expanded minimap.",
           },
           {
+            id: 34,
+            type: 1,
+            name: "digitalhpar",
+            label: "Digital HP & AR Display",
+            description:
+              "Toggles the digital Health & Armour display (bottom-left corner of the radar).",
+          },
+          {
             id: 5,
             type: 1,
             name: "tooltips",
@@ -1029,6 +1038,11 @@ function updateMenuSettingsTab() {
       33,
       mp.storage.data.menu.ShowDamageIndicator
     );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      34,
+      mp.storage.data.menu.digitalHPAR
+    );
 
     // global.ServerUI.call(
     //   "mainmenu_setting_value_set",
@@ -1151,6 +1165,10 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
 
   } else if (id == 33) {
     mp.storage.data.menu.ShowDamageIndicator = value;
+  }
+  else if(id == 34){
+    mp.storage.data.menu.digitalHPAR = value;
+    global.digitalHPAR = value;
   }
 
   if (global.ServerUI != null) {

@@ -4170,6 +4170,14 @@ function setStorageDataVars(){
         mp.players.local.EventMusic = true;
     }
 
+    if(mp.storage.data.menu.digitalHPAR == undefined){
+        mp.storage.data.menu.digitalHPAR = true;
+        global.digitalHPAR = true;
+    }
+    else{
+        global.digitalHPAR = mp.storage.data.menu.digitalHPAR;
+    }
+
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
         //mp.storage.data.menu.VoiceMode = false;

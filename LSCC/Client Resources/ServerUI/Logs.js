@@ -28,24 +28,22 @@ mp.events.add("dialog_logs_request_page", (dialogId, username, first, rows) => {
 
 mp.events.add("RequestLogsFromServer", (type, username) => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute('gm.$refs.mainMenu.$refs.logsTab.isLoading = true;');
     mp.events.callRemote("ReqLogFromSrv", username, type);
 });
 mp.events.add("Menu_SetLogsTabLoading", (toggle) => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.isLoading = ${toggle};`);
 });
 mp.events.add("InitiateLogsTab", () => {
     if(!global.ServerUI) return;
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.options = [
-        { name: "Sessions", value: 2 },
-        { name: "Admin", value: 1 },
-        { name: "Admin Records", value: 3 },
-        { name: "Incoming Damages", value: 4 },
-        { name: "Outgoing Damages", value: 5 },
-        { name: "Commands", value: 6 },
-      ];`);
-    if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.selectedOption = 3;`);
+    // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.options = [
+    //     { name: "Sessions", value: 2 },
+    //     { name: "Admin", value: 1 },
+    //     { name: "Admin Records", value: 3 },
+    //     { name: "Incoming Damages", value: 4 },
+    //     { name: "Outgoing Damages", value: 5 },
+    //     { name: "Commands", value: 6 },
+    //   ];`);
+    // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.selectedOption = 3;`);
 });
 mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
     if(!global.ServerUI) return;
@@ -63,18 +61,18 @@ mp.events.add("ReturnLogsToClient", (type, jsonLogs) => {
 
     switch(type){
         case 1:{ // admin
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Description"];`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Description"];`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
         case 2:{ // session
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Join Time", "Leave Time", "Duration", "IP", "HWID"];`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
         case 3:{ // admin records
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
-            if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.rows = ["Timestamp", "Admin", "Duration", "Reason"];`);
+            //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.mainMenu.$refs.logsTab.columns = ${jsonLogs}`);
             break;
         }
         case 4:{ // incoming damage

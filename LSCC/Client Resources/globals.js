@@ -971,7 +971,6 @@ function focusChat(toggle){
 
     if(global.menuToggled && toggle === true){
         focusChat(false);
-        //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
         return;
     }
     if(toggle === true){
@@ -982,26 +981,10 @@ function focusChat(toggle){
       (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
       (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
           focusChat(false);
-          //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = false;`);
           return;
       }
     }
 
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive = ${toggle.toString()}`);
-    //if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.api.toggleActive(${toggle.toString()});`);
-
-    // if(toggle){
-    //     if(mp.storage.data.menu.ActiveChatOpacity !== undefined){
-    //         if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = ${mp.storage.data.menu.ActiveChatOpacity.toString()}`);
-    //     }
-    //     else if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.base.$refs.chat.settings.opacity = 1.0`);
-    // }
-    // else{
-    //     increaseChatOpacity(3000);
-    // }
-
-    //global.ServerUI.call('chat:activate', toggle);
-    //global.ServerUI.call('chat:show', toggle);
     global.ServerUI.call('chat:activate', toggle); // this opens the chatbox, not mp.gui.chat.activate
     mp.events.callRemote("onFocusChat", toggle);
 }
@@ -1116,6 +1099,8 @@ let global = {
 
   lastVoiceBind: 0x4E,
   curVoiceBind: 0x4E,
+
+  digitalHPAR: false,
 
   BankRobberyOn: false,
 

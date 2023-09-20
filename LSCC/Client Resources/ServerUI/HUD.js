@@ -133,7 +133,7 @@ function TimeFormat(time)
 }
 
 mp.keys.bind(
-    0x76,
+    0x76, // F7 key
     false,
     () => {
         if(global.menuToggled !== undefined && global.menuToggled) return;
@@ -1212,6 +1212,12 @@ mp.events.add('ToggleHud', (toggle) => {
         if(global.ServerUI) global.ServerUI.call('hud_toggle', toggle);
         mp.storage.data.menu.HUD = toggle;
     }
+    if(toggle == true){
+        global.digitalHPAR = mp.storage.data.menu.digitalHPAR;
+    }
+    else{
+        global.digitalHPAR = false;
+    }
 
     global.activateChat(global.showHud);
     mp.game.ui.displayRadar(global.showHud);
@@ -2044,6 +2050,36 @@ mp.events.add("render", () => {
     }
 });
 
+// Numeric health display
+let hparpos = {
+    "hpx":0.03,
+    "hpy":0.942,
+    "arx":0.03,
+    "ary":0.924
+}
+mp.events.add('sethpar', (key, value) => {
+    hparpos[key] = value;
+});
+
+mp.events.add('render', () => {
+    if(!global.digitalHPAR) return;
+
+    let HPvar = mp.players.local.getHealth();
+    mp.game.graphics.drawText(`HP: ${HPvar}`, [hparpos.hpx, hparpos.hpy], {
+        font:4,
+        color:(HPvar > 25 ? [87, 163, 86, 255] : [172, 29, 29, 255]),
+        scale: [0.4, 0.4],
+        outline:true,
+        centre:true
+    });
+    mp.game.graphics.drawText(`AR: ${mp.players.local.getArmour()}`, [hparpos.arx, hparpos.ary], {
+        font:4,
+        color:[69, 144, 184, 255],
+        scale: [0.4, 0.4],
+        outline:true,
+        centre:true
+    });
+});
 
 
 
