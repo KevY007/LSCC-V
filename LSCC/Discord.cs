@@ -284,6 +284,7 @@ namespace RNC
                 }
 
                 bool givePerks = !target.UsedDiscordPerks;
+                bool allGood = false;
                 NAPI.Task.Run(() =>
                 {
                     Player player = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name.Equals(username, StringComparison.OrdinalIgnoreCase));
@@ -317,16 +318,9 @@ namespace RNC
                         player.SendChatMessage(Translator.Translate(player, "VERIFIED_OLD_MSG_1"));
                         player.SendChatMessage(Translator.Translate(player, "VERIFIED_OLD_MSG_2"));
                     }
-
-                    Task.Run(async () =>
-                    {
-                        target.DiscordID = command.User.Id.ToString();
-                        target.UsedDiscordPerks = true;
-                        await context.SaveChangesAsync();
-
-                        await RespondAlert(command, $"You successfully linked your Discord account to your RnC account: {target.Username}", EmbedType.Success);
-                    });
+                    Task.Run(async () => await RespondAlert(command, $"You successfully linked your Discord account to your RnC account: {target.Username}", EmbedType.Success));                 
                 }, 50);
+
             }
         }
 
