@@ -145,6 +145,7 @@ namespace RNC
         [RemoteEvent("playerReadyCon")]
         public void OnPlayerConnected(Player player)
         {
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has joined the server. *(Total online: {RAGE.Entities.Players.Count})*", "Auth");
             //Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
             NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -2917,6 +2918,7 @@ namespace RNC
                     Settings.LoggedInPlayers.Remove(player);
                     EPlayer.ResetPlayerData(player);
 
+                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has left the server. *(Total online: {RAGE.Entities.Players.Count})*", "Auth");
                     //Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
                 }
             }
@@ -3947,6 +3949,7 @@ namespace RNC
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has logged in as **{acc.Username}**", "Auth");
             //Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -5134,7 +5137,8 @@ namespace RNC
         {
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
-            player.SetData("PlaytimeTick", Environment.TickCount64);
+            player.SetData("PlaytimeTick", Environment.TickCount64); 
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has registered an account: **{acc.Username}**", "Auth");
             //Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
