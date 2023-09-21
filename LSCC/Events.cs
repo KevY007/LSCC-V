@@ -7707,8 +7707,6 @@ namespace RNC
                 if (target.GetSharedData<int>("Wounded") == 1) return;
             }
 
-            //target.SendChatMessage($"You've been ~r~shot ~w~for ~r~{damageToDeal}~w~DMG by ~r~{player.Name}~w~!");
-
             int ARtoset = 0;
             int HPtoset = 0;
 
@@ -7734,10 +7732,6 @@ namespace RNC
                 ARtoset = 0;
                 HPtoset = targetHealth - diff;
             }
-            if (damageToDeal > 0)
-                SetIsPlayerDamaged(target);
-
-            player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
 
             if (ARtoset < 0) ARtoset = 0;
             if (HPtoset < 0)
@@ -7751,6 +7745,7 @@ namespace RNC
                     target.Armor = 0;
                     target.Health = 100;
                     Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+                    player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
                     return;
                 }
                 else
@@ -7762,6 +7757,7 @@ namespace RNC
                     OnPlayerDeath(target, player, realWeapon);
 
                     Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+                    player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
                     return;
                 }
             }
@@ -7769,6 +7765,14 @@ namespace RNC
             target.Armor = ARtoset;
             target.Health = HPtoset;
             Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
+
+            if (damageToDeal > 0)
+            {
+                SetIsPlayerDamaged(target);
+                player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
+            }
+
+
 
             //target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
             //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
