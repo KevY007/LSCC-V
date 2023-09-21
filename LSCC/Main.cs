@@ -2897,7 +2897,7 @@ namespace RNC
                                             {
                                                 if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
                                                 {
-                                                    if (player.GetSharedData<int>("PlayerWeather") == -1)
+                                                    if (player.HasSharedData("InLobby") && player.GetSharedData<int>("PlayerWeather") == -1)
                                                     {
                                                         player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
                                                         //player.SendChatMessage(Translator.Translate(player, "WEATHER_FORECAST_2", weatherString));
@@ -2917,7 +2917,7 @@ namespace RNC
                                     {
                                         lock (player)
                                         {
-                                            if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                            if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobby.lobbyId)
                                             {
                                                 if (player.GetSharedData<int>("PlayerWeather") == -1)
                                                     player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
