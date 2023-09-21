@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
+using System.ServiceModel.Channels;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace RNC
 {
@@ -21,7 +21,14 @@ namespace RNC
         }
 
         private static DiscordSocketClient client;
-        private static ulong gameChatChannelId = 717768143140814928;
+
+        public enum Channel : long{
+            Global = 717768143140814928,
+            Local = 717768143140814928,
+            Restricted = 856968180462518332,
+            General = 717768143140814928
+        }
+
         private static ulong guildId = 713731146072064040;
         private static List<CommandDefinition> commands = new List<CommandDefinition>();
 
@@ -75,9 +82,9 @@ namespace RNC
             embed.Description = $"{emoji} \u200B \u200B {message}";
             return embed.Build();
         }
-        public static async Task SendMessage(string message)
+        public static async Task SendMessage(string message, Channel channelId = Channel.Global)
         {
-            var channel = client.GetChannel(gameChatChannelId) as IMessageChannel;
+            var channel = client.GetChannel((ulong)channelId) as IMessageChannel;
             if (channel == null)
             {
                 Console.WriteLine($"[Discord] Game chat channel not found!");
@@ -86,9 +93,43 @@ namespace RNC
             await channel.SendMessageAsync(message);
         }
 
-        public static async Task SendAlert(string message, EmbedType type = EmbedType.Info)
+        public enum ChatMessageType : long
         {
-            var channel = client.GetChannel(gameChatChannelId) as IMessageChannel;
+            Global = 1,
+            Local = 2,
+            Restricted = 3,
+            General = 4
+        }
+        public static async Task SendChatMessage(ChatMessageType type, string message, string channel = null)
+        {
+            switch (type)
+            {
+                case ChatMessageType.Local:
+                    {
+                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #LOCAL{(channel != null ? $" - {channel}" : "")}] {message}", Channel.Local);
+                    }
+                    break;
+                case ChatMessageType.Global:
+                    {
+                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #GLOBAL{(channel != null ? $" - {channel}" : "")}] {message}", Channel.Global);
+                    }
+                    break;
+                case ChatMessageType.Restricted:
+                    {
+                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #RESTRICTED{(channel != null ? $" - {channel}" : "")}] {message}", Channel.Restricted);
+                    }
+                    break;
+                case ChatMessageType.General:
+                    {
+                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #GENERAL{(channel != null ? $" - {channel}" : "")}] {message}", Channel.AdminLogs);
+                    }
+                    break;
+            }
+        }
+
+        public static async Task SendAlert(string message, EmbedType type = EmbedType.Info, Channel channelId = Channel.Global)
+        {
+            var channel = client.GetChannel((ulong)channelId) as IMessageChannel;
             if (channel == null)
             {
                 Console.WriteLine($"[Discord] Game chat channel not found!");
@@ -97,9 +138,9 @@ namespace RNC
 
             await channel.SendMessageAsync("", false, embed(message, type));
         }
-        public static async Task RespondAlert(SocketSlashCommand command, string message, EmbedType type = EmbedType.Info)
+        public static async Task RespondAlert(SocketSlashCommand command, string message, EmbedType type = EmbedType.Info, Channel channelId = Channel.Global)
         {
-            var channel = client.GetChannel(gameChatChannelId) as IMessageChannel;
+            var channel = client.GetChannel((ulong)channelId) as IMessageChannel;
             if (channel == null)
             {
                 Console.WriteLine($"[Discord] Game chat channel not found!");

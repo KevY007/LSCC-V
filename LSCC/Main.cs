@@ -3147,7 +3147,7 @@ namespace RNC
                 if (winner != null)
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
-                    EPlayer.GrantXP(winner, winXP);
+                    EPlayer.GrantXP(winner, winXP); DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{winner.Name}** has won the Derby round! | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}", $"Derby");
                     ////Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
 
                     winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
@@ -3179,12 +3179,14 @@ namespace RNC
                 {
                     case 0:
                         EPlayer.SendMessageToAll("GAME_STOP_ADMIN", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Stopped by an admin.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
                         break;
                     case 1: // time run out | fugi escape shit
                         if (lobby.gameMode != GameModes.BANKROBBERY)
                         {
                             EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_ESCAPE", lobbyid);
+                            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives have escaped.", $"Lobby {lobbyid}");
                             //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives have escaped.**");
                             winnerTeam = 0;
                             foreach (Player i in lobby.Fugitives)
@@ -3205,6 +3207,7 @@ namespace RNC
                             {
                                 winnerTeam = 1;
                                 EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_BANKROB_FAIL", lobbyid);
+                                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives failed to rob the bank in time.", $"Lobby {lobbyid}");
                                 //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
 
                                 foreach (Player i in lobby.Cops)
@@ -3221,6 +3224,7 @@ namespace RNC
                         break;
                     case 2:
                         EPlayer.SendMessageToAll("GAME_STOP_COPS_DEAD", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | All cops have been eliminated.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -3258,6 +3262,7 @@ namespace RNC
                         break;
                     case 3:
                         EPlayer.SendMessageToAll("GAME_STOP_FUGITIVES_DEAD", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Police has neutralized all fugitives.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
                         if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -3290,10 +3295,12 @@ namespace RNC
                         break;
                     case 4:
                         EPlayer.SendMessageToAll("GAME_STOP_NO_PLAYERS", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Lack of players.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Game was ended due to lack of players.**");
                         break;
                     case 5: // event cop win
                         EPlayer.SendMessageToAll("GAME_STOP_BANKROB_NO_LEADER", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | No one was left to replace the heist leader.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
                         winnerTeam = 1;
                         foreach (Player i in lobby.Cops)
@@ -3310,6 +3317,7 @@ namespace RNC
                         {
                             winnerTeam = 0;
                             EPlayer.SendMessageToAll("GAME_STOP_BANKROB_FUGI_WIN", lobbyid);
+                            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives successfully delivered the money to their hideout.", $"Lobby {lobbyid}");
                             //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
                             foreach (Player i in lobby.Fugitives)
                             {
@@ -4597,6 +4605,7 @@ namespace RNC
                                 if (lobby.gameMode == GameModes.STANDARD)
                                 {
                                     lobby.NextEventCounter--;
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"Standard copchase has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}**!", $"Lobby {lobbyid}");
                                     //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
 
                                     if (lobby.NextEventCounter == 0)
@@ -4604,10 +4613,12 @@ namespace RNC
                                 }
                                 else if (lobby.gameMode == GameModes.BUSTED)
                                 {
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"BUSTED! mode has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}**!", $"Lobby {lobbyid}");
                                     //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                                 }
                                 else if (lobby.gameMode == GameModes.BANKROBBERY)
                                 {
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"Bank Robbery event has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}**!", $"Lobby {lobbyid}");
                                     //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in Bank Robbery event has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                                     lobby.BankRobbery.State = 0;
                                 }

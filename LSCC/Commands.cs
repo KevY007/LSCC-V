@@ -7422,6 +7422,8 @@ namespace RNC
             {
                 EPlayer.SendMessage(playa, $"!{{#218a3d}}[{nameDisp}] {EPlayer.Name(player)}: !{{#26a347}}{message}");
             }
+
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**{player.Name}:** {message}", $"Clan - *{player.GetSharedData<string>("ClanName")}*");
             return;
         }
 
@@ -10522,6 +10524,8 @@ namespace RNC
             else
                 EPlayer.SendPlayerMessageToAllAdmins(player, text);
             //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {player.Name}:  {text}");
+
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.AdminLogs, $"**{player.Name}:** {text}", "Staff Chat");
         }
 
         [Command("looc", "!{#AFAFAF}[USAGE] looc (text)", Alias = "b", GreedyArg = true)]
@@ -10540,6 +10544,7 @@ namespace RNC
             }
 
             string chatStr = $"(( (LOCAL OOC) {EPlayer.Name(player).Replace("_", " ")}: {text} ))";
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"(( **{player.Name}**: {text} ))", "Local OOC");
             foreach (Player i in RAGE.Entities.Players.All)
             {
                 if (i.Dimension == player.Dimension)
@@ -10566,6 +10571,7 @@ namespace RNC
             if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
             if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
             string chatStr = $"[LOW] {EPlayer.Name(player).Replace("_", " ")} says: {messageFixed}";
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}", "Low");
             foreach (Player i in Settings.LoggedInPlayers)
             {
                 if (i.Dimension == player.Dimension)
@@ -10596,6 +10602,7 @@ namespace RNC
             string messageFixed = text.Trim();
             if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
             if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}", "Car Whisper");
             foreach (Player i in Settings.LoggedInPlayers.Where(a => a.IsInVehicle && a.Vehicle == player.Vehicle))
             {
                 i.SendChatMessage(Translate(i, "CAR_WHISPER", EPlayer.Name(player), messageFixed));
@@ -10617,6 +10624,7 @@ namespace RNC
 
             string messageFixed = text.Trim();
             if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}", "Shout");
             foreach (Player i in RAGE.Entities.Players.All)
             {
                 if (i.Dimension == player.Dimension)
@@ -10662,6 +10670,7 @@ namespace RNC
             if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
             if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
             string chatStr = $"!{{#FFFF00}}** [MEGAPHONE] {EPlayer.Name(player).Replace("_", " ")}: {messageFixed}";
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}", "Megaphone");
 
             foreach (Player i in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension 
                 && a.Position.DistanceTo(player.Position) < 150.0))
@@ -10700,6 +10709,7 @@ namespace RNC
                 string messageFixed = text.Trim();
                 if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
                 if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}", "Police Radio");
                 string chatStr = $"!{{#FFEC8B}}** [RADIO | FREQ: 911] {EPlayer.Name(player).Replace("_", " ")}: {messageFixed}";
 
                 foreach (Player i in lobby.Cops)
@@ -10712,6 +10722,7 @@ namespace RNC
                 string messageFixed = text.Trim();
                 if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
                 if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
+                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}", "Fugitive Radio");
                 string chatStr = $"!{{#FFEC8B}}** [WT | FREQ: {lobby.lobbyId + 8346}] {EPlayer.Name(player).Replace("_", " ")}: {messageFixed}";
 
                 foreach (Player i in lobby.Fugitives)
@@ -10810,7 +10821,7 @@ namespace RNC
 
                     //pl.SendChatMessage($"!{{#AFAFAF}}(( [GOOC] {EPlayer.GetPrefix(player, true)}~w~ {EPlayer.Name(player)}: {text} !{{#AFAFAF}}))");
             });
-
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Global, $"(( **{player.Name}:** {text} ))", "Global OOC");
             //Discord.SendTextChannel("staff-bot", $"**(GOOC) | {EPlayer.GetPrefix(player, false)} {player.Name}**: {text}");
         }
 
@@ -10865,7 +10876,7 @@ namespace RNC
             }
 
             int languageID = EPlayer.GetAccount(player).Language;
-            if(languageID == 0)
+            if(languageID == 0 || languageID == -1)
             {
                 cmd_gooc(player, text);
                 return;
@@ -10907,6 +10918,7 @@ namespace RNC
                 //pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} ~w~{EPlayer.Name(player)}: {text} ~w~))");
             }
 
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Global, $"(( **{player.Name}:** {text} ))", "Lobby OOC");
 
             //Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
         }

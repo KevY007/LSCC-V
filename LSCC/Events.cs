@@ -3502,6 +3502,7 @@ namespace RNC
                 if (!char.IsUpper(messageFixed[0])) messageFixed = (char.ToUpper(messageFixed[0]) + messageFixed.Substring(1));
                 if (!messageFixed.EndsWith(".") && !messageFixed.EndsWith("!") && !messageFixed.EndsWith("?")) messageFixed += ".";
 
+                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Local, $"**{player.Name}**: {messageFixed}");
                 foreach (Player i in RAGE.Entities.Players.All)
                 {
                     if (i.Dimension == player.Dimension)
