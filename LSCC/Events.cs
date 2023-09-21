@@ -3949,7 +3949,7 @@ namespace RNC
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64);
-            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has logged in as **{acc.Username}**", "Auth");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has **logged in** as **{acc.Username}**", "Auth");
             //Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
             NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
@@ -5138,7 +5138,7 @@ namespace RNC
             player.SetSharedData("SQL_ID", acc.SQL_ID);
             player.SetSharedData("EntAlpha", 255);
             player.SetData("PlaytimeTick", Environment.TickCount64); 
-            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has registered an account: **{acc.Username}**", "Auth");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has **registered** an account: **{acc.Username}**", "Auth");
             //Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
