@@ -106,22 +106,22 @@ namespace RNC
             {
                 case ChatMessageType.Local:
                     {
-                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #LOCAL{(channel != null ? $" - {channel}" : "")}] {message}", Channel.Local);
+                        await SendMessage($"`[{DateTime.Now.ToString("T")} | #LOCAL{(channel != null ? $" - {channel}" : "")}]` {message}", Channel.Local);
                     }
                     break;
                 case ChatMessageType.Global:
                     {
-                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #GLOBAL{(channel != null ? $" - {channel}" : "")}] {message}", Channel.Global);
+                        await SendMessage($"`[{DateTime.Now.ToString("T")} | #GLOBAL{(channel != null ? $" - {channel}" : "")}]` {message}", Channel.Global);
                     }
                     break;
                 case ChatMessageType.Restricted:
                     {
-                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #RESTRICTED{(channel != null ? $" - {channel}" : "")}] {message}", Channel.Restricted);
+                        await SendMessage($"`[{DateTime.Now.ToString("T")} | #RESTRICTED{(channel != null ? $" - {channel}" : "")}]` {message}", Channel.Restricted);
                     }
                     break;
                 case ChatMessageType.General:
                     {
-                        await SendMessage($"[**{DateTime.Now.ToString("T")}** | #GENERAL{(channel != null ? $" - {channel}" : "")}] {message}", Channel.AdminLogs);
+                        await SendMessage($"`[{DateTime.Now.ToString("T")} | #GENERAL{(channel != null ? $" - {channel}" : "")}]` {message}", Channel.General);
                     }
                     break;
             }

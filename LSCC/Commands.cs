@@ -7423,7 +7423,7 @@ namespace RNC
                 EPlayer.SendMessage(playa, $"!{{#218a3d}}[{nameDisp}] {EPlayer.Name(player)}: !{{#26a347}}{message}");
             }
 
-            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**{player.Name}:** {message}", $"Clan - *{player.GetSharedData<string>("ClanName")}*");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**{player.Name}:** {message}", $"Clan ({player.GetSharedData<string>("ClanName")})");
             return;
         }
 
@@ -10525,7 +10525,7 @@ namespace RNC
                 EPlayer.SendPlayerMessageToAllAdmins(player, text);
             //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {player.Name}:  {text}");
 
-            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.AdminLogs, $"**{player.Name}:** {text}", "Staff Chat");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{player.Name}:** {text}", "Staff Chat");
         }
 
         [Command("looc", "!{#AFAFAF}[USAGE] looc (text)", Alias = "b", GreedyArg = true)]
