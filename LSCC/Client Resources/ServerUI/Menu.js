@@ -57,11 +57,11 @@ mp.events.add("setSelectedProfile", (profileID, settings) => {
   ActiveCrosshairProfileUUID = profileID;
 
   mp.events.callRemote("Crosshair_SetProfile", profileID);
+  mp.events.callLocal('mainmenu_settings_crosshair_save');
 });
 mp.events.add(
   "mainmenu_settings_crosshair_save",
   (profileData, selectedProfile) => {
-    mp.events.callRemote("Crosshair_SaveProfiles", profileData);
 
     eval(`var realProfileData = ${profileData}`);
 
@@ -88,6 +88,7 @@ mp.events.add(
       }
     }
     mp.events.callRemote("Crosshair_SetProfile", selectedProfile);
+    mp.events.callRemote("Crosshair_SaveProfiles", profileData);
   }
 );
 
@@ -104,9 +105,6 @@ mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
       realProfileData,
       realActiveProfile
     );
-
-  mp.events.callRemote('ServerConsoleOutput', `Profile Data (p1): ${JSON.stringify(realProfileData)}`);
-  mp.events.callRemote('ServerConsoleOutput', `Active Profile (p2): ${realActiveProfile}`);
   ActiveCrosshairProfileUUID = activeProfile;
 });
 
