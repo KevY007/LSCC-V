@@ -2825,6 +2825,7 @@ namespace RNC
                 }
             }
 
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, messageFormatted, "Admin");
             //Discord.SendTextChannel("staff-bot", $"(ADM) |** {message}**");
         }
 

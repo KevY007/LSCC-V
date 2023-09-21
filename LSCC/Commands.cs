@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.ServiceModel.Channels;
@@ -6630,6 +6631,7 @@ namespace RNC
                     //if (tpAcc.Username.StartsWith("KevY") || tpAcc.Username.StartsWith("CodeName420")) return;
                     NAPI.Task.Run(() =>
                     {
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has offline-banned {tpAcc.Username} for {reason}", "Admin");
                         RAGE.Entities.Players.All.ForEach((Player p) =>
                         {
                             p.SendChatMessage(Translate(p, "PLAYER_BANNED", ((EPlayer.GetAccount(player).Admin >= 2 && player.GetData<bool>("Anonymous") == true) ? "Anonymous" : EPlayer.Name(player)), tpAcc.Username, reason));
@@ -6718,6 +6720,8 @@ namespace RNC
             target.SendChatMessage($"!{{#FF6347}}[BANNED] You have been banned from this server, Ban ID: {_new.SQL_ID}");
 
             target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has banned {target.Name} for {reason}", "Admin");
 
             Logs.LogAdmin(player, $"Banned {target.Name} for {reason}.");
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
@@ -10990,6 +10994,8 @@ namespace RNC
 
             target.SetData<Player>("LastPMFrom", player);
 
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**(( {player.Name}'s PM to {target.Name}**: {text} ))", "Private Message");
+
             target.SendChatMessage(Translate(target, "PRIVATE_MESSAGE_RECEIVED", EPlayer.Name(player), text));
             player.SendChatMessage(Translate(player, "PRIVATE_MESSAGE_SENT", EPlayer.Name(target), text));
             return;
@@ -11286,7 +11292,7 @@ namespace RNC
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
                 
 
-                target.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has kicked {target.Name} for {reason}", "Admin");
 
                 target.SetData("Kicked", true);
                 NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
@@ -11338,6 +11344,7 @@ namespace RNC
 
                     NAPI.Task.Run(() =>
                     {
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has offline-admin-jailed {tpAcc.Username} for {minutes} minutes, reason: {reason}", "Admin");
                         RAGE.Entities.Players.All.ForEach((Player playa) =>
                         {
                             playa.SendChatMessage(Translate(playa, "JAILED_MSG", EPlayer.GetAdminName(player), tpAcc.Username, minutes, reason));
@@ -11383,6 +11390,7 @@ namespace RNC
                     playa.SendChatMessage(Translate(playa, "JAILED_MSG", EPlayer.GetAdminName(player), EPlayer.Name(target), mins, reason));
                 });
 
+                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has admin-jailed {target.Name} for {mins} minutes, reason: {reason}", "Admin");
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
                 Logs.LogAdmin(player, $"Jailed player {target.Name} for {mins} minutes, reason: {reason}.");
                 EPlayer.Jail(target, mins, reason); 
