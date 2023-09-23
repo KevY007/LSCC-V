@@ -186,7 +186,7 @@ mp.events.add('showLoginBrowser', (state) => {
                 mp.gui.cursor.show(state, state);
         }
         else{
-            mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser to ${mp.players.local.name} while it's null! Trying again...`);
+            //mp.events.callRemote("ServerConsoleOutput", `Attempted to show login browser to ${mp.players.local.name} while it's null! Trying again...`);
             global.ServerUI = global.InitializeServerUI();
             if(global.ServerUI) global.ServerUI.active = true;
             setTimeout(() => {
