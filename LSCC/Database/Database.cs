@@ -202,21 +202,6 @@ namespace RNC
 
         public string WeaponSets { get; set; }
     }
-    public class RadioCategory
-    {
-        [Key]
-        public int SQL_ID { get; set; }
-        public string Name { get; set; }
-    }
-    public class RadioStation
-    {
-        [Key]
-        public int SQL_ID { get; set; }
-        public string StreamURL { get; set; }
-        public string IconURL { get; set; }
-        public string Name { get; set; }
-        public int CategoryID { get; set; }
-    }
     public class CustomDMArenaSpawns
     {
         [Key]
@@ -294,8 +279,6 @@ namespace RNC
         public DbSet<CustomDMArenas> CustomArenas { get; set; }
         public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
-        public DbSet<RadioStation> RadioStations { get; set; }
-        public DbSet<RadioCategory> RadioCategories { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
 
         public DbSet<Badge> Badges { get; set; }
