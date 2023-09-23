@@ -484,7 +484,8 @@ namespace RNC
                                     }
                                     foreach (Player ay in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
                                     {
-                                        ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
+                                        ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
+                                        //ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                     }
 
                                     int killStreak = killer.GetData<int>("Killstreak") + 1;
@@ -3057,6 +3058,7 @@ namespace RNC
                                     }
                                     else
                                     {
+                                        //indm.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                         indm.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                     }
                                 }
@@ -3292,7 +3294,8 @@ namespace RNC
                                                 {
                                                     ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "Busted", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                                 }
-                                                else ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
+                                                else ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
+                                                //else ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                             }
                                         }
                                         else
@@ -3398,7 +3401,8 @@ namespace RNC
                                             }
                                             else
                                             {
-                                                ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
+                                                ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), "", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
+                                                //ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), reasonStr, EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                             }
                                         }
                                         else
