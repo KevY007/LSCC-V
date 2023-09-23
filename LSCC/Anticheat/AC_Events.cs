@@ -9,8 +9,9 @@ namespace RNC
     public class AC_Events : Script
     {
         [RemoteEvent("AC_SendWeaponHackAlert")]
-        public void AC_OnReceiveWeaponHackAlert(Player player, long hackedWeapon)
+        public void AC_OnReceiveWeaponHackAlert(Player player, string hackedWeaponStr)
         {
+            long hackedWeapon = Int64.Parse(hackedWeaponStr);
             string weaponName = "";
             bool weaponFound = Main.WeaponReasons.TryGetValue(hackedWeapon, out weaponName);
             if (weaponFound)
