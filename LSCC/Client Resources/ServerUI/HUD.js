@@ -1148,7 +1148,7 @@ mp.events.add('browserDomReady', (browser) => {
         });
         miniHUD_items.push({ 
             id:9,
-            enabled:true,
+            enabled:false,
             name: "copchase_time",
             icon: "fa-clock",
             value: "00:00",

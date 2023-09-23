@@ -564,7 +564,7 @@ function stopNoClip() {
 }
 
 mp.events.add("render", function () {
-  if (!noClipCamera || mp.gui.cursor.visible) {
+  if (!noClipCamera || mp.gui.cursor.visible || global.chatStatus == true) {
     return;
   }
   controlModifier = mp.keys.isDown(bindASCIIKeys.LCtrl);
