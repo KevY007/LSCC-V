@@ -1241,13 +1241,13 @@ mp.events.add('render', () => {
     wasInInterior = false;
     mp.game.ui.displayRadar(true);
     if(mp.storage.data.menu?.nametags && global)
-      global.renderNametags = mp.storage.data.menu.nametags;
+      global.isInInterior = false;
   }
   else{
     wasInInterior = true;
     mp.game.ui.displayRadar(false);
     if(global)
-      global.renderNametags = false;
+      global.isInInterior = true;
 
       if(!sentInteriorHideMessage){
         sentInteriorHideMessage = true;

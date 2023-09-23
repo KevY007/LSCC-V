@@ -1109,6 +1109,8 @@ let global = {
   specTarget: null,
   isNoClip: false,
 
+  isInInterior:false,
+
   heliCam:null,
 
   IsInTutorial:false,

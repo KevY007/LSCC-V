@@ -5129,9 +5129,10 @@ namespace RNC
 
             lobby.Time[0] = hour;
 
+
             foreach (Player eplayer in Settings.LoggedInPlayers)
             {
-                if (eplayer.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                if (eplayer.GetSharedData<int>("InLobby") == lobby.lobbyId && eplayer.GetSharedData<int>("Team") < 0)
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
@@ -5140,7 +5141,7 @@ namespace RNC
                 }
             }
 
-            EPlayer.SendMessageToAllAdmins("!{#FF6347}[AdmCmd] " + EPlayer.Name(player) + " has changed time in lobby " + lobby.lobbyId);
+            EPlayer.SendMessageToAllAdmins("!{#FF6347}[AdmCmd] " + EPlayer.Name(player) + " has changed time in lobby " + lobby.lobbyId + ". This does not affect players in copchase!");
             return;
         }
 
