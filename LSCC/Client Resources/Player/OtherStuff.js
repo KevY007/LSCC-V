@@ -1195,23 +1195,17 @@ mp.events.add("TwoSecondsEvent", () => {
   }
 });
 function LockLSPDHQ(lock){
-  if(LSPDHQLocked === lock) return;
-
   // Front doors
   mp.game.object.doorControl(320433149, 434.7479, -983.2151, 30.83926, lock, 0, 0, 0);
   mp.game.object.doorControl(-1215222675, 434.7479, -980.6184, 30.83926, lock, 0, 0, 0);
-  mp.game.object.doorControl(-1215222675>>>0, 434.7479, -980.6184, 30.83926, lock, 0, 0, 0);
 
   // Back doors
   mp.game.object.doorControl(-2023754432, 469.9679, -1014.452, 26.53623, lock, 0, 0, 0);
-  mp.game.object.doorControl(-2023754432>>>0, 469.9679, -1014.452, 26.53623, lock, 0, 0, 0);
 
   mp.game.object.doorControl(-2023754432, 467.3716, -1014.452, 26.53623, lock, 0, 0, 0);
-  mp.game.object.doorControl(-2023754432>>>0, 467.3716, -1014.452, 26.53623, lock, 0, 0, 0);
 
   // Roof door
   mp.game.object.doorControl(-340230128, 464.3613, -984.678, 43.83443, lock, 0, 0, 0);
-  mp.game.object.doorControl(-340230128>>>0, 464.3613, -984.678, 43.83443, lock, 0, 0, 0);
 
   LSPDHQLocked = lock;
 }

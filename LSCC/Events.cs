@@ -4118,6 +4118,8 @@ namespace RNC
                             EPlayer.Spawn(player);
                             player.TriggerEvent("DestroyLoginScene");
 
+                            EPlayer.GetAccount(player).Character = "{}";
+                            EPlayer.ShowCharCreator(player, null, true);
                             EPlayer.Notify(player, Translate(player, "CHAR_RESET_UPDATE"), "yellow", "fas fa-tshirt", false, 7000);
                         }
                         else

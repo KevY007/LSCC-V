@@ -4063,6 +4063,9 @@ mp.events.add("Bleeding_OnShot", (entity) => {
     Bleeding_Objects.push(bloodObj);
 });
 mp.events.add("TwoSecondsEvent", () => {
+    mp.players.local.setConfigFlag(149, true);
+    mp.players.local.setConfigFlag(438, true);
+
     mp.events.callRemote("RemoveIsDamaged");
     mp.players.forEachInStreamRange((entity) => {
         if(entity.getVariable("Bleeding_WasShot") == true && entity.dimension == mp.players.local.dimension){
