@@ -1230,7 +1230,12 @@ mp.events.add('TwoSecondsEvent', () => {
   }
 });
 mp.events.add('render', () => { 
-  if(!isInCopchaseCheck) return;
+  if(!isInCopchaseCheck){
+    if(global.isInInterior){
+      global.isInInterior = false;
+    }
+    return;
+  }
 
   let interior = mp.game.invoke("0x2107BA504071A6BB", mp.players.local.handle); 
   let interiorGroup = mp.game.invoke("0xE4A84ABF135EF91A", interior);
@@ -1240,7 +1245,7 @@ mp.events.add('render', () => {
   if(isInInterior == false){
     wasInInterior = false;
     //mp.game.ui.displayRadar(true);
-    if(mp.storage.data.menu?.nametags && global)
+    if(global)
       global.isInInterior = false;
   }
   else{
