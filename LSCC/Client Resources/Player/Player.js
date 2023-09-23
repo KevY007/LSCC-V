@@ -1976,70 +1976,72 @@ mp.events.add('render', () => {
         playerBlips = [];
 
         global.traceLastFunc(`[Players] Blips Stage2`);
+        if(!global.isInInterior){
+            mp.players.forEach(target => {
 
-        mp.players.forEach(target => {
-
-            if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && (!target.isDead() || target.handle == 0))
-            {
-                if ((target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true) || 
-					(target.getVariable("Team") == 0 && target.getVariable("HasShot") == true))
+                if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && (!target.isDead() || target.handle == 0))
                 {
-                    var blipColor = 45;
-                    var blipId = 1;
-                    if(target.getVariable("InLobby") == -6 && target.getVariable("InDM") != -1)
+                    if ((target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true) || 
+                        (target.getVariable("Team") == 0 && target.getVariable("HasShot") == true))
                     {
-                        blipColor = Number(target.getVariable("DMBlipColor"));
-                    }
-                    else 
-                    {
-                        if(target.getVariable("Team") == 0) 
+                        var blipColor = 45;
+                        var blipId = 1;
+                        if(target.getVariable("InLobby") == -6 && target.getVariable("InDM") != -1)
                         {
-                            blipColor = 70;
-                            if(target.getVariable("HasShot") == true){
+                            blipColor = Number(target.getVariable("DMBlipColor"));
+                        }
+                        else 
+                        {
+                            if(target.getVariable("Team") == 0) 
+                            {
                                 blipColor = 70;
-                                blipId = 458;
+                                if(target.getVariable("HasShot") == true){
+                                    blipColor = 70;
+                                    blipId = 458;
+                                }
+                            }
+                            else if(target.getVariable("Team") == 1) blipColor = 3;
+                            if(target.getVariable("InLobby") == -3) blipColor = 15;
+                            if(target.getVariable("InLobby") == -4) blipColor = 69;
+                            if(target.getVariable("InDM") != -1) blipColor = 39;
+                        }
+                        
+    
+                        if(target.isInAnyVehicle(false)){ 
+                            blipId = 724; 
+                            if(target.isInAnyHeli()){
+                                blipId = 43;
+                            }
+                            if(target.isOnAnyBike()){
+                                blipId = 226;
                             }
                         }
-                        else if(target.getVariable("Team") == 1) blipColor = 3;
-                        if(target.getVariable("InLobby") == -3) blipColor = 15;
-                        if(target.getVariable("InLobby") == -4) blipColor = 69;
-                        if(target.getVariable("InDM") != -1) blipColor = 39;
-                    }
-                    
-
-                    if(target.isInAnyVehicle(false)){ 
-                        blipId = 724; 
-                        if(target.isInAnyHeli()){
-                            blipId = 43;
+    
+                        var position = target.position;
+    
+                        if(global.calcDist(position, mp.players.local.position) >= 1000.0 
+                        || (target.handle !== 0) == false || target.handle === null || 
+                            target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
+                        {
+                            position.x = target.getVariable("UnstreamedX");
+                            position.y = target.getVariable("UnstreamedY");
+                            position.z = target.getVariable("UnstreamedZ");
+                            if(target.getVariable("UnstreamedState") == 1) blipId = 724;
                         }
-                        if(target.isOnAnyBike()){
-                            blipId = 226;
-                        }
+    
+                        var targetBlip = mp.blips.new(blipId, position,
+                        {
+                            name: target.name,
+                            color: blipColor,
+                            shortRange: false,
+                            dimension: mp.players.local.dimension
+                        });
+                        playerBlips.push(targetBlip.id);
                     }
-
-                    var position = target.position;
-
-                    if(global.calcDist(position, mp.players.local.position) >= 1000.0 
-                    || (target.handle !== 0) == false || target.handle === null || 
-                        target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
-                    {
-                        position.x = target.getVariable("UnstreamedX");
-                        position.y = target.getVariable("UnstreamedY");
-                        position.z = target.getVariable("UnstreamedZ");
-                        if(target.getVariable("UnstreamedState") == 1) blipId = 724;
-                    }
-
-                    var targetBlip = mp.blips.new(blipId, position,
-                    {
-                        name: target.name,
-                        color: blipColor,
-                        shortRange: false,
-                        dimension: mp.players.local.dimension
-                    });
-                    playerBlips.push(targetBlip.id);
                 }
-            }
-        });
+            });
+        }
+        
 
         global.traceLastFunc(`[Players] Update Completed`);
     }

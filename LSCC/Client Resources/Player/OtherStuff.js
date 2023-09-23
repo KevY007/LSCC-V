@@ -1239,13 +1239,13 @@ mp.events.add('render', () => {
 
   if(isInInterior == false){
     wasInInterior = false;
-    mp.game.ui.displayRadar(true);
+    //mp.game.ui.displayRadar(true);
     if(mp.storage.data.menu?.nametags && global)
       global.isInInterior = false;
   }
   else{
     wasInInterior = true;
-    mp.game.ui.displayRadar(false);
+    //mp.game.ui.displayRadar(false);
     if(global)
       global.isInInterior = true;
 
