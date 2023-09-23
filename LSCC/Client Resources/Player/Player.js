@@ -2315,20 +2315,23 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         //mp.game.cam.shakeGameplayCam('JOLT_SHAKE', shakeValue/2);
     }
     else{
-        let value = 0.0;
+        let value = 0.3;
         let carSpeed = mp.players.local.vehicle.getSpeed();
-        var gunType = gunData.Type;
-        switch(gunType){ // first doing the types in general
-            case "Handguns":
-                value = (carSpeed * 0.013) + 0.015;
-                break;
-            case "Submachine Guns":
-                value = (carSpeed * 0.0075) + 0.015;
-                break;
-            default:
-                shakeValue = (carSpeed * 0.013) + 0.01;
-                break;
+        if(gunData && gunData.Type){
+            var gunType = gunData.Type;
+            switch(gunType){ // first doing the types in general
+                case "Handguns":
+                    value = (carSpeed * 0.013) + 0.015;
+                    break;
+                case "Submachine Guns":
+                    value = (carSpeed * 0.0075) + 0.015;
+                    break;
+                default:
+                    shakeValue = (carSpeed * 0.013) + 0.01;
+                    break;
+            }
         }
+
        mp.game.cam.shakeGameplayCam('JOLT_SHAKE', value);
     }
 

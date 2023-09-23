@@ -1147,6 +1147,14 @@ mp.events.add('browserDomReady', (browser) => {
             color: "#60a5fa"
         });
         miniHUD_items.push({ 
+            id:9,
+            enabled:true,
+            name: "copchase_time",
+            icon: "fa-clock",
+            value: "00:00",
+            color: "#fb923c"
+        });
+        miniHUD_items.push({ 
             id:5,
             enabled:true,
             name: "voice",
@@ -1177,14 +1185,6 @@ mp.events.add('browserDomReady', (browser) => {
             icon: "fa-location-crosshairs",
             value: "N/A",
             color: "#34d399"
-        });
-        miniHUD_items.push({ 
-            id:9,
-            enabled:false,
-            name: "copchase_time",
-            icon: "fa-clock",
-            value: "00:00",
-            color: "#fb923c"
         });
         global.ServerUI.call('hud_minilist_items_set', miniHUD_items);
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
