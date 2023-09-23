@@ -1219,6 +1219,9 @@ mp.events.add('ToggleHud', (toggle) => {
         global.digitalHPAR = false;
     }
 
+    if(global.ServerUI)
+        global.ServerUI.call("hud_weapon_fire_mode_toggle", toggle);
+
     global.activateChat(global.showHud);
     mp.game.ui.displayRadar(global.showHud);
 });
