@@ -735,6 +735,7 @@ mp.events.add("creator_SetClothingPhase", () => {
 });
 mp.events.add("toggleCreator", (active, charData, blockGenderChange) => {
     isGenderChangeBlocked = blockGenderChange;
+    mp.events.callLocal('ToggleHud', !active);
 
     if (active) {
         if (creatorCamera === undefined) {
