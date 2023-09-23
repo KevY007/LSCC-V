@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using Newtonsoft.Json;
+using RNC;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -3110,7 +3111,7 @@ namespace RNC
             //player.SetSharedData("InWeaponEditor", true);
             foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
             {
-                player.GiveWeapon((WeaponHash)weapon.Key, 1);
+                player.GiveWeaponAC((WeaponHash)weapon.Key, 1);
             }
             player.Dimension = (uint)(player.Id + 69);
             player.Position = new Vector3(461.8967f, -980.518f, 30.689589f);
@@ -3576,7 +3577,7 @@ namespace RNC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not a level 3 admin.");
                 return;
             }
-            player.GiveWeapon((WeaponHash)hash, ammo);
+            player.GiveWeaponAC((WeaponHash)hash, ammo);
             player.SendChatMessage( $"Given you weapon ${hash}.");
         }
 
@@ -3644,7 +3645,7 @@ namespace RNC
             }
             else if (worldid <= 0)
             {
-                player.RemoveAllWeapons();
+                player.RemoveAllWeaponsAC();
             }
             return;
         }
@@ -3731,7 +3732,7 @@ namespace RNC
 
             foreach (Player target in Settings.LoggedInPlayers)
             {
-                target.GiveWeapon((WeaponHash)wephash, ammo);
+                target.GiveWeaponAC((WeaponHash)wephash, ammo);
 
                 if (EPlayer.GetAccount(target).WeaponComponents != null && EPlayer.GetAccount(target).WeaponComponents.Length > 3)
                 {
@@ -4169,7 +4170,7 @@ namespace RNC
             }
             if(gunToUse != WeaponHash.Knife)
             {
-                player.GiveWeapon(gunToUse, 1);
+                player.GiveWeaponAC(gunToUse, 1);
                 animName = "PISTOL";
                 animTime = 0.365f;
             }
@@ -5465,7 +5466,7 @@ namespace RNC
                     }
                 }
             }
-            player.GiveWeapon(holding, 1); // equipping them with the weapon they were holding
+            player.GiveWeaponAC(holding, 1); // equipping them with the weapon they were holding
 
             if (notificationString.Length >= 3)
             {
@@ -9038,14 +9039,14 @@ namespace RNC
                                         return;
                                     }
 
-                                    player.RemoveAllWeapons();
+                                    player.RemoveAllWeaponsAC();
                                     jWeaponData wepdat = new jWeaponData();
                                     player.SendChatMessage($"!{{#69f5a8}}Weapon Set @ Index {index} =>");
                                     foreach (var wep in set.Weapons)
                                     {
                                         if (Settings.WeaponData.TryGetValue(wep.Weapon, out wepdat))
                                         {
-                                            player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
+                                            player.GiveWeaponAC((WeaponHash)wep.Weapon, wep.Ammo);
 
                                             if (wep.Components.Length > 0) player.SendChatMessage("!{#31b55a}     -- " + wepdat.Name + " | Ammo: " + wep.Ammo + " @ Attachments:");
                                             else player.SendChatMessage("!{#31b55a}" + wepdat.Name + " | Ammo: " + wep.Ammo);
@@ -11060,9 +11061,9 @@ namespace RNC
             int ammo = player.GetWeaponAmmo(wep);
 
             player.SetWeaponAmmo(wep, 0);
-            player.RemoveWeapon(wep);
+            player.RemoveWeaponAC(wep);
 
-            target.GiveWeapon(wep, ammo);
+            target.GiveWeaponAC(wep, ammo);
 
             EPlayer.Action(player, "ACTION_PASS_GUN", EPlayer.Name(target), wepName);
             player.SendChatMessage(Translate(player, "PASSED_GUN", wepName, EPlayer.Name(target)));
@@ -11084,7 +11085,7 @@ namespace RNC
             }
             else
             {
-                target.RemoveAllWeapons();
+                target.RemoveAllWeaponsAC();
                 target.ResetData("AttachedComponents");
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removeguns:{target.Name}"); } catch { }
                 Logs.LogAdmin(player, $"Removed {target.Name}'s weapons.");
@@ -11107,7 +11108,7 @@ namespace RNC
             {
                 foreach (Player target in RAGE.Entities.Players.All)
                 {
-                    target.RemoveAllWeapons();
+                    target.RemoveAllWeaponsAC();
                     target.ResetData("AttachedComponents");
                 }
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removegunsfromall"); } catch { }

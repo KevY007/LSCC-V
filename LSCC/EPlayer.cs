@@ -7,12 +7,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using GTANetworkAPI;
-using RNC;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
+using RNC;
 
 namespace RNC
 {
@@ -1414,7 +1414,7 @@ namespace RNC
             if (lobby == null) { return; }
             if (lobby.gameMode == GameModes.BANKROBBERY)
             {
-                player.GiveWeapon(WeaponHash.Stungun, 1);
+                player.GiveWeaponAC(WeaponHash.Stungun, 1);
                 if (player.HasData("BankRobberyUnit"))
                 {
                     if(player.GetData<string>("BankRobberyUnit") == "fib")
@@ -1423,11 +1423,11 @@ namespace RNC
                         player.Armor = 100;
 
                         player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Heavypistol);
-                        player.GiveWeapon(WeaponHash.Heavypistol, 100);
-                        player.GiveWeapon(WeaponHash.Assaultsmg, 200);
-                        player.GiveWeapon(WeaponHash.Specialcarbine, 500);
-                        player.GiveWeapon(WeaponHash.Bzgas, 3);
-                        player.GiveWeapon(WeaponHash.Assaultshotgun, 500);
+                        player.GiveWeaponAC(WeaponHash.Heavypistol, 100);
+                        player.GiveWeaponAC(WeaponHash.Assaultsmg, 200);
+                        player.GiveWeaponAC(WeaponHash.Specialcarbine, 500);
+                        player.GiveWeaponAC(WeaponHash.Bzgas, 3);
+                        player.GiveWeaponAC(WeaponHash.Assaultshotgun, 500);
                     }
                     else
                     {
@@ -1435,18 +1435,18 @@ namespace RNC
                         player.Armor = 75;
 
                         player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Combatpistol);
-                        player.GiveWeapon(WeaponHash.Combatpistol, 100);
-                        player.GiveWeapon(WeaponHash.Smg, 300);
-                        player.GiveWeapon(WeaponHash.Carbinerifle, 500);
-                        player.GiveWeapon(WeaponHash.Bzgas, 1);
-                        player.GiveWeapon(WeaponHash.Pumpshotgun, 72);
+                        player.GiveWeaponAC(WeaponHash.Combatpistol, 100);
+                        player.GiveWeaponAC(WeaponHash.Smg, 300);
+                        player.GiveWeaponAC(WeaponHash.Carbinerifle, 500);
+                        player.GiveWeaponAC(WeaponHash.Bzgas, 1);
+                        player.GiveWeaponAC(WeaponHash.Pumpshotgun, 72);
                     }
                 }
                 return;
             }
             if (lobby.gameMode != GameModes.BUSTED)
             {
-                player.GiveWeapon(WeaponHash.Stungun, 1);
+                player.GiveWeaponAC(WeaponHash.Stungun, 1);
                 if (EPlayer.GetAccount(player).LoadoutCop.Length >= 2)
                 {
                     LoadoutData loadout = Settings.Loadouts.Find(a => a.Team == 1 && a.Name.Equals(EPlayer.GetAccount(player).LoadoutCop));
@@ -1505,7 +1505,7 @@ namespace RNC
                                         {
                                             player.Armor = (int)wepar[3];
                                         }
-                                        else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
+                                        else player.GiveWeaponAC((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
                                     });
                                 });
                             }
@@ -1515,8 +1515,8 @@ namespace RNC
                 }
                 else
                 {
-                    player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
-                    player.GiveWeapon(WeaponHash.Pistol, 40);
+                    player.GiveWeaponAC(WeaponHash.Pumpshotgun, 20);
+                    player.GiveWeaponAC(WeaponHash.Pistol, 40);
                 }
 
                 NAPI.Task.Run(() =>
@@ -1544,7 +1544,7 @@ namespace RNC
                 }, 500 + player.Ping);
             }
 
-            //player.GiveWeapon(WeaponHash.Nightstick, 1);
+            //player.GiveWeaponAC(WeaponHash.Nightstick, 1);
             player.SendChatMessage(Translate(player, "STUNGUN_MSG"));
             return;
         }
@@ -1564,11 +1564,11 @@ namespace RNC
                     player.Armor = 100;
 
                     player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Pistol50);
-                    player.GiveWeapon(WeaponHash.Pistol50, 100);
-                    player.GiveWeapon(WeaponHash.Heavyshotgun, 50);
-                    player.GiveWeapon(WeaponHash.Smg, 250);
-                    player.GiveWeapon(WeaponHash.Specialcarbine, 250);
-                    player.GiveWeapon(WeaponHash.Molotov, 1);
+                    player.GiveWeaponAC(WeaponHash.Pistol50, 100);
+                    player.GiveWeaponAC(WeaponHash.Heavyshotgun, 50);
+                    player.GiveWeaponAC(WeaponHash.Smg, 250);
+                    player.GiveWeaponAC(WeaponHash.Specialcarbine, 250);
+                    player.GiveWeaponAC(WeaponHash.Molotov, 1);
                 }
                 else if(lobby.BankRobbery.Sniper == player)
                 {
@@ -1576,11 +1576,11 @@ namespace RNC
                     player.Armor = 50;
 
                     player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Snspistol);
-                    player.GiveWeapon(WeaponHash.Snspistol, 100);
-                    player.GiveWeapon(WeaponHash.Sawnoffshotgun, 50);
-                    player.GiveWeapon(WeaponHash.Assaultrifle, 90);
-                    player.GiveWeapon(WeaponHash.Marksmanrifle, 5);
-                    player.GiveWeapon(WeaponHash.Molotov, 1);
+                    player.GiveWeaponAC(WeaponHash.Snspistol, 100);
+                    player.GiveWeaponAC(WeaponHash.Sawnoffshotgun, 50);
+                    player.GiveWeaponAC(WeaponHash.Assaultrifle, 90);
+                    player.GiveWeaponAC(WeaponHash.Marksmanrifle, 5);
+                    player.GiveWeaponAC(WeaponHash.Molotov, 1);
                 }
                 else
                 {
@@ -1588,10 +1588,10 @@ namespace RNC
                     player.Armor = 50;
 
                     player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Pistol);
-                    player.GiveWeapon(WeaponHash.Pistol, 100);
-                    player.GiveWeapon(WeaponHash.Pumpshotgun, 50);
-                    player.GiveWeapon(WeaponHash.Microsmg, 200);
-                    player.GiveWeapon(WeaponHash.Assaultrifle, 300);
+                    player.GiveWeaponAC(WeaponHash.Pistol, 100);
+                    player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
+                    player.GiveWeaponAC(WeaponHash.Microsmg, 200);
+                    player.GiveWeaponAC(WeaponHash.Assaultrifle, 300);
                 }
                 return;
             }
@@ -1655,7 +1655,7 @@ namespace RNC
                                         {
                                             player.Armor = (int)wepar[3];
                                         }
-                                        else player.GiveWeapon((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
+                                        else player.GiveWeaponAC((WeaponHash)wepar[0], (int)wepar[3] + extraAmmo);
                                     });
                                 });
                             }
@@ -1665,8 +1665,8 @@ namespace RNC
                 }
                 else
                 {
-                    player.GiveWeapon(WeaponHash.Pistol, 40);
-                    player.GiveWeapon(WeaponHash.Pumpshotgun, 20);
+                    player.GiveWeaponAC(WeaponHash.Pistol, 40);
+                    player.GiveWeaponAC(WeaponHash.Pumpshotgun, 20);
                 }
 
                 NAPI.Task.Run(() =>
@@ -1696,7 +1696,7 @@ namespace RNC
 
             //WeaponHash[] randomWeps = { WeaponHash.Bottle, WeaponHash.Knife, WeaponHash.Bat, WeaponHash.Battleaxe, WeaponHash.Crowbar };
             
-            //player.GiveWeapon(randomWeps.OrderBy(a => Guid.NewGuid()).First(), 1);
+            //player.GiveWeaponAC(randomWeps.OrderBy(a => Guid.NewGuid()).First(), 1);
             return;
         }
 
@@ -1814,7 +1814,7 @@ namespace RNC
 
                     wepData.ForEach(wepTuple =>
                     {
-                        player.GiveWeapon(wepTuple.Item1, wepTuple.Item2);
+                        player.GiveWeaponAC(wepTuple.Item1, wepTuple.Item2);
                     });
 
                     player.ResetData("FreezeWeapons");
@@ -2732,7 +2732,7 @@ namespace RNC
         {
             foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.GetSharedData<int>("InLobby") == lobbyid)
+                if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobbyid)
                 {
                     player.SendChatMessage(Translate(player, message_code, args));
                 }

@@ -1,6 +1,5 @@
 ﻿using GTANetworkAPI;
 using System;
-using RNC;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -16,6 +15,7 @@ using Newtonsoft.Json.Linq;
 using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
 using System.Diagnostics;
+using RNC;
 
 namespace RNC
 {
@@ -69,8 +69,8 @@ namespace RNC
             }, 1000);
             NAPI.Task.Run(() =>
             {
-                player.GiveWeapon(WeaponHash.Assaultrifle, 500);
-                player.GiveWeapon(WeaponHash.Autoshotgun, 500);
+                player.GiveWeaponAC(WeaponHash.Assaultrifle, 500);
+                player.GiveWeaponAC(WeaponHash.Autoshotgun, 500);
             }, 2000);
         }
 
@@ -1099,7 +1099,7 @@ namespace RNC
         [RemoteEvent("RequestParachute")]
         public void OnPlayerReqParachute(Player player, Vehicle veh)
         {
-            player.GiveWeapon(WeaponHash.Parachute, 1);
+            player.GiveWeaponAC(WeaponHash.Parachute, 1);
 
             if (player.GetSharedData<int>("Team") == 0 && player.GetSharedData<int>("InLobby") > -1)
             {
@@ -1403,7 +1403,7 @@ namespace RNC
                 jData += $"{{\"name\":\"{component.Value.Name}\", \"hash\":\"{component.Key}\", \"price\":{price}, \"attached\":{alreadyHas.ToString().ToLower()}}},";
             }
             jData += "]";
-            player.GiveWeapon((WeaponHash)wephash, 1);
+            player.GiveWeaponAC((WeaponHash)wephash, 1);
             player.TriggerEvent("WeaponEditor:sendComponentList", jData);
         }
 
@@ -3701,7 +3701,7 @@ namespace RNC
                 }
                 else Logs.LogAdmin(player, $"Gave a {target.Name} a weapon hashed {weaponHash} with {ammo} ammo.");
 
-                target.GiveWeapon((WeaponHash)weaponHash, ammo);
+                target.GiveWeaponAC((WeaponHash)weaponHash, ammo);
 
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You have given that weapon with " + ammo + " ammo to the target.");
 
@@ -3737,7 +3737,7 @@ namespace RNC
                     return;
                 }
 
-                player.GiveWeapon((WeaponHash)weaponHash, ammo);
+                player.GiveWeaponAC((WeaponHash)weaponHash, ammo);
                 player.SendChatMessage(Translate(player, "RECEIVED_WEAPON"));
 
                 if (attachments)
@@ -9075,40 +9075,40 @@ namespace RNC
                                         switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
                                         {
                                             case 0:
-                                                player.GiveWeapon(WeaponHash.Appistol, 1000);
-                                                player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
-                                                player.GiveWeapon(WeaponHash.Smg_mk2, 1000);
-                                                player.GiveWeapon(WeaponHash.Assaultrifle_mk2, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Appistol, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pumpshotgun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Smg_mk2, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Assaultrifle_mk2, 1000);
                                                 break;
                                             case 1:
-                                                player.GiveWeapon(WeaponHash.Pistol50, 1000);
-                                                player.GiveWeapon(WeaponHash.Bullpuprifle_mk2, 1000);
-                                                player.GiveWeapon(WeaponHash.Bullpupshotgun, 1000);
-                                                player.GiveWeapon(WeaponHash.Microsmg, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol50, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Bullpuprifle_mk2, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Bullpupshotgun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Microsmg, 1000);
                                                 break;
                                             case 2:
-                                                player.GiveWeapon(WeaponHash.Pistol50, 1000);
-                                                player.GiveWeapon(WeaponHash.Carbinerifle, 1000);
-                                                player.GiveWeapon(WeaponHash.Sawnoffshotgun, 1000);
-                                                player.GiveWeapon(WeaponHash.Minismg, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol50, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Carbinerifle, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Sawnoffshotgun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Minismg, 1000);
                                                 break;
                                             case 3:
-                                                player.GiveWeapon(WeaponHash.Assaultsmg, 1000);
-                                                player.GiveWeapon(WeaponHash.Pistol, 1000);
-                                                player.GiveWeapon(WeaponHash.Bottle, 1000);
-                                                player.GiveWeapon(WeaponHash.Autoshotgun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Assaultsmg, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Bottle, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Autoshotgun, 1000);
                                                 break;
                                             case 4:
-                                                player.GiveWeapon(WeaponHash.Compactrifle, 1000);
-                                                player.GiveWeapon(WeaponHash.Combatpdw, 1000);
-                                                player.GiveWeapon(WeaponHash.Pistol50, 1000);
-                                                player.GiveWeapon(WeaponHash.Assaultshotgun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Compactrifle, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Combatpdw, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol50, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Assaultshotgun, 1000);
                                                 break;
                                             case 5:
-                                                player.GiveWeapon((WeaponHash)3520460075, 1000); // m16
-                                                player.GiveWeapon((WeaponHash)94989220, 1000); // combat shotgun | spas-12 lookalike
-                                                player.GiveWeapon(WeaponHash.Vintagepistol, 1000);
-                                                player.GiveWeapon(WeaponHash.Machinepistol, 1000);
+                                                player.GiveWeaponAC((WeaponHash)3520460075, 1000); // m16
+                                                player.GiveWeaponAC((WeaponHash)94989220, 1000); // combat shotgun | spas-12 lookalike
+                                                player.GiveWeaponAC(WeaponHash.Vintagepistol, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Machinepistol, 1000);
                                                 break;
                                         }
                                     }
@@ -9117,25 +9117,25 @@ namespace RNC
                                         switch (arenaID)
                                         {
                                             case 1:
-                                                player.GiveWeapon(WeaponHash.Pistol_mk2, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol_mk2, 1000);
                                                 break;
                                             case 5:
-                                                player.GiveWeapon(WeaponHash.Pistol, 1000);
-                                                player.GiveWeapon(WeaponHash.Pumpshotgun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pumpshotgun, 1000);
                                                 player.Armor = 0;
                                                 player.Health = 100;
                                                 break;
                                             case 6:
-                                                player.GiveWeapon(WeaponHash.Stungun, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Stungun, 1000);
                                                 player.Health = 1;
                                                 player.Armor = 0;
                                                 break;
                                             case 7:
-                                                player.GiveWeapon(WeaponHash.Pistol, 1000);
-                                                player.GiveWeapon(WeaponHash.Smg, 1000);
-                                                player.GiveWeapon(WeaponHash.Specialcarbine, 1000);
-                                                player.GiveWeapon(WeaponHash.Marksmanrifle, 1000);
-                                                player.GiveWeapon(WeaponHash.Musket, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Pistol, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Smg, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Specialcarbine, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Marksmanrifle, 1000);
+                                                player.GiveWeaponAC(WeaponHash.Musket, 1000);
                                                 break;
                                         }
                                     }
@@ -9249,7 +9249,7 @@ namespace RNC
 
                                                 foreach (var wep in set.Weapons)
                                                 {
-                                                    player.GiveWeapon((WeaponHash)wep.Weapon, wep.Ammo);
+                                                    player.GiveWeaponAC((WeaponHash)wep.Weapon, wep.Ammo);
 
                                                     foreach (var comp in wep.Components)
                                                     {
