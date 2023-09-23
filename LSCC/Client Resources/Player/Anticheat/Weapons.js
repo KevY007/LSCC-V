@@ -15,10 +15,13 @@ function checkHackedWeapons(){
     const weaponsArray = JSON.parse(weaponsJSON);
 
     if(!weaponsArray.includes(mp.players.local.weapon)){
-        if(Date.now() - lastHackedWeaponMessageSent > 15000){
-            mp.events.callRemote("AC_SendWeaponHackAlert", mp.players.local.weapon.toString());
-            lastHackedWeaponMessageSent = Date.now();
+        if(mp.players.local.weapon !== 2725352035){
+            if(Date.now() - lastHackedWeaponMessageSent > 15000){
+                mp.events.callRemote("AC_SendWeaponHackAlert", mp.players.local.weapon.toString());
+                lastHackedWeaponMessageSent = Date.now();
+            }
         }
+      
     }
 }
 mp.events.add('TwoSecondsEvent', () => {
