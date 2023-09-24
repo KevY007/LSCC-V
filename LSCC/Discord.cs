@@ -278,11 +278,26 @@ namespace RNC
                 .AddOption("username", ApplicationCommandOptionType.String, "Target player username", isRequired: true)
                 .Build(), UnlinkCommandHandler));
 
+
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("lookup")
+                .WithDescription("Look a player up by their Rockstar username or E-mail address")
+                .AddOption(new SlashCommandOptionBuilder()
+                            .WithName("type")
+                            .WithDescription("Which data to look the player up by")
+                            .WithRequired(true)
+                            .WithType(ApplicationCommandOptionType.String)
+                            .AddChoice("E-mail", "email")
+                            .AddChoice("Rockstar Username", "rockstarname"))
+                .AddOption("query", ApplicationCommandOptionType.String, "Which e-mail or Rockstar Username to search for", isRequired:true)
+                .Build(), LookupCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
 
         // Commands
+
 
         private static async Task PunishmentResponse(SocketSlashCommand command, string type, params (string, string)[] details)
         {
@@ -427,6 +442,58 @@ namespace RNC
                 }, 50);
 
             }
+        }
+
+        private static async Task LookupCommandHandler(SocketSlashCommand command)
+        {
+            string type = command.Data.Options.ElementAt(0).ToString();
+            string query = command.Data.Options.ElementAt(1).ToString();
+
+            if (type == "email")
+            {
+                using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                {
+                    List<Account> results = await dbcontext.Accounts.AsQueryable().Where(a => a.Email.ToLower().Equals(query.ToLower())).ToListAsync();
+                    if (results.Count == 0)
+                    {
+                        await SendAlert($"No accounts are linked to the e-mail *{query}*!", EmbedType.Warning);
+                        return;
+                    }
+                    EmbedBuilder embed = new EmbedBuilder();
+                    embed.Title = $"Search Results";
+                    embed.Description = $"**Accounts linked to email:** {query}";
+                    embed.Color = new Discord.Color(0, 220, 0);
+                    embed.ThumbnailUrl = "https://media.discordapp.net/attachments/747725642350723172/1149001447946604625/logo.webp";
+                    foreach (Account account in results)
+                    {
+                        embed.AddField($"{account.Username}", $"Level: {account.Level} | Last Login: {account.LastLogin.ToString("g")}");
+                    }
+                    await command.RespondAsync(null, new Embed[] { embed.Build() });
+                }
+            }
+            else if (type == "rockstarname")
+            {
+                using (MainDatabase dbcontext = ContextFactory.CreateContext())
+                {
+                    List<Account> results = await dbcontext.Accounts.AsQueryable().Where(a => a.LastSC.ToLower().Equals(query.ToLower()) || a.RegisterSC.ToLower().Equals(query.ToLower())).ToListAsync();
+                    if (results.Count == 0)
+                    {
+                        await SendAlert($"No accounts are linked to the Rockstar Username *{query}*!", EmbedType.Warning);
+                        return;
+                    }
+                    EmbedBuilder embed = new EmbedBuilder();
+                    embed.Title = $"Search Results";
+                    embed.Description = $"**Accounts linked to Rockstar Username:** {query}";
+                    embed.Color = new Discord.Color(0, 220, 0);
+                    embed.ThumbnailUrl = "https://media.discordapp.net/attachments/747725642350723172/1149001447946604625/logo.webp";
+                    foreach (Account account in results)
+                    {
+                        embed.AddField($"{account.Username}", $"Level: {account.Level} | Last Login: {account.LastLogin.ToString("g")}");
+                    }
+                    await command.RespondAsync(null, new Embed[] { embed.Build() });
+                }
+            }
+            else await command.RespondAsync("**[!]** Invalid lookup type!.");
         }
 
         private static async Task SetStaffCommandHandler(SocketSlashCommand command)
