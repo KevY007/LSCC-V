@@ -147,6 +147,15 @@ mp.events.add('entityStreamIn', (entity) => {
 
 mp.events.add("DestroyLoginScene", () => toggleLoginScene(false));
 
+mp.events.add('finishAccountHwidCheck', (status) => {
+  if(status == 0){
+
+  }
+  else{
+
+  }
+});
+
 mp.events.add('showLoginBrowser', (state) => {
     setTimeout(() => {
         if(global.ServerUI != null)
@@ -158,6 +167,7 @@ mp.events.add('showLoginBrowser', (state) => {
                 mp.game.graphics.transitionToBlurred(1000);
                 mp.players.local.freezePosition(true);
 
+                mp.events.callRemote('Auth_ConfirmAccountBySerial');
                 if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
                 global.isLoginScreenActive = true;
                 global.ServerUI.call('auth_quick_login_toggle', false);

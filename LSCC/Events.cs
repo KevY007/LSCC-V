@@ -3818,6 +3818,45 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("Auth_ConfirmAccountBySerial")]
+        public static void Auth_ConfirmAccountBySerial(Player player)
+        {
+            if (EPlayer.LoggedIn(player)) return;
+            if (player.HasData("Kicked")) return;
+
+            string serial = player.Serial;
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Account> accounts = await context.Accounts.AsQueryable().Where(a => a.LastHWID.Equals(serial)).ToListAsync();
+                    if (accounts.Count > 0)
+                    {
+                        accounts.OrderByDescending(a => a.Level);
+                        Account account = accounts[0];
+                        if(account.Password.Length < 1)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                OnPlayerLogin(player, account);
+                                player.TriggerEvent("finishAccountHwidCheck", 1);
+                            });
+                        }
+                   
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("finishAccountHwidCheck", 0);
+                        });
+                        return;
+                    }
+                }
+            });
+
+        }
+
         public static void OnPlayerLogin(Player player, Account acc)
         {
             if (EPlayer.LoggedIn(player)) return;
@@ -3913,8 +3952,6 @@ namespace RNC
                 }
                 NAPI.Task.Run(() =>
                 {
-                    pClanTag = (EPlayer.GetAccount(player).ClanTag == true ? pClan.Tag : "");
-                    pClanPartnering = EPlayer.GetAccount(player).ClanPartnering;
                     player.Name = acc.Username;
                     player.SetData("LoggedIn", true);
                     player.SetData("AccountHandle", acc);
@@ -3922,6 +3959,11 @@ namespace RNC
                     player.SetSharedData("pLogged", true);
                     player.SetSharedData("RegisterDate", acc.RegisterDate.ToString("F"));
                     player.TriggerEvent("request_version_check");
+
+                    if(acc.ClanTag != null && pClan != null)
+                        pClanTag = (acc.ClanTag == true ? pClan.Tag : "");
+                    if(acc.ClanPartnering != null)
+                        pClanPartnering = acc.ClanPartnering;
 
                     player.SetSharedData("TattooList", acc.TattooList);
                     player.TriggerEvent("ApplyTattoos", acc.TattooList);
@@ -7597,10 +7639,18 @@ namespace RNC
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
 
-            uint realWeapon = Convert.ToUInt32(weapon);
+            uint realWeapon = 0;
+            if(weapon != null) realWeapon = Convert.ToUInt32(weapon);
 
-            int playerTeam = player.GetSharedData<int>("Team");
-            int targetTeam = target.GetSharedData<int>("Team");
+
+
+            int playerTeam = -1;
+            int targetTeam = -1;
+            if (player.HasSharedData("Team"))
+                playerTeam = player.GetSharedData<int>("Team");
+            if (target.HasSharedData("Team"))
+                targetTeam = target.GetSharedData<int>("Team");
+
             if (targetTeam != -1)
             {
                 if (playerTeam == targetTeam) return;
