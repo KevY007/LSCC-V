@@ -4612,7 +4612,7 @@ namespace RNC
                                 if (lobby.gameMode == GameModes.STANDARD)
                                 {
                                     lobby.NextEventCounter--;
-                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"Standard copchase has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}**!", $"Lobby {lobbyid}");
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"Standard copchase has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}** Fugitives!", $"Lobby {lobbyid}");
                                     //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Standard Copchase has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
 
                                     if (lobby.NextEventCounter == 0)
@@ -4620,12 +4620,12 @@ namespace RNC
                                 }
                                 else if (lobby.gameMode == GameModes.BUSTED)
                                 {
-                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"BUSTED! mode has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}**!", $"Lobby {lobbyid}");
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"BUSTED! mode has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}** Fugitives!", $"Lobby {lobbyid}");
                                     //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in BUSTED! mode has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                                 }
                                 else if (lobby.gameMode == GameModes.BANKROBBERY)
                                 {
-                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"Bank Robbery event has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}**!", $"Lobby {lobbyid}");
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"Bank Robbery event has started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count}** Fugitives!", $"Lobby {lobbyid}");
                                     //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase in Bank Robbery event has been started! Cops: {lobby.Cops.Count} | Fugitives: {lobby.Fugitives.Count}**");
                                     lobby.BankRobbery.State = 0;
                                 }
