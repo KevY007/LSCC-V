@@ -1036,6 +1036,99 @@ function InitializeClothingEditorDOM(){
     global.ClothingEditorActive = false;
 }
 
+const enterableBuldingsUnfiltered = [
+  [new mp.Vector3(433.919, -981.88116, 30.709455), 91.243935, "Police Station", 60],
+  [new mp.Vector3(1855.289, 3683.2783, 34.26754), -155.12216, "Police Station", 60],
+  [new mp.Vector3(-443.17432, 6016.3916, 31.71221), -58.92256, "Police Station", 60],
+  [new mp.Vector3(417.98846, -807.51514, 29.397846), 89.17556, "Clothing Store", 73],
+  [new mp.Vector3(82.95728, -1391.6437, 29.411314), -91.942116, "Clothing Store", 73],
+  [new mp.Vector3(127.474014, -210.47804, 54.538425), -17.514898, "Clothing Store", 73],
+  [new mp.Vector3(-3168.0598, 1056.835, 20.858864), 158.76701, "Clothing Store", 73],
+  [new mp.Vector3(1197.9128, 2702.575, 38.156094), -167.03397, "Clothing Store", 73],
+  [new mp.Vector3(617.9219, 2750.137, 42.088955), 5.2716217, "Clothing Store", 73],
+  [new mp.Vector3(1686.2122, 4820.5693, 41.9779), -3.139387, "Clothing Store", 73],
+  [new mp.Vector3(-1.8723875, 6517.2583, 31.483122), -81.96693, "Clothing Store", 73],
+  [new mp.Vector3(-1095.2634, 2705.6094, 19.08352), -97.42532, "Clothing Store", 73],
+  [new mp.Vector3(-717.02545, -156.80402, 36.988018), -135.40097, "Clothing Store", 73],
+  [new mp.Vector3(-155.85936, -305.98184, 39.289597), -13.635981, "Clothing Store", 73],
+  [new mp.Vector3(-817.6786, -1079.5449, 11.132536), 108.381096, "Clothing Store", 73],
+  [new mp.Vector3(-1201.8987, -778.27277, 17.337143), 36.595222, "Clothing Store", 73],
+  [new mp.Vector3(-1456.3527, -231.9416, 49.34221), -108.30579, "Clothing Store", 73],
+  [new mp.Vector3(151.08084, -1037.2583, 29.339083), -18.368605, "Bank", 108],
+  [new mp.Vector3(230.26367, 214.54152, 105.55165), 107.37271, "Bank", 108],
+  [new mp.Vector3(1175.447, 2702.9802, 38.172596), 79.56133, "Bank", 108],
+  [new mp.Vector3(-111.0951, 6462.488, 31.640772), 131.73488, "Bank", 108],
+  [new mp.Vector3(-2966.3823, 483.12125, 15.692721), 97.38031, "Bank", 108],
+  [new mp.Vector3(-53.19084, -1757.1958, 29.439632), 138.3869, "General Store", 52],
+  [new mp.Vector3(-712.0335, -917.12573, 19.214228), -165.72762, "General Store", 52],
+  [new mp.Vector3(376.45834, 322.9743, 103.57246), 164.76015, "General Store", 52],
+  [new mp.Vector3(29.014181, -1350.0109, 29.330671), 178.37935, "General Store", 52],
+  [new mp.Vector3(-1226.6317, -902.0572, 12.284421), 34.853443, "General Store", 52],
+  [new mp.Vector3(1159.586, -327.39114, 69.2069), 26.24761, "General Store", 52],
+  [new mp.Vector3(1141.9082, -980.9195, 46.197273), -82.31642, "General Store", 52],
+  [new mp.Vector3(-3038.0398, 589.6614, 7.8159347), -75.56125, "General Store", 52],
+  [new mp.Vector3(-3239.455, 1004.35754, 12.613415), -97.95817, "General Store", 52],
+  [new mp.Vector3(-2974.5254, 390.84995, 15.032467), 92.103386, "General Store", 52],
+  [new mp.Vector3(-1821.9016, 787.904, 138.1819), -119.5243, "General Store", 52],
+  [new mp.Vector3(2559.8208, 385.24298, 108.62105), -103.74505, "General Store", 52],
+  [new mp.Vector3(543.9823, 2673.5598, 42.150967), -164.34106, "General Store", 52],
+  [new mp.Vector3(1394.3987, 3599.277, 35.007645), -156.69781, "General Store", 52],
+  [new mp.Vector3(1965.6084, 3740.0222, 32.324284), 145.27957, "General Store", 52],
+  [new mp.Vector3(2682.9756, 3282.0818, 55.238586), -22.671528, "General Store", 52],
+  [new mp.Vector3(1698.2491, 4929.7495, 42.078136), -173.00418, "General Store", 52],
+  [new mp.Vector3(1730.7263, 6410.941, 35.00061), 152.38426, "General Store", 52],
+  [new mp.Vector3(-1491.7097, -384.13174, 40.05992), 145.3827, "General Store", 52],
+  [new mp.Vector3(1990.7975, 3053.9634, 47.214928), -179.2838, "Bar", 93],
+  [new mp.Vector3(-564.56793, 275.46957, 83.036514), 116.935356, "Bar", 93],
+  [new mp.Vector3(-3163.8137, 1082.067, 20.847738), 156.68716, "Weapon Store", 110],
+  [new mp.Vector3(1699.7227, 3751.9797, 34.5176), 62.504383, "Weapon Store", 110],
+  [new mp.Vector3(-324.67267, 6075.518, 31.243692), -20.820875, "Weapon Store", 110],
+  [new mp.Vector3(17.042889, -1115.6641, 29.791164), -150.31505, "Weapon Store", 110],
+  [new mp.Vector3(243.7973, -45.14607, 69.89652), 113.76118, "Weapon Store", 110],
+  [new mp.Vector3(-1314.8613, -390.05228, 36.58421), 125.82767, "Weapon Store", 110],
+  [new mp.Vector3(-1112.4161, 2689.9128, 18.588762), -65.482925, "Weapon Store", 110],
+  [new mp.Vector3(-663.95325, -945.24023, 21.783993), 135.03511, "Weapon Store", 110],
+  [new mp.Vector3(812.01636, -2147.6223, 29.50994), 35.41494, "Weapon Store", 110],
+  [new mp.Vector3(844.0101, -1023.5221, 27.98121), -175.35904, "Weapon Store", 110],
+  [new mp.Vector3(2569.5264, 304.4676, 108.60786), 120.68825, "Weapon Store", 110],
+  [new mp.Vector3(-1149.9208, -1521.7838, 10.628015), 32.143345, "Safehouse", 40],
+  [new mp.Vector3(-817.43414, 177.93681, 72.22407), 115.10763, "Safehouse", 40],
+  [new mp.Vector3(2451.903, 4969.29, 46.571575), 23.83546, "Safehouse", 40],
+  [new mp.Vector3(8.432799, 540.177, 176.0273), 162.03288, "Safehouse", 40],
+  [new mp.Vector3(-14.277575, -1442.3053, 31.099993), -7.2073927, "Safehouse", 40],
+  [new mp.Vector3(-29.886766, -146.67, 57.006653), -14.317797, "Hair Salon", 71],
+  [new mp.Vector3(132.33678, -1712.7504, 29.302402), -25.616528, "Hair Salon", 71],
+  [new mp.Vector3(1934.2506, 3724.4253, 32.802742), 29.181149, "Hair Salon", 71],
+  [new mp.Vector3(-282.37573, 6233.015, 31.489086), -126.68627, "Hair Salon", 71],
+  [new mp.Vector3(-1288.5099, -1116.5143, 6.980809), -78.46615, "Hair Salon", 71],
+  [new mp.Vector3(1206.4691, -470.36188, 66.18448), -110.0705, "Hair Salon", 71],
+  [new mp.Vector3(-823.9467, -188.37604, 37.62022), 16.1521, "Hair Salon", 71],
+  [new mp.Vector3(128.80002, -1298.5297, 29.232729), 120.83149, "Strip Club", 121],
+  [new mp.Vector3(320.9853, 177.96117, 103.54415), 157.75287, "Tattoo Shop", 75],
+  [new mp.Vector3(1859.6602, 3748.8728, 33.032528), 84.75233, "Tattoo Shop", 75],
+  [new mp.Vector3(1321.3888, -1649.578, 52.14558), -146.76845, "Tattoo Shop", 75],
+  [new mp.Vector3(-3167.3445, 1073.9807, 20.848097), 167.05197, "Tattoo Shop", 75],
+  [new mp.Vector3(-289.08853, 6200.185, 31.4653), 129.98734, "Tattoo Shop", 75],
+  [new mp.Vector3(-1155.1997, -1422.9274, 4.784532), 33.00279, "Tattoo Shop", 75],
+  [new mp.Vector3(-2342.5286, 3266.2368, 32.827637), -112.88373, "Fort Zancudo Tower", 181],
+  [new mp.Vector3(-1082.0801, -260.31897, 37.80518), -157.7062, "Lifeinvader Offices", 475],
+  [new mp.Vector3(-252.85185, -2025.1189, 29.946032), -17.70971, "Maze Bank Arena", 557],
+  [new mp.Vector3(736.1084, 132.5129, 80.72056), -120.125916, "LSDWP", 769],
+  [new mp.Vector3(717.91974, -976.4302, 24.92134), -102.15795, "Garment Factory", 473],
+  [new mp.Vector3(1064.7393, -2004.7765, 32.06369), 29.043642, "Steel Foundry", 473],
+  [new mp.Vector3(-609.8029, -1609.7666, 26.898926), -1.0767382, "Scrap Yard & Recycling Center", 473],
+  [new mp.Vector3(-1589.2687, -3230.5068, 26.312695), 148.57982, "Airport Terminal", 758],
+  [new mp.Vector3(-1388.5024, -586.8714, 30.218977), 35.01387, "Nightclub", 136] 
+]
+const EnterableBuildingData = enterableBuldingsUnfiltered.map((b) => {
+  return {
+    position:b[0],
+    heading:b[1],
+    name:b[2],
+    blipID:b[3]
+  }
+});
+
 let ServerUI = null;
 function InitializeServerUI(){
   if(ServerUI) return ServerUI;
@@ -1062,6 +1155,8 @@ function isHoldingSniper() {
 }
 
 let global = {
+  EnterableBuildings:EnterableBuildingData,
+  
   currentJailTime: 0,
   lastJailUpdate: 10,
 
@@ -1090,7 +1185,7 @@ let global = {
   lastFunc: "Init",
 
   miniHUD_items:[],
-  
+
   WeaponEditorDOM:null,
   CharacterImportCEF:null,
 

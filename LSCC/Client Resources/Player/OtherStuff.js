@@ -1244,12 +1244,14 @@ mp.events.add('render', () => {
 
   if(isInInterior == false){
     wasInInterior = false;
+    mp.events.callLocal('onExitInterior');
     //mp.game.ui.displayRadar(true);
     if(global)
       global.isInInterior = false;
   }
   else{
     wasInInterior = true;
+    mp.events.callLocal('onEnterInterior', interior);
     //mp.game.ui.displayRadar(false);
     if(global)
       global.isInInterior = true;
@@ -1261,6 +1263,28 @@ mp.events.add('render', () => {
   }
 
 });
+
+mp.events.add('onEnterInterior', (id) => {
+  if(mp.players.local.getVariable('Team') == 0){
+    mp.events.callRemote('FugitiveEnterInterior', id);
+  }
+});
+mp.events.add('onExitInterior', () => {
+
+});
+
+mp.events.add('createBuildingBlip', (id, blipId, x, y, z, scale, color, name, alpha, drawDistance, shortRange) => {
+  mp.blips.new(blipId, new mp.Vector3(x, y, z), {
+    bID:id,
+    alpha:alpha,
+    shortRange:shortRange,
+    name:name,
+    color:color,
+    scale:scale,
+    dimension:mp.players.local.dimension
+  });
+})
+
 
 let timeUntilShotTag = 0;
 let earlyWarnIntervalCount = 0;
@@ -1335,3 +1359,34 @@ function updateGameProgressTimerColor(colorToSet){
   }
 }
  
+let lastDimension = -1;
+var BuildingBlips = [];
+mp.events.add("OneSecondEvent", () => {
+  if(mp.players.local.dimension != lastDimension){
+    mp.events.callLocal('onDimensionChange', lastDimension, mp.players.local.dimension);
+    lastDimension = mp.players.local.dimension;
+  }
+});
+
+mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
+  if(BuildingBlips.length > 0){
+    for(let i = 0 ; i < BuildingBlips.length ; i++){
+      BuildingBlips[i].blip.destroy();
+    }
+    BuildingBlips = [];
+  }
+
+  for(let i = 0 ; i < global.EnterableBuildings.length ; i++){
+    BuildingBlips[i] = {
+      blip:mp.blips.new(global.EnterableBuildings[i].blipID, global.EnterableBuildings[i].position, {
+        name:global.EnterableBuildings[i].name,
+        scale:0.9,
+        color:0,
+        alpha:255,
+        dimension:mp.players.local.dimension,
+        shortRange:true
+      }),
+      id:i
+    }
+  }
+});

@@ -2099,12 +2099,6 @@ namespace RNC
             BackupContextFactory.Instance.Database.EnsureCreated();
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
 
-            for(int i = 0; i < EnterableBuildings.EnterableBuildingPositions.Length; i++)
-            {
-                EnterableBuildingData _d = EnterableBuildings.EnterableBuildingPositions[i];
-                NAPI.Blip.CreateBlip(_d.BlipID, _d.Position, 0.9f, 0, _d.Name, 255, 0, true);
-            }
-
             Settings.Lobbies = new List<LobbyData>();
             Settings.Requests = new List<RequestData>();
             Settings.LoggedInPlayers = new List<Player>();

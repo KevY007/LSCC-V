@@ -9,6 +9,7 @@ const Language = {
     "CLAN_INVITE_TIP": "Pour accepter l'invitation, appuyez sur <strong>F2</strong> pour afficher le curseur et cliquez sur le bouton <strong>accepter</strong>.",
     "MUST_HOLD_H": "Vous devez maintenir <strong>H</strong> enfoncé pour effectuer cette action !",
     "LAST_SEEN_REPORT": "!{#FFEC8B}** [RADIO | FRÉQUENCE: 911] DISPATCH: Le fugitif {PLAYER NAME} a dernièrement été repéré à {STREET NAME}, {ZONE NAME}.",
+    "FUGITIVE_ENTER_INTERIOR_REPORT": "!{#FFEC8B}** [RADIO | FRÉQUENCE : 911] CENTRAL : Le criminel {PLAYER NAME} a été repéré entrant dans le {BUILDING NAME} à {STREET NAME}, {ZONE NAME} !",
     "AFK_MESSAGE_1_1": "!{#ff0000}[ANTI-AFK] !{#ffffff}Il semble que vous n'ayez appuyé sur aucune touche pendant 10 minutes.",
     "AFK_MESSAGE_1_2": "!{#ff0000}[ANTI-AFK] !{#ffffff}Si vous continuez à être absent, vous serez expulsé dans 15 minutes !",
     "AFK_MESSAGE_1_3": "!{#ff0000}[ANTI-AFK] !{#ffffff}Votre auto-join a également été désactivé, il sera réactivé si vous revenez.",

@@ -16,6 +16,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Security.Claims;
 using System.Diagnostics;
 using RNC;
+using RNC.Data;
 
 namespace RNC
 {

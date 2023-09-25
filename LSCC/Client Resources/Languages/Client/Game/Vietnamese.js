@@ -9,6 +9,7 @@ const Language = {
     "CLAN_INVITE_TIP": "Để chấp nhận lời mời, ấn <strong>F2</strong> để hiện con trỏ chuột, và ấn nút <strong>Chấp nhận</strong>.",
     "MUST_HOLD_H": "Bạn phải giữ phím <strong>H</strong> để thực hiện hành động này!",
     "LAST_SEEN_REPORT": "!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Nghi phạm {PLAYER NAME} được phát hiện lần cuối tại {STREET NAME}, {ZONE NAME}.",
+    "FUGITIVE_ENTER_INTERIOR_REPORT": "!{#FFEC8B}** [RADIO | FREQ: 911] DISPATCH: Tội phạm {PLAYER NAME} đã được phát hiện khi vào {BUILDING NAME} tại {STREET NAME}, {ZONE NAME}!",
     "AFK_MESSAGE_1_1": "!{#ff0000}[ANTI-AFK] !{#ffffff}Bạn đã không ấn nút nào trong 10 phút.",
     "AFK_MESSAGE_1_2": "!{#ff0000}[ANTI-AFK] !{#ffffff}Nếu bạn tiếp tục treo máy, bạn sẽ bị kick trong 15 phút!",
     "AFK_MESSAGE_1_3": "!{#ff0000}[ANTI-AFK] !{#ffffff}Chế độ autojoin của bạn đã bị tắt, nó sẽ được bật lại nếu bạn quay trở lại game.",
