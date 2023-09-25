@@ -1261,4 +1261,77 @@ mp.events.add('render', () => {
   }
 
 });
+
+let timeUntilShotTag = 0;
+let earlyWarnIntervalCount = 0;
+let isTimerRed = false;
+let timerColorToSet = "#fb923c";
+let earlyWarningColorInterval = null;
+let earlyWarningTimeInterval = null;
+mp.events.add('startCopchaseTimerEarlyWarningEffect', () => {
+  timeUntilShotTag = 60;
+  earlyWarnIntervalCount = 0;
+  isTimerRed = false;
+  earlyWarningTimeInterval = setInterval(() => {
+    timeUntilShotTag--;
+    mp.gui.chat.push("!{yellow}Time left: !{white}" + timeUntilShotTag.toString() + "s.");
+  }, 1000);
+  earlyWarningColorInterval = setInterval(() => {
+    if(timeUntilShotTag > 30){
+      if(earlyWarnIntervalCount >= 4){
+        earlyWarnIntervalCount = 0;
+
+        if(!isTimerRed){
+          isTimerRed = true;
+          timerColorToSet = "#f87171";
+        }
+        else{
+          isTimerRed = false;
+          timerColorToSet = "#fb923c";
+        }
+        updateGameProgressTimerColor(timerColorToSet);
+      }
+      else earlyWarnIntervalCount++;
+    }
+    else if(timeUntilShotTag <= 30 && timeUntilShotTag > 10){
+      if(earlyWarnIntervalCount >= 2){
+        earlyWarnIntervalCount = 0;
+
+        if(!isTimerRed){
+          isTimerRed = true;
+          timerColorToSet = "#f87171";
+        }
+        else{
+          isTimerRed = false;
+          timerColorToSet = "#fb923c";
+        }
+        updateGameProgressTimerColor(timerColorToSet);
+      }
+      else earlyWarnIntervalCount++;
+    }
+    else if(timeUntilShotTag <= 10 && timeUntilShotTag > 0){
+      if(!isTimerRed){
+        isTimerRed = true;
+        timerColorToSet = "#f87171";
+      }
+      else{
+        isTimerRed = false;
+        timerColorToSet = "#fb923c";
+      }
+      updateGameProgressTimerColor(timerColorToSet);      
+    }
+    else{
+      updateGameProgressTimerColor("#fb923c");  
+      clearInterval(earlyWarningColorInterval);
+      clearInterval(earlyWarningTimeInterval);
+    }
+  }, 500);
+});
+
+function updateGameProgressTimerColor(colorToSet){
+  if(global && global.miniHUD_items.find(i => i.id === 9)){
+    global.miniHUD_items.find(i => i.id === 9).color = colorToSet;
+    mp.events.callLocal('forceUpdateMiniHUD');
+  }
+}
  

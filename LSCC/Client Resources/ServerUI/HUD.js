@@ -543,7 +543,7 @@ mp.events.add("weapon_give", (weaponHash, ammo, targetName, attachments) => {
     let real_ammo = (ammo ? ammo : 9999);
     let real_attachments = (attachments !== undefined ? attachments : false);
 
-    mp.events.callRemote('ServerConsoleOutput', `weapon spawner giving gun to ${targetName}`);
+    //mp.events.callRemote('ServerConsoleOutput', `weapon spawner giving gun to ${targetName}`);
     mp.events.callRemote("WeaponSpawner_RequestGiveWeapon", weaponHash, real_ammo, targetName, real_attachments);
     if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', false, "");
 });
@@ -554,7 +554,7 @@ mp.events.add("menu_weapon_spawner_close", () => {
 });
 mp.events.add("WeaponSpawner:show", (targetName, weaponName) => {
     global.VehicleSpawnerActive = true;
-    mp.events.callRemote('ServerConsoleOutput', `weapon spawner on for ${weaponName} and target ${targetName}`);
+    //mp.events.callRemote('ServerConsoleOutput', `weapon spawner on for ${weaponName} and target ${targetName}`);
     if(global.ServerUI) global.ServerUI.call('menu_weapon_spawner_toggle', true, weaponName, targetName);
     mp.gui.cursor.show(true, true);
 });
@@ -1113,80 +1113,83 @@ mp.events.add('browserDomReady', (browser) => {
         }
         if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
 
-        var miniHUD_items = [];
-        miniHUD_items.push({ 
-            id:1,
-            enabled:false,
-            name: "ping",
-            icon: "fa-stopwatch",
-            value: "0 ms",
-            color: "#fbbf24"
-        });
-        miniHUD_items.push({ 
-            id:2,
-            enabled:false,
-            name: "packetloss",
-            icon: "fa-minus",
-            value: "0.0%",
-            color: "#fb923c"
-        });
-        miniHUD_items.push({ 
-            id:3,
-            enabled:miniHUDVars["jailed"],
-            name: "jail",
-            icon: "fa-ban",
-            value: "N/A",
-            color: "#fb7185"
-        });
-        miniHUD_items.push({ 
-            id:4,
-            enabled:false,
-            name: "visible",
-            icon: "fa-globe",
-            value: "Visible",
-            color: "#60a5fa"
-        });
-        miniHUD_items.push({ 
-            id:9,
-            enabled:false,
-            name: "copchase_time",
-            icon: "fa-clock",
-            value: "00:00",
-            color: "#fb923c"
-        });
-        miniHUD_items.push({ 
-            id:5,
-            enabled:true,
-            name: "voice",
-            icon: "fa-microphone",
-            value: "Standby",
-            color: "#818cf8"
-        });
-        miniHUD_items.push({ 
-            id:6,
-            enabled:true,
-            name: "direction",
-            icon: "fa-compass",
-            value: "N/A",
-            color: "#a3e635"
-        });
-        miniHUD_items.push({ 
-            id:7,
-            enabled:true,
-            name: "street",
-            icon: "fa-location-dot",
-            value: "N/A",
-            color: "#4ade80"
-        });
-        miniHUD_items.push({ 
-            id:8,
-            enabled:true,
-            name: "zone",
-            icon: "fa-location-crosshairs",
-            value: "N/A",
-            color: "#34d399"
-        });
-        global.ServerUI.call('hud_minilist_items_set', miniHUD_items);
+        
+        global.miniHUD_items = [
+            { 
+                id:1,
+                enabled:false,
+                name: "ping",
+                icon: "fa-stopwatch",
+                value: "0 ms",
+                color: "#fbbf24"
+            },
+            { 
+                id:2,
+                enabled:false,
+                name: "packetloss",
+                icon: "fa-minus",
+                value: "0.0%",
+                color: "#fb923c"
+            },
+            { 
+                id:3,
+                enabled:miniHUDVars["jailed"],
+                name: "jail",
+                icon: "fa-ban",
+                value: "N/A",
+                color: "#fb7185"
+            },
+            {
+                id:4,
+                enabled:false,
+                name: "visible",
+                icon: "fa-globe",
+                value: "Visible",
+                color: "#60a5fa"
+            },
+            { 
+                id:9,
+                enabled:false,
+                name: "copchase_time",
+                icon: "fa-clock",
+                value: "00:00",
+                color: "#fb923c"
+            },
+            { 
+                id:5,
+                enabled:true,
+                name: "voice",
+                icon: "fa-microphone",
+                value: "Standby",
+                color: "#818cf8"
+            },
+            { 
+                id:6,
+                enabled:true,
+                name: "direction",
+                icon: "fa-compass",
+                value: "N/A",
+                color: "#a3e635"
+            },
+            { 
+                id:7,
+                enabled:true,
+                name: "street",
+                icon: "fa-location-dot",
+                value: "N/A",
+                color: "#4ade80"
+            },
+            { 
+                id:8,
+                enabled:true,
+                name: "zone",
+                icon: "fa-location-crosshairs",
+                value: "N/A",
+                color: "#34d399"
+            }
+        ];
+
+        global.ServerUI.call('hud_minilist_items_set', global.miniHUD_items);
         mp.events.callLocal("ToggleTooltips", mp.storage.data.menu.tooltips);
         if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
         if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
@@ -1196,6 +1199,25 @@ mp.events.add('browserDomReady', (browser) => {
             if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
         }
     }
+});
+
+mp.events.add('setMiniHudItemToggle', (id, toggle) => {
+    if(global && global.miniHUD_items.find(i => i.id === id)){
+        global.miniHUD_items.find(i => i.id === id).enabled = toggle;
+    }   
+    if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", id, toggle);
+})
+mp.events.add('setMiniHudItemValue', (id, value) => {
+    if(global && global.miniHUD_items.find(i => i.id === id)){
+        global.miniHUD_items.find(i => i.id === id).value = value;
+    }
+    if(global.ServerUI){
+        global.ServerUI.call("hud_minilist_item_value_set", id, value);
+    }
+});
+mp.events.add('forceUpdateMiniHUD', () => {
+    if(global.ServerUI)
+        global.ServerUI.call('hud_minilist_items_set', global.miniHUD_items);
 });
 
 mp.events.add('ToggleHud', (toggle) => {
@@ -1364,45 +1386,45 @@ mp.events.add("UpdateRateEvent", () => {
         if(mp.players.local.getVariable("VisibleBlip") != miniHUDVars["visible"])
         {
             miniHUDVars["visible"] = mp.players.local.getVariable("VisibleBlip");
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 4, miniHUDVars["visible"]);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 4, miniHUDVars["visible"]);
         }
         if(voiceString != miniHUDVars["voice"])
         {
             miniHUDVars["voice"] = voiceString;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 5, miniHUDVars["voice"]);
+            if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 5, miniHUDVars["voice"]);
         }
         if(dirtext != miniHUDVars["direction"])
         {
             miniHUDVars["direction"] = dirtext;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 6, miniHUDVars["direction"]);
+            if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 6, miniHUDVars["direction"]);
         }
         if(global.streetName != miniHUDVars["street"])
         {
             miniHUDVars["street"] = global.streetName;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 7, miniHUDVars["street"]);
+            if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 7, miniHUDVars["street"]);
         }
         if(global.zoneName != miniHUDVars["zone"])
         {
             miniHUDVars["zone"] = global.zoneName;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 8, miniHUDVars["zone"]);
+            if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 8, miniHUDVars["zone"]);
         }
 
         if(global.chaseTimeCur >= global.chaseTimeMax || global.chaseTimeCur <= -1)
         {
             global.chaseRunning = false;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, false);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 9, false);
         }
         else {
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 9, mp.storage.data.menu.gameProgress);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 9, mp.storage.data.menu.gameProgress);
             if(global.collisionTime > 0)
             {
                 let timeDisplay = new Date(global.collisionTime * 1000).toISOString().substring(14, 19);
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 9, timeDisplay);
+                if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 9, timeDisplay);
             }
             else 
             {
                 let timeDisplay = new Date((global.chaseTimeMax - global.chaseTimeCur) * 1000).toISOString().substring(14, 19);
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 9, timeDisplay);
+                if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 9, timeDisplay);
             }
         }
 
@@ -1411,15 +1433,15 @@ mp.events.add("UpdateRateEvent", () => {
             if(miniHUDVars["jailed"] != true)
             {
                 miniHUDVars["jailed"] = true;
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 3, miniHUDVars["jailed"]);
+                if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 3, miniHUDVars["jailed"]);
             }
             miniHUDVars["jail"] = jailString;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 3, miniHUDVars["jail"]);
+            if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 3, miniHUDVars["jail"]);
         }
         else if(miniHUDVars["jailed"] == true)
         {
             miniHUDVars["jailed"] = false;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 3, miniHUDVars["visible"]);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 3, miniHUDVars["visible"]);
         }
 
         if (global.specState == true && global.specTarget != null && mp.players.exists(global.specTarget)) 
@@ -1427,30 +1449,30 @@ mp.events.add("UpdateRateEvent", () => {
             if(miniHUDVars["spec"] == false)
             {
                 miniHUDVars["spec"] = true;
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 1, true);
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 2, true);
+                if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 1, true);
+                if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 2, true);
 
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 6, false);
+                if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 6, false);
             }
         
             if(miniHUDVars["packetloss"] != global.specTarget.getVariable("Packetloss").toFixed(2))
             {
                 miniHUDVars["packetloss"] = global.specTarget.getVariable("Packetloss").toFixed(2);
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 2, `${miniHUDVars["packetloss"]}%`);
+                if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 2, `${miniHUDVars["packetloss"]}%`);
             }
             if(miniHUDVars["ping"] != global.specTarget.getVariable("Ping"))
             {
                 miniHUDVars["ping"] = global.specTarget.getVariable("Ping");
-                if(global.ServerUI) global.ServerUI.call("hud_minilist_item_value_set", 1, `${miniHUDVars["ping"]}ms`);
+                if(global.ServerUI) mp.events.callLocal('setMiniHudItemValue', 1, `${miniHUDVars["ping"]}ms`);
             }
         }
         else if(miniHUDVars["spec"] == true) 
         {
             miniHUDVars["spec"] = false;
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 1, false);
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 2, false);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 1, false);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 2, false);
 
-            if(global.ServerUI) global.ServerUI.call("hud_minilist_item_toggle", 6, true);
+            if(global.ServerUI) mp.events.callLocal("setMiniHudItemToggle", 6, true);
         }
     }
 });

@@ -198,7 +198,7 @@ mp.events.add("addAchievementsToMenu", () => {
         }
         achievements_object.push(achObject);
     }
-    mp.events.callRemote("ServerConsoleOutput", JSON.stringify(achievements_object));
+    //mp.events.callRemote("ServerConsoleOutput", JSON.stringify(achievements_object));
     if(global.ServerUI) global.ServerUI.call('mainmenu_profile_achievements_set', achievements_object);
 });
 mp.events.add("unlockAchievement", (achievementName) => {

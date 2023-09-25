@@ -5552,6 +5552,7 @@ namespace RNC
                                             lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
 
                                             fugitive.SendChatMessage(Translate(fugitive, "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING"));
+                                            fugitive.TriggerEvent("startCopchaseTimerEarlyWarningEffect");
                                         }
                                     }
                                     catch { }

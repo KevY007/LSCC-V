@@ -1089,6 +1089,8 @@ let global = {
   lastMuteUpdate: 10,
   lastFunc: "Init",
 
+  miniHUD_items:[],
+  
   WeaponEditorDOM:null,
   CharacterImportCEF:null,
 
