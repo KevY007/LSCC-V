@@ -1987,7 +1987,7 @@ mp.events.add('render', () => {
                 if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && (!target.isDead() || target.handle == 0))
                 {
                     if ((target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true) || 
-                        (target.getVariable("Team") == 0 && mp.players.local.getVariable("Team") == 0))
+                        (target.getVariable("Team") == 0 && mp.players.local.getVariable("Team") == 0 && target.remoteId != mp.players.local.remoteId))
                     {
                         var blipColor = 45;
                         var blipId = 1;
