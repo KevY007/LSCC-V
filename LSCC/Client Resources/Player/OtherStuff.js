@@ -1297,13 +1297,19 @@ let isTimerRed = false;
 let timerColorToSet = "#fb923c";
 let earlyWarningColorInterval = null;
 let earlyWarningTimeInterval = null;
+mp.events.add('stopCopchaseTimerEarlyWarningEffect', () => {
+  updateGameProgressTimerColor("#fb923c");  
+  clearInterval(earlyWarningColorInterval);
+  clearInterval(earlyWarningTimeInterval);
+});
 mp.events.add('startCopchaseTimerEarlyWarningEffect', () => {
   timeUntilShotTag = 60;
   earlyWarnIntervalCount = 0;
   isTimerRed = false;
+  clearInterval(earlyWarningColorInterval);
+  clearInterval(earlyWarningTimeInterval);
   earlyWarningTimeInterval = setInterval(() => {
     timeUntilShotTag--;
-    mp.gui.chat.push("!{yellow}Time left: !{white}" + timeUntilShotTag.toString() + "s.");
   }, 1000);
   earlyWarningColorInterval = setInterval(() => {
     if(timeUntilShotTag > 30){

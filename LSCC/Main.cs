@@ -3362,6 +3362,7 @@ namespace RNC
                     i.ResetSharedData("InteriorsEntered");
                     i.TriggerEvent("resetBuildingBlips");
 
+                    i.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
                     i.TriggerEvent("forceStopCuffing");
                     i.TriggerEvent("MDC:RemoveAllBlips");
                     i.TriggerEvent("ResetKillFeed");
@@ -3566,6 +3567,7 @@ namespace RNC
 
                         player.ResetSharedData("InteriorsEntered");
 
+                        player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
                         player.TriggerEvent("PoliceHeliCam_ClearFugitives");
                         player.TriggerEvent("hideMDC");
                         player.TriggerEvent("MDC:RemoveAllBlips");
@@ -5545,10 +5547,6 @@ namespace RNC
 
                                         if (fugitive.GetSharedData<bool>("HasShot") == false)
                                         {
-                                            fugitive.SetSharedData("HasShot", true);
-                                            fugitive.SetSharedData("VisibleBlip", true);
-                                            lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
-
                                             fugitive.SendChatMessage(Translate(fugitive, "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING"));
                                             fugitive.TriggerEvent("startCopchaseTimerEarlyWarningEffect");
                                         }

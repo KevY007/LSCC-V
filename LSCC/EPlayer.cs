@@ -1025,7 +1025,7 @@ namespace RNC
 
             target.SendChatMessage($"!{{#ffffff}}_____| !{{#d1f797}}Statistics for {acc.Username} ({acc.SQL_ID}) at {DateTime.Now.ToString()} !{{#ffffff}}|_____");
 
-            if (EPlayer.GetAccount(target).DiscordID.Equals("n/a"))
+            if (EPlayer.GetAccount(target).DiscordID.Length < 5)
             {
                 if (EPlayer.GetAccount(target) == acc)
                 {
@@ -2591,6 +2591,7 @@ namespace RNC
 
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
+                player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
 
                 player.TriggerEvent("resetBuildingBlips");
 

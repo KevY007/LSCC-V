@@ -4767,11 +4767,11 @@ namespace RNC
             if (player.GetSharedData<int>("Team") != 0) return;
 
             // Prevent spam for same player entering same interior multiple times in a round
-            if (player.HasSharedData("InteriorsEntered") && NAPI.Util.FromJson<List<int>>(player.GetSharedData<string>("InteriorsEntered")).ToList().Contains(interiorID)) return;
-            List<int> interiors = new List<int>();
-            if (player.HasSharedData("InteriorsEntered")) interiors = NAPI.Util.FromJson<List<int>>(player.GetSharedData<string>("InteriorsEntered")).ToList();
-            interiors.Add(interiorID);
-            player.SetSharedData("InteriorsEntered", NAPI.Util.ToJson(interiors));
+            //if (player.HasSharedData("InteriorsEntered") && NAPI.Util.FromJson<List<int>>(player.GetSharedData<string>("InteriorsEntered")).ToList().Contains(interiorID)) return;
+            //List<int> interiors = new List<int>();
+            //if (player.HasSharedData("InteriorsEntered")) interiors = NAPI.Util.FromJson<List<int>>(player.GetSharedData<string>("InteriorsEntered")).ToList();
+            //interiors.Add(interiorID);
+            //player.SetSharedData("InteriorsEntered", NAPI.Util.ToJson(interiors));
             // ----------------------------------------------------------------------------------
 
 
