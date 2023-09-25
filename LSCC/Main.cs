@@ -5537,6 +5537,26 @@ namespace RNC
                                 }
                             }
 
+                            if (lobby.GameProgress >= (Convert.ToInt32(0.7 * Settings.GameRunTime) - 60) && lobby.gameMode != GameModes.BUSTED && lobby.gameMode != GameModes.BANKROBBERY)
+                            {
+                                foreach (Player fugitive in lobby.Fugitives)
+                                {
+                                    try
+                                    {
+                                        if (fugitive == null) continue;
+
+                                        if (fugitive.GetSharedData<bool>("HasShot") == false)
+                                        {
+                                            fugitive.SetSharedData("HasShot", true);
+                                            fugitive.SetSharedData("VisibleBlip", true);
+                                            lobby.FugitiveShowCounter = 29; // Set them to VISIBLE
+
+                                            fugitive.SendChatMessage(Translate(fugitive, "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING"));
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
                             if (lobby.GameProgress >= Convert.ToInt32(0.7 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED && lobby.gameMode != GameModes.BANKROBBERY)
                             {
                                 foreach (Player fugitive in lobby.Fugitives)

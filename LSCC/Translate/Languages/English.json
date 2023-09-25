@@ -442,6 +442,7 @@
   "LAW_ON_WAY_RADIO": "!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!",
   "CAN_BE_SHOT_LONG_GAME": "!{#FF6347}You can be shot down by cops as the game has progressed to 70%!",
   "CAN_BE_SHOT_LONG_GAME_GLOBAL": "!{#FF6347}[GAME] !{#FFFFFF}70% of the game has elapsed, all fugitives can be shot down now.",
+  "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING": "!{#FF6347}[GAME] !{#FFFFFF}You will receive the !{#ffff00}shot tag in 60 seconds!{#ffffff}, be ready!",
   "SELL_WEAPON_ATTACHMENT": "You successfully removed/sold the attachment and have been refunded <strong>{PRICE} Points</strong>.",
   "BUY_WEAPON_ATTACHMENT": "You successfully purchased the weapon attachment for {PRICE} Points!",
   "CLAN_ACCESS_SET": "You've set your clan access to <strong>{VALUE}</strong>!",
@@ -581,9 +582,9 @@
   "ERROR_PAY_INVALID_POINTS": "!{#FF6347}[!] ~w~You can only send between 1 and 10 000 points at once!",
   "SENT_POINTS": "!{#55FF55}[PAY] ~w~You have sent {POINTS} Points to {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
   "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~You have received {POINTS} Points from {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
-  "COTW_MOTD":"~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won {POINTS} points! All clans' weekly kills have been reset.",
-  "COTW_ONLINE_MESSAGE":"~y~You've received ~w~{POINTS} Points ~y~as reward for being part of the clan of the week.",
-  "COTW_OTHER_MOTD":"~r~[CLAN OF THE WEEK]~w~ Clan {CLAN NAME} won clan of the week. All clans' weekly kills have been reset!",
-  "COTW_OTHER_MESSAGE_1":"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{CLAN NAME} ~w~had the most kills this week! Congratulations!",
-  "COTW_OTHER_MESSAGE_2":"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset."
+  "COTW_MOTD": "~y~[CLAN OF THE WEEK]~w~ Congratulations! Your clan had the most kills this week and you won {POINTS} points! All clans' weekly kills have been reset.",
+  "COTW_ONLINE_MESSAGE": "~y~You've received ~w~{POINTS} Points ~y~as reward for being part of the clan of the week.",
+  "COTW_OTHER_MOTD": "~r~[CLAN OF THE WEEK]~w~ Clan {CLAN NAME} won clan of the week. All clans' weekly kills have been reset!",
+  "COTW_OTHER_MESSAGE_1": "~y~[CLAN OF THE WEEK] ~w~Clan ~g~{CLAN NAME} ~w~had the most kills this week! Congratulations!",
+  "COTW_OTHER_MESSAGE_2": "~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset."
 }

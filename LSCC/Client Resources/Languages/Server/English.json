@@ -442,6 +442,7 @@
   "LAW_ON_WAY_RADIO": "!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Alright ladies and gentlemen, I hear that the cops are on their way. Good luck!",
   "CAN_BE_SHOT_LONG_GAME": "!{#FF6347}You can be shot down by cops as the game has progressed to 70%!",
   "CAN_BE_SHOT_LONG_GAME_GLOBAL": "!{#FF6347}[GAME] !{#FFFFFF}70% of the game has elapsed, all fugitives can be shot down now.",
+  "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING": "!{#FF6347}[GAME] !{#FFFFFF}You will receive the !{#ffff00}shot tag in 60 seconds!{#ffffff}, be ready!",
   "SELL_WEAPON_ATTACHMENT": "You successfully removed/sold the attachment and have been refunded <strong>{PRICE} Points</strong>.",
   "BUY_WEAPON_ATTACHMENT": "You successfully purchased the weapon attachment for {PRICE} Points!",
   "CLAN_ACCESS_SET": "You've set your clan access to <strong>{VALUE}</strong>!",

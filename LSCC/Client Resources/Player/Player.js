@@ -1343,6 +1343,7 @@ mp.events.add("car_window_end", () => {
 });
 
 var isInTrunkDB = false;
+/*
 mp.keys.bind(0xA3, false, () => {
     mp.events.callRemote("db_test");
 });
@@ -1416,6 +1417,7 @@ mp.events.add('render', () => {
 
     mp.game.cam.setFollowPedCamViewMode(4);
 });
+*/
 
 // mp.keys.bind(0x4A, false, () => {
 
@@ -3041,7 +3043,7 @@ mp.events.add("render", () => {
     }
 
     mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", target, target.getHealth(), totalDmg, target.getArmour(), weapon.toString(), bone);  
-    mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} | Added up total damage: ${totalDmg} from the fast shots (${shotsToRegister.length} total)`);           
+    //mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} | Added up total damage: ${totalDmg} from the fast shots (${shotsToRegister.length} total)`);           
 
     shotsToRegister = [];
     triggerMultipleShotsStamp = 0;
@@ -3219,7 +3221,7 @@ mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weap
                     shotsToRegister.push({weapon:weapon, damage:DAMAGE_TO_DEAL, target:targetPlayer, bone:boneIndex});
 
                     triggerMultipleShotsStamp = Date.now()+30;
-                    mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} is dealing damage too fast! Adding to shotsToRegister (${shotsToRegister.length})`);
+                    //mp.events.callRemoteUnreliable("ServerConsoleOutput", `${mp.players.local.name} is dealing damage too fast! Adding to shotsToRegister (${shotsToRegister.length})`);
                 }
             }
             

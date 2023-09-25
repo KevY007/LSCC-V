@@ -442,6 +442,7 @@
   "LAW_ON_WAY_RADIO": "!{#FFEC8B}** [RADIO | GRATUIT: 69420] SCOUT: Ok les gars, les forces de l'ordre sont en route. Bonne chance!",
   "CAN_BE_SHOT_LONG_GAME": "!{#FF6347}Vous pouvez être abattu par la police au-delà de 70% de progression de la partie!",
   "CAN_BE_SHOT_LONG_GAME_GLOBAL": "!{#FF6347}[GAME] !{#FFFFFF}70% de la partie s'est écoulée, tous les fugitifs peuvent être abattus maintenant.",
+  "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING": "!{#FF6347}[GAME] !{#FFFFFF}Vous allez recevoir le tag !{#ffff00}tir dans 60 secondes!{#ffffff}, soyez prêt!",
   "SELL_WEAPON_ATTACHMENT": "Vous avez vendu l'accessoire et avez été remboursé <strong>{PRICE} points</strong>.",
   "BUY_WEAPON_ATTACHMENT": "Vous avez acheté cet accessoire pour {PRICE} points !",
   "CLAN_ACCESS_SET": "Vous avez défini l'accès de votre clan à <strong>{VALUE}</strong>!",

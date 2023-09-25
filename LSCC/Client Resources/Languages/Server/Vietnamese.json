@@ -442,6 +442,7 @@
   "LAW_ON_WAY_RADIO": "!{#FFEC8B}** [RADIO | FREQ: 69420] SCOUT: Được rồi các quý vị, tôi nghe được bọn cảnh sát đang trên đường đến. Chúc may mắn!",
   "CAN_BE_SHOT_LONG_GAME": "!{#FF6347}Phía cảnh sát sẽ được phép nổ súng bắn hạ bạn nếu tiến trình vòng chơi đạt 70%!",
   "CAN_BE_SHOT_LONG_GAME_GLOBAL": "!{#FF6347}[GAME] !{#FFFFFF}70% tiến trình vòng chơi đã qua, phía cảnh sát đã có thể nổ súng bắn hạ fugitives.",
+  "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING": "!{#FF6347}[Game] !{#FFFFFF}Bạn sẽ nhận được thẻ !{#ffff00}bắn trong 60 giây!{#ffffff}, hãy sẵn sàng!",
   "SELL_WEAPON_ATTACHMENT": "Bạn đã gỡ/bán thành công phụ kiện và đã được hoàn trả <strong>{PRICE} Points</strong>.",
   "BUY_WEAPON_ATTACHMENT": "Bạn đã mua thành công phụ kiện vũ khí với {PRICE} Points!",
   "CLAN_ACCESS_SET": "Bạn đã chỉnh quyền truy cập clan của bạn thành <strong>{VALUE}</strong>!",
