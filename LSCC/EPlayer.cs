@@ -2667,7 +2667,7 @@ namespace RNC
                 {
                     player.SetSharedData("InDM", -1);
                     int LobbyToBeIn = Settings.MaxLobbies;
-                    foreach (LobbyData lobby in Settings.Lobbies.OrderByDescending(l => Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == l.lobbyId)))
+                    foreach (LobbyData lobby in Settings.Lobbies.OrderByDescending(l => Settings.LoggedInPlayers.Count(a => a.HasSharedData("InLobby") && a.GetSharedData<int>("InLobby") == l.lobbyId)))
                     {
                         if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.Dynamics.MaxInLobby)
                         {

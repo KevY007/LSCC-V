@@ -29,6 +29,7 @@ namespace RNC
         [ServerEvent(Event.PlayerConnected)]
         public void OnPlayerConnected_Old(Player player)
         {
+            player.SetSharedData("InLobby", -69696969);
             EPlayer.ResetPlayerData(player);
             player.SetSharedData("Wounded", 0);
         }
@@ -5527,7 +5528,7 @@ namespace RNC
             // ID, Name, Background, Gamemode, Password, Players, MaxPlayers, Description
             Settings.Lobbies.ForEach((LobbyData lobby) =>
             {
-                List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId).ToList();
+                List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedData<int>("InLobby") == lobby.lobbyId).ToList();
                 int players = lobbyPlayers.Count;
 
                 string lobbyOwnerName = "";

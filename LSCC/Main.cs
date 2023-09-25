@@ -2902,7 +2902,7 @@ namespace RNC
                                         {
                                             lock (player)
                                             {
-                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                                if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobby.lobbyId)
                                                 {
                                                     if (player.HasSharedData("InLobby") && player.GetSharedData<int>("PlayerWeather") == -1)
                                                     {
