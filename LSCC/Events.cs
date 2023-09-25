@@ -4760,6 +4760,40 @@ namespace RNC
 
         }
 
+        [RemoteEvent("FugitiveEnterInterior")]
+        public void OnFugitiveEnterInterior(Player player, int interiorID, string interiorName, string streetName, string zoneName)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (player.GetSharedData<int>("Team") != 0) return;
+
+            // Prevent spam for same player entering same interior multiple times in a round
+            if (player.HasSharedData("InteriorsEntered") && NAPI.Util.FromJson<List<int>>(player.GetSharedData<string>("InteriorsEntered")).ToList().Contains(interiorID)) return;
+            List<int> interiors = new List<int>();
+            if (player.HasSharedData("InteriorsEntered")) interiors = NAPI.Util.FromJson<List<int>>(player.GetSharedData<string>("InteriorsEntered")).ToList();
+            interiors.Add(interiorID);
+            player.SetSharedData("InteriorsEntered", NAPI.Util.ToJson(interiors));
+            // ----------------------------------------------------------------------------------
+
+
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            if (lobby == null) return;
+
+            foreach (Player lobbyPlayer in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+            {
+                if(lobbyPlayer.GetSharedData<int>("Team") >= 0)
+                {
+                    lobbyPlayer.TriggerEvent("changeBuildingBlipColor", interiorID, 47);
+                    if (lobbyPlayer.GetSharedData<int>("Team") == 1)
+                    {
+                        lobbyPlayer.TriggerEvent("ReportFugitiveEnterBuilding", player.Name, interiorName, streetName, zoneName);
+                    }
+                }
+            }
+
+
+            // "ReportFugitiveEnterBuilding"
+        }
+
         [RemoteEvent("RequestSetGlasses")]
         public void OnRequestSetGlasses(Player player, int drawable, int texture)
         {

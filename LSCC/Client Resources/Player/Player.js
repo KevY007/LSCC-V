@@ -908,10 +908,13 @@ mp.events.add("SetVehicleLights", (vehicle, state) => vehicle.setLights(state));
 mp.events.add("ReportLastSeen", (name, posx, posy, posz) => {
     let getStreet = mp.game.pathfind.getStreetNameAtCoord(posx, posy, posz, 0, 0);
 
-    global.zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
-    global.streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
+    let zoneName = mp.game.ui.getLabelText(mp.game.zone.getNameOfZone(posx, posy, posz));
+    let streetName = mp.game.ui.getStreetNameFromHashKey(getStreet.streetName);
 
-    mp.gui.chat.push(Translate("LAST_SEEN_REPORT", [name, global.streetName, global.zoneName]));
+    mp.gui.chat.push(Translate("LAST_SEEN_REPORT", [name, streetName, zoneName]));
+});
+mp.events.add("ReportFugitiveEnterBuilding", (name, interiorName, streetName, zoneName) => {
+    mp.gui.chat.push(Translate("FUGITIVE_ENTER_INTERIOR_REPORT", [name, interiorName, streetName, zoneName]));
 });
 
 mp.events.add("AFKDriverCheck", (x,y,z) => {

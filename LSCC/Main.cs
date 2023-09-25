@@ -3359,6 +3359,8 @@ namespace RNC
                     if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
 
                     EPlayer.StopCarry(i);
+                    i.ResetSharedData("InteriorsEntered");
+                    i.TriggerEvent("resetBuildingBlips");
 
                     i.TriggerEvent("forceStopCuffing");
                     i.TriggerEvent("MDC:RemoveAllBlips");
@@ -3561,6 +3563,8 @@ namespace RNC
                                 EPlayer.Save(player, false);
                             }
                         }
+
+                        player.ResetSharedData("InteriorsEntered");
 
                         player.TriggerEvent("PoliceHeliCam_ClearFugitives");
                         player.TriggerEvent("hideMDC");

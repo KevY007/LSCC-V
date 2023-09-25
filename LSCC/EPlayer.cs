@@ -2592,6 +2592,8 @@ namespace RNC
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
 
+                player.TriggerEvent("resetBuildingBlips");
+
                 if (player.HasData("Spectating"))
                 {
                     Commands.cmd_specoff(player);

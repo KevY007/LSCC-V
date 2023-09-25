@@ -1266,24 +1266,29 @@ mp.events.add('render', () => {
 
 mp.events.add('onEnterInterior', (id) => {
   if(mp.players.local.getVariable('Team') == 0){
-    mp.events.callRemote('FugitiveEnterInterior', id);
+    
+    const buildingEnteredCheck = BuildingBlips.filter(b => b.data.position.subtract(mp.players.local.position).length() < 50);
+    if(buildingEnteredCheck.length == 0) return;
+    const buildingEntered = buildingEnteredCheck.map(b => {
+     return {...b, distance:b.data.position.subtract(mp.players.local.position).length()}
+    });
+    buildingEntered.sort((a, b) => {
+     if(a.distance < b.distance) return -1;
+     else if(a.distance > b.distance) return 1;
+     else return 0;
+    });
+    const realBuilding = buildingEntered[0];
+    //mp.gui.chat.push(`You entered ${realBuilding.data.id} - ${realBuilding.data.name}!`);
+    
+    mp.events.callRemote('FugitiveEnterInterior', realBuilding.data.id, realBuilding.data.name, global.streetName, global.zoneName);
   }
+});
+mp.events.add('changeBuildingBlipColor', (id, color) => {
+  BuildingBlips[id].blip.setColour(color);
 });
 mp.events.add('onExitInterior', () => {
 
 });
-
-mp.events.add('createBuildingBlip', (id, blipId, x, y, z, scale, color, name, alpha, drawDistance, shortRange) => {
-  mp.blips.new(blipId, new mp.Vector3(x, y, z), {
-    bID:id,
-    alpha:alpha,
-    shortRange:shortRange,
-    name:name,
-    color:color,
-    scale:scale,
-    dimension:mp.players.local.dimension
-  });
-})
 
 
 let timeUntilShotTag = 0;
@@ -1368,7 +1373,7 @@ mp.events.add("OneSecondEvent", () => {
   }
 });
 
-mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
+mp.events.add('resetBuildingBlips', () => {
   if(BuildingBlips.length > 0){
     for(let i = 0 ; i < BuildingBlips.length ; i++){
       BuildingBlips[i].blip.destroy();
@@ -1386,7 +1391,15 @@ mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
         dimension:mp.players.local.dimension,
         shortRange:true
       }),
-      id:i
+      data:{
+        position:global.EnterableBuildings[i].position,
+        name:global.EnterableBuildings[i].name,
+        id:i
+      }
     }
   }
+});
+
+mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
+  mp.events.callLocal('resetBuildingBlips');
 });
