@@ -464,7 +464,6 @@ namespace RNC
                     if (aSQL == -1)
                     {
                         command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
-                        command.RespondAsync("**HINT:** /link");
                         return;
                     }
 

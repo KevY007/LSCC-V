@@ -5316,8 +5316,8 @@ namespace RNC
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
         }
 
-        [Command("resetclothing", "!{#AFAFAF}[USAGE] resetclothing (target) (cop/fugitive)")]
-        public void cmd_resetclothing(Player player, Player target, string team)
+        [Command("resetclothing", "!{#AFAFAF}[USAGE] resetclothing (target)")]
+        public void cmd_resetclothing(Player player, Player target)
         {
             if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target)) return;
 
@@ -5344,37 +5344,14 @@ namespace RNC
 
             try
             {
+                CharacterData resetChar = EPlayer.ResetAllPlayerClothing(target, ConvChar);
+                EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(resetChar);
+                EPlayer.ApplyCharacter(target, resetChar, EPlayer.GetAccount(target).LobbyClothing);
+                EPlayer.Save(player, false);
 
-                if (team.StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-                {
-                    ConvChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
-                    ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
-                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
+                Logs.LogAdmin(player, $"Reset {target.Name}'s clothing.");
 
-                    target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your cop clothing has been reset by an admin.");
-
-                    EPlayer.ApplyCharacter(target, ConvChar, (target.GetSharedData<int>("Team") < 0) ? (EPlayer.GetAccount(target).LobbyClothing) : (target.GetSharedData<int>("Team")));
-                }
-                else if (team.StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-                {
-                    ConvChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
-                    ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
-                    EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
-
-                    target.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Your fugitive clothing has been reset by an admin.");
-
-                    EPlayer.ApplyCharacter(target, ConvChar, (target.GetSharedData<int>("Team") < 0) ? (EPlayer.GetAccount(target).LobbyClothing) : (target.GetSharedData<int>("Team")));
-                }
-                else
-                {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid team, clothings can only be reset for 'fugitive' or 'cop' team.");
-                    return;
-                }
-
-
-                Logs.LogAdmin(player, $"Reset {target.Name}'s {team.ToLower()} clothing.");
-
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has reset {target.Name}'s {team.ToLower()} clothing.");
+                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has reset {target.Name}'s clothing.");
             }
             catch { player.SendChatMessage("!{#FF6347}[!!] Unknown error occured, ask kevy to check da cooomsole."); }
         }
