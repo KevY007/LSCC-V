@@ -257,7 +257,7 @@ namespace RNC
                 return;
             }
 
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
 
             if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
 
@@ -308,7 +308,7 @@ namespace RNC
 
             if (player.Vehicle.HasSharedData("Status_Trunk"))
             {
-                if (player.Vehicle.GetSharedData<bool>("Status_Trunk") == false)
+                if (player.Vehicle.GetSharedDataSafe<bool>("Status_Trunk") == false)
                 {
                     player.Vehicle.SetSharedData("Status_Trunk", true); // This variable is ONLY supposed to be used for syncing.
                     player.Vehicle.SetSharedData("TrunkOpened", true); // THIS VARIABLE IS FOR SCRIPT SIDEDLY GETTING TRUNK STATUS...
@@ -342,8 +342,8 @@ namespace RNC
             {
                 if (v.Dimension == player.Dimension && v.Position.DistanceTo(player.Position) <= 3.5)
                 {
-                    if (v.HasSharedData("Team") && v.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && v.GetSharedData<int>("Team") != 10
-                        && v.GetSharedData<bool>("Locked") == true) continue;
+                    if (v.HasSharedData("Team") && v.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team") && v.GetSharedDataSafe<int>("Team") != 10
+                        && v.GetSharedDataSafe<bool>("Locked") == true) continue;
 
                     targetVeh = v;
                     break;
@@ -377,7 +377,7 @@ namespace RNC
                 {
                     if (v.Dimension == player.Dimension && v.Position.DistanceTo(player.Position) <= 3.5)
                     {
-                        if (v.HasSharedData("Team") && v.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") && v.GetSharedData<int>("Team") != 10) continue;
+                        if (v.HasSharedData("Team") && v.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team") && v.GetSharedDataSafe<int>("Team") != 10) continue;
 
                         targetVeh = v;
                         break;
@@ -393,7 +393,7 @@ namespace RNC
                 return;
             }
 
-            if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") &&
+            if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team") &&
                 targetVeh.Locked == true)
             {
                 if (!player.HasData("SilentLock")) { player.SendChatMessage(Translate(player, "ERROR_CANT_UNLOCK_USE_LOCKPICK")); }
@@ -401,10 +401,10 @@ namespace RNC
                 return;
             }
 
-            LobbyData ld = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData ld = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (ld != null)
             {
-                if (ld.gameMode == GameModes.BANKROBBERY && player.GetSharedData<int>("Team") == 0 && ld.BankRobbery.State < 1)
+                if (ld.gameMode == GameModes.BANKROBBERY && player.GetSharedDataSafe<int>("Team") == 0 && ld.BankRobbery.State < 1)
                 {
                     player.SendChatMessage(Translate(player, "ERROR_CANT_UNLOCK_BANKROB"));
                     return;
@@ -420,7 +420,7 @@ namespace RNC
 
             player.TriggerEvent("PlaySoundFrontend", "COMPUTERS_MOUSE_CLICK", "");
 
-            if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedData<int>("Team") != player.GetSharedData<int>("Team"))
+            if (targetVeh.HasSharedData("Team") && targetVeh.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team"))
             {
                 EPlayer.Action(player, "ACTION_LOCKS_DOOR_INSIDE");
             }
@@ -527,19 +527,19 @@ namespace RNC
                 return;
             }
 
-            if (player.Vehicle.HasSharedData("Fuel") && (double)player.Vehicle.GetSharedData<Single>("Fuel") <= 0.0)
+            if (player.Vehicle.HasSharedData("Fuel") && (double)player.Vehicle.GetSharedDataSafe<Single>("Fuel") <= 0.0)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NO_FUEL"));
                 return;
             }
 
-            if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
+            if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team") || player.Vehicle.GetSharedDataSafe<int>("Team") == 10) &&
                 player.Vehicle.EngineStatus == false)
             {
                 player.SendNotification(Translate(player, "ERROR_CANT_START_USE_HOTWIRE"));
                 return;
             }
-            if(player.Vehicle.GetSharedData<int>("Team") == 10 && player.Vehicle.EngineStatus == false)
+            if(player.Vehicle.GetSharedDataSafe<int>("Team") == 10 && player.Vehicle.EngineStatus == false)
             {
                 player.SendNotification(Translate(player, "ERROR_CANT_START_USE_HOTWIRE"));
                 return;
@@ -595,13 +595,13 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            if (player.GetSharedData<int>("InLobby") < 1)
+            if (player.GetSharedDataSafe<int>("InLobby") < 1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
 
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if ((lobby != null) == false)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
@@ -855,7 +855,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -953,7 +953,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -980,7 +980,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -1006,7 +1006,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 player.SendChatMessage(Translate(player, "MYWEATHER_HINT"));
@@ -1031,7 +1031,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            if ((player.GetSharedDataSafe<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -1050,7 +1050,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            if ((player.GetSharedDataSafe<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -1069,7 +1069,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            if ((player.GetSharedDataSafe<int>("InLobby") == -3 && player.Dimension >= 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -1096,7 +1096,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if ((player.GetSharedData<int>("InLobby") == -3 && player.Dimension > 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
+            if ((player.GetSharedDataSafe<int>("InLobby") == -3 && player.Dimension > 256 && player.Dimension <= 512) == false && EPlayer.GetAccount(player).Admin < 3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM_OR_WORLD"));
                 return;
@@ -1123,7 +1123,7 @@ namespace RNC
                 return;
 
             bool isACop = false;
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby != null)
             {
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1)
@@ -1151,7 +1151,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<bool>("VehicleDL") == true)
+            if (player.GetSharedDataSafe<bool>("VehicleDL") == true)
             {
                 player.SendChatMessage(Translate(player, "VEHINFO_DISABLED"));
                 player.SetSharedData("VehicleDL", false);
@@ -1321,12 +1321,12 @@ namespace RNC
             }
             else
             {
-                if (player.GetSharedData<int>("InLobby") != -3)
+                if (player.GetSharedDataSafe<int>("InLobby") != -3)
                 {
                     player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                     return;
                 }
-                if (target.GetSharedData<int>("InLobby") != -3)
+                if (target.GetSharedDataSafe<int>("InLobby") != -3)
                 {
                     player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_IN_FREEROAM"));
                     return;
@@ -1364,7 +1364,7 @@ namespace RNC
                 return;
             }
 
-            if (target.GetSharedData<int>("InLobby") == -5)
+            if (target.GetSharedDataSafe<int>("InLobby") == -5)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is in customizer/character creator. Use /sendtolobby to force them out.");
                 return;
@@ -1452,7 +1452,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby == null) return;
             
             if (!lobby.Cops.Contains(player))
@@ -1466,12 +1466,12 @@ namespace RNC
                 player.SendChatMessage("!{#FF6347}[!] ~w~You must be at least level 5 to use this!");
                 return;
             }
-            if(player.GetSharedData<int>("Wounded") > 0 || player.Dead)
+            if(player.GetSharedDataSafe<int>("Wounded") > 0 || player.Dead)
             {
                 player.SendChatMessage("!{#FF6347}[!] ~w~You are wounded or dead!");
                 return;
             }
-            if(player.GetSharedData<bool>("PlacingStingers") == true)
+            if(player.GetSharedDataSafe<bool>("PlacingStingers") == true)
             {
                 player.SendChatMessage("!{#FF6347}[!] ~w~You are already deploying spikes!");
                 player.SendChatMessage("~b~[STINGERS] ~w~Walk to the position where the other end will be placed and press ~y~H~w~ to place them.");
@@ -1512,7 +1512,7 @@ namespace RNC
                 NAPI.Task.Run(() =>
                 {
                     int archivedAccs = 0;
-                    foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.GetSharedData<int>("Team") > 0))
+                    foreach (Player pl in NAPI.Pools.GetAllPlayers().Where(p => p.GetSharedDataSafe<int>("Team") > 0))
                     {
                         EPlayer.Notify(pl, "<strong>Account archiving in process...</strong> This will take a few seconds.", "orange", "fa-regular fa-server", false, 999999999, "center", "replace");
                         EPlayer.Freeze(pl, true);
@@ -1661,7 +1661,7 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 5)
             {
-                if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+                if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
                 {
                     player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                     return;
@@ -1685,7 +1685,7 @@ namespace RNC
                 player.SendChatMessage("!{#FF6347}LSHIFT: Boost | LCTRL: Slow | LSHIFT + CTRL: Very slow (adjustable)");
                 player.SendChatMessage("!{#FF6347}/noclip_vsm (rate) (rate is in decimal like 0.10) -- will adjust very slow speed (for cinematic etc)");
 
-                player.SetData("IsNoclipping", player.GetSharedData<bool>("VisibleBlip"));
+                player.SetData("IsNoclipping", player.GetSharedDataSafe<bool>("VisibleBlip"));
                 player.SetSharedData("VisibleBlip", false);
                 player.TriggerEvent("ForceNoclip", true);
                 player.SetSharedData("EntAlpha", 0);
@@ -1752,8 +1752,8 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.SendChatMessage(Translate(player, "FUGITIVE_CHANCE", player.GetSharedData<float>("FugitiveChance").ToString("N2")));
-            player.SendChatMessage(Translate(player, "FUGITIVE_CHANCE_HIGHEST", Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")).OrderByDescending(a => a.GetSharedData<float>("FugitiveChance")).First().GetSharedData<float>("FugitiveChance").ToString("N2")));
+            player.SendChatMessage(Translate(player, "FUGITIVE_CHANCE", player.GetSharedDataSafe<float>("FugitiveChance").ToString("N2")));
+            player.SendChatMessage(Translate(player, "FUGITIVE_CHANCE_HIGHEST", Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")).OrderByDescending(a => a.GetSharedDataSafe<float>("FugitiveChance")).First().GetSharedDataSafe<float>("FugitiveChance").ToString("N2")));
 
         }
 
@@ -1769,7 +1769,7 @@ namespace RNC
                 return;
             }
 
-            if (target.GetSharedData<bool>("Collisions") == false)
+            if (target.GetSharedDataSafe<bool>("Collisions") == false)
             {
                 Logs.LogAdmin(player, $"Enabled {target.Name}'s collisions");
                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has enabled {target.Name}'s collisions.");
@@ -1860,7 +1860,7 @@ namespace RNC
 
 
             target.SetSharedData("SQL_ID", EPlayer.GetAccount(target).SQL_ID);
-            target.TriggerEvent("TakeScreenshot", 100, 100, player.GetSharedData<string>("ScreenshotServerAPI"), player.GetSharedData<int>("SQL_ID"));
+            target.TriggerEvent("TakeScreenshot", 100, 100, player.GetSharedDataSafe<string>("ScreenshotServerAPI"), player.GetSharedDataSafe<int>("SQL_ID"));
             if (EPlayer.GetAccount(player).Admin < 5) EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has requested {target.Name}'s game screenshot.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}Screenshot taken, it is now being uploaded. The upload speed depends on the target.");
             player.SendChatMessage("!{#33C446}[>>] !{#FFFFFF}If the image upload fails, you SHOULD be notified, although in rare-case scenarios you won't.");
@@ -1914,10 +1914,10 @@ namespace RNC
         [Command("stopanim", Alias = "sa")]
         public void cmd_sa(Player player)
         {
-            if (player.GetSharedData<int>("Wounded") > 0)
+            if (player.GetSharedDataSafe<int>("Wounded") > 0)
             { player.SendChatMessage(Translate(player, "ERROR_WOUNDED")); return; }
 
-            if (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill"))
+            if (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill"))
             { player.SendChatMessage(Translate(player, "ERROR_TASED")); return; }
 
             if (player.HasData("Cuffed"))
@@ -1928,11 +1928,11 @@ namespace RNC
 
             /*
             long currentTimestamp = new DateTimeOffset().ToUnixTimeSeconds();
-            if(player.HasSharedData("LastVehicleExit") && player.GetSharedData<System.Int64>("LastVehicleExit") > 0 && currentTimestamp - player.GetSharedData<System.Int64>("LastVehicleExit") < 20)
+            if(player.HasSharedData("LastVehicleExit") && player.GetSharedDataSafe<System.Int64>("LastVehicleExit") > 0 && currentTimestamp - player.GetSharedDataSafe<System.Int64>("LastVehicleExit") < 20)
             { player.SendChatMessage(Translate(player, "ERROR_STOPANIM_VEHEXIT_COOLDOWN")); return; }
             */
 
-            if (!player.GetSharedData<string>("ActionType").Equals("none"))
+            if (!player.GetSharedDataSafe<string>("ActionType").Equals("none"))
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
             player.TriggerEvent("togglePrecisionPositioner", false);
@@ -1958,12 +1958,12 @@ namespace RNC
             {
                 return;
             }
-            player.SetSharedData("VisibleBlip", !player.GetSharedData<bool>("VisibleBlip"));
+            player.SetSharedData("VisibleBlip", !player.GetSharedDataSafe<bool>("VisibleBlip"));
         }
         [Command("painkillers", Alias = "pk")]
         public static void cmd_painkillers(Player player, string option)
         {
-            if (player.GetSharedData<int>("Team") == -1)
+            if (player.GetSharedDataSafe<int>("Team") == -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE"));
                 return;
@@ -1975,10 +1975,10 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+            if (player.GetSharedDataSafe<string>("ActionType") != "none" || player.GetSharedDataSafe<int>("ActionTime") > 0)
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
-            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill")))
             { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             /*if (player.IsInVehicle)
@@ -2003,7 +2003,7 @@ namespace RNC
         public static void cmd_medkit(Player player, string option)
         {
 
-            if (player.GetSharedData<int>("Team") == -1)
+            if (player.GetSharedDataSafe<int>("Team") == -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE"));
                 return;
@@ -2015,10 +2015,10 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<string>("ActionType") != "none" || player.GetSharedData<int>("ActionTime") > 0)
+            if (player.GetSharedDataSafe<string>("ActionType") != "none" || player.GetSharedDataSafe<int>("ActionTime") > 0)
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
-            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill")))
             { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             if (player.IsInVehicle)
@@ -2042,13 +2042,13 @@ namespace RNC
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
-            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedData<long>("TasedTill")))
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill")))
             { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             if (player.IsInVehicle)
             { player.SendChatMessage(Translate(player, "ERROR_CANT_USE_INSIDE_VEHICLE")); return; }
 
-            if (!player.GetSharedData<string>("ActionType").Equals("none"))
+            if (!player.GetSharedDataSafe<string>("ActionType").Equals("none"))
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
             if (player.HasData("Handsup"))
@@ -2068,7 +2068,7 @@ namespace RNC
         [Command("cuff", "!{#AFAFAF}[USAGE] cuff (optional:target)")]
         public void cmd_cuff(Player player, Player target = null)
         {
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if(lobby == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby!");
@@ -2142,7 +2142,7 @@ namespace RNC
                                 return;
                             }
                             
-                            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
                             if (lobbye != null)
                             {
                                 if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && !target.HasData("Cuffed"))
@@ -2169,7 +2169,7 @@ namespace RNC
                             player.ResetData("CuffingTarget");
 
                             EPlayer.GrantXP(player, 5);
-                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance")+(0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
+                            player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance")+(0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             EPlayer.Action(player, $"has grabbed ahold of {target.Name} and slapped the handcuffs on their wrists.");
 
                             EPlayer.SendMessageInLobby(lobbye.lobbyId, $"!{{#ADD8E6}}Cop {player.Name} has apprehended Fugitive {target.Name}.");
@@ -2208,7 +2208,7 @@ namespace RNC
         [Command("dragout", "!{#AFAFAF}[USAGE] dragout (optional:target)")]
         public static void cmd_dragout(Player player, Player target = null)
         {
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby == null)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_COPCHASE"));
@@ -2271,14 +2271,14 @@ namespace RNC
                     {
                         if (player != null && target != null && target.Exists)
                         {
-                            if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead || player.GetSharedData<int>("Wounded") > 0)
+                            if (target == null || !target.IsInstanceAlive || player == null || !player.IsInstanceAlive || player.Dead || player.GetSharedDataSafe<int>("Wounded") > 0)
                             {
                                 player.SendChatMessage(Translate(player, "ERROR_PLAYER_OR_TARGET_DEAD"));
                                 player.ResetData("DraggingOut");
                                 return;
                             }
 
-                            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedData<int>("InLobby"));
+                            LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
                             if (lobbye != null)
                             {
                                 if (lobbye.Cops.Contains(player) && lobbye.gameStatus == 1 && lobbye.Fugitives.Contains(target) && target.IsInVehicle
@@ -2324,7 +2324,7 @@ namespace RNC
                             EPlayer.GrantXP(player, 2);
                             target.TriggerEvent("ToggleSeatbelt", false);
                             target.ResetData("Seatbelt");
-                            player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
+                            player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
                             
                             player.ResetData("DraggingOut");
                             target.ResetData("DragoutVehicle");
@@ -3031,7 +3031,7 @@ namespace RNC
                 string[] firstNames = new string[]{ "adolf", "Great", "notorious", "The", "juan", "real", "stay" };
                 string[] additions = new string[] { "fxked", "_realest", "69", "420", "XXX", "GANG", "01", "itor" }; 
 
-                bool isOn = player.GetSharedData<bool>("FakeNameOn");
+                bool isOn = player.GetSharedDataSafe<bool>("FakeNameOn");
                 player.SetSharedData("FakeNameOn", !isOn);
 
                 player.SendChatMessage($"!{{#FF6347}}[!] ~w~You have toggled fake name {(!isOn == true ? "~g~ON" : "~r~OFF")}~w~!");
@@ -3093,12 +3093,12 @@ namespace RNC
         [Command("weaponeditor")]
         public static void cmd_weaponeditor(Player player)
         {
-            if(player.GetSharedData<int>("Team") > -1 || player.GetSharedData<int>("InDM") > -1 || player.GetSharedData<int>("InLobby") < 0)
+            if(player.GetSharedDataSafe<int>("Team") > -1 || player.GetSharedDataSafe<int>("InDM") > -1 || player.GetSharedDataSafe<int>("InLobby") < 0)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"));
                 return;
             }
-            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if(lobby != null)
             {
                 if(lobby.gameStatus == 2)
@@ -3604,7 +3604,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension <= 256 || player.Dimension > 512)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension <= 256 || player.Dimension > 512)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM_OR_WORLD"));
                 return;
@@ -3620,7 +3620,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -3764,7 +3764,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -3867,7 +3867,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") == -5) return;
+            if (player.GetSharedDataSafe<int>("InLobby") == -5) return;
 
             if (EPlayer.GetAccount(player).JailTime > 0)
             {
@@ -3876,7 +3876,7 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<bool>("AutoJoin") == true)
+            if (player.GetSharedDataSafe<bool>("AutoJoin") == true)
             {
                 EPlayer.Notify(player, Translate(player, "AUTOJOIN_OFF"), "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                 player.SetSharedData("AutoJoin", false);
@@ -3894,9 +3894,9 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<bool>("WantsDriveby") == true)
+            if (player.GetSharedDataSafe<bool>("WantsDriveby") == true)
             {
-                if (player.GetSharedData<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
+                if (player.GetSharedDataSafe<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
                 {
                     foreach (Player p in Settings.LoggedInPlayers.Where(a => a.Vehicle == player.Vehicle && a != player))
                     {
@@ -3908,7 +3908,7 @@ namespace RNC
             }
             else
             {
-                if (player.GetSharedData<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
+                if (player.GetSharedDataSafe<int>("Team") == 0 && player.IsInVehicle && player.VehicleSeat == 0)
                 {
                     foreach (Player p in Settings.LoggedInPlayers.Where(a => a.Vehicle == player.Vehicle))
                     {
@@ -4089,7 +4089,7 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin < 1)
                 return;
 
-            player.SendChatMessage($"!{{#FFFFFF}}{target.Name}'s framerate is !{{#FF6347}}{target.GetSharedData<int>("FPS")}");
+            player.SendChatMessage($"!{{#FFFFFF}}{target.Name}'s framerate is !{{#FF6347}}{target.GetSharedDataSafe<int>("FPS")}");
             return;
         }
 
@@ -4124,12 +4124,12 @@ namespace RNC
             {
                 player.SetSharedData($"VoiceMute{target.Name}", false);
             }
-            if (player.GetSharedData<bool>($"VoiceMute{target.Name}") == true)
+            if (player.GetSharedDataSafe<bool>($"VoiceMute{target.Name}") == true)
             {
                 player.SetSharedData($"VoiceMute{target.Name}", false);
                 EPlayer.Notify(player, Translate(player, "VOICEBLOCK_OFF", EPlayer.Name(target)), "green", "", false, 3000);
             }
-            else if (player.GetSharedData<bool>($"VoiceMute{target.Name}") == false)
+            else if (player.GetSharedDataSafe<bool>($"VoiceMute{target.Name}") == false)
             {
                 player.SetSharedData($"VoiceMute{target.Name}", true);
                 EPlayer.Error(player, Translate(player, "VOICEBLOCK_ON", EPlayer.Name(target)));
@@ -4143,7 +4143,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") == -5) return;
+            if (player.GetSharedDataSafe<int>("InLobby") == -5) return;
 
             if (player.HasData("Spectating"))
             {
@@ -4192,7 +4192,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") == -5) return;
+            if (player.GetSharedDataSafe<int>("InLobby") == -5) return;
 
             if (!player.HasData("DMLobbySkipID"))
             {
@@ -4257,12 +4257,12 @@ namespace RNC
                 // not really needed for ingame but other stuff
             }
 
-            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (elobby != null)
             {
                 if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
                 {
-                    if (elobby.Fugitives.Contains(player) && !player.GetSharedData<string>("CuffedBy").Equals("n/a"))
+                    if (elobby.Fugitives.Contains(player) && !player.GetSharedDataSafe<string>("CuffedBy").Equals("n/a"))
                     {
                         player.SendChatMessage(Translate(player, "ERROR_CUFFED"));
                         return;
@@ -4272,7 +4272,7 @@ namespace RNC
                 }
             }
 
-            if (player.GetSharedData<int>("InDM") != -1)
+            if (player.GetSharedDataSafe<int>("InDM") != -1)
             {
                 player.TriggerEvent("ResetKillFeed");
             }
@@ -4304,10 +4304,10 @@ namespace RNC
                 return;
 
 
-            player.SendChatMessage($"!{{#FFFF00}}You are in lobby {player.GetSharedData<int>("InLobby")}, /switchlobby to change to another lobby.");
+            player.SendChatMessage($"!{{#FFFF00}}You are in lobby {player.GetSharedDataSafe<int>("InLobby")}, /switchlobby to change to another lobby.");
 
             player.SendChatMessage("Current Lobby Players:");
-            Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")).ToList().ForEach((Player ePlayer) =>
+            Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")).ToList().ForEach((Player ePlayer) =>
             {
                 player.SendChatMessage($"!{{#999999}}{ePlayer.Name}");
             });
@@ -4325,7 +4325,7 @@ namespace RNC
         [Command("packetloss", Alias = "pl,ploss")]
         public void cmd_packetloss(Player player, Player target)
         {
-            player.SendChatMessage($"{target.Name}'s packetloss is !{{#FF6347}}{Convert.ToDouble(target.GetSharedData<object>("Packetloss")).ToString("N2")}%");
+            player.SendChatMessage($"{target.Name}'s packetloss is !{{#FF6347}}{Convert.ToDouble(target.GetSharedDataSafe<object>("Packetloss")).ToString("N2")}%");
             return;
         }
 
@@ -4522,7 +4522,7 @@ namespace RNC
 
                 player.SendChatMessage($">> !{{#DAA520}}Lobby {lobby.lobbyId} | {enabledStr} " +
                     $"!{{#DAA520}}| Players: !{{#FFFFFF}}" +
-                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId)}!{{#DAA520}}/!{{#FFFFFF}}{Settings.Dynamics.MaxInLobby} !{{#DAA520}}| Status: {Main.ConvertGameStatus(lobby.gameStatus, true)} !{{#DAA520}}| Mode: {Main.ConvertGameMode(lobby.gameMode, true)}!{{#DAA520}}");
+                    $"{Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId)}!{{#DAA520}}/!{{#FFFFFF}}{Settings.Dynamics.MaxInLobby} !{{#DAA520}}| Status: {Main.ConvertGameStatus(lobby.gameStatus, true)} !{{#DAA520}}| Mode: {Main.ConvertGameMode(lobby.gameMode, true)}!{{#DAA520}}");
             }
 
             return;
@@ -4535,7 +4535,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") == -5) return;
+            if (player.GetSharedDataSafe<int>("InLobby") == -5) return;
 
             if (player.GetData<int>("JailTime") > 0)
             {
@@ -4618,14 +4618,14 @@ namespace RNC
                 }
             }
 
-            if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
+            if (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
             {
                 //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
                 EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_FULL"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
-            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (elobby != null)
             {
                 if (elobby.gameStatus == 1 && (elobby.Cops.Contains(player) || elobby.Fugitives.Contains(player)))
@@ -4637,7 +4637,7 @@ namespace RNC
             }
 
             player.SetData("LastLobbySwitch", Environment.TickCount64);
-            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid && a.Id != player.Id))
+            foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == lobbyid && a.Id != player.Id))
             {
                 //targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
                 EPlayer.Notify(targ, Translate(targ, "PLAYER_JOINED_LOBBY", EPlayer.Name(player)), "blue", "fas fa-user-plus", false, 1000);
@@ -4669,7 +4669,7 @@ namespace RNC
 
             for (int i = 0; i < Settings.DMNames.Length; i++)
             {
-                if (player.GetSharedData<int>("InLobby") <= -1)
+                if (player.GetSharedDataSafe<int>("InLobby") <= -1)
                 {
                     player.SendChatMessage($">> !{{#DAA520}}Arena ID {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
                            $"!{{#DAA520}}| Players: N/A (No lobby)");
@@ -4677,7 +4677,7 @@ namespace RNC
                 else
                 {
                     player.SendChatMessage($">> !{{#DAA520}}Arena ID {i} | !{{#FF6347}}{Settings.DMNames[i]} " +
-                       $"!{{#DAA520}}| Players: !{{#FFFFFF}}{Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == i)}!{{#DAA520}}/!{{#FFFFFF}}{7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3)}");
+                       $"!{{#DAA520}}| Players: !{{#FFFFFF}}{Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby") && a.GetSharedDataSafe<int>("InDM") == i)}!{{#DAA520}}/!{{#FFFFFF}}{7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")) / 3)}");
                 }
             }
 
@@ -4699,7 +4699,7 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -6)
+            if (player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") != -6)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are currently in the copchase!");
                 EPlayer.Notify(player, "You are in a copchase.", "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
@@ -4763,7 +4763,7 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<int>("Team") != -1)
+            if (player.GetSharedDataSafe<int>("Team") != -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 EPlayer.Notify(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
@@ -4777,21 +4777,21 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<int>("InLobby") <= -1)
+            if (player.GetSharedDataSafe<int>("InLobby") <= -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 EPlayer.Notify(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
-            if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby") && a.GetSharedData<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")) / 3))
+            if (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby") && a.GetSharedDataSafe<int>("InDM") == arenaid) >= 7 + (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")) / 3))
             {
                 //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That arena has maxed out on players.");
                 EPlayer.Notify(player, Translate(player, "ERROR_ARENA_FULL"), "red", "fas fa-users-slash", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
-            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (elobby == null) return;
 
             if (elobby.gameStatus == 2)
@@ -4914,7 +4914,7 @@ namespace RNC
                 case "freeroam":
                     tAcc.FreeroamBanReason = reason;
                     tAcc.FreeroamBanTime = banTimestamp;
-                    if (target.GetSharedData<int>("InLobby") == -3)
+                    if (target.GetSharedDataSafe<int>("InLobby") == -3)
                     {
                         cmd_lobby(target);
                     }
@@ -4922,7 +4922,7 @@ namespace RNC
                 case "deathmatch":
                     tAcc.DeathmatchBanReason = reason;
                     tAcc.DeathmatchBanTime = banTimestamp;
-                    if (target.GetSharedData<int>("InDM") >= 0)
+                    if (target.GetSharedDataSafe<int>("InDM") >= 0)
                     {
                         cmd_lobby(target);
                     }
@@ -4930,7 +4930,7 @@ namespace RNC
                 case "copchase":
                     tAcc.CopchaseBanReason = reason;
                     tAcc.CopchaseBanTime = banTimestamp;
-                    if(target.GetSharedData<int>("Team") >= 0)
+                    if(target.GetSharedDataSafe<int>("Team") >= 0)
                     {
                         cmd_lobby(target);
                     }
@@ -4972,16 +4972,16 @@ namespace RNC
                 }
             }
 
-            if (player.GetSharedData<int>("Team") != -1)
+            if (player.GetSharedDataSafe<int>("Team") != -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_IN_COPCHASE"));
                 EPlayer.Notify(player, Translate(player, "ERROR_IN_COPCHASE_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
-            if (player.GetSharedData<int>("InLobby") > -1)
+            if (player.GetSharedDataSafe<int>("InLobby") > -1)
             {
-                LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+                LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
                 if (elobby != null)
                 {
                     
@@ -5038,16 +5038,16 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
 
-            if (player.GetSharedData<int>("Team") != -1)
+            if (player.GetSharedDataSafe<int>("Team") != -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_IN_COPCHASE"));
                 EPlayer.Notify(player, Translate(player, "ERROR_IN_COPCHASE_NOCOLOR"), "red", "fas fa-ban", false, 1000, "bottomCenter", "replace");
                 return;
             }
 
-            if (player.GetSharedData<int>("InLobby") > -1)
+            if (player.GetSharedDataSafe<int>("InLobby") > -1)
             {
-                LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+                LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
                 if (elobby == null) return;
                 
                 if (elobby.gameStatus == 2)
@@ -5086,7 +5086,7 @@ namespace RNC
                 return;
             }
 
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
 
             if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
 
@@ -5097,7 +5097,7 @@ namespace RNC
 
             foreach (Player eplayer in Settings.LoggedInPlayers)
             {
-                if (eplayer.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                if (eplayer.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId)
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
@@ -5121,7 +5121,7 @@ namespace RNC
                 return;
             }
 
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
 
             if (lobby == null) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a copchase lobby."); return; }
 
@@ -5132,7 +5132,7 @@ namespace RNC
 
             foreach (Player eplayer in Settings.LoggedInPlayers)
             {
-                if (eplayer.GetSharedData<int>("InLobby") == lobby.lobbyId && eplayer.GetSharedData<int>("Team") < 0)
+                if (eplayer.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId && eplayer.GetSharedDataSafe<int>("Team") < 0)
                 {
                     eplayer.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
 
@@ -5272,7 +5272,7 @@ namespace RNC
                 return;
             }
 
-            if (target.GetSharedData<int>("InLobby") == -5)
+            if (target.GetSharedDataSafe<int>("InLobby") == -5)
             {
                 if (target.GetData<bool>("Creator_Using") == true)
                 {
@@ -5498,7 +5498,7 @@ namespace RNC
         [Command("teleport", "!{#AFAFAF}[USAGE] teleport (option: chilliad, airport)", Alias = "tp", GreedyArg = true)]
         public void cmd_teleport(Player player, string tp)
         {
-            if (!EPlayer.LoggedIn(player) || player.GetSharedData<int>("InLobby") != -3)
+            if (!EPlayer.LoggedIn(player) || player.GetSharedDataSafe<int>("InLobby") != -3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -5525,7 +5525,7 @@ namespace RNC
         public void cmd_playanim(Player player, string lib, string name, int flags)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin >= 4 || player.GetSharedData<int>("InLobby") == -3)
+            if (EPlayer.GetAccount(player).Admin >= 4 || player.GetSharedDataSafe<int>("InLobby") == -3)
             {
                 Events.RequestPlayAnimation(player, lib, name, flags);
                 player.SendChatMessage("~y~[ANIMATION]~w~ Attempting to play animation ~y~" + name + "~w~.");
@@ -5537,7 +5537,7 @@ namespace RNC
         public void cmd_anim(Player player, string lib, string name, int flags)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            if (EPlayer.GetAccount(player).Admin >= 4 || player.GetSharedData<int>("InLobby") == -3)
+            if (EPlayer.GetAccount(player).Admin >= 4 || player.GetSharedDataSafe<int>("InLobby") == -3)
             {
                 player.SetSharedData("PlayedAnimation", $"{{\"library\":\"{lib}\", \"name\":\"{name}\", \"flags\":{flags}}}");
                 player.TriggerEvent("togglePrecisionPositioner", true);
@@ -6364,7 +6364,7 @@ namespace RNC
                 return;
             }
 
-            if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedData<int>("Team") != player.GetSharedData<int>("Team") || player.Vehicle.GetSharedData<int>("Team") == 10) &&
+            if (player.Vehicle.HasSharedData("Team") && (player.Vehicle.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team") || player.Vehicle.GetSharedDataSafe<int>("Team") == 10) &&
             player.Vehicle.EngineStatus == false)
             {
                 player.SendChatMessage(Translate(player, "HOTWIRE_HELP"));
@@ -6832,7 +6832,7 @@ namespace RNC
             {
                 pl.SendChatMessage(Translate(pl, "PLAYER_DELETED_LOBBY", EPlayer.GetAdminName(player), lobbyid));
 
-                if (pl.GetSharedData<int>("InLobby") == lobbyid)
+                if (pl.GetSharedDataSafe<int>("InLobby") == lobbyid)
                 {
                     EPlayer.Spawn(pl, true);
                 }
@@ -7059,7 +7059,7 @@ namespace RNC
                 return;
             }
 
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby == null)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in a lobby!");
@@ -7395,18 +7395,18 @@ namespace RNC
         [Command("clanchat", "!{#AFAFAF}[USAGE] clanchat (text)", Alias = "c", GreedyArg = true)]
         public void cmd_clanchat(Player player, string message)
         {
-            if(!player.HasSharedData("ClanID") || player.GetSharedData<int>("ClanID") == -1)
+            if(!player.HasSharedData("ClanID") || player.GetSharedDataSafe<int>("ClanID") == -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_CLAN"));
                 return;
             }
-            string nameDisp = (player.GetSharedData<string>("ClanTag") == "" ? player.GetSharedData<string>("ClanName") : player.GetSharedData<string>("ClanTag"));
-            foreach(Player playa in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == player.GetSharedData<int>("ClanID")))
+            string nameDisp = (player.GetSharedDataSafe<string>("ClanTag") == "" ? player.GetSharedDataSafe<string>("ClanName") : player.GetSharedDataSafe<string>("ClanTag"));
+            foreach(Player playa in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedDataSafe<int>("ClanID") == player.GetSharedDataSafe<int>("ClanID")))
             {
                 EPlayer.SendMessage(playa, $"!{{#218a3d}}[{nameDisp}] {EPlayer.Name(player)}: !{{#26a347}}{message}");
             }
 
-            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**{player.Name}:** {message}", $"Clan ({player.GetSharedData<string>("ClanName")})");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**{player.Name}:** {message}", $"Clan ({player.GetSharedDataSafe<string>("ClanName")})");
             return;
         }
 
@@ -7476,19 +7476,19 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 2) return;
 
-            if (player.GetSharedData<int>("InLobby") <= -1)
+            if (player.GetSharedDataSafe<int>("InLobby") <= -1)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You are not in any lobby!");
                 return;
             }
 
-            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData elobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (elobby == null) return;
 
             player.SendChatMessage("!{#FF6347}Next Round Fugitive List =>");
-            foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == elobby.lobbyId).OrderByDescending(a => a.HasData("GrantFugitive")).ThenByDescending(a => a.GetSharedData<float>("FugitiveChance")))
+            foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == elobby.lobbyId).OrderByDescending(a => a.HasData("GrantFugitive")).ThenByDescending(a => a.GetSharedDataSafe<float>("FugitiveChance")))
             {
-                player.SendChatMessage($"{EPlayer.Name(p)} !{{#FF6347}}Chance !{{#FFFFFF}}[{p.GetSharedData<float>("FugitiveChance").ToString("N2")}%] !{{#FF6347}}Grant !{{#FFFFFF}}[{p.HasData("GrantFugitive").ToString()}]");
+                player.SendChatMessage($"{EPlayer.Name(p)} !{{#FF6347}}Chance !{{#FFFFFF}}[{p.GetSharedDataSafe<float>("FugitiveChance").ToString("N2")}%] !{{#FF6347}}Grant !{{#FFFFFF}}[{p.HasData("GrantFugitive").ToString()}]");
             }
             return;
         }
@@ -7670,7 +7670,7 @@ namespace RNC
 
             if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
 
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == target.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == target.GetSharedDataSafe<int>("InLobby"));
             if (lobby != null)
             {
                 if (lobby.gameStatus != 1 || lobby.Fugitives.Contains(target) || lobby.Cops.Contains(target))
@@ -9556,7 +9556,7 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
+            if (player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") != -4)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
@@ -9621,7 +9621,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("InLobby") != -3)
+            if (player.GetSharedDataSafe<int>("InLobby") != -3)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_FREEROAM"));
                 return;
@@ -9680,7 +9680,7 @@ namespace RNC
             Stinger st = Stinger.Stingers.FirstOrDefault(s => s.ID == spikeID);
             if(st == null) { player.SendChatMessage("no exist :("); return; }
             player.Position = st.StingerObjects[0].Position;
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             player.Dimension = Convert.ToUInt32(lobby.lobbyId);
             player.SendChatMessage( $"~y~You have requested stinger deployment at location: ~w~{st.Area} - {st.Street}.");
         }
@@ -9958,12 +9958,12 @@ namespace RNC
         [Command("laser")]
         public void cmd_laser(Player player)
         {
-            if(player.GetSharedData<bool>("LaserEquipped") == false || !player.HasSharedData("LaserEquipped"))
+            if(player.GetSharedDataSafe<bool>("LaserEquipped") == false || !player.HasSharedData("LaserEquipped"))
                 player.SetSharedData("LaserEquipped", true);
             else
                 player.SetSharedData("LaserEquipped", false);
 
-            player.SendChatMessage($"Laser {(player.GetSharedData<bool>("LaserEquipped") ? "~g~ENABLED" : "~r~DISABLED")}");
+            player.SendChatMessage($"Laser {(player.GetSharedDataSafe<bool>("LaserEquipped") ? "~g~ENABLED" : "~r~DISABLED")}");
         }
         /*
         [Command("forcelogin")]
@@ -10175,8 +10175,8 @@ namespace RNC
 
             predicate.ForEach((p) =>
             {
-                string lobby = "!{#ffffff}[Lobby " + p.GetSharedData<int>("InLobby") + (p.GetSharedData<int>("InDM") > -1 ? (" DM " + p.GetSharedData<int>("InDM")) : "")  + "]";
-                switch (p.GetSharedData<int>("InLobby"))
+                string lobby = "!{#ffffff}[Lobby " + p.GetSharedDataSafe<int>("InLobby") + (p.GetSharedDataSafe<int>("InDM") > -1 ? (" DM " + p.GetSharedDataSafe<int>("InDM")) : "")  + "]";
+                switch (p.GetSharedDataSafe<int>("InLobby"))
                 {
                     case -1:
                         lobby = "!{#FF6347}[Login]";
@@ -10200,7 +10200,7 @@ namespace RNC
                 
                 p.SetSharedData("Ping", p.Ping);
 
-                player.SendChatMessage($"!{{#C4C4C4}}{EPlayer.Name(p)} (ID: {p.Id}) (Ping: {p.GetSharedData<int>("Ping")}ms) {lobby} {(EPlayer.IsAFK(p) ? "!{#FF0000}(AFK)" : "")}");
+                player.SendChatMessage($"!{{#C4C4C4}}{EPlayer.Name(p)} (ID: {p.Id}) (Ping: {p.GetSharedDataSafe<int>("Ping")}ms) {lobby} {(EPlayer.IsAFK(p) ? "!{#FF0000}(AFK)" : "")}");
             });
 
             return;
@@ -10229,7 +10229,7 @@ namespace RNC
                 return;
             }
             
-            if (player.GetSharedData<bool>("FakeNameOn"))
+            if (player.GetSharedDataSafe<bool>("FakeNameOn"))
             {
                 EPlayer.SendPlayerMessageToAllAdmins(player, text);
                 //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[A] {EPlayer.Name(player)} ({player.Name}):  {text}");
@@ -10363,7 +10363,7 @@ namespace RNC
             }
 
             bool isInCopchase = false;
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby != null)
             {
                 if (lobby.Cops.Contains(player) && lobby.gameStatus == 1)
@@ -10374,7 +10374,7 @@ namespace RNC
 
             if (!isInCopchase) { player.SendChatMessage(Translate(player, "ERROR_NOT_COP")); return; }
 
-            if(!player.IsInVehicle || (!player.Vehicle.HasSharedData("Team") || player.Vehicle.GetSharedData<int>("Team") != 1))
+            if(!player.IsInVehicle || (!player.Vehicle.HasSharedData("Team") || player.Vehicle.GetSharedDataSafe<int>("Team") != 1))
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_COP_CAR"));
                 return;
@@ -10406,7 +10406,7 @@ namespace RNC
             }
 
             bool isInCopchase = false;
-            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby != null)
             {
                 if ((lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)) && lobby.gameStatus == 1)
@@ -10625,7 +10625,7 @@ namespace RNC
             }
 
 
-            foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
+            foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")))
             {
                 EPlayer.SendPlayerMessage(pl, player, "Lobby", "lo", text);
                 //pl.SendChatMessage($"(( [LOBBY] {EPlayer.GetPrefix(player)} ~w~{EPlayer.Name(player)}: {text} ~w~))");
@@ -10633,7 +10633,7 @@ namespace RNC
 
             DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Global, $"(( **{player.Name}:** {text} ))", "Lobby OOC");
 
-            //Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedData<int>("InLobby")}) | {player.Name}**: {text}");
+            //Discord.SendTextChannel("staff-bot", $"**(Lobby {player.GetSharedDataSafe<int>("InLobby")}) | {player.Name}**: {text}");
         }
 
         [Command("ann", "!{#AFAFAF}[USAGE] ann (text)", Alias = "announce", GreedyArg = true)]
@@ -10887,7 +10887,7 @@ namespace RNC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid && a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedDataSafe<int>("Team") == teamid && a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")))
                 {
                     EPlayer.Freeze(p, true);
                     //EPlayer.Notify(p, $"You have been frozen by {EPlayer.GetAdminName(player)}", "red", "fas fa-iciles", false, 2000);
@@ -10911,7 +10911,7 @@ namespace RNC
             }
             else
             {
-                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedData<int>("Team") == teamid && a.GetSharedData<int>("InLobby") == player.GetSharedData<int>("InLobby")))
+                foreach (Player p in RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a != player && a.GetSharedDataSafe<int>("Team") == teamid && a.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby")))
                 {
                     EPlayer.Freeze(p, false);
                     //EPlayer.Notify(p, $"You have been thawed by {EPlayer.GetAdminName(player)}", "green", "fas fa-walking", false, 2000);
@@ -11473,7 +11473,7 @@ namespace RNC
                     return;
                 }
 
-                if (target.GetSharedData<int>("InLobby") == -5) return;
+                if (target.GetSharedDataSafe<int>("InLobby") == -5) return;
 
                 if (EPlayer.GetAccount(target).JailTime > 0)
                 {
@@ -11482,7 +11482,7 @@ namespace RNC
                     return;
                 }
 
-                if (target.GetSharedData<bool>("AutoJoin") == true)
+                if (target.GetSharedDataSafe<bool>("AutoJoin") == true)
                 {
                     EPlayer.Notify(target, Translate(target, "AUTOJOIN_OFF"), "red", "fas fa-check", false, 1500, "bottomCenter", "replace");
                     player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target's auto join has been turned off!");
@@ -11599,7 +11599,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
+            if (player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") != -4)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
@@ -11705,7 +11705,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (player.GetSharedData<int>("Team") != -1 && player.GetSharedData<int>("InLobby") != -4)
+            if (player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") != -4)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
@@ -12024,7 +12024,7 @@ namespace RNC
                 return;
             }
 
-            if (player.GetSharedData<bool>("NametagHack") == true)
+            if (player.GetSharedDataSafe<bool>("NametagHack") == true)
             {
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Nametag hack has been disabled.");
                 Logs.LogAdmin(player, $"Disabled nametag hack.");
@@ -12051,7 +12051,7 @@ namespace RNC
                 cmd_specoff(player);
             }
 
-            if (player.GetSharedData<int>("InDM") != -1)
+            if (player.GetSharedDataSafe<int>("InDM") != -1)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
@@ -12059,13 +12059,13 @@ namespace RNC
 
             if (EPlayer.GetAccount(player).Admin < 1)
             {
-                if (player.GetSharedData<int>("Team") != -1)
+                if (player.GetSharedDataSafe<int>("Team") != -1)
                 {
                     player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                     return;
                 }
 
-                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedData<int>("InLobby"));
+                LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
                 if (lobby != null)
                 {
                     if (

@@ -81,7 +81,7 @@ namespace RNC
         {
             try
             {
-                int languageID = (player.HasSharedData("Language") ? player.GetSharedData<int>("Language") : 0);
+                int languageID = (player.HasSharedData("Language") ? player.GetSharedDataSafe<int>("Language") : 0);
                 return Translate(languageID, message_code, args);
             }
             catch (Exception ex)

@@ -17,7 +17,7 @@ namespace RNC
             }
             else
             {
-                List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedData<string>("AC_WeaponData"));
+                List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedDataSafe<string>("AC_WeaponData"));
                 if (!weapons.Contains(weapon)) { weapons.Add(weapon); }
                 player.SetSharedData("AC_WeaponData", NAPI.Util.ToJson(weapons));
             }
@@ -35,7 +35,7 @@ namespace RNC
         {
             if (player.HasSharedData("AC_WeaponData"))
             {
-                List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedData<string>("AC_WeaponData"));
+                List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedDataSafe<string>("AC_WeaponData"));
                 if (weapons.Contains(weapon)) { weapons.Remove(weapon); }
                 player.SetSharedData("AC_WeaponData", NAPI.Util.ToJson(weapons));
             }

@@ -2730,7 +2730,7 @@ namespace RNC
                             {
                                 if (player != null && player.Exists)
                                 {
-                                    if (player.GetSharedData<int>("InLobby") == lobbyid && player.GetSharedData<bool>("AutoJoin") == true)
+                                    if (player.GetSharedDataSafe<int>("InLobby") == lobbyid && player.GetSharedDataSafe<bool>("AutoJoin") == true)
                                     {
                                         if (time > 0)
                                         {
@@ -2896,16 +2896,16 @@ namespace RNC
                                         {
                                             lock (player)
                                             {
-                                                if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                                if (player.HasSharedData("InLobby") && player.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId)
                                                 {
-                                                    if (player.HasSharedData("InLobby") && player.GetSharedData<int>("PlayerWeather") == -1)
+                                                    if (player.HasSharedData("InLobby") && player.GetSharedDataSafe<int>("PlayerWeather") == -1)
                                                     {
                                                         player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
                                                         //player.SendChatMessage(Translator.Translate(player, "WEATHER_FORECAST_2", weatherString));
                                                     }
                                                     else
                                                     {
-                                                        player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedData<int>("PlayerWeather"));
+                                                        player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedDataSafe<int>("PlayerWeather"));
                                                     }
 
 
@@ -2918,11 +2918,11 @@ namespace RNC
                                     {
                                         lock (player)
                                         {
-                                            if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                            if (player.HasSharedData("InLobby") && player.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId)
                                             {
-                                                if (player.GetSharedData<int>("PlayerWeather") == -1)
+                                                if (player.GetSharedDataSafe<int>("PlayerWeather") == -1)
                                                     player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], lobby.Weather);
-                                                else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedData<int>("PlayerWeather"));
+                                                else player.TriggerEvent("SetTimeWeather", lobby.Time[0], lobby.Time[1], lobby.Time[2], player.GetSharedDataSafe<int>("PlayerWeather"));
                                             }
                                         }
                                     }
@@ -2941,7 +2941,7 @@ namespace RNC
                                                 {
                                                     if(player != null)
                                                     {
-                                                        if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<int>("InDM") == -1 && player.GetSharedData<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
+                                                        if (player.HasSharedData("InLobby") && player.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId && player.GetSharedDataSafe<int>("InDM") == -1 && player.GetSharedDataSafe<bool>("AutoJoin") == true && !EPlayer.IsAFK(player))
                                                         {
                                                             pCount++;
                                                         }
@@ -2966,9 +2966,9 @@ namespace RNC
                                                 {
                                                     lock (player)
                                                     {
-                                                        if (player.GetSharedData<int>("InLobby") == lobby.lobbyId && player.GetSharedData<bool>("AutoJoin") == true)
+                                                        if (player.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId && player.GetSharedDataSafe<bool>("AutoJoin") == true)
                                                         {
-                                                            if (player.GetSharedData<int>("InLobby") < 0 || player.GetSharedData<int>("InDM") != -1)
+                                                            if (player.GetSharedDataSafe<int>("InLobby") < 0 || player.GetSharedDataSafe<int>("InDM") != -1)
                                                             {
                                                                 player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
                                                                 EPlayer.Notify(player, Translate(player, "ROUND_STARTING_GO_LOBBY"), "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
@@ -2979,7 +2979,7 @@ namespace RNC
                                                                 {
                                                                     Commands.cmd_specoff(player);
                                                                 }
-                                                                if (player.GetSharedData<bool>("global.WeaponEditorActive"))
+                                                                if (player.GetSharedDataSafe<bool>("global.WeaponEditorActive"))
                                                                 {
                                                                     player.TriggerEvent("WeaponEditor:exit");
                                                                 }
@@ -2989,7 +2989,7 @@ namespace RNC
                                                                 player.TriggerEvent("PlaySoundFrontend", "10s", "MP_MISSION_COUNTDOWN_SOUNDSET");
                                                                 EPlayer.Notify(player, Translate(player, "ROUND_STARTING"), "orange", "fas fa-hourglass-start", false, 10000, "topCenter");
 
-                                                                if (player.GetSharedData<bool>("IsTabbed") == true || EPlayer.IsAFK(player))
+                                                                if (player.GetSharedDataSafe<bool>("IsTabbed") == true || EPlayer.IsAFK(player))
                                                                 {
                                                                     player.TriggerEvent("SendNotification", "AFK Check", "Chase is starting in 10 seconds",
                                                                         "Race 'N' Chase", 10);
@@ -3022,7 +3022,7 @@ namespace RNC
                                         {
                                             lock (player)
                                             {
-                                                if (player.GetSharedData<int>("InLobby") == lobby.lobbyId)
+                                                if (player.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId)
                                                 {
                                                     player.SetSharedData("InLobby", -1);
                                                     player.SendChatMessage(Translate(player, "LOBBY_DISABLED_SENDING_ANOTHER"));
@@ -3045,12 +3045,12 @@ namespace RNC
                                             StopGame(lobby.lobbyId, 3);
                                         }
 
-                                        int woundedCops = lobby.Cops.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
+                                        int woundedCops = lobby.Cops.Where(c => c.GetSharedDataSafe<int>("Wounded") > 0).ToList().Count;
                                         if (woundedCops >= lobby.Cops.Count)
                                         {
                                             StopGame(lobby.lobbyId, 2);
                                         }
-                                        int woundedFugs = lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") > 0).ToList().Count;
+                                        int woundedFugs = lobby.Fugitives.Where(c => c.GetSharedDataSafe<int>("Wounded") > 0).ToList().Count;
                                         if (woundedFugs >= lobby.Fugitives.Count)
                                         {
                                             StopGame(lobby.lobbyId, 3);
@@ -3116,23 +3116,23 @@ namespace RNC
 
         public static void CheckDerbyWinner()
         {
-            int derbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count();
+            int derbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4).Count();
             if (Settings.DerbyTimeLeft <= 0 && derbyPlayers >= 2)
             {
                 Player winner = null;
                 int lastBigTime = 0;
                 int winXP = derbyPlayers * 2;
 
-                foreach (Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                foreach (Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4))
                 {
-                    if (player.GetSharedData<int>("DerbyTime") > lastBigTime)
+                    if (player.GetSharedDataSafe<int>("DerbyTime") > lastBigTime)
                     {
-                        lastBigTime = player.GetSharedData<int>("DerbyTime");
+                        lastBigTime = player.GetSharedDataSafe<int>("DerbyTime");
                         winner = player;
                     }
                 }
 
-                foreach (Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4))
+                foreach (Player player in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4))
                 {
                     player.Health = 0;
                     if (winner == null)
@@ -3148,10 +3148,10 @@ namespace RNC
                 if (winner != null)
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
-                    EPlayer.GrantXP(winner, winXP); DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{winner.Name}** has won the Derby round! | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}", $"Derby");
-                    ////Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == -4).Count()}**");
+                    EPlayer.GrantXP(winner, winXP); DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{winner.Name}** has won the Derby round! | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4).Count()}", $"Derby");
+                    ////Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4).Count()}**");
 
-                    winner.SetSharedData("FugitiveChance", winner.GetSharedData<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
+                    winner.SetSharedData("FugitiveChance", winner.GetSharedDataSafe<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
 
                     EPlayer.UnlockAchievement(winner, "first_derby");
                     EPlayer.TryAdvanceChallenge(winner, Challenge.ChallengeType.Win, "derby");
@@ -3199,7 +3199,7 @@ namespace RNC
                                 EPlayer.GivePoints(i, 5);
 
                                 if(i.HasSharedData("FugitiveChance"))
-                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.3);
                             }
                             EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
 
@@ -3219,7 +3219,7 @@ namespace RNC
                                     // Reward
                                     EPlayer.GrantXP(i, 8);
                                     EPlayer.GivePoints(i, 7);
-                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
                                     EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                                 }
                             }
@@ -3239,7 +3239,7 @@ namespace RNC
                                 // Reward
                                 EPlayer.GrantXP(i, 3);
                                 EPlayer.GivePoints(i, 2);
-                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                                i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.2);
                             }
                         }
                         else
@@ -3252,7 +3252,7 @@ namespace RNC
                                     // Reward
                                     EPlayer.GrantXP(i, 8);
                                     EPlayer.GivePoints(i, 7);
-                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.1);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.1);
 
                                     EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
 
@@ -3277,7 +3277,7 @@ namespace RNC
                                 // Reward
                                 EPlayer.GrantXP(i, 4);
                                 EPlayer.GivePoints(i, 2);
-                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+                                i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.3);
                             }
                         }
                         else
@@ -3290,7 +3290,7 @@ namespace RNC
                                     // Reward
                                     EPlayer.GrantXP(i, 8);
                                     EPlayer.GivePoints(i, 7);
-                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
                                     EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                                 }
                             }
@@ -3311,7 +3311,7 @@ namespace RNC
                             // Reward
                             EPlayer.GrantXP(i, 8);
                             EPlayer.GivePoints(i, 6);
-                            i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.5);
+                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
                             EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                         }
                         break;
@@ -3327,7 +3327,7 @@ namespace RNC
                                 // Reward
                                 EPlayer.GrantXP(i, 10);
                                 EPlayer.GivePoints(i, 13);
-                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.2);
+                                i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.2);
                                 EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
 
                                 if (i.GetData<bool>("ShotsFired") == false)
@@ -3342,15 +3342,15 @@ namespace RNC
 
                 lobby.FirstKill = new KeyValuePair<Player, Player>(null, null);
 
-                if (winnerTeam == 0 && lobby.Fugitives.Where(c => c.GetSharedData<int>("Wounded") == 0).ToList().Count == 1)
+                if (winnerTeam == 0 && lobby.Fugitives.Where(c => c.GetSharedDataSafe<int>("Wounded") == 0).ToList().Count == 1)
                 {
-                    Player last = lobby.Fugitives.FirstOrDefault(c => c.GetSharedData<int>("Wounded") == 0);
+                    Player last = lobby.Fugitives.FirstOrDefault(c => c.GetSharedDataSafe<int>("Wounded") == 0);
                     if (last != null)
                         EPlayer.UnlockAchievement(last, "last_man_standing");
                 }
-                if (winnerTeam == 1 && lobby.Cops.Where(c => c.GetSharedData<int>("Wounded") == 0).ToList().Count == 1)
+                if (winnerTeam == 1 && lobby.Cops.Where(c => c.GetSharedDataSafe<int>("Wounded") == 0).ToList().Count == 1)
                 {
-                    Player last = lobby.Cops.FirstOrDefault(c => c.GetSharedData<int>("Wounded") == 0);
+                    Player last = lobby.Cops.FirstOrDefault(c => c.GetSharedDataSafe<int>("Wounded") == 0);
                     if (last != null)
                         EPlayer.UnlockAchievement(last, "last_man_standing");
                 }
@@ -3358,7 +3358,7 @@ namespace RNC
 
                 foreach (Player i in Settings.LoggedInPlayers)
                 {
-                    if (i.GetSharedData<int>("InLobby") != lobby.lobbyId) continue;
+                    if (i.GetSharedDataSafe<int>("InLobby") != lobby.lobbyId) continue;
 
                     EPlayer.StopCarry(i);
                     i.ResetSharedData("InteriorsEntered");
@@ -3414,7 +3414,7 @@ namespace RNC
 
                     if (i.HasSharedData("Wounded"))
                     {
-                        if (i.GetSharedData<int>("Wounded") == 2)
+                        if (i.GetSharedDataSafe<int>("Wounded") == 2)
                         {
                             Events.RequestClearAnimation(i);
                             i.StopAnimation();
@@ -3524,15 +3524,15 @@ namespace RNC
                     lobby.GameProgress = 0;
 
                     // DECIDING WHO GETS PUT IN COPCHASE LOBBY AND WHO DOESN'T!
-                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobbyid &&
+                    List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == lobbyid &&
                     !EPlayer.IsAFK(a) &&
                     !a.HasData("Spectating") &&
-                    a.GetSharedData<bool>("AutoJoin") == true &&
+                    a.GetSharedDataSafe<bool>("AutoJoin") == true &&
                     !a.Dead &&
                     a.GetData<int>("EditingClothing") == -1 &&
-                    a.GetSharedData<int>("InDM") == -1 &&
-                    a.GetSharedData<int>("InLobby") >= 0 &&
-                    !a.GetSharedData<bool>("global.WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
+                    a.GetSharedDataSafe<int>("InDM") == -1 &&
+                    a.GetSharedDataSafe<int>("InLobby") >= 0 &&
+                    !a.GetSharedDataSafe<bool>("global.WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
 
@@ -3751,9 +3751,9 @@ namespace RNC
                                 {
                                     // FULL RANDOM CHANCE MODE 
                                     /*
-                                    if (lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetSharedData<bool>("AutoJoin") == true).Count() > 0)
+                                    if (lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetSharedDataSafe<bool>("AutoJoin") == true).Count() > 0)
                                     {
-                                        _tempPlayer = lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetSharedData<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).First();
+                                        _tempPlayer = lobbyPlayers.Where(a => a.HasData("GrantFugitive") && !lobby.Fugitives.Contains(a) && a.GetSharedDataSafe<bool>("AutoJoin") == true).OrderBy(c => Guid.NewGuid()).First();
                                     }
                                     else _tempPlayer = lobbyPlayers.OrderBy(c => Guid.NewGuid()).First();
 
@@ -3762,7 +3762,7 @@ namespace RNC
                                     // FULL RANDOM CHANCE MODE END
 
                                     /* HIGHEST FUGITIVE CHANCE MODE */
-                                    var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetSharedData<bool>("AutoJoin") == true).OrderByDescending(p => p.HasData("GrantFugitive")).ThenByDescending(p => p.GetSharedData<float>("FugitiveChance"));
+                                    var highestFugitives = lobbyPlayers.Where(p => !lobby.Fugitives.Contains(p) && p.GetSharedDataSafe<bool>("AutoJoin") == true).OrderByDescending(p => p.HasData("GrantFugitive")).ThenByDescending(p => p.GetSharedDataSafe<float>("FugitiveChance"));
 
                                     if (highestFugitives.Count() == 0) _tempPlayer = lobbyPlayers.OrderBy(c => Guid.NewGuid()).First();
                                     else _tempPlayer = highestFugitives.First();
@@ -3770,7 +3770,7 @@ namespace RNC
 
                                     // HIGHEST CHANCE MODE END
 
-                                    if (_tempPlayer.GetSharedData<bool>("AutoJoin") == false) continue;
+                                    if (_tempPlayer.GetSharedDataSafe<bool>("AutoJoin") == false) continue;
 
 
                                     if (!lobby.Fugitives.Contains(_tempPlayer))
@@ -3797,7 +3797,7 @@ namespace RNC
                             {
                                 foreach (Player player in lobbyPlayers)
                                 {
-                                    if (player.GetSharedData<bool>("AutoJoin") != true) continue;
+                                    if (player.GetSharedDataSafe<bool>("AutoJoin") != true) continue;
 
                                     player.ResetData("DragoutVehicle");
                                     player.ResetData("ExitedDragoutVehicle");
@@ -3848,7 +3848,7 @@ namespace RNC
                                     if (!lobby.Fugitives.Contains(player))
                                     {
                                         lobby.Cops.Add(player);
-                                        player.SetSharedData("FugitiveChance", player.GetSharedData<float>("FugitiveChance") + 1.0);
+                                        player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + 1.0);
                                     }
                                 }
                                 crashcheck = 15;
@@ -4080,11 +4080,11 @@ namespace RNC
                                             if (overridemaxseats != 0) maxseats = overridemaxseats;
 
                                             bool hasClanPartnering = false;
-                                            if (player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1
-                                            && player.HasSharedData("ClanPartnering") && player.GetSharedData<bool>("ClanPartnering") == true)
+                                            if (player.HasSharedData("ClanID") && player.GetSharedDataSafe<int>("ClanID") != -1
+                                            && player.HasSharedData("ClanPartnering") && player.GetSharedDataSafe<bool>("ClanPartnering") == true)
                                             {
-                                                int clanSQLID = player.GetSharedData<int>("ClanID");
-                                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedData<int>("ClanID") == clanSQLID && lobby.Cops.Contains(p) && p.Id != player.Id))
+                                                int clanSQLID = player.GetSharedDataSafe<int>("ClanID");
+                                                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasSharedData("ClanID") && p.GetSharedDataSafe<int>("ClanID") == clanSQLID && lobby.Cops.Contains(p) && p.Id != player.Id))
                                                 {
                                                     if (seat < maxseats)
                                                     {
@@ -4525,7 +4525,7 @@ namespace RNC
                                         else
                                         {
                                             if (lobby.Fugitives.Count == 2)
-                                                lobby.BankRobbery.Sniper = lobby.Fugitives.FirstOrDefault(lp => lp.GetSharedData<bool>("HeistLeader") == false);
+                                                lobby.BankRobbery.Sniper = lobby.Fugitives.FirstOrDefault(lp => lp.GetSharedDataSafe<bool>("HeistLeader") == false);
                                         }
                                         crashcheck = 22;
 
@@ -4642,7 +4642,7 @@ namespace RNC
 
                                 foreach (Player p in Settings.LoggedInPlayers)
                                 {
-                                    if (p.GetSharedData<int>("InLobby") == lobbyid)
+                                    if (p.GetSharedDataSafe<int>("InLobby") == lobbyid)
                                     {
                                         p.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                                     }
@@ -4677,7 +4677,7 @@ namespace RNC
         {
             try
             {
-                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedData<int>("InLobby") == -4).Count() >= 2)
+                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedDataSafe<int>("InLobby") == -4).Count() >= 2)
                 {
                     //Settings.DerbyTimeLeft--;
                     Settings.LastDerbyTick = Environment.TickCount64;
@@ -5547,7 +5547,7 @@ namespace RNC
                                     {
                                         if (fugitive == null) continue;
 
-                                        if (fugitive.GetSharedData<bool>("HasShot") == false)
+                                        if (fugitive.GetSharedDataSafe<bool>("HasShot") == false)
                                         {
                                             fugitive.SendChatMessage(Translate(fugitive, "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING"));
                                             fugitive.TriggerEvent("startCopchaseTimerEarlyWarningEffect");
@@ -5564,7 +5564,7 @@ namespace RNC
                                     {
                                         if (fugitive == null) continue;
 
-                                        if (fugitive.GetSharedData<bool>("HasShot") == false)
+                                        if (fugitive.GetSharedDataSafe<bool>("HasShot") == false)
                                         {
                                             fugitive.SetSharedData("HasShot", true);
                                             fugitive.SetSharedData("VisibleBlip", true);
@@ -5578,7 +5578,7 @@ namespace RNC
 
                                 if (lobby.GameProgress == Convert.ToInt32(0.7 * Settings.GameRunTime) && lobby.gameMode != GameModes.BUSTED && lobby.gameMode != GameModes.BANKROBBERY)
                                 {
-                                    foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    foreach (Player pl in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId))
                                     {
                                         try
                                         {
@@ -5691,7 +5691,7 @@ namespace RNC
                         {
                             lock (lobby.Fugitives)
                             {
-                                if (lobby.Fugitives.Where(fg => fg.HasSharedData("VisibleBlip") && fg.GetSharedData<bool>("VisibleBlip") == false).ToList().Count > 0)
+                                if (lobby.Fugitives.Where(fg => fg.HasSharedData("VisibleBlip") && fg.GetSharedDataSafe<bool>("VisibleBlip") == false).ToList().Count > 0)
                                 {
                                     foreach (Player fugi in lobby.Fugitives)
                                     {
@@ -5702,7 +5702,7 @@ namespace RNC
                                 }
                                 if (lobby.FugitiveShowCounter == 60 && lobby.GameProgress >= 60 && lobby.CollisionCounter <= -1)
                                 {
-                                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                    foreach (Player p in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId))
                                     {
                                         p.TriggerEvent("StartChaseTimer", lobby.GameProgress, gameRunTime, -1, (short)lobby.gameMode);
                                     }
@@ -5716,7 +5716,7 @@ namespace RNC
 
                             lock (lobby.Fugitives)
                             {
-                                foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedData<bool>("HasShot") == false))
+                                foreach (Player fugi in lobby.Fugitives.Where(a => a.GetSharedDataSafe<bool>("HasShot") == false))
                                 {
                                     fugi.SetSharedData("VisibleBlip", false);
 
@@ -5728,7 +5728,7 @@ namespace RNC
                         if (lobby.GameProgress % 5 == 0) // Every 5 seconds/multiple during collision phase
                         {
 
-                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId))
                             {
                                 try
                                 {
@@ -5758,7 +5758,7 @@ namespace RNC
                                 {
                                     if (lobby.gameMode != GameModes.BANKROBBERY)
                                     {
-                                        foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                        foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId))
                                         {
                                             try
                                             {
@@ -5804,9 +5804,9 @@ namespace RNC
                                         foreach (Vehicle veh in lobby.Vehicles)
                                         {
                                             veh.SetSharedData("Collisions", true);
-                                            if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
+                                            if (veh.HasSharedData("Team") && veh.GetSharedDataSafe<int>("Team") == 0)
                                             {
-                                                if (veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
+                                                if (veh.HasSharedData("SpeedInfo") && veh.GetSharedDataSafe<string>("SpeedInfo").Contains("Fast"))
                                                 {
                                                     veh.SetSharedData("vMaxSpeed", (float)(175 / 3.6)); // 175 KM/H for fast cars
                                                 }
@@ -5816,9 +5816,9 @@ namespace RNC
                                                 }
 
                                             }
-                                            else if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 1)
+                                            else if (veh.HasSharedData("Team") && veh.GetSharedDataSafe<int>("Team") == 1)
                                             {
-                                                if (veh.HasSharedData("SpeedInfo") && veh.GetSharedData<string>("SpeedInfo").Contains("Fast"))
+                                                if (veh.HasSharedData("SpeedInfo") && veh.GetSharedDataSafe<string>("SpeedInfo").Contains("Fast"))
                                                 {
                                                     veh.SetSharedData("vMaxSpeed", (float)(193 / 3.6)); // 193 KM/H for fast cop cars
                                                 }
@@ -5833,7 +5833,7 @@ namespace RNC
                                     {
                                         if (lobby.gameMode == GameModes.BANKROBBERY)
                                         {
-                                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedData<int>("InLobby") == lobby.lobbyId))
+                                            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId))
                                             {
                                                 try
                                                 {
@@ -5870,7 +5870,7 @@ namespace RNC
                                         foreach (Vehicle veh in lobby.Vehicles)
                                         {
                                             veh.SetSharedData("Collisions", true);
-                                            if (veh.HasSharedData("Team") && veh.GetSharedData<int>("Team") == 0)
+                                            if (veh.HasSharedData("Team") && veh.GetSharedDataSafe<int>("Team") == 0)
                                             {
                                                 veh.SetSharedData("vMaxSpeed", (float)(155 / 3.6)); // 155 KM/H
                                             }
@@ -5896,7 +5896,7 @@ namespace RNC
                                             cop.SetSharedData("VisibleBlip", true);
                                         }
 
-                                        if (cop.GetSharedData<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                        if (cop.GetSharedDataSafe<bool>("ClimbProtection") == true && cop.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
                                         {
                                             cop.SetSharedData("ClimbProtection", false);
                                         }
@@ -5912,7 +5912,7 @@ namespace RNC
                                     {
                                         if (fugi == null) continue;
 
-                                        if (fugi.GetSharedData<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
+                                        if (fugi.GetSharedDataSafe<bool>("ClimbProtection") == true && fugi.GetData<long>("ClimbProtectionEnd") < Environment.TickCount64)
                                         {
                                             fugi.SetSharedData("ClimbProtection", false);
                                         }

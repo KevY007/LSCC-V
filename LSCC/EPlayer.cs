@@ -699,11 +699,11 @@ namespace RNC
         {
             if (override_anonymous) return player.Name;
 
-            if(player.GetSharedData<bool>("FakeNameOn") == true && 
-                player.GetSharedData<string>("FakeName").Length > 0 && 
+            if(player.GetSharedDataSafe<bool>("FakeNameOn") == true && 
+                player.GetSharedDataSafe<string>("FakeName").Length > 0 && 
                 EPlayer.GetAccount(player).Admin >= 4)
             {
-                return player.GetSharedData<string>("FakeName");
+                return player.GetSharedDataSafe<string>("FakeName");
             }
 
             return player.Name;
@@ -897,6 +897,36 @@ namespace RNC
                     player.SetData("LoggedIn", false);
                 }
             }
+        }
+
+        public static T GetSharedDataSafe<T>(this Entity player, string key)
+        {
+            if (player.HasSharedData(key))
+            {
+                return player.GetSharedData<T>(key);
+            }
+            else
+            {
+                Type type = typeof(T);
+                if (type == typeof(int) || type == typeof(long)) return (T)(object)-1;
+                else if (type == typeof(float)) return (T)(object)-1f;
+                else if (type == typeof(double)) return (T)(object)-1.0f;
+                else if (type == typeof(float)) return (T)(object)-1f;
+                else if (type == typeof(bool)) return (T)(object)false;
+                else if (type == typeof(string)) return (T)(object)"";
+                else if (type == typeof(List<T>)) return (T)(object)new List<T>();
+                else if (type == typeof(Vector3)) return (T)(object)new Vector3(0, 0, 0);
+                else
+                {
+                    if(typeof(Entity) == typeof(Player))
+                    {
+                        Player pl = (Player)player;
+                        NAPI.Util.ConsoleOutput($"[GETSHAREDDATA SAFE FAIL] Key {key} on {pl.Name} was of Type: {type.Name}!");
+                    }
+                    return default(T);
+                }
+            }
+
         }
 
         public static bool IsAFK(Player player)
@@ -1142,7 +1172,7 @@ namespace RNC
         public static void SendPlayerMessage(Player target, Player messageFrom, string channel, string channelValue, string message)
         {
             target.TriggerEvent("chat:sendCustomMessage", $"{{\"name\":\"{channel}\", \"value\":\"{channelValue}\"}}",
-                                messageFrom.GetSharedData<string>("BadgeData"), 
+                                messageFrom.GetSharedDataSafe<string>("BadgeData"), 
                                 messageFrom.Name, message);
         }
         public static void SendPlayerMessage(Player target, string messageFromName, string channel, string channelValue, string message, string badges = "[]")
@@ -1154,7 +1184,7 @@ namespace RNC
 
         public static string GetPrefix(Player player, bool color = true)
         {
-            if (player.GetSharedData<bool>("FakeNameOn")) return "~w~Player";
+            if (player.GetSharedDataSafe<bool>("FakeNameOn")) return "~w~Player";
 
             string toReturn = "";
             Account acc = EPlayer.GetAccount(player);
@@ -1168,10 +1198,10 @@ namespace RNC
                 toReturn = EPlayer.GetDonatorLevelName(acc.DonatorLevel, color);
                 return toReturn;
             }
-            if(player.HasSharedData("ClanID") && player.GetSharedData<int>("ClanID") != -1 && player.HasSharedData("ClanTag") && player.GetSharedData<string>("ClanTag") != "")
+            if(player.HasSharedData("ClanID") && player.GetSharedDataSafe<int>("ClanID") != -1 && player.HasSharedData("ClanTag") && player.GetSharedDataSafe<string>("ClanTag") != "")
             {
                 if (color == true) toReturn += "!{#218a3d}";
-                toReturn += player.GetSharedData<string>("ClanTag");
+                toReturn += player.GetSharedDataSafe<string>("ClanTag");
                 return toReturn;
             }
             if (color == true) toReturn += "~w~";
@@ -1409,7 +1439,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
 
             if (lobby == null) { return; }
             if (lobby.gameMode == GameModes.BANKROBBERY)
@@ -1552,7 +1582,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedData<int>("InLobby"));
+            LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
 
             if (lobby == null) { return; }
 
@@ -1866,9 +1896,9 @@ namespace RNC
         public static Color GetColor(Player player)
         {
             return new Color(
-                player.GetSharedData<int>("Color_R"), 
-                player.GetSharedData<int>("Color_G"),
-                player.GetSharedData<int>("Color_B"));
+                player.GetSharedDataSafe<int>("Color_R"), 
+                player.GetSharedDataSafe<int>("Color_G"),
+                player.GetSharedDataSafe<int>("Color_B"));
         }
 
         public static String HexConverter(Color c)
@@ -2285,7 +2315,7 @@ namespace RNC
                 return;
             }
 
-            List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId).ToList();
+            List<Player> lobbyPlayers = Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId).ToList();
             int players = lobbyPlayers.Count;
 
             if (lobby.PlayerCreated == true && lobby.lobbyId == EPlayer.GetAccount(player).SQL_ID + 50000)
@@ -2441,7 +2471,7 @@ namespace RNC
                         {
                             if (player != null)
                             {
-                                if (player.GetSharedData<int>("Level") >= 100)
+                                if (player.GetSharedDataSafe<int>("Level") >= 100)
                                 {
                                     EPlayer.UnlockAchievement(player, "reach_level_100");
                                 }
@@ -2565,7 +2595,7 @@ namespace RNC
         }
         public static void StopCarry(Player player)
         {
-            int targetID = player.GetSharedData<int>("CarryingPlayer");
+            int targetID = player.GetSharedDataSafe<int>("CarryingPlayer");
             if (targetID == -1) return;
             Player target = GetByID(targetID);
             if (target == null) return;
@@ -2639,11 +2669,11 @@ namespace RNC
 
                 player.TriggerEvent("hideMDC");
 
-                if (player.GetSharedData<int>("Team") == 0)
+                if (player.GetSharedDataSafe<int>("Team") == 0)
                 {
                     Events.OnPlayerWounded(player, 0, -1);
                 }
-                else if(player.GetSharedData<int>("Team") != 0 && player.GetSharedData<int>("Team") != 1)
+                else if(player.GetSharedDataSafe<int>("Team") != 0 && player.GetSharedDataSafe<int>("Team") != 1)
                 {
                     Events.OnPlayerWounded(player, 0, -1);
                 }
@@ -2656,23 +2686,23 @@ namespace RNC
                     player.ResetData("DerbyVehicle");
                 }
 
-                if (forceAutojoin && player.GetSharedData<bool>("AutoJoin") == false)
+                if (forceAutojoin && player.GetSharedDataSafe<bool>("AutoJoin") == false)
                 {
                     EPlayer.Notify(player, Translate(player, "AUTOJOIN_ON"), "green", "fas fa-check", false, 1500, "bottomRight", "replace");
                     player.SetSharedData("AutoJoin", true);
                 }
 
-                if (((player.GetSharedData<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedData<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY
-                    player.GetSharedData<int>("InLobby") == -1 ||  // IN INVALID LOBBY PT2
-                    (player.GetSharedData<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ||  // IN CUSTOMIZER & DONE
-                    (player.GetSharedData<int>("InLobby") == -6 && player.GetSharedData<int>("InDM") == -1)) && // IN CUSTOM ARENAS BUT NOT IN ANY ARENA
+                if (((player.GetSharedDataSafe<int>("InLobby") >= 1 && Settings.Lobbies.Count(lob => lob.lobbyId == player.GetSharedDataSafe<int>("InLobby")) == 0) || // IN DELETED/NON EXISTENT LOBBY
+                    player.GetSharedDataSafe<int>("InLobby") == -1 ||  // IN INVALID LOBBY PT2
+                    (player.GetSharedDataSafe<int>("InLobby") == -5 && player.GetData<bool>("Creator_Using") == false && player.GetData<bool>("Tuner_Using") == false) ||  // IN CUSTOMIZER & DONE
+                    (player.GetSharedDataSafe<int>("InLobby") == -6 && player.GetSharedDataSafe<int>("InDM") == -1)) && // IN CUSTOM ARENAS BUT NOT IN ANY ARENA
                     EPlayer.GetAccount(player).JailTime < 1) // NOT IN JAIL
                 {
                     player.SetSharedData("InDM", -1);
                     int LobbyToBeIn = Settings.MaxLobbies;
-                    foreach (LobbyData lobby in Settings.Lobbies.OrderByDescending(l => Settings.LoggedInPlayers.Count(a => a.HasSharedData("InLobby") && a.GetSharedData<int>("InLobby") == l.lobbyId)))
+                    foreach (LobbyData lobby in Settings.Lobbies.OrderByDescending(l => Settings.LoggedInPlayers.Count(a => a.HasSharedData("InLobby") && a.GetSharedDataSafe<int>("InLobby") == l.lobbyId)))
                     {
-                        if (Settings.LoggedInPlayers.Count(a => a.GetSharedData<int>("InLobby") == lobby.lobbyId) >= Settings.Dynamics.MaxInLobby)
+                        if (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == lobby.lobbyId) >= Settings.Dynamics.MaxInLobby)
                         {
                             continue;
                         }
@@ -2684,7 +2714,7 @@ namespace RNC
 
                     player.SetSharedData("InLobby", LobbyToBeIn);
 
-                    foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedData<int>("InLobby") == LobbyToBeIn))
+                    foreach (Player targ in Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == LobbyToBeIn))
                     {
                         targ.SendChatMessage(Translate(targ, "JOINED_LOBBY_MSG", LobbyToBeIn, EPlayer.Name(player)));
                     }
@@ -2735,7 +2765,7 @@ namespace RNC
         {
             foreach (Player player in Settings.LoggedInPlayers)
             {
-                if (player.HasSharedData("InLobby") && player.GetSharedData<int>("InLobby") == lobbyid)
+                if (player.HasSharedData("InLobby") && player.GetSharedDataSafe<int>("InLobby") == lobbyid)
                 {
                     player.SendChatMessage(Translate(player, message_code, args));
                 }

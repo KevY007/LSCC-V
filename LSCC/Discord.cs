@@ -1221,9 +1221,9 @@ namespace RNC
                         }
                         else
                         {
-                            int lobbyID = player.GetSharedData<int>("InLobby");
-                            int teamID = player.GetSharedData<int>("Team");
-                            int dmID = player.GetSharedData<int>("InDM");
+                            int lobbyID = player.GetSharedDataSafe<int>("InLobby");
+                            int teamID = player.GetSharedDataSafe<int>("Team");
+                            int dmID = player.GetSharedDataSafe<int>("InDM");
                             string modeDisplay = $"Lobby {lobbyID}";
                             if (lobbyID > 0 && teamID != -1) modeDisplay = $"Copchase ({lobbyID})";
                             else if (lobbyID > 0 && dmID != -1) modeDisplay = $"Deathmatch ({lobbyID})";
@@ -1248,7 +1248,7 @@ namespace RNC
                                         break;
                                 }
                             }
-                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, $"{modeDisplay} | Level {player.GetSharedData<int>("Level")}", true);
+                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, $"{modeDisplay} | Level {player.GetSharedDataSafe<int>("Level")}", true);
                         }
 
                         count++;
@@ -1285,7 +1285,7 @@ namespace RNC
                 int count = 0;
                 lock (RAGE.Entities.Players)
                 {
-                    foreach (Player player in RAGE.Entities.Players.All.Where(p => p.HasSharedData("Admin") && p.GetSharedData<int>("Admin") > 0))
+                    foreach (Player player in RAGE.Entities.Players.All.Where(p => p.HasSharedData("Admin") && p.GetSharedDataSafe<int>("Admin") > 0))
                     {
                         if (count >= 6)
                         {
@@ -1300,9 +1300,9 @@ namespace RNC
                         }
                         else
                         {
-                            int lobbyID = player.GetSharedData<int>("InLobby");
-                            int teamID = player.GetSharedData<int>("Team");
-                            int dmID = player.GetSharedData<int>("InDM");
+                            int lobbyID = player.GetSharedDataSafe<int>("InLobby");
+                            int teamID = player.GetSharedDataSafe<int>("Team");
+                            int dmID = player.GetSharedDataSafe<int>("InDM");
                             string modeDisplay = $"Lobby {lobbyID}";
                             if (lobbyID > 0 && teamID != -1) modeDisplay = $"Copchase ({lobbyID})";
                             else if (lobbyID > 0 && dmID != -1) modeDisplay = $"Deathmatch ({lobbyID})";
@@ -1327,7 +1327,7 @@ namespace RNC
                                         break;
                                 }
                             }
-                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, $"{modeDisplay} | Admin Level {player.GetSharedData<int>("Admin")}", true);
+                            playerListEmbeds[playerListEmbeds.Count - 1].AddField(player.Name, $"{modeDisplay} | Admin Level {player.GetSharedDataSafe<int>("Admin")}", true);
                         }
 
                         count++;
