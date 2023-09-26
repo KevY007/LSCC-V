@@ -33,6 +33,7 @@ namespace RNC
             player.SetSharedData("InLobby", -69696969);
             EPlayer.ResetPlayerData(player);
             player.SetSharedData("Wounded", 0);
+            player.SetSharedData("FugitiveChance", 10.0);
         }
 
         [RemoteEvent("ServerConsoleOutput")]
@@ -157,7 +158,9 @@ namespace RNC
             EPlayer.SetDiscordStatus(player, "Connecting to the server...");
             player.SetData("LastCryptAttempt", Environment.TickCount64);
 
+            player.SetSharedData("InLobby", -1);
             EPlayer.ResetPlayerData(player);
+            player.SetSharedData("InLobby", -1);
             EPlayer.SyncServerSettings(player);
             EPlayer.Freeze(player, true);
 

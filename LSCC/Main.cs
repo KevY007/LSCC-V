@@ -3197,7 +3197,9 @@ namespace RNC
                                 EPlayer.GetAccount(i).Escapes++;
                                 EPlayer.GrantXP(i, 5);
                                 EPlayer.GivePoints(i, 5);
-                                i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
+
+                                if(i.HasSharedData("FugitiveChance"))
+                                    i.SetSharedData("FugitiveChance", i.GetSharedData<float>("FugitiveChance") + 0.3);
                             }
                             EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
 
