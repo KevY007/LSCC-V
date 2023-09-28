@@ -6706,8 +6706,11 @@ namespace RNC
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
 
+
             target.SetData("Kicked", true);
-            NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+            EPlayer.ShowPunishmentScreen(target, _new.SQL_ID, "ban", player.Name, reason, null, false);
+            EPlayer.SendToKickedScreen(target);
+
             return;
         }
 
@@ -10968,6 +10971,7 @@ namespace RNC
         [Command("kick", "!{#AFAFAF}[USAGE] kick (target) (reason)", GreedyArg = true)]
         public static void cmd_kick(Player player, Player target, string reason)
         {
+            int punishmentID = -1;
             if (!EPlayer.LoggedIn(player))
                 return;
 
@@ -10986,7 +10990,7 @@ namespace RNC
                         return;
                     }
                     Logs.LogAdmin(player, $"Kicked {target.Name} for {reason}.");
-                    Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Kick", reason, "N/A");
+                    punishmentID = Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Kick", reason, "N/A");
                 }
 
                 if (target.Name.StartsWith("KevY")) return;
@@ -10999,12 +11003,12 @@ namespace RNC
                 EPlayer.Notify(target, Translate(player, "KICKED_MSG", EPlayer.GetAdminName(player), reason), "red", "fas fa-ban", true, 30000);
 
                 // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:kick:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
-                
 
                 DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has kicked {target.Name} for {reason}", "Admin");
 
                 target.SetData("Kicked", true);
-                NAPI.Task.Run(() => { try { target.KickSilent(); } catch { } }, 1000);
+                EPlayer.ShowPunishmentScreen(target, punishmentID, "kick", player.Name, reason, null, false);
+                EPlayer.SendToKickedScreen(target);
             }
 
         }
@@ -11102,8 +11106,8 @@ namespace RNC
                 DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has admin-jailed {target.Name} for {mins} minutes, reason: {reason}", "Admin");
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:jail:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
                 Logs.LogAdmin(player, $"Jailed player {target.Name} for {mins} minutes, reason: {reason}.");
-                EPlayer.Jail(target, mins, reason); 
-                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Jail", reason, mins + " minutes.");
+                int id = Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Jail", reason, mins + " minutes.");
+                EPlayer.Jail(target, mins, reason, id, player.Name); 
             }
             return;
         }
@@ -11210,9 +11214,9 @@ namespace RNC
 
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:warn:{target.Name}:{reason.Replace(":", "|")}"); } catch { }
                 Logs.LogAdmin(player, $"Warned {target.Name} for {reason}.");
-                EPlayer.Warn(target);
 
-                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Warn", "(#" + (EPlayer.GetAccount(target).Warns) + ") " + reason, "N/A");
+                int recordID = Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Warn", "(#" + (EPlayer.GetAccount(target).Warns) + ") " + reason, "N/A");
+                EPlayer.Warn(target, recordID, player.Name, reason);
             }
             return;
         }
@@ -11268,8 +11272,8 @@ namespace RNC
                 Acc.MuteTime = Acc.MuteTime + (mins * 60);
                 target.SendChatMessage(Translate(target, "MUTED_PLAYER_MSG", mins, reason));
 
-                Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", reason, mins + " minutes.");
-
+                int punishId = Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", reason, mins + " minutes.");
+                EPlayer.ShowPunishmentScreen(player, punishId, "mute", player.Name, reason, $"{mins} minutes.", true);
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
                 Logs.LogAdmin(player, $"Muted {target.Name} for {mins} minutes, reason: {reason}.");
                 target.SetSharedData("MuteTime", Acc.MuteTime);

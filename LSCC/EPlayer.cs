@@ -941,7 +941,15 @@ namespace RNC
             return false;
         }
 
-        public static void Jail(Player player, int minutes, string reason)
+        public static void SendToKickedScreen(Player player)
+        {
+            player.SetData("Kicked", true);
+            player.Position = new Vector3(0, 0, 400);
+            player.TriggerEvent("startKickedScreen");
+            NAPI.Task.Run(() => { try { player.KickSilent(); } catch { } }, 60000);
+        }
+
+        public static void Jail(Player player, int minutes, string reason, int punishmentId = -1, string adminName = "")
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -951,7 +959,7 @@ namespace RNC
                 Acc.JailReason = reason;
                 Acc.JailTime = Acc.JailTime + (minutes * 60);
                 player.SendChatMessage(Translator.Translate(player, "JAILED_PLAYER_MSG", minutes, reason));
-
+                EPlayer.ShowPunishmentScreen(player, punishmentId, "jail", adminName, reason, $"{minutes} minutes.", true);
                 lock (Settings.Lobbies)
                 {
                     foreach (LobbyData il in Settings.Lobbies)
@@ -1126,7 +1134,12 @@ namespace RNC
             return;
         }
 
-        public static void Warn(Player player)
+        public static void ShowPunishmentScreen(Player player, int recordId, string type, string adminName, string reason, string duration, bool acknowledgable)
+        {
+            player.TriggerEvent("showPunishmentScreen", recordId, type, adminName, reason, duration, acknowledgable);
+        }
+
+        public static void Warn(Player player, int recordId = -1, string adminName = "Anonymous", string reason = "")
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -1138,6 +1151,7 @@ namespace RNC
                 if (Acc.Warns < 10)
                 {
                     player.SendChatMessage(Translate(player, "WARNED_PLAYER_MSG"));
+                    EPlayer.ShowPunishmentScreen(player, recordId, "warn", adminName, reason, null, true);
                 }
                 else
                 {

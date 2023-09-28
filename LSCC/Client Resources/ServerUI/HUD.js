@@ -242,6 +242,7 @@ mp.events.add('actionMenu:close', () => {
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
+    if(global.isInPunishmentDialog) return;
     if(global.chatStatus == true || global.isHeliCamActive() || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
         || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.StationPickerToggled == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
 
@@ -260,6 +261,7 @@ mp.events.add('actionMenu:open', () => {
 let lastActionMenuClick = 0;
 
 mp.events.add('menu_actionwheel_action_click', (actionID) => {
+    if(global.isInPunishmentDialog) return;
     if(!global.ServerUI) return;
     if(Date.now() - lastActionMenuClick < 100) return;
     lastActionMenuClick = Date.now();

@@ -951,6 +951,8 @@ mp.keys.bind(0x74, true, () => { // F5 to open emoji picker in chat
 
 
 function focusChat(toggle){
+  
+    if(global.isInPunishmentDialog) return;
     if(global.ServerUI == null) return;
 
     emojiPickerOpen = false;
@@ -1183,6 +1185,8 @@ let global = {
   currentMuteTime: 0,
   lastMuteUpdate: 10,
   lastFunc: "Init",
+
+  isInPunishmentDialog:false,
 
   miniHUD_items:[],
 

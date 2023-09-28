@@ -437,7 +437,7 @@ namespace RNC
                 }
             });
         }
-        public static void AddToAdminRecord(int accountID, int adminID, string type, string reason, string duration)
+        public static int AddToAdminRecord(int accountID, int adminID, string type, string reason, string duration)
         {
             reason = reason.Replace("{", "(");
             reason = reason.Replace("}", ")");
@@ -459,6 +459,7 @@ namespace RNC
                     await context.SaveChangesAsync();
                 }
             });
+            return _a.SQL_ID;
         }
     }
 }

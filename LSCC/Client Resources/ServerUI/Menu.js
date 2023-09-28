@@ -423,6 +423,8 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
 });
 
 function ToggleMenu() {
+  if(global.isInPunishmentDialog) return;
+
   if (global.MDCActive !== undefined && global.MDCActive == true) {
     global.ToggleMDC();
   }
@@ -1351,11 +1353,64 @@ mp.events.add("UpdateMaxMenuItem", (id, max) => {
 mp.events.add("UpdateMenuItem", (id, owned) => {
   
 });
+
+let isPlayerKicked = false;
+mp.events.add('startKickedScreen', () => {
+  isPlayerKicked = true;
+  mp.players.local.freezePosition(true);
+  let kickedCam = mp.cameras.new('default', new mp.Vector3(0, 0, 450), new mp.Vector3(0, 0, 0));
+  kickedCam.setActive(true);
+  mp.game.cam.renderScriptCams(true, false, 0, true, false);
+  mp.game.graphics.startScreenEffect('DeathFailMPIn', 60000, true);
+});
+
+mp.events.add('render', () => {
+  if(global.isInPunishmentDialog == true){
+    for(let i = 0 ; i < 34 ; i++){
+      mp.game.controls.disableAllControlActions(i);
+    }
+  }
+});
+mp.events.add('dialog_punishment_confirm_acknowledged', () => {
+  global.isInPunishmentDialog = false;
+  if(isPlayerKicked === true){
+    setTimeout(() => {
+      if(mp.players.local && mp.players.exists(mp.players.local))
+        mp.events.callRemote('KickPlayer', "", true);
+    }, 30000);
+  }
+});
+
+mp.events.add("showPunishmentScreen", (punishmentId, type, admin, reason, duration, acknowledgable) => {
+  if(global.ServerUI) global.ServerUI.call('dialog_punishment_confirm_open', punishmentId, type, admin, reason, duration, acknowledgable);
+  global.isInPunishmentDialog = true;
+});
+
 // called by menu:
-mp.events.add("menu_buyNamechange", (id) => {
+mp.events.add('mainmenu_store_buy', (packageName) => {
+  if(packageName.startsWith('namechange')){
+    switch(packageName){
+      case "namechange-1":
+        mp.events.callLocal("mainmenu_store_buy_namechange", 0);
+        break;
+      case "namechange-5":
+        mp.events.callLocal("mainmenu_store_buy_namechange", 1);
+        break;
+      case "namechange-10":
+        mp.events.callLocal("mainmenu_store_buy_namechange", 2);
+        break;
+    }
+  }
+  else{
+    mp.events.callLocal('mainmenu_store_buy_rank', packageName);
+  }
+});
+
+
+mp.events.add("mainmenu_store_buy_namechange", (id) => {
   mp.events.callRemote("Menu_OnBuyNamechange", id);
 });
-mp.events.add("menu_buyRank", (id) => {
+mp.events.add("mainmenu_store_buy_rank", (id) => {
   mp.events.callRemote("Menu_OnBuyRank", id);
 });
 mp.events.add("mainmenu_inventory_items_item_buy", (id) => {
