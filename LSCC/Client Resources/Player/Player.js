@@ -3145,9 +3145,9 @@ const WeaponDamageData = [
     {
         categoryId:4,
         category:"Shotguns",
-        torsoDamage:12,
-        limbDamage:8,
-        headDamage:20,
+        torsoDamage:24,
+        limbDamage:20,
+        headDamage:40,
         weapons:[3800352039, 984333226, 317205821, 94989220] 
         // Assault Shotgun, Heavy Shotgun, Sweeper Shotgun, Combat Shotgun
     },
@@ -3213,6 +3213,12 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
             }
             if(damageInfo.categoryId == 4){
                 const distance = sourceEntity.position.subtract(targetEntity.position).length();
+                if(boneIndex === 20){
+                    if(distance <= 10.0)
+                        DamageToDeal = 1000.0;
+                    else DamageToDeal = (damageInfo.headDamage*1.2);
+                }    
+
                 if(distance > 10.0 && distance < 20.0)
                     DamageToDeal *= 0.8;
                 else if(distance > 20.0 && distance < 30.0)
