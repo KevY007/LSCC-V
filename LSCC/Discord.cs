@@ -371,7 +371,7 @@ namespace RNC
                     await RespondAlert(command, "An account with that username could not be found!", EmbedType.Error);
                     return;
                 }
-                if (target.DiscordID != null || target.DiscordID.Length > 5)
+                if (target.DiscordID != null || target.DiscordID.Length > 5 || target.DiscordID.ToLower() != "n/a")
                 {
                     await RespondAlert(command, "That RnC account is already linked to another Discord account!", EmbedType.Error);
                     return;
