@@ -3094,8 +3094,8 @@ const WeaponDamageData = [
         torsoDamage:18,
         limbDamage:15,
         headDamage:33,
-        weapons:[324215364, 736523883, 171789620, 3173288789, 3675956304, 584646201] 
-        // Micro SMG, SMG, Combat PDW, Mini SMG, Machine Pistol, AP Pistol
+        weapons:[324215364, 736523883, 171789620, 3173288789, 3675956304, 584646201, 350597077] 
+        // Micro SMG, SMG, Combat PDW, Mini SMG, Machine Pistol, AP Pistol, Tactical SMG
     },   
     {
         categoryId:2,
@@ -3211,14 +3211,14 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                 default: DamageToDeal = damageInfo.limbDamage;
                 break;
             }
-        }
-        if(damageInfo.categoryId == 4){
-            const distance = sourceEntity.position.subtract(targetEntity.position).length();
-            if(distance > 10.0 && distance < 20.0)
-                DamageToDeal *= 0.8;
-            else if(distance > 20.0 && distance < 30.0)
-                DamageToDeal *= 0.5;
-            else DamageToDeal *= 0.2;
+            if(damageInfo.categoryId == 4){
+                const distance = sourceEntity.position.subtract(targetEntity.position).length();
+                if(distance > 10.0 && distance < 20.0)
+                    DamageToDeal *= 0.8;
+                else if(distance > 20.0 && distance < 30.0)
+                    DamageToDeal *= 0.5;
+                else DamageToDeal *= 0.2;
+            }
         }
 
         if(DamageToDeal > 0){
