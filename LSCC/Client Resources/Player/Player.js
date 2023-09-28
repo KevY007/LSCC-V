@@ -3062,6 +3062,8 @@ mp.events.add("fakeDeathToRespawn", () => {
 
 const WeaponDamageData = [
     {
+        categoryId:0,
+        category:"Less-Lethal",
         torsoDamage:5,
         limbDamage:5,
         headDamage:5,
@@ -3069,6 +3071,8 @@ const WeaponDamageData = [
         // Pump Shotgun Mk2, Stun Gun
     },
     {
+        categoryId:1,
+        category:"Handguns",
         torsoDamage:26,
         limbDamage:20,
         headDamage:52,
@@ -3076,6 +3080,8 @@ const WeaponDamageData = [
         // Pistol, Pistol MK2, Combat Pistol, AP Pistol, SNS Pistol, SNS Pistol MK2, Heavy Pistol, Vintage Pistol, Pistol XM3
     },
     {
+        categoryId:1,
+        category:"Handguns",
         torsoDamage:40,
         limbDamage:35,
         headDamage:70,
@@ -3083,6 +3089,8 @@ const WeaponDamageData = [
         // Marksman Pistol, Heavy Revolver, Heavy Revolver MK2, Double Action, Pistol .50, Navy Revolver
     },    
     {
+        categoryId:2,
+        category:"Submachine Guns",
         torsoDamage:18,
         limbDamage:15,
         headDamage:33,
@@ -3090,6 +3098,8 @@ const WeaponDamageData = [
         // Micro SMG, SMG, Combat PDW, Mini SMG, Machine Pistol, AP Pistol
     },   
     {
+        categoryId:2,
+        category:"Submachine Guns",
         torsoDamage:22,
         limbDamage:18,
         headDamage:38,
@@ -3097,6 +3107,8 @@ const WeaponDamageData = [
         // Assault SMG, SMG MK2
     },  
     {
+        categoryId:3,
+        category:"Assault Rifles",
         torsoDamage:30,
         limbDamage:27,
         headDamage:60,
@@ -3104,6 +3116,8 @@ const WeaponDamageData = [
         // Assault Rifle, Carbine Rifle, Special Carbine, Bullpup Rifle, Compact Rifle, MG
     }, 
     {
+        categoryId:3,
+        category:"Assault Rifles",
         torsoDamage:34,
         limbDamage:30,
         headDamage:63,
@@ -3111,6 +3125,8 @@ const WeaponDamageData = [
         // Assault Rifle MK2, Carbine Rifle MK2, Advanced Rifle, Special Carbine MK2, Bullpup Rifle MK2, Combat MG, Tactical Rifle, Gusenberg Sweeper
     }, 
     {
+        categoryId:3,
+        category:"Assault Rifles",
         torsoDamage:37,
         limbDamage:33,
         headDamage:63,
@@ -3118,6 +3134,8 @@ const WeaponDamageData = [
         // Combat MG MK2, Military Rifle, Heavy Rifle
     },    
     {
+        categoryId:4,
+        category:"Shotguns",
         torsoDamage:60,
         limbDamage:50,
         headDamage:100,
@@ -3125,6 +3143,8 @@ const WeaponDamageData = [
         // Pump Shotgun, Sawed-Off Shotgun, Double Barrel Shotgun, Bullpup Shotgun
     },
     {
+        categoryId:4,
+        category:"Shotguns",
         torsoDamage:12,
         limbDamage:8,
         headDamage:20,
@@ -3132,6 +3152,8 @@ const WeaponDamageData = [
         // Assault Shotgun, Heavy Shotgun, Sweeper Shotgun, Combat Shotgun
     },
     {
+        categoryId:5,
+        category:"Rifles",
         torsoDamage:100,
         limbDamage:90,
         headDamage:200,
@@ -3139,6 +3161,8 @@ const WeaponDamageData = [
         // Sniper Rifle, Heavy Sniper, Precision Rifle, Musket
     },
     {
+        categoryId:5,
+        category:"Rifles",
         torsoDamage:200,
         limbDamage:150,
         headDamage:300,
@@ -3146,6 +3170,8 @@ const WeaponDamageData = [
         // Heavy Sniper MK2
     },
     {
+        categoryId:5,
+        category:"Rifles",
         torsoDamage:80,
         limbDamage:70,
         headDamage:150,
@@ -3164,10 +3190,204 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         if(targetEntity.getHealth() <= 0) return;
 
         var DamageToDeal = 0;
+        const damageInfo = WeaponDamageData.find(w => w.weapons.includes(weapon));
+        if(!damageInfo) DamageToDeal = 0;
+        else{
+            switch(boneIndex){
+                case 0: DamageToDeal = damageInfo.torsoDamage;
+                break;
+                case 7: DamageToDeal = damageInfo.torsoDamage;
+                break;
+                case 8: DamageToDeal = damageInfo.torsoDamage;
+                break;
+                case 9: DamageToDeal = damageInfo.torsoDamage;
+                break;
+                case 10: DamageToDeal = damageInfo.torsoDamage;
+                break;
+                case 19: DamageToDeal = damageInfo.headDamage;
+                break;
+                case 20: DamageToDeal = 1000;
+                break;
+                default: DamageToDeal = damageInfo.limbDamage;
+                break;
+            }
+        }
+        if(damageInfo.categoryId == 4){
+            const distance = sourceEntity.position.subtract(targetEntity.position).length();
+            if(distance > 10.0 && distance < 20.0)
+                DamageToDeal *= 0.8;
+            else if(distance > 20.0 && distance < 30.0)
+                DamageToDeal *= 0.5;
+            else DamageToDeal *= 0.2;
+        }
 
+        if(DamageToDeal > 0){
+            if(Date.now() - lastRegisteredShotTime > 20 && damageInfo.categoryId !== 4){
+                mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DamageToDeal, targetPlayer.getArmour(), weapon.toString(), boneIndex);            
+                lastRegisteredShotTime = Date.now();
+            }
+            else{
+                shotsToRegister.push({weapon:weapon, damage:DamageToDeal, target:targetPlayer, bone:boneIndex});
+                triggerMultipleShotsStamp = Date.now()+30;
+            }
+        }
+
+        /* Other checks to prevent/reduce visual bugs such as players dying on shooter's screen */
+        if(targetEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
+            {
+                if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
+                {
+                    damage = 0;
+                    mp.game.weapon.setCurrentDamageEventAmount(0);
+                    mp.game.weapon.cancelCurrentDamageEvent();
+                    return true;
+                }
+
+                if(sourceEntity.getVariable("Team") == 1 && targetEntity.getVariable("Team") == 0 && global.chaseRunning)
+                {
+                    if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
+                    {
+                        if(weapon != 911657153){
+                           
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            return true; // cant damage dem at alll if thy havent shot unless taser
+                        }
+
+                        if(global.chaseTimeCur < 60){                           
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            return true;
+                        }
+
+                        if(targetEntity.getVariable("TaseProtection") == true && targetEntity.getVariable("Team") == 0)
+                        {                   
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            mp.events.callLocal("HUDError", "Target has active Tase Protection! You can't tase them yet.");
+                            return true;
+                        }
+
+                        if(targetEntity.getVariable("Team") == 0 && targetEntity.getVariable("HasShot") == true) {
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            return true;
+                        }
+
+                        if((targetEntity.isInAnyVehicle(false) == true || 
+                            global.calcDist(targetEntity.position, player.position) > 7.5)) {
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            mp.events.callLocal("HUDError", "You're too far! Must be less than 7.5m away from target.");
+                            return true; // Stun Gun no shot if more than 10 meters or target in car.
+                        }
+                    }
+                    else{
+                        if(weapon == 911657153){ // Attempt to tase a fugitive with shot tag.
+                            damage = 0;
+                            mp.game.weapon.setCurrentDamageEventAmount(0);
+                            mp.game.weapon.cancelCurrentDamageEvent();
+                            mp.events.callLocal("HUDError", "You can't tase players who have the Shot Tag!");
+                            return true;
+                        }
+                    }
+                }
+                if(sourceEntity.getVariable("Team") == 0 && targetEntity.getVariable("Team") == 1 && sourceEntity.getVariable("HasShot") == false
+                    && isMeleeWeapon(weapon) && global.chaseRunning)
+                {
+                    mp.events.callRemote("GivePlayerShotTag");
+                }
+
+                if(sourceEntity.getVariable("Team") != targetEntity.getVariable("Team"))
+                {
+                    if(targetEntity.getVariable("Wounded") == 1)
+                    {
+                        damage = 0;
+                        mp.game.weapon.setCurrentDamageEventAmount(0);
+                        mp.game.weapon.cancelCurrentDamageEvent();
+                        return true;
+                    }
+                    if(targetEntity.getVariable("Wounded") == 2)
+                    {
+                        damage = 0;
+                        mp.game.weapon.setCurrentDamageEventAmount(0);
+                        mp.game.weapon.cancelCurrentDamageEvent();
+                        mp.events.callRemote("opsp", targetPlayer, boneIndex, mp.players.local.weapon);
+                        return true;
+                    }
+                }
+            }
+    }
+    else if(targetEntity !== undefined && targetEntity.type === 'vehicle'){
+        if(targetEntity.getVariable("Team") !== undefined && player.getVariable("Team") != -1)
+        {
+            let breakShot = false;
+            var vehicleOccupants = 0;
+
+            if(weapon == 911657153)
+            {
+                breakShot = true;
+                mp.events.callLocal("HUDError", "Taser does not work for vehicles!!");
+            }
+
+            if(targetEntity.getVariable("Team") == player.getVariable("Team"))
+            {
+                breakShot = true; // Break team-kill car by default
+                
+                mp.players.streamed.forEach(occupant => {
+                    if(occupant.isInVehicle(targetEntity.handle, false)) {
+                        vehicleOccupants++;
+                        if(occupant.getVariable("Team") != player.getVariable("Team")) {
+                            breakShot = false; // Don't break shot if there's a fugi in or opposite team member!
+                        }
+                    }
+                });
+
+                if(mp.players.local.vehicle != undefined && mp.players.local.vehicle.handle == targetEntity.handle) breakShot = false;
+
+                if(vehicleOccupants == 0) breakShot = false;
+
+                if(breakShot) mp.events.callLocal("HUDError", "Team-killing is not allowed!");
+            }
+            else if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && weapon != 911657153 && global.chaseRunning)
+            {
+                breakShot = true; // Break innocent car shots by default.
+
+                mp.players.streamed.forEach(occupant => {
+                    if(occupant.isInVehicle(targetEntity.handle, false)) {
+                        vehicleOccupants++;
+                        if(occupant.getVariable("Team") == 0 && occupant.getVariable("HasShot") == true && !occupant.isDead()) {
+                           breakShot = false; // Don't break shot if there's a fugitive that shot in!
+                        }
+                    }
+                });
+
+                if(vehicleOccupants == 0) breakShot = false;
+
+                if(breakShot) mp.events.callLocal("HUDError", "Deathmatching is not allowed - fugitive doesn't have the Shot Tag!");
+            }
+
+            if(targetEntity.getVariable("Team") == 0 && player.getVariable("Team") == 1 && weapon == 911657153)
+            {
+                breakShot = true; 
+                mp.events.callLocal("HUDError", "Taser does not work for vehicles!");
+            }
+
+            if(breakShot == true){
+                damage = 0;
+                mp.game.weapon.setCurrentDamageEventAmount(0);
+                mp.game.weapon.cancelCurrentDamageEvent();
+                return true;
+            }
+        }
     }
 });
-
+/*
 mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
     if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player)
     {
@@ -3499,7 +3719,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         }
     }
 });
-
+*/
 mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag, speed = 8.0, speedMul = 0.0, duration = -1, playbackRate = 0.0, lockX = false, lockY = false, lockZ = false) => {
     if(entity.handle === 0) return;
 

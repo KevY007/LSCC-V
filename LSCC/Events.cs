@@ -7780,6 +7780,8 @@ namespace RNC
 
             if (damageToDeal > 0)
             {
+                player.SendChatMessage($"!{{white}}You hit !{{red}}{target.Name} !{{white}}for !{{red}}{damageToDeal} DMG!{{white}}!");
+                target.SendChatMessage($"!{{white}}You've been hit by !{{red}}{player.Name} !{{white}}for !{{red}}{damageToDeal} DMG!{{white}}!");
                 SetIsPlayerDamaged(target);
                 player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
             }
