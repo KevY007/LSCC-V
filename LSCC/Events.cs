@@ -2867,8 +2867,24 @@ namespace RNC
         [ServerEvent(Event.PlayerDeath)]
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
-            if (!EPlayer.LoggedIn(player)) return;
+            try
+            {
+                if (player == null) return;
+                if (!EPlayer.LoggedIn(player)) return;
+                if (player.HasSharedData("LastDeathEventTimestamp"))
+                {
+                    long lastDeathTimestamp = player.GetSharedDataSafe<long>("LastDeathEventTimestamp");
+                    long currentTimestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                    if (currentTimestamp - lastDeathTimestamp < 1000) return;
+                }
+                else player.SetSharedData("LastDeathEventTimestamp", DateTimeOffset.Now.ToUnixTimeMilliseconds());
 
+                player.SetSharedData("LastDeathEventTimestamp", DateTimeOffset.Now.ToUnixTimeMilliseconds());
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput("OnPlayerDeath: " + ex.ToString());
+            }
             try
             {
                 player.SetSharedData("Collisions", true); // Reset collision from chase.
