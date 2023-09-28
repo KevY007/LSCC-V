@@ -432,7 +432,7 @@ namespace RNC
         private static async Task SetStaffCommandHandler(SocketSlashCommand command)
         {
             string targetName = command.Data.Options.ElementAt(0).Value.ToString();
-            int level = (int)command.Data.Options.ElementAt(1).Value;
+            int level = Convert.ToInt32(command.Data.Options.ElementAt(1).Value);
             int aLevel = GetIngameAdminLevel(command.User);
             if (aLevel < 4)
             {
