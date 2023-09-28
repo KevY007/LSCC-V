@@ -2515,7 +2515,7 @@ mp.events.add("setClearDamageNametag", () => {
     }, 500);
 });
 
-mp._events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
+mp.events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapon, boneIndex, damage) => {
 
     if(mp.players.local.getVariable("Invincible") === false && sourceEntity.type !== 'player'){
         mp.events.callRemote("SetIsDamaged");
@@ -3060,7 +3060,115 @@ mp.events.add("fakeDeathToRespawn", () => {
     mp.players.local.setToRagdoll(10000, 10000, 0, false, false, false);
 });
 
-mp._events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
+const WeaponDamageData = [
+    {
+        torsoDamage:5,
+        limbDamage:5,
+        headDamage:5,
+        weapons:[1432025498, 911657153] // Reserved for weapons that don't deal / barely deal damage, like taser and beanbag
+        // Pump Shotgun Mk2, Stun Gun
+    },
+    {
+        torsoDamage:26,
+        limbDamage:20,
+        headDamage:52,
+        weapons:[453432689, 3219281620, 1593441988, 584646201, 3218215474, 2285322324, 3523564046, 137902532, 465894841] 
+        // Pistol, Pistol MK2, Combat Pistol, AP Pistol, SNS Pistol, SNS Pistol MK2, Heavy Pistol, Vintage Pistol, Pistol XM3
+    },
+    {
+        torsoDamage:40,
+        limbDamage:35,
+        headDamage:70,
+        weapons:[3696079510, 3249783761, 3415619887, 2548703416, 2578377531, 2441047180] 
+        // Marksman Pistol, Heavy Revolver, Heavy Revolver MK2, Double Action, Pistol .50, Navy Revolver
+    },    
+    {
+        torsoDamage:18,
+        limbDamage:15,
+        headDamage:33,
+        weapons:[324215364, 736523883, 171789620, 3173288789, 3675956304, 584646201] 
+        // Micro SMG, SMG, Combat PDW, Mini SMG, Machine Pistol, AP Pistol
+    },   
+    {
+        torsoDamage:22,
+        limbDamage:18,
+        headDamage:38,
+        weapons:[4024951519, 2024373456] 
+        // Assault SMG, SMG MK2
+    },  
+    {
+        torsoDamage:30,
+        limbDamage:27,
+        headDamage:60,
+        weapons:[3220176749, 2210333304, 3231910285, 2132975508, 1649403952, 2634544996] 
+        // Assault Rifle, Carbine Rifle, Special Carbine, Bullpup Rifle, Compact Rifle, MG
+    }, 
+    {
+        torsoDamage:34,
+        limbDamage:30,
+        headDamage:63,
+        weapons:[961495388, 4208062921, 2937143193, 2526821735, 2228681469, 2144741730, 3520460075, 1627465347] 
+        // Assault Rifle MK2, Carbine Rifle MK2, Advanced Rifle, Special Carbine MK2, Bullpup Rifle MK2, Combat MG, Tactical Rifle, Gusenberg Sweeper
+    }, 
+    {
+        torsoDamage:37,
+        limbDamage:33,
+        headDamage:63,
+        weapons:[3686625920, 2636060646, 3347935668] 
+        // Combat MG MK2, Military Rifle, Heavy Rifle
+    },    
+    {
+        torsoDamage:60,
+        limbDamage:50,
+        headDamage:100,
+        weapons:[487013001, 2017895192, 4019527611, 2640438543] 
+        // Pump Shotgun, Sawed-Off Shotgun, Double Barrel Shotgun, Bullpup Shotgun
+    },
+    {
+        torsoDamage:12,
+        limbDamage:8,
+        headDamage:20,
+        weapons:[3800352039, 984333226, 317205821, 94989220] 
+        // Assault Shotgun, Heavy Shotgun, Sweeper Shotgun, Combat Shotgun
+    },
+    {
+        torsoDamage:100,
+        limbDamage:90,
+        headDamage:200,
+        weapons:[100416529, 205991906, 1853742572, 2828843422] 
+        // Sniper Rifle, Heavy Sniper, Precision Rifle, Musket
+    },
+    {
+        torsoDamage:200,
+        limbDamage:150,
+        headDamage:300,
+        weapons:[177293209] 
+        // Heavy Sniper MK2
+    },
+    {
+        torsoDamage:80,
+        limbDamage:70,
+        headDamage:150,
+        weapons:[3342088282, 1785463520] 
+        // Marksman Rifle, Marksman Rifle MK2
+    },
+]
+
+mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
+    if(sourceEntity === undefined || sourceEntity === null || sourceEntity.type !== 'player' || sourceEntity !== player) return;
+
+    // In case of the target being another player
+    if(targetEntity !== undefined && targetEntity.type === 'player' && targetPlayer !== player){
+        if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return;
+        if(targetEntity.getVariable("Invincible") == true) return;
+        if(targetEntity.getHealth() <= 0) return;
+
+        var DamageToDeal = 0;
+
+    }
+});
+
+mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
     if(sourceEntity !== undefined && sourceEntity !== null && sourceEntity.type === 'player' && sourceEntity == player)
     {
         if(targetEntity !== undefined && targetEntity !== null && targetEntity.type === 'player')
