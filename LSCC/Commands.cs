@@ -833,9 +833,10 @@ namespace RNC
         [Command("verify", Alias = "link")]
         public void cmd_verify(Player player)
         {
-            if (EPlayer.GetAccount(player).DiscordID != "n/a")
+            if (EPlayer.GetAccount(player).DiscordID != null && EPlayer.GetAccount(player).DiscordID.ToLower() != "n/a")
             {
                 player.SendChatMessage(Translate(player, "ERROR_DISCORD_VERIFIED"));
+                player.SendChatMessage(Translate(player, "DISCORD_VERIFY_CODE", EPlayer.GetAccount(player).DiscordCode));
                 return;
             }
 

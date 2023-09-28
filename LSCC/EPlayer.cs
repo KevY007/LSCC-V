@@ -943,6 +943,7 @@ namespace RNC
 
         public static void SendToKickedScreen(Player player)
         {
+            player.Dimension = 6969;
             player.SetData("Kicked", true);
             player.Position = new Vector3(0, 0, 400);
             player.TriggerEvent("startKickedScreen");
