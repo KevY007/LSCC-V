@@ -1723,7 +1723,6 @@ namespace RNC
             {2285322324, "SNS Pistol MK2"},
             {3523564046, "Heavy Pistol"},
             {2636060646, "Military Rifle"},
-            {3520460075, "Tactical Rifle" },
             {3347935668, "Heavy Rifle"},
             {137902532, "Vintage Pistol"},
             {1198879012, "Flare Gun"},
