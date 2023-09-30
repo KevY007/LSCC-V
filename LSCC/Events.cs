@@ -2864,6 +2864,16 @@ namespace RNC
             target.SendChatMessage(Translate(target, "STOP_BEING_CARRIED"));
         }
 
+        [RemoteEvent("SyncPlayerWeaponShot")]
+        public static void OnSyncPlayerWeaponShot(Player player, float x, float y, float z, bool accurate)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            foreach(Player pl in Settings.LoggedInPlayers.Where(p => p.Id != player.Id && p.Dimension == player.Dimension)){
+                pl.TriggerEvent("playerTaskWeaponShot", player, x, y, z, accurate);
+            }
+        }
+
         [ServerEvent(Event.PlayerDeath)]
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
