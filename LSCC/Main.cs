@@ -5494,6 +5494,7 @@ namespace RNC
                                                         p.SendNotification("~b~Head to the bank! It has been marked on your GPS.");
                                                         p.TriggerEvent("ToggleCanExitVehicle", true);
                                                         p.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
+                                                        p.ResetData("EarlyWarningGiven");
 
                                                         p.SendChatMessage(Translate(p, "START_BROB_RADIO_COP"));
                                                     }
@@ -5550,8 +5551,9 @@ namespace RNC
                                     {
                                         if (fugitive == null) continue;
 
-                                        if (fugitive.GetSharedDataSafe<bool>("HasShot") == false)
+                                        if (fugitive.GetSharedDataSafe<bool>("HasShot") == false && !fugitive.HasData("EarlyWarningGiven"))
                                         {
+                                            fugitive.SetData<bool>("EarlyWarningGiven", true);
                                             fugitive.SendChatMessage(Translate(fugitive, "CAN_BE_SHOT_LONG_GAME_EARLY_WARNING"));
                                             fugitive.TriggerEvent("startCopchaseTimerEarlyWarningEffect");
                                         }
