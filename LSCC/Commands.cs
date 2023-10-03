@@ -11274,7 +11274,7 @@ namespace RNC
                 target.SendChatMessage(Translate(target, "MUTED_PLAYER_MSG", mins, reason));
 
                 int punishId = Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Mute", reason, mins + " minutes.");
-                EPlayer.ShowPunishmentScreen(player, punishId, "mute", player.Name, reason, $"{mins} minutes.", true);
+                EPlayer.ShowPunishmentScreen(target, punishId, "mute", player.Name, reason, $"{mins} minutes.", true);
                 //// try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:mute:{target.Name}:{mins}:{reason.Replace(":", "|")}"); } catch { }
                 Logs.LogAdmin(player, $"Muted {target.Name} for {mins} minutes, reason: {reason}.");
                 target.SetSharedData("MuteTime", Acc.MuteTime);
