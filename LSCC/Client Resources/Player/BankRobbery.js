@@ -22,14 +22,17 @@ mp.events.add("BankDoorLocked", (toggle) => {
 mp.events.add("StartBankRobberyTimer", () => {
     if(mp.players.local == undefined){
         clearInterval(robTimer);
+        robTimer = null;
         return;
     }
     if(!mp.players.exists(mp.players.local)){
         clearInterval(robTimer);
+        robTimer = null;
         return;
     }
     if(mp.players.local.getVariable("HeistLeader") == false){
         clearInterval(robTimer);
+        robTimer = null;
         return;
     }
 
@@ -39,18 +42,22 @@ mp.events.add("StartBankRobberyTimer", () => {
 
         if(mp.players.local == undefined){
             clearInterval(robTimer);
+            robTimer = null;
             return;
         }
         if(!mp.players.exists(mp.players.local)){
             clearInterval(robTimer);
+            robTimer = null;
             return;
         }
         if(mp.players.local.getVariable("Team") != 0){
             clearInterval(robTimer);
+            robTimer = null;
             return;
         }
         if(mp.players.local.getVariable("HeistLeader") == false){
             clearInterval(robTimer);
+            robTimer = null;
             return;
         }
 
@@ -58,6 +65,7 @@ mp.events.add("StartBankRobberyTimer", () => {
         if(robTimeLeft <= 2){
             mp.events.callRemote("BankRob_ContinueState", 1);
             clearInterval(robTimer);
+            robTimer = null;
         }
         else if(robTimeLeft == 30){
             mp.events.callRemote("BankRob_SendMessage", 0, 0);

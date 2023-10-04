@@ -2864,6 +2864,7 @@ namespace RNC
             target.SendChatMessage(Translate(target, "STOP_BEING_CARRIED"));
         }
 
+
         [RemoteEvent("SyncPlayerWeaponShot")]
         public static void OnSyncPlayerWeaponShot(Player player, float x, float y, float z, bool accurate)
         {
@@ -7725,6 +7726,7 @@ namespace RNC
             if (target.Dead) return;
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
+            if (target.GetSharedDataSafe<bool>("IsCuffed") == true || target.GetSharedDataSafe<bool>("IsBeingCuffed") == true) return;
 
             uint realWeapon = 0;
             if(weapon != null) realWeapon = Convert.ToUInt32(weapon);
@@ -8381,6 +8383,23 @@ namespace RNC
             return;
         }
 
+
+        [RemoteEvent("OnPlayerStopCuffingPlayer")]
+        public static void OnPlayerStopCuffingPlayer(Player player, Player target)
+        {
+            target.SetSharedData("IsBeingCuffed", false);
+        }
+        [RemoteEvent("OnPlayerStartCuffingPlayer")]
+        public static void OnPlayerStartCuffingPlayer(Player player, Player target)
+        {
+            if (player.GetSharedDataSafe<int>("Team") == 1 && target.GetSharedDataSafe<int>("Team") == 0)
+            {
+                if (target.GetSharedDataSafe<bool>("IsCuffed") == true || target.GetSharedDataSafe<bool>("IsBeingCuffed")) return;
+
+                target.SetSharedData("IsBeingCuffed", true);
+            }
+        }
+
         [RemoteEvent("FinishCuffing")]
         public void OnFinishCuffing(Player player, Player target)
         {
@@ -8389,6 +8408,8 @@ namespace RNC
             LobbyData lobbye = Settings.Lobbies.Find(lob => lob.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
 
             if (lobbye == null || !lobbye.Cops.Contains(player) || !lobbye.Fugitives.Contains(target)) return;
+
+            target.SetSharedData("IsCuffed", true);
 
             Events.RequestClearAnimation(player);
             EPlayer.GrantXP(player, 5);

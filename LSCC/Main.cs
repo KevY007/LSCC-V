@@ -3377,6 +3377,8 @@ namespace RNC
                     i.TriggerEvent("BankRob_SetMusic", -1);
                     i.TriggerEvent("StopHotwire");
                     i.ResetSharedData("Handgun_Hash");
+                    i.SetSharedData("IsBeingCuffed", false);
+                    i.SetSharedData("IsCuffed", false);
                     i.TriggerEvent("stopLockpicking");
                     i.TriggerEvent("hideMDC");
                     i.TriggerEvent("ClearClimbTaseProtection", true);
@@ -3571,7 +3573,8 @@ namespace RNC
                         }
 
                         player.ResetSharedData("InteriorsEntered");
-
+                        player.SetSharedData("IsBeingCuffed", false);
+                        player.SetSharedData("IsCuffed", false);
                         player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
                         player.TriggerEvent("PoliceHeliCam_ClearFugitives");
                         player.TriggerEvent("hideMDC");

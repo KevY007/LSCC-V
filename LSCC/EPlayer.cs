@@ -729,6 +729,9 @@ namespace RNC
                 player.SetSharedData("LastVehicleExit", 0);
                 player.SetSharedData("Invincible", false);
 
+                player.SetSharedData("IsBeingCuffed", false);
+                player.SetSharedData("IsCuffed", false);
+
                 player.SetSharedData("BadgeData", "[]");
 
                 player.SetSharedData("FakeNameOn", false);

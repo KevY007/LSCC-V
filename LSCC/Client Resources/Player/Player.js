@@ -1445,7 +1445,6 @@ mp.events.add("clearTaseAnims", (time) => {
     }, time);
 });
 
-
 mp.events.add('render', () => {
 
     global.FPS_Frames++;
@@ -3244,6 +3243,14 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         }
 
         /* Other checks to prevent/reduce visual bugs such as players dying on shooter's screen */
+        
+        if(targetEntity.getVariable("IsBeingCuffed") === true || targetEntity.getVariable("IsCuffed") === true)
+        {
+            damage = 0;
+            mp.game.weapon.setCurrentDamageEventAmount(0);
+            mp.game.weapon.cancelCurrentDamageEvent();
+            return true;
+        }
         if(targetEntity.getVariable("Team") != -1 && player.getVariable("Team") != -1)
             {
                 if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))

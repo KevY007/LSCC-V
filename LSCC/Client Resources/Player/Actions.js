@@ -440,12 +440,14 @@ mp.events.add("BeginCuffing", (target) => {
     if(mp.players.local.getVariable("Wounded") > 0){
         return;
     }
+    if(target.getVariable("IsBeingCuffed") === true || target.getVariable("IsCuffed") === true) return;
 
     isCuffing = true;
     global.cuffTarget = target;
     cuffTimeLeft = 5;
     global.disableSprint = true;
 
+    mp.events.callRemote("OnPlayerStartCuffingPlayer", target);
     initiateActionTimer(cuffTimeLeft);
     startActionTimer("Handcuffing player...", cuffTimeLeft);
     
@@ -494,6 +496,7 @@ mp.events.add("forceStopCuffing", () => {
 
 function stopCuffing(reason){ // if unsuccessful / force stopped
 
+    mp.events.callRemote("OnPlayerStopCuffingPlayer", global.cuffTarget);
     global.disableSprint = false;
     clearInterval(global.cuffInterval);
     isCuffing = false;
