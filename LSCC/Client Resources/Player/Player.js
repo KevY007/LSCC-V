@@ -196,6 +196,7 @@ mp.events.add('render', () => {
         lastWeapon = mp.players.local.weapon;
         holster_aimDisabled = true;
         clearTimeout(holsterAnimTimeout);
+        holsterAnimTimeout = undefined;
 
         let gunData = global.weaponData.find(w => Number(w.Hash) == mp.players.local.weapon);
         const gunType = (gunData ? (gunData.Type || "Handguns") : "Handguns");
@@ -2513,6 +2514,7 @@ mp.events.add("setClearDamageNametag", () => {
         if(mp.players.local == null || mp.players.local == undefined || !mp.players.exists(mp.players.local)) return;
         
         mp.events.callRemote("RemoveIsDamaged");
+        damageNametagTimeout = null;
         isShowingDamage = false;
     }, 500);
 });
@@ -3748,7 +3750,7 @@ mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag, speed 
 
 	mp.game.streaming.requestAnimDict(animDictionary);
 	new Promise(() => {
-	const timer = setInterval(() => {
+	var timer = setInterval(() => {
 		if(mp.game.streaming.hasAnimDictLoaded(animDictionary)) {
 			clearInterval(timer);
             timer = null;

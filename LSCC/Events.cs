@@ -7726,7 +7726,6 @@ namespace RNC
             if (target.Dead) return;
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;
-            if (target.GetSharedDataSafe<bool>("IsCuffed") == true || target.GetSharedDataSafe<bool>("IsBeingCuffed") == true) return;
 
             uint realWeapon = 0;
             if(weapon != null) realWeapon = Convert.ToUInt32(weapon);
@@ -7742,6 +7741,7 @@ namespace RNC
 
             if (targetTeam != -1)
             {
+                if (target.GetSharedDataSafe<bool>("IsCuffed") == true || target.GetSharedDataSafe<bool>("IsBeingCuffed") == true) return;
                 if (playerTeam == targetTeam) return;
                 if (targetTeam == 0 && playerTeam == 1 && target.GetSharedDataSafe<bool>("HasShot") == false) return;
                 if (target.GetSharedDataSafe<int>("Wounded") == 1) return;
@@ -8387,6 +8387,8 @@ namespace RNC
         [RemoteEvent("OnPlayerStopCuffingPlayer")]
         public static void OnPlayerStopCuffingPlayer(Player player, Player target)
         {
+            if (target == null) return;
+
             target.SetSharedData("IsBeingCuffed", false);
         }
         [RemoteEvent("OnPlayerStartCuffingPlayer")]
