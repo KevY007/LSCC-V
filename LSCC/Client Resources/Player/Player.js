@@ -248,6 +248,7 @@ mp.events.add('render', () => {
             mp.events.callRemote("HolsterAnimation_StopSynced", holsterAnimData.dict, holsterAnimData.name, 3.0);
             holster_aimDisabled = false;
             clearTimeout(holsterAnimTimeout);
+            holsterAnimTimeout = null;
         }, holsterTimeoutTime);
         
     }
@@ -1440,6 +1441,7 @@ mp.events.add("clearTaseAnims", (time) => {
     mp.gui.chat.push("[>] You've been tased, the effect will last " + (time/1000) + " seconds before you can get up!");
     clearTaseAnimTimer = setTimeout(() => {
         mp.players.local.clearTasksImmediately();
+        clearTaseAnimTimer = null;
     }, time);
 });
 
@@ -1583,6 +1585,7 @@ mp.events.add('render', () => {
                         checkClimbingDurationTimeout = setTimeout(() => {
                             if(!mp.players.local || !mp.players.exists(mp.players.local) || !wasClimbingLastFrame){
                                 clearTimeout(checkClimbingDurationTimeout);
+                                checkClimbingDurationTimeout = null;
                                 return;
                             }
 
@@ -2972,6 +2975,7 @@ function toggleCrawl(option){
         if(mp.players.local.crawl){
             mp.players.local.crawl = false;
             clearInterval(crawlInterval);
+            crawlInterval = null;
             mp.players.local.clearTasks();
             //player.clearSecondaryTask()
 
@@ -3000,6 +3004,7 @@ function toggleCrawl(option){
         if(mp.players.local.crawl){
             mp.players.local.crawl = false;
             clearInterval(crawlInterval);
+            crawlInterval = null;
             mp.players.local.clearTasks();
             //player.clearSecondaryTask()
         }       
@@ -3739,6 +3744,7 @@ mp.events.add("entplayanim", (entity, animDictionary, animName, animFlag, speed 
 	const timer = setInterval(() => {
 		if(mp.game.streaming.hasAnimDictLoaded(animDictionary)) {
 			clearInterval(timer);
+            timer = null;
 			resolvePlayAnim(entity, animDictionary, animName, animFlag, speed, speedMul, duration, playbackRate, lockX, lockY, lockZ);
 		}
 	}, 100);

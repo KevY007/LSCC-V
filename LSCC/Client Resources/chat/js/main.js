@@ -48,6 +48,7 @@ function toggleChatOpacity(enable){
 			clearTimeout(chatOpacityTimeout);
 			chatOpacityTimeout = setTimeout(() =>{
 				toggleChatOpacity(false);
+				chatOpacityTimeout = null;
 			}, 5000);			
 		}
 	}
@@ -87,6 +88,7 @@ function enableChatInput(enable)
 			clearTimeout(chatOpacityTimeout);
 			chatOpacityTimeout = setTimeout(() =>{
 				toggleChatOpacity(false);
+				chatOpacityTimeout = null;
 			}, 5000);
         }
 		*/
@@ -140,6 +142,7 @@ var chatAPI =
 
 		chatOpacityTimeout = setTimeout(() =>{		
 			toggleChatOpacity(false);
+				chatOpacityTimeout = null;
 		}, 5000);
 	},
 	

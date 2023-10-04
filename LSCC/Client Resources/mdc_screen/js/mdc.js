@@ -249,6 +249,7 @@ document.addEventListener("keyup", function(e){
         case 16:
         case 17:
             clearInterval(zoomInterval);
+            zoomInterval = null;
             isZoomKeyDown = false;
             break;    
         case 37:
@@ -256,6 +257,7 @@ document.addEventListener("keyup", function(e){
         case 39:
         case 40:
             clearInterval(panInterval);
+            panInterval = null;
             isPanKeyDown = false;
             break;
     }   

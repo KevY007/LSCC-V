@@ -40,9 +40,11 @@ mp.events.add("StopPlayerActions", () => {
         case "medkit":
             mp.events.callRemote("clear_anim");
             clearInterval(actionInterval);
+            actionInterval = null;
             break;
         case "painkiller":
             clearInterval(actionInterval);
+            actionInterval = null;
             break;
         default: return;
     }
@@ -65,10 +67,12 @@ function PainkillerAction(){
 
         if(mp.players.local == null || mp.players.local.handle == 0){
             clearInterval(actionInterval);
+            actionInterval = null;
             return;
         }
         if(mp.players.local.getVariable("Wounded") > 0){
             clearInterval(actionInterval);
+            actionInterval = null;
             return;
         }
 
@@ -78,6 +82,7 @@ function PainkillerAction(){
                 mp.events.callRemote("FinishPlayerAction", actionType);
                 stopActionTimer();
                 clearInterval(actionInterval);
+                actionInterval = null;
             }
             else{
                 actionTime--;
@@ -111,6 +116,7 @@ function MedkitAction(){
         if(mp.players.local == null || mp.players.local.handle == null) return;
         if(mp.players.local.getVariable("Wounded") > 0){
             clearInterval(actionInterval);
+            actionInterval = null;
             return;
         }
         try{
@@ -120,6 +126,7 @@ function MedkitAction(){
                 mp.events.callRemote("FinishPlayerAction", actionType);
                 stopActionTimer();
                 clearInterval(actionInterval);
+                actionInterval = null;
             }
             else{
                 actionTime--;           
@@ -352,6 +359,7 @@ mp.events.add("BeginReviving", () => {
     initiateActionTimer(reviveTime);
     startActionTimer("Reviving player...", reviveTime);
     clearInterval(reviveTimer);
+    reviveTimer = null;
     reviveTimer = setInterval(() => {
         if(mp.players.local == null || !mp.players.exists(mp.players.local)){ stopCuffing(69); return; }
         if(reviveTarget == null || !mp.players.exists(reviveTarget)){ stopCuffing(69); return; }
@@ -377,6 +385,7 @@ mp.events.add("BeginReviving", () => {
             finishCuffing();
             mp.events.callRemote("FinishRevive", reviveTarget);
             clearInterval(reviveTimer);
+            reviveTimer = null;
             return;
         }
     }, 1000);
@@ -387,6 +396,7 @@ function stopReviving(reason){
 
     isReviving = false;
     clearInterval(reviveTimer);
+    reviveTimer = null;
     reviveTarget = null;
 
     mp.events.callRemote("StopReviving");
@@ -440,6 +450,7 @@ mp.events.add("BeginCuffing", (target) => {
     startActionTimer("Handcuffing player...", cuffTimeLeft);
     
     if(global.cuffInterval != null) clearInterval(global.cuffInterval);
+    global.cuffInterval = null;
 
     global.cuffInterval = setInterval(() => {
 
