@@ -251,9 +251,9 @@ mp.events.add("auth_reset_rememberMe", () => {
 
 mp.events.add("onOpenChatbox", (toggle) =>
 {
-    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    if(toggle === true && ((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
     (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
-    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true)){
+    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true))){
         return;
     }
     if(mp.players.local.getVariable("pLogged") == undefined || mp.players.local.getVariable("pLogged") == false && toggle)
@@ -275,6 +275,7 @@ mp.events.add("onOpenChatbox", (toggle) =>
     else{
         global.chatStatusTimeout = setTimeout(() =>{
             global.chatStatusLate = false;
+            global.chatStatusTimeout = null;
         }, 500);
     }
 

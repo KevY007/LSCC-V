@@ -782,13 +782,20 @@ mp.events.add("chat:sendCustomMessage", (channel, badges, username, text) => {
 });
 
 mp.keys.bind(0x54, true, function() { // T key
-    if(global.ServerUI == null) return;
-    if(global.isLoginScreenActive === true) return;
+    if(global.ServerUI == null) 
+    {
+        return;
+    }
+    if(global.isLoginScreenActive === true)
+    {
+        return;
+    }
     if(global.menuToggled){
         if(global.ServerUI) global.focusChat(false);
         return;
     }
-    if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
+    if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false)
+    {
         return;
     }
     if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
