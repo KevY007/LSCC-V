@@ -2819,40 +2819,58 @@ namespace RNC
 
         public static void UpdatePlayerBadges(Player player)
         {
-            string badgeDataJSON = JsonConvert.SerializeObject(GetPlayerBadges(player));
-            player.SetSharedData("BadgeData", badgeDataJSON);
+            try
+            {
+                string badgeDataJSON = JsonConvert.SerializeObject(GetPlayerBadges(player));
+                player.SetSharedData("BadgeData", badgeDataJSON);
+            }
+            catch(Exception e)
+            {
+                NAPI.Util.ConsoleOutput(e.ToString());
+            }
         }
         
         public static List<Main.SelectedBadgeData> GetPlayerBadges(Player player)
         {
-            List<Main.SelectedBadgeData> toReturn = new List<Main.SelectedBadgeData>();
-
-            Account acc = EPlayer.GetAccount(player);
-
-            if (acc.Admin > 0 && player.GetData<bool>("Anonymous") == false)
+            try
             {
-                Main.StaticBadgeData _b = Main.GetStaticBadgeData("Admin", acc.Admin);
-                if(_b != null)
+                List<Main.SelectedBadgeData> toReturn = new List<Main.SelectedBadgeData>();
+
+                Account acc = EPlayer.GetAccount(player);
+
+                if (acc.Admin > 0 && player.GetData<bool>("Anonymous") == false)
                 {
-                    string badgeName = EPlayer.GetAdminLevelName(acc.Admin, false);
-                    toReturn.Add(new Main.SelectedBadgeData(_b.SQL_ID, badgeName, _b.Image));
+                    Main.StaticBadgeData _b = Main.GetStaticBadgeData("Admin", acc.Admin);
+                    if (_b != null)
+                    {
+                        string badgeName = EPlayer.GetAdminLevelName(acc.Admin, false);
+                        toReturn.Add(new Main.SelectedBadgeData(_b.SQL_ID, badgeName, _b.Image));
+                    }
                 }
+                if (acc.DonatorLevel > 0 && acc.DonatorStatus == true)
+                {
+                    Main.StaticBadgeData _b = Main.GetStaticBadgeData("Donator", acc.DonatorLevel);
+                    if (_b != null)
+                    {
+                        string badgeName = EPlayer.GetDonatorLevelName(acc.DonatorLevel, false);
+                        toReturn.Add(new Main.SelectedBadgeData(_b.SQL_ID, badgeName, _b.Image));
+                    }
+                }
+
+                Main.SelectedBadgeData _bd = JsonConvert.DeserializeObject<Main.SelectedBadgeData>(acc.SelectedBadgeData);
+                if (_bd.id > 0)
+                    toReturn.Add(_bd);
+
+                return toReturn;
             }
-            if (acc.DonatorLevel > 0 && acc.DonatorStatus == true)
+            catch (Exception e)
             {
-                Main.StaticBadgeData _b = Main.GetStaticBadgeData("Donator", acc.DonatorLevel);
-                if (_b != null)
-                {
-                    string badgeName = EPlayer.GetDonatorLevelName(acc.DonatorLevel, false);
-                    toReturn.Add(new Main.SelectedBadgeData(_b.SQL_ID, badgeName, _b.Image));
-                }
+                NAPI.Util.ConsoleOutput(e.ToString());
+
+                List<Main.SelectedBadgeData> toReturn = new List<Main.SelectedBadgeData>();
+                return toReturn;
             }
-
-            Main.SelectedBadgeData _bd = JsonConvert.DeserializeObject<Main.SelectedBadgeData>(acc.SelectedBadgeData);
-            if (_bd.id > 0)
-                toReturn.Add(_bd);
-
-            return toReturn;
+            
         }
         
         public static void SendMessageToAllAdmins(string message)
