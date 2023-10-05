@@ -352,6 +352,7 @@ mp.events.add("showPasswordChangeDialog", (reason) => {
 });
 mp.events.add('force_password_change_submit', (newPassword) => {
   clearInterval(passwordChangeDialogInterval);
+  passwordChangeDialogInterval = null;
   mp.events.callRemote("OnForceChangePassword", newPassword);
 });
 mp.events.add("showPasswordChangeDisclaimer", () => {

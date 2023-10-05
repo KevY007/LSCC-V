@@ -59,10 +59,15 @@ function shootWeaponAtRealPosition(){
     wasMouseOnBeforeAntipeek = true;
 
     const weaponEntityIndex = mp.game.invoke('0x3B390A939AF0B5FC', mp.players.local.handle);
+    if(!weaponEntityIndex) return;
     let weapCoord = mp.players.local.getWorldPositionOfBone(mp.players.local.getBoneIndexByName("BONETAG_R_HAND"));
+    if(!weapCoord) return;
     const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 8.0, 1);
+    if(!weaponRaycast?.position) return;
     const entityRaycast1 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 4);
+    if(!entityRaycast1?.position) return;
     const entityRaycast2 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 8);
+    if(!entityRaycast2?.position) return;
     
     mp.game.invoke("0x96A05E4FB321B1BA", mp.players.local.handle, antiPeekRealCoord.x, antiPeekRealCoord.y, antiPeekRealCoord.z, false); // SET_PED_SHOOTS_AT_COORD
     mp.events.callRemote("SyncPlayerWeaponShot", antiPeekRealCoord.x, antiPeekRealCoord.y, antiPeekRealCoord.z, false);

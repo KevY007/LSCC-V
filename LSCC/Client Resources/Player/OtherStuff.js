@@ -1301,6 +1301,8 @@ mp.events.add('stopCopchaseTimerEarlyWarningEffect', () => {
   updateGameProgressTimerColor("#fb923c");  
   clearInterval(earlyWarningColorInterval);
   clearInterval(earlyWarningTimeInterval);
+  earlyWarningColorInterval = null;
+  earlyWarningTimeInterval = null;
 });
 mp.events.add('startCopchaseTimerEarlyWarningEffect', () => {
   timeUntilShotTag = 60;
@@ -1308,6 +1310,8 @@ mp.events.add('startCopchaseTimerEarlyWarningEffect', () => {
   isTimerRed = false;
   clearInterval(earlyWarningColorInterval);
   clearInterval(earlyWarningTimeInterval);
+  earlyWarningColorInterval = null;
+  earlyWarningTimeInterval = null;
   earlyWarningTimeInterval = setInterval(() => {
     timeUntilShotTag--;
   }, 1000);
@@ -1359,6 +1363,8 @@ mp.events.add('startCopchaseTimerEarlyWarningEffect', () => {
       updateGameProgressTimerColor("#fb923c");  
       clearInterval(earlyWarningColorInterval);
       clearInterval(earlyWarningTimeInterval);
+      earlyWarningColorInterval = null;
+      earlyWarningTimeInterval = null;
     }
   }, 500);
 });
