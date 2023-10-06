@@ -36,6 +36,9 @@ mp.events.add('character_import_data', (gender, data) => {
                         mp.players.local.setFaceFeature(i, Number(FacialFeaturesArray[i]));
                     }
                 }
+                if(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.EyeColour){
+                    mp.players.local.setEyeColor(Number(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.EyeColour));
+                }
                 if(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.Overlays){
                     for(let i = 0 ; i < 13 ; i++){
                         const overlayData = CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.Overlays[`_${i}`];
