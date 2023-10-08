@@ -261,7 +261,11 @@ mp.events.add("onOpenChatbox", (toggle) =>
         global.activateChat(false);
         return;
     }
-    clearTimeout(global.chatStatusTimeout);
+    
+    if(global.chatStatusTimeout)
+      clearTimeout(global.chatStatusTimeout);
+
+    global.chatStatusTimeout = null;
     global.chatStatus = toggle;
     global.lastChatToggle = Date.now();
     global.focusChat(toggle);
