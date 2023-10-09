@@ -729,6 +729,11 @@ namespace RNC
                 player.SetSharedData("LastVehicleExit", 0);
                 player.SetSharedData("Invincible", false);
 
+                List<int> tracers = new List<int>();
+                string tracersJSON = NAPI.Util.ToJson(tracers);
+                player.SetSharedData("Admin_BulletTracers", tracersJSON);
+                player.SetSharedData("Admin_TraceTarget", -1);
+
                 player.SetSharedData("IsBeingCuffed", false);
                 player.SetSharedData("IsCuffed", false);
 

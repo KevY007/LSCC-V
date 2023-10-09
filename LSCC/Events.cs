@@ -2618,6 +2618,12 @@ namespace RNC
                 Logs.LogSession(player);
                 if (player.HasData("Tuner_Vehicle")) player.GetData<Vehicle>("Tuner_Vehicle").Delete();
 
+                if(player.GetSharedDataSafe<int>("Admin_TraceTarget") != -1)
+                {
+                    Player target = NAPI.Pools.GetAllPlayers().FirstOrDefault(p => p.HasSharedData("Admin_BulletTracers") && p.Id == player.GetSharedDataSafe<int>("Admin_TraceTarget"));
+                    if (target != null) Anticheat.AC_ForceRemoveTracer(target, player.Id);
+                }
+
                 foreach (Player p in Settings.LoggedInPlayers.Where(a => a.HasData("Spectating") && a.GetData<Player>("SpectatingPlayer") == player))
                 {
                     Commands.cmd_specoff(p);

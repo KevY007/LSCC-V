@@ -42,5 +42,58 @@ namespace RNC
 
             player.RemoveWeapon(weapon);
         }
+
+        public static void AC_ForceRemoveTracer(Player target, int id)
+        {
+            if (!target.HasSharedData("Admin_BulletTracers"))
+                target.SetSharedData("Admin_BulletTracers", NAPI.Util.ToJson(new List<int>()));
+
+            List<int> tracerIDs = NAPI.Util.FromJson<List<int>>(target.GetSharedData<string>("Admin_BulletTracers"));
+            if (tracerIDs.Contains(id)) tracerIDs.Remove(id);
+            target.SetSharedData("Admin_BulletTracers", NAPI.Util.ToJson(tracerIDs));
+        }
+        public static void AC_ClearBulletTraces(Player player)
+        {
+            player.TriggerEvent("BulletTrace:ClearLines");
+        }
+        public static void AC_ToggleBulletTracing(Player player, Player target, bool toggle)
+        {
+            if (EPlayer.GetAccount(player).Admin < 1) return;
+
+            if (!target.HasSharedData("Admin_BulletTracers"))
+                target.SetSharedData("Admin_BulletTracers", NAPI.Util.ToJson(new List<int>()));
+
+
+            List<int> tracerIDs = NAPI.Util.FromJson<List<int>>(target.GetSharedData<string>("Admin_BulletTracers"));
+            if (toggle == true)
+            {
+                if (tracerIDs.Contains(player.Id))
+                {
+                    player.SendChatMessage("!{#ff6347}[!] !{#ffffff}Bullet tracing for this player is already on!");
+                    return;
+                }
+
+                tracerIDs.Add(player.Id);
+                target.SetSharedData("Admin_BulletTracers", NAPI.Util.ToJson(tracerIDs));
+                AC_ClearBulletTraces(player);
+                player.SetSharedData("Admin_TraceTarget", target.Id);
+                player.SendChatMessage($"!{{#ff6347}}[!] !{{#ffffff}}Bullet tracing for {target.Name} has been turned !{{#00ff00}}ON!{{#ffffff}}!");
+            }
+            else
+            {
+                if (!tracerIDs.Contains(player.Id))
+                {
+                    player.SendChatMessage("!{#ff6347}[!] !{#ffffff}Bullet tracing for this player is already off!");
+                    return;
+                }
+
+
+                tracerIDs.Remove(player.Id);
+                target.SetSharedData("Admin_BulletTracers", NAPI.Util.ToJson(tracerIDs));
+                AC_ClearBulletTraces(player);
+                player.SetSharedData("Admin_TraceTarget", -1);
+                player.SendChatMessage($"!{{#ff6347}}[!] !{{#ffffff}}Bullet tracing for {target.Name} has been turned !{{#ff0000}}OFF!{{#ffffff}}!");
+            }
+        }
     }
 }

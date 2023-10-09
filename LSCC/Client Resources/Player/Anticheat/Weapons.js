@@ -1,5 +1,6 @@
 var global = require('./globals');
 
+// Weapon Hacks
 let lastHackedWeaponMessageSent = 0;
 function checkHackedWeapons(){
     const weaponsJSON = mp.players.local.getVariable("AC_WeaponData");
@@ -26,4 +27,28 @@ function checkHackedWeapons(){
 }
 mp.events.add('TwoSecondsEvent', () => {
     checkHackedWeapons();
+});
+
+
+// Bullet Tracing for Aimbot checking
+var bulletLineData = [];
+mp.events.add('render', () => {
+    for(let i = 0 ; i < bulletLineData.length ; i++){
+        const line = bulletLineData[i];
+        if(!line.end || !line.start) continue;
+
+        if(line.hit === true)
+            mp.game.graphics.drawLine(line.start.x, line.start.y, line.start.z, line.end.x, line.end.y, line.end.z, 0, 255, 0, 200);
+        else
+            mp.game.graphics.drawLine(line.start.x, line.start.y, line.start.z, line.end.x, line.end.y, line.end.z, 255, 0, 0, 200);
+    }
+});
+mp.events.add('BulletTrace:ClearLines', () => {
+    bulletLineData = [];
+})
+mp.events.add("BulletTrace:AddLine", (entity, x, y, z, hit) => {
+    const targetPosition = new mp.Vector3(x, y, z);
+
+    const playerPosition = entity.getWorldPositionOfBone(entity.getBoneIndexByName("BONETAG_R_HAND"));  
+    bulletLineData.push({start:playerPosition, end:targetPosition, hit:hit});
 });

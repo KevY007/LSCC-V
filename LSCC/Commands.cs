@@ -12097,6 +12097,11 @@ namespace RNC
             player.TriggerEvent("showHPBars", 1);
             player.SetSharedData("EntAlpha", 0);
 
+            if(EPlayer.GetAccount(player).Admin > 0)
+            {
+                Anticheat.AC_ToggleBulletTracing(player, target, true);
+            }
+
             player.Dimension = target.Dimension;
             Vector3 pos = target.Position;
             pos.Z -= 20f;
@@ -12140,30 +12145,72 @@ namespace RNC
         }
         */
 
-        [Command("specoff", GreedyArg = true)]
-        public static void cmd_specoff(Player player)
+        [Command("bullettrace", "!{#AFAFAF}[USAGE] bullettrace (option: true/false to turn on, 'clear' to clear lines)", Alias = "btc")]
+        public static void cmd_bullettrace(Player player, string option)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
-
-            if (!player.HasData("Spectating")) { player.SendChatMessage(Translate(player, "ERROR_NOT_SPECTATING")); return; }
-
-            player.TriggerEvent("StopSpectating");
-            player.TriggerEvent("SetPlayerFrozen", false);
-
-            player.ResetData("Spectating");
-            player.ResetData("SpectatingPlayer");
-            player.ResetSharedData("NametagHack");
-
-            player.SetSharedData("EntAlpha", 255);
-            if (player.HasData("Spec_Pos"))
+            if(EPlayer.GetAccount(player).Admin < 1)
             {
-                player.Dimension = player.GetData<uint>("Spec_Dimension");
-                player.Position = player.GetData<Vector3>("Spec_Pos");
-
-                player.ResetData("Spec_Pos");
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
             }
-            return;
+
+            if(!player.HasData("Spectating") || !player.HasData("SpectatingPlayer"))
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_SPECTATING"));
+                return;
+            }
+
+            Player target = player.GetData<Player>("SpectatingPlayer");
+            if (option == "true")
+                Anticheat.AC_ToggleBulletTracing(player, target, true);
+            else if (option == "false")
+                Anticheat.AC_ToggleBulletTracing(player, target, false);
+            else if (option == "clear")
+                Anticheat.AC_ClearBulletTraces(player);
+            else player.SendChatMessage("!{#ff6347}[!] !{#ffffff}Invalid option! Valid options are: true/false to toggle or 'clear' to clear lines!");
+        }
+
+        [Command("specoff", GreedyArg = true)]
+        public static void cmd_specoff(Player player)
+        {
+            try
+            {
+                if (!EPlayer.LoggedIn(player))
+                    return;
+
+                if (!player.HasData("Spectating")) { player.SendChatMessage(Translate(player, "ERROR_NOT_SPECTATING")); return; }
+
+                player.TriggerEvent("StopSpectating");
+                player.TriggerEvent("SetPlayerFrozen", false);
+
+                Anticheat.AC_ClearBulletTraces(player);
+
+                if (player.HasData("SpectatingPlayer"))
+                {
+                    Player target = player.GetData<Player>("SpectatingPlayer");
+                    if (target != null) Anticheat.AC_ToggleBulletTracing(player, target, false);
+                }
+
+                player.ResetData("Spectating");
+                player.ResetData("SpectatingPlayer");
+                player.ResetSharedData("NametagHack");
+
+                player.SetSharedData("EntAlpha", 255);
+                if (player.HasData("Spec_Pos"))
+                {
+                    player.Dimension = player.GetData<uint>("Spec_Dimension");
+                    player.Position = player.GetData<Vector3>("Spec_Pos");
+
+                    player.ResetData("Spec_Pos");
+                }
+                return;
+            }
+            catch (Exception ex) 
+            {
+                NAPI.Util.ConsoleOutput($"[SPECOFF ERROR] {ex.ToString()}");
+            }
         }
        
     }
