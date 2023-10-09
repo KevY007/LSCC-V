@@ -7777,6 +7777,7 @@ namespace RNC
             if (HPtoset < 0)
             {
                 HPtoset = 0;
+                target.TriggerEvent("showKillTrace", player.Position.X, player.Position.Y, player.Position.Z);
 
                 if (targetTeam != -1 && target.GetSharedDataSafe<int>("Wounded") == 0)
                 {

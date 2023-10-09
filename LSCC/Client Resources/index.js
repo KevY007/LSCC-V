@@ -41,6 +41,7 @@ require("./Player/SyncScripts/Flashlight");
 require("./Player/SyncScripts/Laser");
 require('./Player/DamageIndicator/damage_indicator');
 require('./Player/DamageIndicator/anti_peek');
+require('./Player/DamageIndicator/kill_trace');
 require('./Player/Anticheat/Weapons');
 require("./ServerUI/HUD.js");
 require("./ServerUI/Menu.js");

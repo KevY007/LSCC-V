@@ -2641,6 +2641,8 @@ namespace RNC
                 player.TriggerEvent("ToggleSeatbelt", false);
                 player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
 
+                player.TriggerEvent("clearKillTraces");
+
                 player.TriggerEvent("resetBuildingBlips");
 
                 if (player.HasData("Spectating"))
