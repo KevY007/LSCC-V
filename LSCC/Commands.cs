@@ -12145,6 +12145,12 @@ namespace RNC
         }
         */
 
+        [Command("newoutfittest")]
+        public static void cmd_outfittest(Player player)
+        {
+            Character.ResetCharacter(player);
+        }
+
         [Command("bullettrace", "!{#AFAFAF}[USAGE] bullettrace (option: true/false to turn on, 'clear' to clear lines)", Alias = "btc")]
         public static void cmd_bullettrace(Player player, string option)
         {

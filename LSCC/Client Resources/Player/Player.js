@@ -2205,8 +2205,11 @@ mp.events.add("changeRecoilSmooting", (value) => {
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
-    let hitPlayer = (targetEntity && targetEntity.type == 'player');
-    mp.events.callRemote("Admin_PlayerShotLines", targetPosition.x, targetPosition.y, targetPosition.z, hitPlayer);
+    if(targetPosition){
+        let hitPlayer = false;
+        if(targetEntity !== undefined && targetEntity.type == 'player') hitPlayer = true;
+        mp.events.callRemote("AC_WeaponShot:BulletTrace", targetPosition.x, targetPosition.y, targetPosition.z, hitPlayer);
+    }
 
     ShotStats.TotalFired++;
 

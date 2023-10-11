@@ -214,6 +214,21 @@ namespace RNC
         public float A { get; set; }
     }
 
+    public class SavedOutfit
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public string Data { get; set; }
+    }
+    public class SavedAppearance
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public string Data { get; set; }
+    }
+
     public class DM_WeaponData
     {
         public long Weapon;
@@ -280,6 +295,9 @@ namespace RNC
         public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+
+        public DbSet<SavedOutfit> SavedOutfits { get; set; }
+        public DbSet<SavedAppearance> SavedAppearances { get; set; }
 
         public DbSet<Badge> Badges { get; set; }
         public DbSet<OwnedBadgeData> OwnedBadges { get; set; }
