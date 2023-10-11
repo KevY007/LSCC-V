@@ -200,7 +200,7 @@ namespace RNC
                 }
 
                 Hair = new HairData(0, 0, 0);
-                HairOverlays = new List<int>() { 0, 21 };
+                HairOverlays = new List<int>();
                 HeadBlend = new HeadBlendData(0, 0, 0, 0, 0, 0, 0, 0, 0, false);
             }
         }
