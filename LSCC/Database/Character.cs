@@ -183,6 +183,7 @@ namespace RNC
             public int EyeColor;
             public HairData Hair;
             public HeadBlendData HeadBlend;
+            public List<int> HairOverlays = new List<int>();
             public Appearance() { }
             public Appearance(string name)
             {
@@ -199,6 +200,7 @@ namespace RNC
                 }
 
                 Hair = new HairData(0, 0, 0);
+                HairOverlays = new List<int>() { 0, 21 };
                 HeadBlend = new HeadBlendData(0, 0, 0, 0, 0, 0, 0, 0, 0, false);
             }
         }
