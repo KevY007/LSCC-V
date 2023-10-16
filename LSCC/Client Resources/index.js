@@ -47,6 +47,7 @@ require('./Player/Anticheat/Weapons');
 require("./ServerUI/HUD.js");
 require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
+require("./ServerUI/CharacterCreator.js");
 require("./ServerUI/Tutorial.js");
 require("./ServerUI/XMR.js");
 require("./WeaponFiringMode/index.js");

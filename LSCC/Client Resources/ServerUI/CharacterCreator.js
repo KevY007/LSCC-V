@@ -13,12 +13,17 @@ mp.events.add("mainmenu_inventory_outfits_edit", (id, team) => {
 });
 
 // Server -> Clientside
-mp.events.add("OutfitCreator:Set", (outfitData) => { // Loading outfits
+mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
     const outfitArray = JSON.parse(outfitData);
     const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
+
+    mp.events.callRemote("ServerConsoleOutput", `Setting outfit data: ${JSON.stringify(outfits)}`);
 
     if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set", outfits);
 });
 mp.events.add("OutfitCreator:SetActive", (id, team) => { // Loading defaults
+
+    mp.events.callRemote("ServerConsoleOutput", `Setting active: ID ${id} team ${team}`);
+
     if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set_active", id, team);
 });

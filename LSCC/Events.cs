@@ -6858,12 +6858,20 @@ namespace RNC
                     {
                         List<object[]> loadoutData = await Menu_LoadoutData(acc);
                         List<object[]> vehData = await Menu_VehicleData(acc);
+                        List<SavedOutfit> outfitData = await Character.GetOutfits(acc);
+
+                        int activeFugiOutfitID = outfitData.FirstOrDefault(o => o.IsActive == true && o.Team == 0).SQL_ID;
+                        int activeCopOutfitID = outfitData.FirstOrDefault(o => o.IsActive == true && o.Team == 1).SQL_ID;
 
                         NAPI.Task.Run(() =>
                         {
                             player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
-                            player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
+                            player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);                                                 
                             EPlayer.Menu_UpdateAllItems(player);
+
+                            player.TriggerEvent("OutfitCreator:SetOutfits", NAPI.Util.ToJson(outfitData));
+                            player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, 0);
+                            player.TriggerEvent("OutfitCreator:SetActive", activeCopOutfitID, 1);
                         });
                     });
                     break;
