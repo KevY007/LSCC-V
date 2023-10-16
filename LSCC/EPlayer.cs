@@ -2642,6 +2642,11 @@ namespace RNC
                 if (player.HasData("Kicked")) return;
                 if (!LoggedIn(player)) return;
 
+                if (player.HasData("CHARACTER:IsNew"))
+                {
+                    EPlayer.Error(player, "<strong>CHARACTER EDITOR</strong> You need to edit your character's appearance.");
+                }
+
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
                 player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");

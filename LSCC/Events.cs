@@ -3972,6 +3972,13 @@ namespace RNC
 
             Task.Run(async () =>
             {
+                List<SavedAppearance> appearances = await Character.GetAppearances(acc);
+                if(appearances == null)
+                {
+                    NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc);  });
+                    await NAPI.Task.WaitForMainThread();
+                }
+
                 string pClanName = "";
                 string pClanCreated = "NULL";
                 bool pClanPartnering = false;
@@ -5227,6 +5234,14 @@ namespace RNC
             }
             Task.Run(async () =>
             {
+                List<SavedAppearance> appearances = await Character.GetAppearances(acc);
+                if (appearances == null)
+                {
+                    NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc); });
+                    await NAPI.Task.WaitForMainThread();
+                }
+
+                /*
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     await context.PlayerOutfits.AddAsync(new PlayerOutfit()
@@ -5236,6 +5251,7 @@ namespace RNC
                     });
                     //ContextFactory.Instance.SaveChanges();
                 }
+                */
             });
 
             player.SetSharedData("SQL_ID", acc.SQL_ID);

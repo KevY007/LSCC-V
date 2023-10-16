@@ -220,6 +220,9 @@ namespace RNC
         public int SQL_ID { get; set; }
         public int AccountID { get; set; }
         public string Data { get; set; }
+        public int Team { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsMale { get; set; }
     }
     public class SavedAppearance
     {
@@ -227,6 +230,17 @@ namespace RNC
         public int SQL_ID { get; set; }
         public int AccountID { get; set; }
         public string Data { get; set; }
+        public int Team { get; set; }
+        public bool IsActive { get; set; }
+        public bool IsMale { get; set; }
+    }
+    public class CharacterSlot
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public string Outfits { get; set; }
+        public string Appearances { get; set; }
     }
 
     public class DM_WeaponData
@@ -298,6 +312,7 @@ namespace RNC
 
         public DbSet<SavedOutfit> SavedOutfits { get; set; }
         public DbSet<SavedAppearance> SavedAppearances { get; set; }
+        public DbSet<CharacterSlot> CharacterSlots { get; set; }
 
         public DbSet<Badge> Badges { get; set; }
         public DbSet<OwnedBadgeData> OwnedBadges { get; set; }
