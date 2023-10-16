@@ -1367,16 +1367,20 @@ mp.events.add("UpdateRateEvent", () => {
         camera.destroy(true);
 
         let voiceString = "Disabled";
-                
+            
         if(mp.players.local.getVariable("VoiceMode") == 0)
         {
-            voiceString = mp.voiceChat.muted ? "Standby" : "Speaking";
+            voiceString = mp.voiceChat.muted ? "Standby (Language)" : "Speaking (Language)";
         }
         else if(mp.players.local.getVariable("VoiceMode") == 1)
         {
-            voiceString = mp.voiceChat.muted ? "Standby (Team)" : "Speaking (Team)";
+            voiceString = mp.voiceChat.muted ? "Standby (Proximity)" : "Speaking (Proximity)";
         }
         else if(mp.players.local.getVariable("VoiceMode") == 2)
+        {
+            voiceString = mp.voiceChat.muted ? "Standby (Team)" : "Speaking (Team)";
+        }
+        else if(mp.players.local.getVariable("VoiceMode") == 3)
         {
             voiceString = mp.voiceChat.muted ? "Standby (Squad)" : "Speaking (Squad)";
         }

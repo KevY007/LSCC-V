@@ -313,6 +313,7 @@
   "VOICE_MODE_TEAMONLY": "!{#FFFF00}Voice mode set to: !{#FFFFFF}Team Only (+15m proximity)",
   "VOICE_MODE_SQUADONLY": "!{#FFFF00}Voice mode set to: !{#FFFFFF}Squad Only (Everyone else gets muted)",
   "VOICE_MODE_DISABLED": "!{#FFFF00}Voice mode set to: !{#FFFFFF}Disabled",
+  "VOICE_MODE_LANGUAGE": "!{#FFFF00}Voice mode set to: !{#FFFFFF}Language (30m) (English included)",
   "HOTWIRE_FAIL_NOCAR": "Hotwire failed - your vehicle no longer exists or you are not the driver!",
   "HOTWIRE_FAIL": "You failed the hotwire minigame! Please try again...",
   "ERROR_NO_SQUAD": "!{#FF6347}[!] ~w~You are not in a squad!",

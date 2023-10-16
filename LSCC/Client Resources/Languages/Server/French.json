@@ -313,6 +313,7 @@
   "VOICE_MODE_TEAMONLY": "! Le mode vocal{#FFFF00}a été changé. Vous n'entendrez que les joueurs !{#FFFFFF}de votre équipe.",
   "VOICE_MODE_SQUADONLY": "! Le mode vocal{#FFFF00}a été changé. Vous n'entendrez que les joueurs !{#FFFFFF}de votre escouade. Tous les autres joueurs sont en sourdine.",
   "VOICE_MODE_DISABLED": "!{#FFFF00}Votre chat vocal a été !{#FFFFFF}désactivé.",
+  "VOICE_MODE_LANGUAGE": "!{#FFFF00}Mode vocal réglé sur : !{#FFFFFF}Langue (30m) (comprend l'anglais)",
   "HOTWIRE_FAIL_NOCAR": "Vous avez échoué votre tentative de fils. Votre véhicule n'est plus ou vous n'êtes pas le conducteur !",
   "HOTWIRE_FAIL": "Vous avez échoué ! Veuillez réessayer...",
   "ERROR_NO_SQUAD": "!{#FF6347}[!] ~w~Vous n'êtes dans aucune escouade !",

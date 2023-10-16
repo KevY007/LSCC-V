@@ -313,6 +313,7 @@
   "VOICE_MODE_TEAMONLY": "!{#FFFF00}Modo de voz establecido a: !{#FFFFFF}solo equipo (+15 m proximidad)",
   "VOICE_MODE_SQUADONLY": "!{#FFFF00}Modo de voz establecido a: !{#FFFFFF}solo escuadrón (todo el mundo queda silenciado)",
   "VOICE_MODE_DISABLED": "!{#FFFF00}Modo de voz establecido a: !{#FFFFFF}Deshabilitado",
+  "VOICE_MODE_LANGUAGE": "!{#FFFF00}Modo de voz establecido en: !{#FFFFFF}Idioma (30m) (incluye inglés)",
   "HOTWIRE_FAIL_NOCAR": "¡El puente falló - su vehículo ya no existe o usted no es el conductor!",
   "HOTWIRE_FAIL": "¡Has fallado el minijuego para puentear el coche! Por favor, inténtalo de nuevo...",
   "ERROR_NO_SQUAD": "¡!{#FF6347}[¡!] ~w~No estás en un escuadrón!",

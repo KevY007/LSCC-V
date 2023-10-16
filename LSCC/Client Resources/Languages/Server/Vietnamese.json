@@ -313,6 +313,7 @@
   "VOICE_MODE_TEAMONLY": "!{#FFFF00}Chế độ Voice đã được chỉnh thành: !{#FFFFFF}Team Only (+15m khoảng cách với đồng đội)",
   "VOICE_MODE_SQUADONLY": "!{#FFFF00}Chế độ Voice đã được chỉnh thành: !{#FFFFFF}Squad Only (Những người khác đều bị tắt tiếng)",
   "VOICE_MODE_DISABLED": "!{#FFFF00}Chế độ Voice đã được chỉnh thành: !{#FFFFFF}Disabled",
+  "VOICE_MODE_LANGUAGE": "!{#FFFF00}Chế độ giọng nói được đặt thành: !{#FFFFFF}Ngôn ngữ (30m) (Bao gồm tiếng Anh)",
   "HOTWIRE_FAIL_NOCAR": "Nối dây thất bại - phương tiện không còn tồn tại hoặc bạn không phải là người cấm lái!",
   "HOTWIRE_FAIL": "Bạn đã thất bại trong việc nối dây! Hãy thử lại...",
   "ERROR_NO_SQUAD": "!{#FF6347}[!] ~w~Bạn không ở trong nhóm nào cả!",

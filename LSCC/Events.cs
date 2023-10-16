@@ -867,17 +867,21 @@ namespace RNC
             {
                 case 0:
                     if (send_msg)
-                        player.SendChatMessage(Translate(player, "VOICE_MODE_NEARBY"));
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_LANGUAGE"));
                     break;
                 case 1:
                     if (send_msg)
-                        player.SendChatMessage(Translate(player, "VOICE_MODE_TEAMONLY"));
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_NEARBY"));
                     break;
                 case 2:
                     if (send_msg)
-                        player.SendChatMessage(Translate(player, "VOICE_MODE_SQUADONLY"));
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_TEAMONLY"));
                     break;
                 case 3:
+                    if (send_msg)
+                        player.SendChatMessage(Translate(player, "VOICE_MODE_SQUADONLY"));
+                    break;
+                case 4:
                     if (send_msg)
                         player.SendChatMessage(Translate(player, "VOICE_MODE_DISABLED"));
                     foreach (Player p in Settings.LoggedInPlayers)
@@ -1011,7 +1015,7 @@ namespace RNC
                 int voiceMode = player.GetSharedDataSafe<int>("VoiceMode");
                 voiceMode++;
 
-                if (voiceMode >= 4) voiceMode = 0;
+                if (voiceMode >= 5) voiceMode = 0;
 
                 OnSetVoiceMode(player, voiceMode, true);
                 player.TriggerEvent("setVoiceModeMenu", voiceMode);
@@ -1032,12 +1036,32 @@ namespace RNC
                     List<Player> listeners = new List<Player>();
                     if (player.GetSharedDataSafe<int>("VoiceMode") == 0)
                     {
+                        if(EPlayer.GetAccount(player).Language == 0)
+                        {
+                            double dist = 30.0;
+
+                            listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
+                                Vector3.Distance(t.Position, player.Position) <= dist));
+                        }
+                        else
+                        {
+                            double dist = 30.0;
+
+                            listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
+                                Vector3.Distance(t.Position, player.Position) <= dist 
+                                && EPlayer.GetAccount(t).Language == EPlayer.GetAccount(player).Language));
+                        }
+
+                    }
+                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 1)
+                    {
                         double dist = 30.0;
 
                         listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
-                            Vector3.Distance(t.Position, player.Position) <= dist));
+                                Vector3.Distance(t.Position, player.Position) <= dist));
+
                     }
-                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 1)
+                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 2)
                     {
                         listeners.AddRange(RAGE.Entities.Players.All.Where(t => t.Dimension == player.Dimension &&
                             Vector3.Distance(t.Position, player.Position) <= 15.0));
@@ -1056,7 +1080,7 @@ namespace RNC
                             }
                         }
                     }
-                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 2)
+                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 3)
                     {
                         if (player.HasData("PlayerSquad"))
                         {
@@ -1064,7 +1088,7 @@ namespace RNC
                         }
                         else player.SendChatMessage(Translate(player, "ERROR_NO_SQUAD"));
                     }
-                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 3)
+                    else if (player.GetSharedDataSafe<int>("VoiceMode") == 4)
                     {
                         // Disabled voice. Nah, no listeners for you.
                     }
@@ -1078,8 +1102,8 @@ namespace RNC
                             continue;
                         }
 
-                        if (t.GetSharedDataSafe<int>("VoiceMode") == 3) continue;
-                        if (t.GetSharedDataSafe<int>("VoiceMode") == 2)
+                        if (t.GetSharedDataSafe<int>("VoiceMode") == 4) continue;
+                        if (t.GetSharedDataSafe<int>("VoiceMode") == 3)
                         {
                             if (!t.HasData("PlayerSquad")) continue;
                             if (!player.HasData("PlayerSquad")) continue;
