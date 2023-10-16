@@ -582,5 +582,11 @@
   "ERROR_CLAN_FULL": "¡El clan ha alcanzado el límite de miembros ({MAX MEMBERS NUMBER})! No puedes unirte en este momento.",
   "ERROR_PAY_INVALID_POINTS": "!{#FF6347}[!]~w~¡Solo puedes enviar entre 1 y 10 000 puntos a la vez!",
   "SENT_POINTS": "!{#55FF55}[PAY] ~w~Has enviado {POINTS} puntos a {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
-  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~Has recibido {POINTS} puntos de {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})"
+  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~Has recibido {POINTS} puntos de {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
+  "ERROR_NOT_FUGITIVE": "!{#FF6347}[!] !{#FFFFFF}Debes ser un fugitivo para usar esto.",
+  "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}El objetivo no tiene la etiqueta de tiro.",
+  "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}No puedes hacer esto a un {RANK NAME}~w~.",
+  "ACTION_EJECT": "empuja a {TARGET NAME} fuera del vehículo.",
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Has sido expulsado del vehículo por {PLAYER NAME}."
+
 }

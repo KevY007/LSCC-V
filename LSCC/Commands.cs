@@ -7541,6 +7541,32 @@ namespace RNC
         }
         */
 
+        [Command("eject", "!{#AFAFAF}[USAGE] eject (target)", Alias = "ej")]
+        public void cmd_eject(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if(player.GetSharedDataSafe<int>("Team") != 0)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_FUGITIVE"));
+                return;
+            }
+            if(target.GetSharedDataSafe<bool>("HasShot") == false)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_TARGET_NO_SHOT_TAG"));
+                return;
+            }
+            if(EPlayer.GetAccount(target).DonatorLevel >= 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_TARGET_IS_RANK", EPlayer.GetDonatorLevelName(EPlayer.GetAccount(target).DonatorLevel, true)));
+                return;
+            }
+
+            target.Position = target.Position.Around(3f);
+            target.SendChatMessage(Translate(target, "TARGET_EJECT_MESSAGE", player.Name));
+            EPlayer.Action(player, "ACTION_EJECT", target.Name);
+        }
+
         [Command("acmds", Alias = "ahelp")]
         public void cmd_ahelp(Player player)
         {

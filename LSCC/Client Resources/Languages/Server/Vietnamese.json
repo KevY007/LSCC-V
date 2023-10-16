@@ -582,5 +582,11 @@
   "ERROR_CLAN_FULL": "Clan này đã đạt giới hạn số lượng thành viên ({MAX MEMBERS NUMBER})! Bạn không thể tham gia clan này ở thời điểm hiện tại.",
   "ERROR_PAY_INVALID_POINTS": "!{#FF6347}[!] ~w~Bạn chỉ có thể chuyển từ 1 đến 10 000 points trong một lần!",
   "SENT_POINTS": "!{#55FF55}[PAY] ~w~Bạn đã chuyển {POINTS} Points cho {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
-  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~Bạn nhận được {POINTS} Points từ {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})"
+  "RECEIVED_POINTS": "!{#55FF55}[PAY] ~w~Bạn nhận được {POINTS} Points từ {PLAYER NAME}. !{#AFAFAF}({DATE AND TIME})",
+  "ERROR_NOT_FUGITIVE": "!{#FF6347}[!] !{#FFFFFF}Bạn phải là một tội phạm mới có thể sử dụng điều này!",
+  "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}Mục tiêu không có thẻ bắn!",
+  "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}Bạn không thể làm điều này với một {RANK NAME}~w~!",
+  "ACTION_EJECT": "đẩy {TARGET NAME} ra khỏi xe.",
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Bạn đã bị đẩy ra khỏi xe bởi {PLAYER NAME}!"
+
 }

@@ -587,5 +587,10 @@
   "COTW_ONLINE_MESSAGE":"~y~You've received ~w~{POINTS} Points ~y~as reward for being part of the clan of the week.",
   "COTW_OTHER_MOTD":"~r~[CLAN OF THE WEEK]~w~ Clan {CLAN NAME} won clan of the week. All clans' weekly kills have been reset!",
   "COTW_OTHER_MESSAGE_1":"~y~[CLAN OF THE WEEK] ~w~Clan ~g~{CLAN NAME} ~w~had the most kills this week! Congratulations!",
-  "COTW_OTHER_MESSAGE_2":"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset."
+  "COTW_OTHER_MESSAGE_2":"~y~[>] ~w~ A new week begins and all clans' weekly kills have been reset.",
+  "ERROR_NOT_FUGITIVE": "!{#FF6347}[!] !{#FFFFFF}You must be a fugitive to use this!",
+  "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}Target does not have the shot tag!",
+  "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}You can't do this to a {RANK NAME}~w~!",
+  "ACTION_EJECT": "pushes {TARGET NAME} out of the vehicle.",
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}You have been ejected from the vehicle by {PLAYER NAME}!"
 }
