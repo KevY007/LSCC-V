@@ -1,3 +1,5 @@
+var global = require("./globals");
+
 // OUTFITS
 // Menu -> Clientside
 mp.events.add("mainmenu_inventory_outfits_create", (activeTeam) => {
@@ -17,7 +19,6 @@ mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
     const outfitArray = JSON.parse(outfitData);
     const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
 
-    mp.events.callRemote("ServerConsoleOutput", `Setting outfit data: ${JSON.stringify(outfits)}`);
 
     if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set", outfits);
 });
