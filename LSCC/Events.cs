@@ -445,6 +445,18 @@ namespace RNC
                                         reasonStr = "(" + rez + ")";
                                     }
 
+                                    if (killer != null)
+                                    {
+                                        if (reasonStr == null)
+                                            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{killer.Name}** has downed **{player.Name}** in Copchase with *an unknown weapon*!", "Killfeed");
+                                        else
+                                            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{killer.Name}** has downed **{player.Name}** in Copchase with **{reasonStr}**!", "Killfeed");
+                                    }
+                                    else
+                                    {
+                                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{player.Name}** has been downed in Copchase due to unknown causes!", "Killfeed");
+                                    }
+
                                     EPlayer.UnlockAchievement(killer, "first_kill");
 
                                     if (killer.Health <= 30)
@@ -492,6 +504,7 @@ namespace RNC
                                         ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                         //ay.TriggerEvent("pushToKillFeed", EPlayer.Name(killer), EPlayer.HexConverter(EPlayer.GetColor(killer)), $"Downed {reasonStr}", EPlayer.Name(player), EPlayer.HexConverter(EPlayer.GetColor(player)), killer.CurrentWeapon);
                                     }
+                                    
 
                                     int killStreak = killer.GetData<int>("Killstreak") + 1;
                                     killer.SetData("Killstreak", killStreak);
@@ -3382,6 +3395,31 @@ namespace RNC
                             player.TriggerEvent("ResetWounded");
                             player.SetSharedData("Wounded", 0);
                             //OnStopReviving(player);
+
+                            if(killer != null)
+                            {
+                                if (reasonStr == null)
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{killer.Name}** has killed **{player.Name}** in Copchase with *an unknown weapon*!", "Killfeed");
+                                else
+                                {
+                                    if (reason == 696988 || reason == 696989)
+                                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{killer.Name}** has arrested **{player.Name}** in Copchase!", "Killfeed");
+                                    else
+                                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{killer.Name}** has killed **{player.Name}** in Copchase with **{reasonStr}**!", "Killfeed");
+                                }  
+                            }
+                            else
+                            {
+                                if (reasonStr == null)
+                                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{player.Name}** died in Copchase - *killed by SERVER*!", "Killfeed");
+                                else
+                                {
+                                    if (reason == 696988 || reason == 696989)
+                                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{player.Name}** has been arrested in Copchase by an unknown player!", "Killfeed");
+                                    else
+                                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{player.Name}** died in Copchase due to **{reasonStr}**!", "Killfeed");
+                                }
+                            }
                         }
                     }
 
