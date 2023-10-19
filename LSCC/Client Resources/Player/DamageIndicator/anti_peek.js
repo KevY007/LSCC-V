@@ -83,8 +83,8 @@ mp.events.add('render', () => {
         return;
     }
 
-    mp.game.graphics.drawText("\+", [weaponRaycast.position.x, weaponRaycast.position.y, weaponRaycast.position.z], {
-        color:[255, 255, 255, 175],
+    mp.game.graphics.drawText("\!", [0.5, 0.55], {
+        color:[255, 50, 50, 175],
         outline:true,
         font:0,
         scale:[0.35, 0.35]
