@@ -2294,7 +2294,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
 
         if(global.isAntiPeekOn){
-            shakeValue = shakeValue * 2.0; // double recoil if anti-peek is active
+            shakeValue = shakeValue * 4; // double recoil if anti-peek is active
         }
 
         //shakeValue = shakeValue/recoil_smoothing;

@@ -83,7 +83,7 @@ mp.events.add('render', () => {
         return;
     }
 
-    mp.game.graphics.drawText("\!", [0.5, 0.55], {
+    mp.game.graphics.drawText("!", [0.5, 0.55], {
         color:[255, 50, 50, 175],
         outline:true,
         font:0,
@@ -92,11 +92,11 @@ mp.events.add('render', () => {
     });
     antiPeekRealCoord = {x:weaponRaycast.position.x, y:weaponRaycast.position.y, z:weaponRaycast.position.z}
 
-    global.HideAllCrosshairs.AntiPeek = true;
+    //global.HideAllCrosshairs.AntiPeek = true;
     global.isAntiPeekOn = true;
     //if(checkIfFirePressed() == true) wasMouseOnBeforeAntipeek = true;
 
-    mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
+    //mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
     // Disable shooting
     //disableAntiPeekFire();
 });
