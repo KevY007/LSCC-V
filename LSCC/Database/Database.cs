@@ -273,6 +273,29 @@ namespace RNC
         public DateTime AcquireDate { get; set; } = DateTime.Now;
     }
 
+    public class Teleport
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string Name { get; set; }
+        public int BlipID { get; set; }
+
+        public float FromX { get; set; }
+        public float FromY { get; set; }
+        public float FromZ { get; set; }
+        public float ToX { get; set; }
+        public float ToY { get; set; }
+        public float ToZ { get; set; }
+
+        public uint FromDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
+        public uint ToDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
+        public int SideEntranceTo { get; set; } // SQL_ID of the main entrance
+
+        public string IPLs { get; set; } // List of IPLs to load for this teleport | Loaded every time the player enters
+
+        public int FreezeTime { get; set; } // Time to freeze the player for (in milliseconds)
+    }
+
     public class DM_WeaponSets
     {
         public DM_WeaponData[] Weapons;
