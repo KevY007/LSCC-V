@@ -3225,7 +3225,15 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         }
 
         if(global.isAntiPeekOn){
+            if(boneIndex === 20){
+                DamageToDeal = 50;
+                if(damageInfo)
+                    DamageToDeal = damageInfo.headDamage;
+            }
+
+
             DamageToDeal *= 0.5; // lower damage by 50% if anti-peek is active
+
         }
 
         if(DamageToDeal > 0){
