@@ -2293,6 +2293,10 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
         }
 
+        if(global.isAntiPeekOn){
+            shakeValue = shakeValue * 2.0; // double recoil if anti-peek is active
+        }
+
         //shakeValue = shakeValue/recoil_smoothing;
         
         const val = shakeValue;
@@ -3177,6 +3181,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
 
         var DamageToDeal = 0;
         const damageInfo = WeaponDamageData.find(w => w.weapons.includes(weapon));
+        const distance = sourceEntity.position.subtract(targetEntity.position).length();
         if(!damageInfo) DamageToDeal = 0;
         else{
             switch(boneIndex){
@@ -3198,7 +3203,6 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                 break;
             }
             if(damageInfo.categoryId == 4){
-                const distance = sourceEntity.position.subtract(targetEntity.position).length();
                 if(boneIndex === 20){
                     if(distance <= 10.0)
                         DamageToDeal = 1000.0;
@@ -3211,6 +3215,17 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                     DamageToDeal *= 0.5;
                 else DamageToDeal *= 0.2;
             }
+        }
+
+        if(boneIndex === 20 && distance > 10.0){ // no instant headshots if more than 10m away from target
+            DamageToDeal = 50;
+
+            if(damageInfo)
+                DamageToDeal = damageInfo.headDamage;
+        }
+
+        if(global.isAntiPeekOn){
+            DamageToDeal *= 0.5; // lower damage by 50% if anti-peek is active
         }
 
         if(DamageToDeal > 0){

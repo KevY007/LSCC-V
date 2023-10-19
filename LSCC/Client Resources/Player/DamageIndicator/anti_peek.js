@@ -1,6 +1,5 @@
 var global = require('./globals');
 
-var isAntiPeekOn = false;
 var antiPeekRealCoord = null;
 
 let wasMouseOnBeforeAntipeek = false;
@@ -49,74 +48,22 @@ function disableAntiPeekFire(){
 }
 
 mp.events.add('render', () => {
-    if(!isAntiPeekOn && wasMouseOnBeforeAntipeek == true){
-        disableAntiPeekFire();
-    }
-});
-
-function shootWeaponAtRealPosition(){
-    if(!isAntiPeekOn || !antiPeekRealCoord) return;
-    wasMouseOnBeforeAntipeek = true;
-
-    const weaponEntityIndex = mp.game.invoke('0x3B390A939AF0B5FC', mp.players.local.handle);
-    if(!weaponEntityIndex) return;
-    let weapCoord = mp.players.local.getWorldPositionOfBone(mp.players.local.getBoneIndexByName("BONETAG_R_HAND"));
-    if(!weapCoord) return;
-    const weaponRaycast = RayCastGamePlayWeapon(weaponEntityIndex, 8.0, 1);
-    if(!weaponRaycast?.position) return;
-    const entityRaycast1 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 4);
-    if(!entityRaycast1?.position) return;
-    const entityRaycast2 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 8);
-    if(!entityRaycast2?.position) return;
-    
-    mp.game.invoke("0x96A05E4FB321B1BA", mp.players.local.handle, antiPeekRealCoord.x, antiPeekRealCoord.y, antiPeekRealCoord.z, false); // SET_PED_SHOOTS_AT_COORD
-    mp.events.callRemote("SyncPlayerWeaponShot", antiPeekRealCoord.x, antiPeekRealCoord.y, antiPeekRealCoord.z, false);
-    if(entityRaycast1 && entityRaycast1.entity){
-        mp.events.callLocal("playerWeaponShot", antiPeekRealCoord, entityRaycast1.entity);
-        return;
-    }
-    if(entityRaycast2 && entityRaycast2.entity){
-        mp.events.callLocal("playerWeaponShot", antiPeekRealCoord, entityRaycast2.entity);
-        return;
-    }
-    mp.events.callLocal("playerWeaponShot", antiPeekRealCoord, null);
-}
-mp.events.add('click', (x, y, upOrDown, leftOrRight, relativeX, relativeY, worldPosition, hitEntity) => {
-    if(leftOrRight == "left"){
-        if(upOrDown == "down")
-            shootWeaponAtRealPosition();
-        else{
-            if(wasMouseOnBeforeAntipeek == true) wasMouseOnBeforeAntipeek = false;
-        }
-    }
-});
-
-mp.events.add('render', () => {
     if(mp.players.local.getVariable("Team") != 0 && mp.players.local.getVariable("Team") != 1) return;
     if(mp.players.local.weapon === 2725352035){
         global.HideAllCrosshairs.AntiPeek = false;
-        isAntiPeekOn = false;
-        if(!isAntiPeekOn && wasMouseOnBeforeAntipeek == true){
-            disableAntiPeekFire();
-        }
+        global.isAntiPeekOn = false;
         return;
     }
     if(mp.game.invoke('0x68EDDA28A5976D07') !== 1 && !mp.game.player.isFreeAiming()){
         global.HideAllCrosshairs.AntiPeek = false;
-        isAntiPeekOn = false;
-        if(!isAntiPeekOn && wasMouseOnBeforeAntipeek == true){
-            disableAntiPeekFire();
-        }
+        global.isAntiPeekOn = false;
         return;
     }
 
     const weaponEntityIndex = mp.game.invoke('0x3B390A939AF0B5FC', mp.players.local.handle);
     if(weaponEntityIndex === undefined || weaponEntityIndex === 0){
         global.HideAllCrosshairs.AntiPeek = false;
-        isAntiPeekOn = false;
-        if(!isAntiPeekOn && wasMouseOnBeforeAntipeek == true){
-            disableAntiPeekFire();
-        }
+        global.isAntiPeekOn = false;
         return;
     }
     let weapCoord = mp.players.local.getWorldPositionOfBone(mp.players.local.getBoneIndexByName("BONETAG_R_HAND"));   
@@ -125,20 +72,14 @@ mp.events.add('render', () => {
 
     if(!weaponRaycast){
         global.HideAllCrosshairs.AntiPeek = false;
-        isAntiPeekOn = false;
-        if(!isAntiPeekOn && wasMouseOnBeforeAntipeek == true){
-            disableAntiPeekFire();
-        }
+        global.isAntiPeekOn = false;
         return;
     }
     const entityRaycast1 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 4);
     const entityRaycast2 = mp.raycasting.testPointToPoint(weapCoord, weaponRaycast.position, mp.players.local, 8);
     if((entityRaycast1 && entityRaycast1.entity.type === 'player') || (entityRaycast2 && entityRaycast2.entity.type === 'player')){
         global.HideAllCrosshairs.AntiPeek = false;
-        isAntiPeekOn = false;
-        if(!isAntiPeekOn && wasMouseOnBeforeAntipeek == true){
-            disableAntiPeekFire();
-        }
+        global.isAntiPeekOn = false;
         return;
     }
 
@@ -152,12 +93,12 @@ mp.events.add('render', () => {
     antiPeekRealCoord = {x:weaponRaycast.position.x, y:weaponRaycast.position.y, z:weaponRaycast.position.z}
 
     global.HideAllCrosshairs.AntiPeek = true;
-    isAntiPeekOn = true;
-    if(checkIfFirePressed() == true) wasMouseOnBeforeAntipeek = true;
+    global.isAntiPeekOn = true;
+    //if(checkIfFirePressed() == true) wasMouseOnBeforeAntipeek = true;
 
     mp.game.ui.hideHudComponentThisFrame(14); // RETICULE
     // Disable shooting
-    disableAntiPeekFire();
+    //disableAntiPeekFire();
 });
 
 function checkIfFirePressed(){

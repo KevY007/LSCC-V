@@ -1223,7 +1223,7 @@ let global = {
   HideAllCrosshairs:{AntiPeek:false},
   loginSceneEntities:[],
   chatStatusTimeout:null,
-
+  isAntiPeekOn:false,
   ServerSettings:[],
 
   LastKeyPress: 0,
