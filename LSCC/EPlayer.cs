@@ -2634,8 +2634,28 @@ namespace RNC
             target.SetSharedData("CarriedBy", -1);
         }
 
+        public static void UpdateTeleports(Player player)
+        {
+            if (player.GetSharedDataSafe<int>("Team") != 0 && player.GetSharedDataSafe<int>("Team") != 1
+                && player.GetSharedDataSafe<int>("InLobby") != -3) return;
+
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    List<Teleport> teleports = await context.Teleports.AsQueryable().ToListAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        UpdateTeleports(player, teleports);
+                    });
+                }
+            });
+        }
         public static void UpdateTeleports(Player player, List<Teleport> teleports)
         {
+            if (player.GetSharedDataSafe<int>("Team") != 0 && player.GetSharedDataSafe<int>("Team") != 1
+                && player.GetSharedDataSafe<int>("InLobby") != -3) return;
+
             string tpData = NAPI.Util.ToJson(teleports);
             player.SetSharedData("TELEPORT:Data", tpData);
         }

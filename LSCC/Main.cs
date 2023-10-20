@@ -4166,6 +4166,8 @@ namespace RNC
                                         player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
                                         player.SetSharedData("CuffedBy", "n/a");
                                         player.SetSharedData("Team", 1);
+
+                                        EPlayer.UpdateTeleports(player);
                                     }
                                 }
                                 else
@@ -4221,6 +4223,8 @@ namespace RNC
                                             player.SetSharedData("CuffedBy", "n/a");
                                             player.SetSharedData("Team", 1);
 
+                                            EPlayer.UpdateTeleports(player);
+
                                             EPlayer.Notify(player, Translate(player, "BANK_ROB_LOADING"), "yellow", "fas fa-spinner fa-spin", false, 19000, "bottomCenter");
                                         }
                                     }
@@ -4266,6 +4270,8 @@ namespace RNC
                                         player.ResetData("Handsup");
                                         player.ResetData("Cuffed");
                                         player.SetSharedData("Team", 0);
+
+                                        EPlayer.UpdateTeleports(player);
                                         player.SetSharedData("CuffedBy", "n/a");
                                         player.SetSharedData("HasShot", false);
                                     }
@@ -4600,6 +4606,8 @@ namespace RNC
                                                 player.ResetData("Handsup");
                                                 player.ResetData("Cuffed");
                                                 player.SetSharedData("Team", 0);
+
+                                                EPlayer.UpdateTeleports(player);
                                                 player.SetSharedData("CuffedBy", "n/a");
                                                 player.SetSharedData("HasShot", true);
                                                 player.Dimension = Convert.ToUInt32(lobbyid);
@@ -5247,6 +5255,7 @@ namespace RNC
                                         player.ResetData("Handsup");
                                         player.ResetData("Cuffed");
                                         player.SetSharedData("Team", 0);
+
                                         player.SetSharedData("CuffedBy", "n/a");
                                         player.SetSharedData("HasShot", true);
                                         player.Dimension = Convert.ToUInt32(lobbyid);

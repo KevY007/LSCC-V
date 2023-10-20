@@ -305,7 +305,7 @@ var PoliceHeliCamFrameCount = 0;
 var PoliceHeliCam_Fugitives = []; // for client-side, updates every 2 seconds
 var PoliceHeliCam_Fugitives_Server = []; // for the server-side updates, every 15 seconds
 
-mp.keys.bind(0x58, true, () => {
+mp.keys.bind(0xA4, true, () => { // Left Alt
     if(Date.now() - LastPoliceHeliCamToggle < 550) return;
     if((mp.players.local.getVariable("Team") != 1 || mp.players.local.vehicle == undefined 
     || !mp.players.local.isInAnyVehicle(false) || mp.players.local.vehicle.getClass() != 15)){

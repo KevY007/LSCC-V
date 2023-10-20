@@ -50,3 +50,4 @@ mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
         global.TeleportIndicators.push(indicator);
     }
 });
+

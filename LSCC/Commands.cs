@@ -3637,6 +3637,7 @@ namespace RNC
 
             player.Dimension = (uint)256 + (uint)worldid;
             player.SetData("FreeroamWorld", (uint)worldid);
+            EPlayer.UpdateTeleports(player);
 
             player.SendChatMessage(Translate(player, "FREEROAM_CHANGE_WORLD", worldid.ToString()));
 
@@ -5005,6 +5006,9 @@ namespace RNC
 
             player.SetSharedData("InDM", -1);
             player.SetSharedData("InLobby", -3);
+
+            EPlayer.UpdateTeleports(player);
+
             EPlayer.Spawn(player, false, new Vector3(1061.547f, -720.113f, 56.786f));
             EPlayer.Notify(player, Translate(player, "JOINED_FREEROAM"), "blue", "fas fa-check", false, 1000, "bottomCenter", "replace");
 
@@ -7549,6 +7553,11 @@ namespace RNC
             if (EPlayer.GetAccount(player).Admin < 4)
             {
                 player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+            if (player.GetSharedDataSafe<int>("InLobby") != -3)
+            {
+                player.SendChatMessage("!{#ff6347}[!] !{#ffffff}You must be in freeroam to use this! !{#c9c9c9}Don't ask why. Don't suggest to change it. It must be this way.");
                 return;
             }
 
