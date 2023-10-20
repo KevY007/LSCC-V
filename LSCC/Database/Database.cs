@@ -283,9 +283,11 @@ namespace RNC
         public float FromX { get; set; }
         public float FromY { get; set; }
         public float FromZ { get; set; }
+        public float FromHeading { get; set; }
         public float ToX { get; set; }
         public float ToY { get; set; }
         public float ToZ { get; set; }
+        public float ToHeading { get; set; }
 
         public uint FromDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
         public uint ToDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
@@ -339,6 +341,8 @@ namespace RNC
 
         public DbSet<Badge> Badges { get; set; }
         public DbSet<OwnedBadgeData> OwnedBadges { get; set; }
+
+        public DbSet<Teleport> Teleports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

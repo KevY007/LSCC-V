@@ -1,0 +1,494 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+
+body{
+    background-image: url('https://images8.alphacoders.com/573/573739.jpg');
+    background-size: cover;
+    margin:0px;
+    overflow: hidden;
+}
+
+.wrapper{
+    margin:0px;
+    height:100vh;  
+}
+.blips-list-wrapper{
+    margin:0px;
+    height:100vh;  
+    width:100%;
+    position:absolute;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 14;    
+}
+.blips-display{
+    height:600px;
+    width:auto;
+    position: relative;
+    padding:10px;
+    background-color: black;
+    border-radius: 12px;
+    text-align: center;
+}
+.blips-display > button{
+    color:white;
+    border:1px solid white;
+    font-size: 16px;
+    background-color: black;
+    margin:10px;
+    border-radius: 12px;
+    cursor:pointer;
+    transition: 100ms;
+}
+.blips-display > button:hover{
+    border:1px solid white;
+    font-size: 16px;
+    color: black;
+    background-color: white;
+}
+.blip-image-wrapper{
+    padding:10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height:550px;
+    position: relative;
+}
+.blip-image-wrapper > img{
+    user-select: none;
+    height:auto;
+    width:100%;
+    vertical-align: bottom;
+}
+
+
+.help-box-wrapper{
+    margin:0px;
+    height:100vh;  
+    width:100%;
+    position:absolute;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 14;
+}
+.help-box{
+    position:absolute;
+    left:0;
+    right:0;
+    margin: auto auto auto auto;
+    width:500px;
+    border-radius: 12px;
+    background-color: black;
+    z-index: 15;
+    overflow:hidden;
+
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+.help-box > textarea:disabled{
+    width:100%;
+    user-select: none;
+    background-color: black;
+    resize: none;
+    text-align: center;
+    height:auto;
+    padding: 10px 20px 10px 25px;
+
+    color:white;
+    font-family: 'Roboto', sans-serif;
+    font-size:16px;
+}
+.help-box > button{
+    color:white;
+    border:1px solid white;
+    font-size: 16px;
+    background-color: black;
+    margin:5px;
+    border-radius: 12px;
+    cursor:pointer;
+    transition: 100ms;
+}
+.help-box > button:hover{
+    border:1px solid white;
+    font-size: 16px;
+    color: black;
+    background-color: white;
+}
+
+.panel-movable{
+    position:absolute;
+    width:500px;
+    height:560px;
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 12px;
+    z-index: 10;
+
+    display:flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+.panel-header{
+    width:100%;
+    height:24px;
+    background-color: black;
+    
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    color:white;
+    user-select: none;
+    cursor:grab;
+}
+
+.panel-header > button{
+    position: absolute;
+    right:2px;
+    background-color:red;
+    color:white;
+    border:0px;
+    height:20px;
+    width:20px;
+    text-align: center;
+
+    border-radius: 100%;
+    cursor:pointer;
+}
+
+.panel-content{
+    width: 100%;
+    height:100%;
+}
+
+.main-menu{
+    width: 100%;
+    height:100%;
+
+    display:flex;
+    align-items: center;
+    flex-direction: column;
+
+    font-family: 'Roboto', sans-serif;
+}
+.main-menu-options{
+    height:30%;
+    width:100%;
+
+    display:flex;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+
+    border-bottom:1px solid gray;
+}
+.main-menu-option{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    margin:3px;
+}
+.main-menu-option > p{
+    font-weight: 500;
+    color:white;
+    font-size:24px;
+    margin:2px;
+}
+.main-menu-option > input{
+    font-weight: 500;
+    color:white;
+    background-color: black;
+    margin:2px;
+    border:0px;
+    font-size:16px;
+    padding:2px;
+    text-align: center;
+    outline:0px;
+    border-radius: 12px;
+}
+.main-menu-option > button{
+    color:white;
+    font-weight: 300;
+    background-color: transparent;
+    border:1px solid white;
+    margin:2px;
+    border-radius: 12px;
+    transition: 100ms;
+}
+.main-menu-option > button:hover{
+    background-color: white;
+    cursor:pointer;
+    color:black;
+}
+
+
+.main-menu-results{
+    height:100%;
+    width:100%;
+
+    overflow-y:auto;
+}
+.main-menu-result{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    min-height:50px;
+    height:auto;
+    padding:2px;
+    border-bottom:1px solid gray;
+    position: relative;
+}
+.main-menu-result > p{
+    position: absolute;
+    left:20px;
+    width:360px;
+    overflow: hidden;
+
+    color:white;
+    font-weight: 500;
+    font-size:20px;
+}
+.main-menu-result > div{
+    width:100px;
+    display:flex;
+    position: absolute;
+    right:10px;
+}
+.main-menu-result > div > button{
+   background-color: transparent;
+   border:1px solid white;
+   margin:1px;
+   color:white;
+   height:32px;
+   transition: 100ms;
+}
+.main-menu-result > div > button:hover{
+    color:black;
+    background-color: white;
+    cursor:pointer;
+ }
+
+ /* width */
+::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 12px;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: #d9d9d9;
+  }
+
+.editor-top{
+    height:40px;
+    width:100%;
+    margin:10px 0px 0px 0px;
+    display:flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+.editor-top > button{
+    border:1px solid white;
+    background-color: transparent;
+    color:white;
+    border-radius: 12px;
+    padding:5px;
+    width:90%;
+    transition: 100ms;
+    font-size: 18px;
+    overflow: hidden;
+    text-wrap:nowrap;
+}
+.editor-top > button:hover{
+    color:black;
+    background-color: white;
+    cursor: pointer;
+}
+
+.teleport-editor{
+    width:100%;
+    height:100%;
+    position: relative;
+}
+.tips-holder{
+    background-color: rgba(0,0,0,0.5);
+    position: absolute;
+    bottom:10px;
+    width:100%;
+    text-align: center;
+}
+.tips-holder > p{
+    margin:1px;
+    color:white;
+    font-family: 'Roboto', sans-serif;
+    font-weight:300;
+}
+
+.editor-positions{
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width:100%;
+    color:white;
+    font-family: 'Roboto', sans-serif;
+}
+.editor-positions > h1{
+    position: absolute;
+    top:0px;
+    font-size: 20px;
+}
+
+.editor-position{
+    margin: 15px 100px 5px 100px;
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.editor-position > h3{
+    font-weight: 400;
+    font-size: 18px;
+    margin:22px 2px 2px 2px;
+
+    cursor:pointer;
+}
+.editor-position > h3:hover{
+    text-decoration: underline;
+}
+.editor-position > p{
+    color:gray;
+    margin:2px;
+}
+.editor-position > button{
+    border:1px solid white;
+    background-color: transparent;
+    color:white;
+    border-radius: 12px;
+    padding:5px;
+    width:64px;
+    transition: 100ms;
+}
+.editor-position > button:hover{
+    color:black;
+    background-color: white;
+    cursor: pointer;
+}
+
+.editor-generic-row{
+    margin-top: 10px;
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    width:100%;
+    color:white;
+    font-family: 'Roboto', sans-serif;   
+}
+.editor-generic-row > div{
+    text-align: center;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.editor-generic-row > div > h3{
+    font-weight: 400;
+    font-size: 18px;
+    margin:2px;
+
+    cursor:pointer;
+}
+.editor-generic-row > div > h3:hover{
+    text-decoration: underline;
+}
+.editor-generic-row > div > button{
+    border:1px solid white;
+    background-color: transparent;
+    color:white;
+    border-radius: 12px;
+    padding:5px;
+    transition: 100ms;
+    margin:5px;
+}
+.editor-generic-row > div > input{
+    font-weight: 500;
+    color:white;
+    background-color: black;
+    margin:2px;
+    border:0px;
+    font-size:16px;
+    padding:2px;
+    text-align: center;
+    outline:0px;
+    border-radius: 12px;
+}
+.editor-generic-row > div > button:hover{
+    color:black;
+    background-color: white;
+    cursor: pointer;
+}
+.ipl-list{
+    height:95px;
+    border-top:1px solid gray;
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+.ipl-list-header{
+    position: absolute;
+    font-size:14px;
+    font-family: 'Roboto', sans-serif;
+    color:gray;
+    background-color: transparent;
+    top:-10px;
+    text-decoration: underline;
+}
+.ipl-list-items{
+    overflow-y: auto;
+    position: absolute;
+    height:75px;
+    top:20px;
+    width:100%;
+}
+.ipl-item{
+    position: relative;
+    display:flex;
+    justify-content: center;
+    align-items:center;
+    height:32px;
+}
+.ipl-item > p{
+    color:white;
+    font-family: 'Roboto', sans-serif;
+}
+.ipl-item > button{
+    position: absolute;
+    right:50px;
+    border:1px solid white;
+    background-color: transparent;
+    color:white;
+    border-radius: 12px;
+    padding:5px;
+    width:64px;
+    transition: 100ms;
+}
+.ipl-item > button:hover{
+    color:black;
+    background-color: white;
+    cursor: pointer;
+}

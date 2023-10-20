@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="./index.css"/>
+        <script src="./index.js" defer></script>
+        <script src="./helpers/draggable.js" defer></script>
+    </head>
+    <body>
+        <div class="blips-list-wrapper" id="blips_list_wrapper" style="visibility: hidden;">
+            <div class="blips-display">
+                <div class="blip-image-wrapper">
+                    <img src="./images/blips_list.png"/>
+                </div>
+                <button>Close</button>
+            </div>                
+        </div>
+        <div class="help-box-wrapper" id="help_box_wrapper" style="visibility: hidden;">
+            <div class="help-box" id="help_box">
+                <textarea disabled id="help_box_text">
+                </textarea>
+                <button id="help_box_close">Close</button>
+            </div>                
+        </div>
+        <div class="wrapper">
+            <div class="panel-movable" id="panel">
+                <div class="panel-header" id="panelheader">
+                    <p>=</p>
+                    <button>X</button>
+                </div>
+                <div class="panel-content">
+                    <!-- <div class="main-menu" id="main_menu">
+                        <div class="main-menu-options">
+                            <div class="main-menu-option">
+                                <p>Create new:</p>
+                                <input placeholder="Teleport name" id="teleport_name_input"/>
+                                <button id="new_teleport_button">Create</button>
+                            </div>
+                            <p style="text-align: center; width:100%; color:gray; margin:0px;">...or...</p>
+                            <div class="main-menu-option">
+                                <p>Search for existing:</p>
+                                <input placeholder="Teleport name" id="new_teleport_name_input"/>
+                                <button id="search_teleport_button">Search</button>
+                            </div>
+                        </div>
+                        <div class="main-menu-results">
+                            <div class="main-menu-result">
+                                <p>Diamond Casino</p>
+                                <div>
+                                    <button id="teleport_teleport_ID">Teleport</button>
+                                    <button id="teleport_edit_ID">Edit</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="teleport-editor" id="teleport_editor">
+                        <div class="tips-holder">
+                            <p>Press <strong>F2</strong> to toggle the cursor.</p>
+                            <p>You can click on any option name to see what it does.</p>
+                        </div>
+                        <div class="editor-top">
+                            <button>Create Diamond Casino - Rooftop Entrance Boy LMFAOOO Niggas Let's fucking go bro yeah nigga we real</button>
+                        </div>
+                        <div class="editor-positions">
+                            <h1>Position</h1>
+                            <div class="editor-position">
+                                <h3>From:</h3>
+                                <button>Set</button>
+                                <p>X,Y,Z,H</p>
+                            </div>
+                            <div class="editor-position">
+                                <h3>To:</h3>
+                                <button>Set</button>
+                                <p>X,Y,Z,H</p>
+                            </div>
+                        </div>
+                        <div class="editor-generic-row">
+                            <div style="width:34%;"><h3>Blip:</h3></div>
+                            <div style="width:33%;"><input type="number" placeholder="Blip ID"/></div>
+                            <div style="width:33%;"><button>Show Blip List</button></div>
+                        </div>
+                        <div class="editor-generic-row">
+                            <div style="width:34%;"><h3>Side Entrance:</h3></div>
+                            <div style="width:33%;"><input type="number" placeholder="Teleport ID"/></div>
+                            <div style="width:33%;"><button>Teleport List</button></div>
+                        </div>
+                        <div class="editor-generic-row">
+                            <div style="width:34%;"><h3>Dimension:</h3></div>
+                            <div style="width:33%;"><button style="background-color:white; color:black;">Outside</button></div>
+                            <div style="width:33%;"><button>Inside</button></div>
+                        </div>
+                        <div class="editor-generic-row">
+                            <div style="width:34%;"><h3>Freeze Time:</h3></div>
+                            <div style="width:33%;"><input type="number" placeholder="Milliseconds"/></div>
+                            <div style="width:33%;"></div>
+                        </div>
+                        <div class="editor-generic-row">
+                            <div style="width:34%;"><h3>IPLs</h3></div>
+                            <div style="width:33%;"><input type="text" placeholder="IPL name"/></div>
+                            <div style="width:33%;"><button>Add</button></div>
+                        </div>
+                        <div class="ipl-list">
+                            <p class="ipl-list-header">IPL List</p>
+                            <div class="ipl-list-items">
+                                <div class="ipl-item">
+                                    <p>test_ipl_bro</p>
+                                    <button>Remove</button>
+                                </div>
+                                <div class="ipl-item">
+                                    <p>test_ipl_bro</p>
+                                    <button>Remove</button>
+                                </div>
+                                <div class="ipl-item">
+                                    <p>test_ipl_bro</p>
+                                    <button>Remove</button>
+                                </div>
+                                <div class="ipl-item">
+                                    <p>test_ipl_bro</p>
+                                    <button>Remove</button>
+                                </div>
+                                <div class="ipl-item">
+                                    <p>test_ipl_bro</p>
+                                    <button>Remove</button>
+                                </div>
+                                <div class="ipl-item">
+                                    <p>test_ipl_bro555</p>
+                                    <button>Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+
+        </div>
+    </body>
+</html>
