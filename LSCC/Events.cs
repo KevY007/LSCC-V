@@ -4275,6 +4275,67 @@ namespace RNC
         {
             Commands.cmd_noclip(player);
         }
+        [RemoteEvent("TPEditor:CreateTeleport")]
+        public static void TPEditor_OnCreateTeleport(Player player, string name, int blipID, int sideEntrance, bool isOutsideDim, string iplList, int freezeTime, float fX, float fY, float fZ, float fH, float tX, float tY, float tZ, float tH)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    int dimToSet = -1;
+                    string iplListToSet = iplList;
+
+                    if (!isOutsideDim)
+                    {
+                        Teleport _highest = await context.Teleports.AsQueryable().OrderByDescending(x => x.ToDimension).FirstOrDefaultAsync();
+                        if (_highest == null) dimToSet = 0;
+                        else dimToSet = (_highest.ToDimension + 1);
+                    }
+                    if(sideEntrance != -1)
+                    {
+                        Teleport _sideEntrance = await context.Teleports.AsQueryable().FirstOrDefaultAsync(t => t.SQL_ID == sideEntrance);
+                        if(_sideEntrance != null)
+                        {
+                            dimToSet = _sideEntrance.ToDimension;
+                            iplListToSet = _sideEntrance.IPLs;
+                        }
+                    }
+
+                    Teleport tp = new Teleport()
+                    {
+                        Name = name,
+                        BlipID = blipID,
+                        SideEntranceTo = sideEntrance,
+                        FromDimension = -1,
+                        ToDimension = (isOutsideDim ? -1 : dimToSet),
+                        IPLs = iplListToSet,
+                        FreezeTime = freezeTime,
+                        FromX = fX,
+                        FromY = fY,
+                        FromZ = fZ,
+                        FromHeading = fH,
+                        ToX = tX,
+                        ToY = tY,
+                        ToZ = tZ,
+                        ToHeading = tH
+                    };
+                    await context.Teleports.AddAsync(tp);
+                    await context.SaveChangesAsync();
+
+                    List<Teleport> teleportsList = await context.Teleports.AsQueryable().ToListAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        foreach(Player p in Settings.LoggedInPlayers)
+                        {
+                            EPlayer.UpdateTeleports(p, teleportsList);
+                        }
+                    });
+                }
+            });
+        }
 
         [RemoteEvent("RequestResetPassword")]
         public static void OnRequestResetPassword(Player player, string code, string newPassword)

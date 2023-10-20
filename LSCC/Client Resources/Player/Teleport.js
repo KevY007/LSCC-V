@@ -14,6 +14,7 @@ mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
             indicator.label.destroy();
         }
     }
+    global.TeleportIndicators = [];
 
     global.TeleportData = JSON.parse(value);
 
@@ -27,7 +28,7 @@ mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
             dimension:mp.players.local.dimension
         });
         const marker = mp.markers.new(23, new mp.Vector3(tp.FromX, tp.FromY, tp.FromZ-0.95), 1, {
-            color:[0, 0, 255, 100], 
+            color:[0, 0, 255, 50], 
             dimension:mp.players.local.dimension, 
             visible:true, 
         });

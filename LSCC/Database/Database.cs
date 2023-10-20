@@ -289,8 +289,8 @@ namespace RNC
         public float ToZ { get; set; }
         public float ToHeading { get; set; }
 
-        public uint FromDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
-        public uint ToDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
+        public int FromDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
+        public int ToDimension { get; set; } // Dimension -1 = Lobby's Copchase Dimension
         public int SideEntranceTo { get; set; } // SQL_ID of the main entrance
 
         public string IPLs { get; set; } // List of IPLs to load for this teleport | Loaded every time the player enters
