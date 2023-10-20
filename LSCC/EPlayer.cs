@@ -2634,6 +2634,12 @@ namespace RNC
             target.SetSharedData("CarriedBy", -1);
         }
 
+        public static void UpdateTeleports(Player player, List<Teleport> teleports)
+        {
+            string tpData = NAPI.Util.ToJson(teleports);
+            player.SetSharedData("TELEPORT:Data", tpData);
+        }
+
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
             try

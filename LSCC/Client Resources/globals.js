@@ -1226,8 +1226,10 @@ let global = {
   isAntiPeekOn:false,
   ServerSettings:[],
 
+  TeleportData:[],
+  TeleportIndicators:[],
   TeleportEditorOpen:false,
-  
+
   LastKeyPress: 0,
   AFKStage: 0,
   SecondsSinceLastKeyPress: 0, // using this for nametags

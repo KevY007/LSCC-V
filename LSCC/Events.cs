@@ -4025,9 +4025,17 @@ namespace RNC
                 List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
+
                 Clan pClan = null;
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
+                    List<Teleport> teleports = await context.Teleports.AsQueryable().ToListAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.UpdateTeleports(player, teleports);
+                    });
+                    await NAPI.Task.WaitForMainThread();
+
                     pClan = await context.Clans.AsQueryable().FirstOrDefaultAsync(c => c.SQL_ID == acc.ClanID);
                     if (pClan != null)
                     {
@@ -5285,17 +5293,17 @@ namespace RNC
                     await NAPI.Task.WaitForMainThread();
                 }
 
-                /*
+                
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    await context.PlayerOutfits.AddAsync(new PlayerOutfit()
+                    List<Teleport> teleports = await context.Teleports.AsQueryable().ToListAsync();
+                    NAPI.Task.Run(() =>
                     {
-                        AccountID = acc.SQL_ID,
-                        OutfitData = NAPI.Util.ToJson(defaultOutfits)
+                        EPlayer.UpdateTeleports(player, teleports);
                     });
-                    //ContextFactory.Instance.SaveChanges();
+                    await NAPI.Task.WaitForMainThread();
                 }
-                */
+                
             });
 
             player.SetSharedData("SQL_ID", acc.SQL_ID);
