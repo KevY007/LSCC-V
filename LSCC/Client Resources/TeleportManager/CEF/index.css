@@ -122,7 +122,7 @@ body{
 .panel-movable{
     position:absolute;
     width:500px;
-    height:560px;
+    height:595px;
     background-color: rgba(0,0,0,0.5);
     border-radius: 12px;
     z-index: 10;
