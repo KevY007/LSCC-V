@@ -3,14 +3,31 @@ const player = mp.players.local;
 
 var TeleportEditorCEF = null;
 
-mp.events.add("TeleportEditor:Open", () => {
+mp.events.add("TeleportEditor:Open", (editTp) => {
     TeleportEditorCEF = mp.browsers.new("package://TeleportManager/CEF/index.html");
     TeleportEditorCEF.active = true;
+    TeleportEditorCEF.call("LoadTeleports", JSON.stringify(global.TeleportData));
+    if(editTp.length === 0){
+        TeleportEditorCEF.call("SetEditTeleport", editTp);
+    }
 
     mp.gui.cursor.show(true, true);
     global.TeleportEditorOpen = true;
     mp.events.callLocal("ToggleHud", false);
 });
+mp.events.add("TeleportEditor:SearchResultAction", (isEdit, tpID) => {
+    const tp = global.TeleportData.find(t => t.SQL_ID == tpID);
+    if(!tp) return;
+
+    if(!isEdit){
+        player.position = new mp.Vector3(tp.FromX, tp.FromY, tp.FromZ);
+        player.setHeading(tp.FromHeading);
+        return;
+    }
+    TeleportEditorCEF.call("SetEditTeleport", JSON.stringify(tp));
+});
+
+
 mp.events.add("TeleportEditor:Close", () => {
     if(!TeleportEditorCEF) return;
 

@@ -1,4 +1,4 @@
-var TELEPORTS_LIST = [{SQL_ID:0, Name:"Diamond Casino"}, {SQL_ID:1, Name:"Diamond Casino - Rooftop"}, {SQL_ID:2, Name:"Bank"}]; // set by client
+var TELEPORTS_LIST = []; // set by client
 const DEFAULT_TP_SETTINGS = {
     Name:"",
     FromPosition:{x:0, y:0, z:0, h:0},
@@ -20,9 +20,25 @@ function clearSelection()
 var IsNewTeleport = true;
 var ExistingTeleportSearch = document.getElementById("new_teleport_name_input");
 var ExistingSearchResults = document.getElementById("teleport_existing_search_results");
+
+function updateExistingTeleportsList(){
+
+    ExistingSearchResults.innerHTML = "";
+    const teleportsToSet = TELEPORTS_LIST;
+    for(let i = 0 ; i < teleportsToSet.length ; i++){
+        ExistingSearchResults.innerHTML += `<div class="main-menu-result">
+                                                <p>${teleportsToSet[i].Name}</p>
+                                                <div>
+                                                    <button onclick="existingTeleportClick(false, ${teleportsToSet[i].SQL_ID})" id="teleport_teleport_ID">Teleport</button>
+                                                    <button onclick="existingTeleportClick(true, ${teleportsToSet[i].SQL_ID})" id="teleport_edit_ID">Edit</button>
+                                                </div>
+                                            </div>`
+    }
+}
+
 ExistingTeleportSearch.addEventListener("input", (e) => {
     if(ExistingTeleportSearch.value.length == 0){
-        ExistingSearchResults.innerHTML = "";
+        updateExistingTeleportsList();
         return;
     }
 
@@ -392,7 +408,9 @@ mp.events.add("SetToPosition", (x, y, z, h) => {
 mp.events.add("LoadTeleports", (tpData) => {
     const TPData = JSON.parse(tpData);
     TELEPORTS_LIST = TPData;
+
+    updateExistingTeleportsList();        
 });
 mp.events.add("SetEditTeleport", (tpData) => {
-    openTeleportEditorFromClient(tpData);
+    openTeleportEditorFromClient(JSON.parse(tpData));
 });

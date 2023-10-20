@@ -7541,8 +7541,8 @@ namespace RNC
         }
         */
 
-        [Command("teleportmanager", "!{#AFAFAF}[USAGE] teleportmanager (optional: teleport ID)", Alias = "tpmanager,managetp,createtp,deletetp,settp")]
-        public void cmd_teleportcreator(Player player, int teleportID = -1)
+        [Command("teleportmanager", "!{#AFAFAF}[USAGE] teleportmanager", Alias = "tpmanager,managetp,createtp,deletetp,settp")]
+        public void cmd_teleportcreator(Player player)
         {
             if (!EPlayer.LoggedIn(player)) return;
 
@@ -7552,34 +7552,7 @@ namespace RNC
                 return;
             }
 
-            if(teleportID != -1)
-            {
-                Task.Run(async () =>
-                {
-                    using(MainDatabase context = ContextFactory.CreateContext())
-                    {
-                        Teleport tp = await context.Teleports.AsQueryable().FirstOrDefaultAsync(t => t.SQL_ID == teleportID);
-                        if(tp == null)
-                        {
-                            NAPI.Task.Run(() =>
-                            {
-                                player.SendChatMessage("!{#FF6347}[!]!{#FFFFFF} A teleport with that ID could not be found!");
-                                return;
-                            });                         
-                        }
-                        NAPI.Task.Run(() =>
-                        {
-                            string tpData = NAPI.Util.ToJson(tp);
-                            player.TriggerEvent("TeleportManager:OpenTeleport", tpData);
-                            player.SetData<Teleport>("EditingTeleport", tp);
-                            return;
-                        });
-                    }
-                });
-                return;
-            }
-
-            player.TriggerEvent("TeleportManager:Open");
+            player.TriggerEvent("TeleportEditor:Open", "");
         }
 
         [Command("eject", "!{#AFAFAF}[USAGE] eject (target)", Alias = "ej")]
