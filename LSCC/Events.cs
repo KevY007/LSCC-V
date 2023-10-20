@@ -4271,6 +4271,44 @@ namespace RNC
 
         }
 
+        [RemoteEvent("Teleport:OnPlayerEnter")]
+        public static void OnPlayerEnterTeleport(Player player, int teleportID, int teleportDimension)
+        {
+            if(player.GetSharedDataSafe<int>("InLobby") == -3)
+            {
+
+                return;
+            }
+            if(player.GetSharedDataSafe<int>("Team") == 0 || player.GetSharedDataSafe<int>("Team") == 1)
+            {
+                if (teleportDimension == -1) return; // if it's an outside teleport, don't change dimensions
+
+                int lobbyID = player.GetSharedDataSafe<int>("InLobby");
+                uint targetDimension = (uint)(teleportDimension + lobbyID + 1000);
+                player.Dimension = targetDimension;
+
+                return;
+            }
+        }
+        [RemoteEvent("Teleport:OnPlayerExit")]
+        public static void OnPlayerExitTeleport(Player player, int teleportID, int teleportDimension)
+        {
+            if (player.GetSharedDataSafe<int>("InLobby") == -3)
+            {
+
+                return;
+            }
+            if (player.GetSharedDataSafe<int>("Team") == 0 || player.GetSharedDataSafe<int>("Team") == 1)
+            {
+                if (teleportDimension != -1) return; // if outside dimension isn't the main one, don't change anything
+
+                int lobbyID = player.GetSharedDataSafe<int>("InLobby");
+                player.Dimension = Convert.ToUInt32(lobbyID);
+
+                return;
+            }
+        }
+
         [RemoteEvent("TPEditor:RequestNoclip")]
         public static void TPEditor_OnNoclipRequest(Player player)
         {
@@ -5391,6 +5429,12 @@ namespace RNC
                 }
             }
             return;
+        }
+
+        [RemoteEvent("ChangePlayerAlpha")]
+        public static void OnChangePlayerAlpha(Player target, int alpha)
+        {
+            target.SetSharedData("EntAlpha", alpha);
         }
 
         public static void OnPlayerRegister(Player player, Account acc)

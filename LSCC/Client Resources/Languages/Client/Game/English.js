@@ -51,6 +51,7 @@ const Language = {
     "MENU":"Menu",
     "ACTION_MENU": "Action Menu",
     "VOICE_CHAT": "Voice Chat",
-    "CLIMB_PROTECTION": "CLIMB PROTECTION"
+    "CLIMB_PROTECTION": "CLIMB PROTECTION",
+    "EARLY_UNFREEZE_TIP": "You can press <strong>ALT</strong> to unfreeze yourself now."
 }
 exports.Language = Language;

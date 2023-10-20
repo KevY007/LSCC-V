@@ -736,6 +736,16 @@ if(mp.storage.data.actionmenubind !== undefined){
     global.curActionMenuBind = mp.storage.data.actionmenubind;
     global.lastActionMenuBind = mp.storage.data.actionmenubind;
 }
+if(mp.storage.data.enterexitbind !== undefined){
+    global.curEnterExitBind = mp.storage.data.enterexitbind;
+    global.lastEnterExitBind = mp.storage.data.enterexitbind;
+
+    mp.keys.bind(global.curEnterExitBind, true, global.enterExitCheck);
+}
+else{
+    mp.keys.bind(0x58, true, global.enterExitCheck);
+}
+
 if(mp.storage.data.mdcbind !== undefined){
     global.curMDCBind = mp.storage.data.mdcbind;
     global.lastMDCBind = mp.storage.data.mdcbind;

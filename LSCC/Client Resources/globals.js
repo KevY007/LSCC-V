@@ -1156,6 +1156,12 @@ function isHoldingSniper() {
   return returnValue;
 }
 
+function enterExitCheck(){
+  if(global.chatStatus) return;
+  
+  mp.events.callLocal("CS_OnPlayerTeleportCheck"); // Checked in Teleport.js
+}
+
 let global = {
   EnterableBuildings:EnterableBuildingData,
   
@@ -1197,6 +1203,8 @@ let global = {
   lastMDCBind: 0x4B,
   curActionMenuBind: 0x59,
   lastActionMenuBind: 0x59,
+  curEnterExitBind:0x58,
+  lastEnterExitBind:0x58,
 
   lastVoiceBind: 0x4E,
   curVoiceBind: 0x4E,
@@ -1285,5 +1293,6 @@ let global = {
   calcDist,
   InitializeServerUI,
   isHoldingSniper,
+  enterExitCheck,
 };
 exports = global;

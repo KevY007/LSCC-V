@@ -50,6 +50,8 @@ const Language = {
     "ENEMY_INJURED":"(( El jugador está herido ))",
     "MENU": "Menú",
     "ACTION_MENU": "Menú de acciones",
-    "VOICE_CHAT": "Chat de voz"
+    "VOICE_CHAT": "Chat de voz",
+    "CLIMB_PROTECTION": "CLIMB PROTECTION",
+    "EARLY_UNFREEZE_TIP": "Puedes presionar <strong>ALT</strong> para descongelarte ahora."
 }
 exports.Language = Language;

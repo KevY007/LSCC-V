@@ -721,6 +721,13 @@ function updateMenuSettingsTab() {
             label: "Police MDC",
             description: "Toggles the police Mobile Data Computer.",
           },
+          {
+            id: 35,
+            type: 3,
+            name: "enterexitbind",
+            label: "Enter/Exit",
+            description: "Keybind used to Enter/Exit custom interiors/teleports.",
+          },
         ],
       },
       {
@@ -1045,6 +1052,11 @@ function updateMenuSettingsTab() {
       34,
       mp.storage.data.menu.digitalHPAR
     );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      35,
+      String.fromCharCode(global.curEnterExitBind)
+    );
 
     // global.ServerUI.call(
     //   "mainmenu_setting_value_set",
@@ -1172,6 +1184,9 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
     mp.storage.data.menu.digitalHPAR = value;
     global.digitalHPAR = value;
   }
+  else if(id == 35){
+    changeEnterExitBind(value);
+  }
 
   if (global.ServerUI != null) {
     global.ServerUI.call("hud_info_toggle", mp.storage.data.menu.topRightInfo);
@@ -1179,6 +1194,48 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
 
   mp.storage.flush();
 });
+
+function changeEnterExitBind(bind){
+  bind = Number(bind);
+
+  if (!Number.isInteger(bind)) {
+    return;
+  }
+
+  if (mp.storage.data.enterexitbind !== undefined) {
+    mp.keys.unbind(mp.storage.data.enterexitbind, true, global.enterExitCheck);
+  } else {
+    mp.keys.unbind(0x58, true, global.enterExitCheck);
+  }
+
+  mp.storage.data.enterexitbind = bind;
+
+  mp.storage.flush();
+
+  global.lastEnterExitBind = global.curEnterExitBind;
+  global.curEnterExitBind = bind;
+
+  mp.keys.unbind(global.lastEnterExitBind, true, global.enterExitCheck);
+  mp.keys.bind(global.curEnterExitBind, true, global.enterExitCheck);
+
+  mp.events.callLocal(
+    "HUDNotify",
+    `Enter/Exit key is now binded to <strong>${String.fromCharCode(
+      global.curEnterExitBind
+    )}</strong>.`,
+    "blue",
+    "fas fa-check",
+    false,
+    1000,
+    "bottomCenter",
+    "replace"
+  );
+
+  mp.events.callLocal(
+    "RemoveTooltip",
+    String.fromCharCode(global.lastEnterExitBind)
+  );
+}
 
 function changeActionMenuBind(bind) {
   bind = Number(bind);
@@ -1213,7 +1270,7 @@ function changeActionMenuBind(bind) {
 
   mp.events.callLocal(
     "HUDNotify",
-    `MDC key is now binded to <strong>${String.fromCharCode(
+    `Quick-Action key is now binded to <strong>${String.fromCharCode(
       global.curActionMenuBind
     )}</strong>.`,
     "blue",

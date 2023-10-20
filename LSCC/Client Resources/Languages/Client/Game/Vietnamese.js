@@ -50,6 +50,8 @@ const Language = {
     "ENEMY_INJURED":"(( Nguoi choi bi thuong ))",
     "MENU": "Menu",
     "ACTION_MENU": "Action Menu",
-    "VOICE_CHAT": "Voice Chat"
+    "VOICE_CHAT": "Voice Chat",
+    "CLIMB_PROTECTION": "CLIMB PROTECTION",
+    "EARLY_UNFREEZE_TIP": "Bạn có thể nhấn <strong>ALT</strong> để tự mình bóc đông bây giờ."
 }
 exports.Language = Language;
