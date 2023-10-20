@@ -4070,7 +4070,7 @@ mp.events.add(
             mp.events.callRemote("RequestParachute", vehicle);
 
             if(mp.players.local.getVariable("Team") === 1){
-                mp.events.callLocal("AddTooltip", "X", "Police Camera™", 1);
+                mp.events.callLocal("AddTooltip", "Alt", "Police Camera™", 1);
             }
         }
 
@@ -4093,7 +4093,7 @@ mp.events.add(
                 mp.players.local.setIntoVehicle(vehicle.handle, seat);
             }
 
-            mp.events.callLocal("RemoveTooltip", "X");
+            mp.events.callLocal("RemoveTooltip", "Alt");
 
             if(vehicle.getVariable("Engine") !== undefined)
                 vehicle.setEngineOn(vehicle.getVariable("Engine"), true, true);
