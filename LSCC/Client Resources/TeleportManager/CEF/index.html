@@ -2,10 +2,20 @@
 <html>
     <head>
         <link rel="stylesheet" href="./index.css"/>
-        <script src="./index.js" defer></script>
         <script src="./helpers/draggable.js" defer></script>
     </head>
     <body>
+        <div class="teleport-list-wrapper" id="teleport_list_wrapper" style="visibility: hidden;">
+            <div class="teleports-display">
+                <div class="teleports-search">
+                    <input id="teleport_list_search" placeholder="Search for a teleport"/>
+                </div>
+                <div class="teleports-list" id="teleport_list_id">
+
+                </div>
+                <button onclick="toggleTeleportList(false)">Close</button>
+            </div>                
+        </div>
         <div class="blips-list-wrapper" id="blips_list_wrapper" style="visibility: hidden;">
             <div class="blips-display">
                 <div class="blip-image-wrapper">
@@ -25,10 +35,30 @@
             <div class="panel-movable" id="panel">
                 <div class="panel-header" id="panelheader">
                     <p>=</p>
-                    <button>X</button>
+                    <button class="panel-header-utility-button" id="utility_button"><img src="./images/wrench.png"/></button>
+                    <button class="panel-header-close-button" id="close_button">X</button>
                 </div>
+                <div class="utilities-panel-wrapper" style="visibility: hidden;" id="utility_pannel">
+                    <div class="utilities-panel">
+                        <div class="utility-teleport">
+                            <p>Teleport</p>
+                            <input id="tp_X" placeholder="X"/>
+                            <input id="tp_Y" placeholder="Y"/>
+                            <input id="tp_Z" placeholder="Z"/>
+                            <button id="tp_button">TP</button>
+                        </div>
+                        <div class="utility-buttons">
+                            <button id="tp_button_from">TP to From</button>
+                            <button id="tp_button_to">TP to To</button>
+                        </div>
+                        <div class="utility-buttons">
+                            <button id="noclip_button">Toggle Noclip</button>
+                        </div>
+                    </div>
+                </div>
+             
                 <div class="panel-content">
-                    <!-- <div class="main-menu" id="main_menu">
+                    <div class="main-menu" id="main_menu">
                         <div class="main-menu-options">
                             <div class="main-menu-option">
                                 <p>Create new:</p>
@@ -42,36 +72,36 @@
                                 <button id="search_teleport_button">Search</button>
                             </div>
                         </div>
-                        <div class="main-menu-results">
-                            <div class="main-menu-result">
-                                <p>Diamond Casino</p>
-                                <div>
-                                    <button id="teleport_teleport_ID">Teleport</button>
-                                    <button id="teleport_edit_ID">Edit</button>
-                                </div>
-                            </div>
+                        <div class="main-menu-results" id="teleport_existing_search_results">
+                 
                         </div>
-                    </div> -->
-                    <div class="teleport-editor" id="teleport_editor">
+                    </div>
+                    <div class="teleport-editor" id="teleport_editor" style="visibility: hidden;">
                         <div class="tips-holder">
                             <p>Press <strong>F2</strong> to toggle the cursor.</p>
                             <p>You can click on any option name to see what it does.</p>
                             <p>If this is your first time using the TP Manager, <strong>read every option's description</strong>!</p>
                         </div>
                         <div class="editor-top">
-                            <button id="teleport_finish_create_button">Create [TP Name]</button>
+                            <div id="top_buttonset_create" class="top_create">
+                                <button id="teleport_finish_create_button">Create [TP Name]</button>
+                            </div>
+                            <div id="top_buttonset_edit" style="visibility: hidden; position: absolute;" class="top_edit">
+                                <button id="teleport_finish_edit_button">Finish Edit</button>
+                                <button id="teleport_finish_delete_button">Delete TP</button>
+                            </div>
                         </div>
                         <div class="editor-positions">
                             <h1>Position</h1>
                             <div class="editor-position">
                                 <h3 onclick="onRequestHelp(0)">From:</h3>
                                 <button id="set_from_position">Set</button>
-                                <p>X,Y,Z,H</p>
+                                <p id="fromPosDisplay">X,Y,Z,H</p>
                             </div>
                             <div class="editor-position">
                                 <h3 onclick="onRequestHelp(1)">To:</h3>
                                 <button id="set_to_position">Set</button>
-                                <p>X,Y,Z,H</p>
+                                <p id="toPosDisplay">X,Y,Z,H</p>
                             </div>
                         </div>
                         <div class="editor-generic-row">
@@ -82,7 +112,7 @@
                         <div class="editor-generic-row">
                             <div style="width:34%;"><h3 onclick="onRequestHelp(3)">Side Entrance:</h3></div>
                             <div style="width:33%;"><input id="side_entrance_id" type="number" placeholder="Teleport ID"/></div>
-                            <div style="width:33%;"><button>Teleport List</button></div>
+                            <div style="width:33%;"><button onclick="toggleTeleportList(true)">Teleport List</button></div>
                         </div>
                         <div class="editor-generic-row">
                             <div style="width:34%;"><h3 onclick="onRequestHelp(4)">Dimension:</h3></div>
@@ -102,10 +132,6 @@
                         <div class="ipl-list">
                             <p class="ipl-list-header">IPL List</p>
                             <div class="ipl-list-items" id="ipl_items_list">
-                                <!-- <div class="ipl-item">
-                                    <p>test_ipl_bro</p>
-                                    <button>Remove</button>
-                                </div> -->
                             </div>
                         </div>
                     </div>
@@ -114,5 +140,7 @@
     
 
         </div>
+        
+        <script src="./index.js"></script>
     </body>
 </html>

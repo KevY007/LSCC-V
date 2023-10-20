@@ -11,6 +11,87 @@ body{
     margin:0px;
     height:100vh;  
 }
+.teleport-list-wrapper{
+    margin:0px;
+    height:100vh;  
+    width:100%;
+    position:absolute;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 14;    
+}
+.teleports-display{
+    height:400px;
+    width:600px;
+    position: relative;
+    padding:10px;
+    background-color: black;
+    border-radius: 12px;
+    text-align: center;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.teleports-display > button{
+    position: absolute;
+    bottom:0px;
+    color:white;
+    border:1px solid white;
+    font-size: 16px;
+    background-color: black;
+    margin:10px;
+    border-radius: 12px;
+    cursor:pointer;
+    transition: 100ms;
+}
+.teleports-display > button:hover{
+    border:1px solid white;
+    font-size: 16px;
+    color: black;
+    background-color: white;
+}
+.teleports-search{
+    position: absolute;
+    top:0px;
+    width:100%;
+    height:40px;
+}
+.teleports-search > input {
+    width:90%;
+    font-weight: 500;
+    color:white;
+    background-color: rgb(35, 35, 35);
+    margin:2px;
+    border:0px;
+    font-size:20px;
+    padding:2px;
+    text-align: center;
+    outline:0px;
+    border-radius: 12px;
+}
+.teleports-list{
+    position: absolute;
+    bottom:40px;
+    height:80%;
+    width:100%;
+    overflow-y: auto;
+}
+.teleports-list > div{
+    height:48px;
+    border-bottom:1px solid gray;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+
+    color:white;
+    font-family: 'Roboto', sans-serif;
+}
+.teleports-list > div > h1{
+    font-weight: 400;
+}
+
 .blips-list-wrapper{
     margin:0px;
     height:100vh;  
@@ -146,7 +227,7 @@ body{
     cursor:grab;
 }
 
-.panel-header > button{
+.panel-header-close-button{
     position: absolute;
     right:2px;
     background-color:red;
@@ -158,6 +239,104 @@ body{
 
     border-radius: 100%;
     cursor:pointer;
+}
+.panel-header-utility-button{
+    position: absolute;
+    right:30px;
+    background-color:blue;
+    color:white;
+    border:0px;
+    height:20px;
+    width:20px;
+    text-align: center;
+
+    border-radius: 100%;
+    cursor:pointer;  
+    overflow: hidden;
+    
+    display:flex;
+    justify-content: center;
+    align-items: center;
+}
+.panel-header-utility-button > img{
+    filter:invert(1);
+    width:14px;
+    height:14px;
+}
+.utilities-panel-wrapper{
+    position: absolute;
+    right:0px;
+    top:23px;
+}
+.utilities-panel{
+    position: fixed;
+    background-color: rgba(0,0,0,0.5);
+    width:220px;
+    height:220px;
+
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.utility-teleport{
+    margin-top:40px;
+    display:flex;
+    position: relative;
+    justify-content: center;
+    color:white;
+    font-family: 'Roboto', sans-serif;
+}
+.utility-teleport > p{
+    position: absolute;
+    font-weight: 500;
+    top:-40px;
+}
+.utility-teleport > input{
+    width:50px;
+    font-weight: 500;
+    color:white;
+    background-color: black;
+    margin:2px;
+    border:0px;
+    font-size:16px;
+    padding:2px;
+    text-align: center;
+    outline:0px;
+    border-radius: 12px;
+}
+.utility-teleport > button{
+    color:white;
+    font-weight: 300;
+    background-color: transparent;
+    border:1px solid white;
+    margin:2px;
+    border-radius: 12px;
+    transition: 100ms;
+}
+.utility-teleport > button:hover{
+    cursor: pointer;
+    background-color: white;
+    color:black;
+}
+.utility-buttons{
+    margin:10px;
+    display:flex;
+}
+.utility-buttons > button{
+    padding:10px;
+    color:white;
+    font-weight: 300;
+    background-color: transparent;
+    border:1px solid white;
+    margin:2px;
+    border-radius: 12px;
+    transition: 100ms;
+}
+.utility-buttons > button:hover{
+    cursor: pointer;
+    background-color: white;
+    color:black;
 }
 
 .panel-content{
@@ -302,7 +481,13 @@ body{
     justify-content: center;
     align-items: center;
 }
-.editor-top > button{
+.top_create{
+    width:90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.top_create > button{
     border:1px solid white;
     background-color: transparent;
     color:white;
@@ -314,7 +499,32 @@ body{
     overflow: hidden;
     text-wrap:nowrap;
 }
-.editor-top > button:hover{
+.top_create > button:hover{
+    color:black;
+    background-color: white;
+    cursor: pointer;
+}
+
+.top_edit{
+    width:90%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.top_edit > button{
+    margin:2px;
+    border:1px solid white;
+    background-color: transparent;
+    color:white;
+    border-radius: 12px;
+    padding:5px;
+    width:90%;
+    transition: 100ms;
+    font-size: 18px;
+    overflow: hidden;
+    text-wrap:nowrap;
+}
+.top_edit > button:hover{
     color:black;
     background-color: white;
     cursor: pointer;
