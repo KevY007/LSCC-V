@@ -182,6 +182,7 @@ function updateTPList(tpArray){
 
 var CreateTeleportButton = document.getElementById("new_teleport_button");
 CreateTeleportButton.addEventListener("click", (e) => {
+    EDITING_TELEPORT_ID = -1;
     const name = document.getElementById("teleport_name_input").value;
     if(!name || name.length === 0 || name.length > 32){
         mp.trigger("TeleportEditor:Error", "Teleport name must be between 0 and 32 characters!");
@@ -382,15 +383,18 @@ CreateTPButton.addEventListener("click", (e) => {
 });
 EditTPButton.addEventListener("click", (e) => {
     clearSelection();
-    mp.trigger("TeleportEditor:EditTeleport", JSON.stringify(TP_SETTINGS));
+    mp.trigger("TeleportEditor:EditTeleport", EDITING_TELEPORT_ID, JSON.stringify(TP_SETTINGS));
 });
 DeleteTPButton.addEventListener("click", (e) => {
     clearSelection();
-    mp.trigger("TeleportEditor:DeleteTeleport", JSON.stringify(TP_SETTINGS));
+    mp.trigger("TeleportEditor:DeleteTeleport", EDITING_TELEPORT_ID);
 });
+
+var EDITING_TELEPORT_ID = -1;
 function existingTeleportClick(isEdit, tpID){
     clearSelection();
     mp.trigger("TeleportEditor:SearchResultAction", isEdit, tpID);   
+    EDITING_TELEPORT_ID = tpID;
 }
 CloseButton.addEventListener("click", (e) => {
     clearSelection();

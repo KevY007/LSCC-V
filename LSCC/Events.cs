@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Diagnostics;
 using RNC;
 using RNC.Data;
+using System.Collections;
 
 namespace RNC
 {
@@ -4275,6 +4276,110 @@ namespace RNC
         {
             Commands.cmd_noclip(player);
         }
+        [RemoteEvent("TPEditor:DeleteTeleport")]
+        public static void TPEditor_OnDeleteTeleport(Player player, int tpID)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Teleport toEdit = await context.Teleports.AsQueryable().FirstOrDefaultAsync(t => t.SQL_ID == tpID);
+                    if (toEdit == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "That teleport no longer exists!");
+                        });
+                        return;
+                    }
+                    context.Teleports.Remove(toEdit);
+
+                    await context.SaveChangesAsync();
+
+                    List<Teleport> teleportsList = await context.Teleports.AsQueryable().ToListAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("TeleportEditor:Close");
+                        foreach (Player p in Settings.LoggedInPlayers)
+                        {
+                            EPlayer.UpdateTeleports(p, teleportsList);
+                        }
+                    });
+                }
+            });
+        }
+        [RemoteEvent("TPEditor:EditTeleport")]
+        public static void TPEditor_OnEditTeleport(Player player, int tpID, string name, int blipID, int sideEntrance, bool isOutsideDim, string iplList, int freezeTime, float fX, float fY, float fZ, float fH, float tX, float tY, float tZ, float tH)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            if (EPlayer.GetAccount(player).Admin < 4) return;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Teleport toEdit = await context.Teleports.AsQueryable().FirstOrDefaultAsync(t => t.SQL_ID == tpID);
+                    if(toEdit == null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "That teleport no longer exists!");
+                        });
+                        return;
+                    }
+                    int dimToSet = -1;
+                    string iplListToSet = iplList;
+
+                    if (!isOutsideDim)
+                    {
+                        Teleport _highest = await context.Teleports.AsQueryable().OrderByDescending(x => x.ToDimension).FirstOrDefaultAsync();
+                        if (_highest == null) dimToSet = 0;
+                        else dimToSet = (_highest.ToDimension + 1);
+                    }
+                    if (sideEntrance != -1)
+                    {
+                        Teleport _sideEntrance = await context.Teleports.AsQueryable().FirstOrDefaultAsync(t => t.SQL_ID == sideEntrance);
+                        if (_sideEntrance != null)
+                        {
+                            dimToSet = _sideEntrance.ToDimension;
+                            iplListToSet = _sideEntrance.IPLs;
+                        }
+                    }
+
+
+                    toEdit.Name = name;
+                    toEdit.BlipID = blipID;
+                    toEdit.SideEntranceTo = sideEntrance;
+                    toEdit.FromDimension = -1;
+                    toEdit.ToDimension = (isOutsideDim ? -1 : dimToSet);
+                    toEdit.IPLs = iplListToSet;
+                    toEdit.FreezeTime = freezeTime;
+                    toEdit.FromX = fX;
+                    toEdit.FromY = fY;
+                    toEdit.FromZ = fZ;
+                    toEdit.FromHeading = fH;
+                    toEdit.ToX = tX;
+                    toEdit.ToY = tY;
+                    toEdit.ToZ = tZ;
+                    toEdit.ToHeading = tH;
+                    
+                    await context.SaveChangesAsync();
+
+                    List<Teleport> teleportsList = await context.Teleports.AsQueryable().ToListAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("TeleportEditor:Close");
+                        foreach (Player p in Settings.LoggedInPlayers)
+                        {
+                            EPlayer.UpdateTeleports(p, teleportsList);
+                        }
+                    });
+                }
+            });
+        }
         [RemoteEvent("TPEditor:CreateTeleport")]
         public static void TPEditor_OnCreateTeleport(Player player, string name, int blipID, int sideEntrance, bool isOutsideDim, string iplList, int freezeTime, float fX, float fY, float fZ, float fH, float tX, float tY, float tZ, float tH)
         {
@@ -4328,7 +4433,8 @@ namespace RNC
                     List<Teleport> teleportsList = await context.Teleports.AsQueryable().ToListAsync();
                     NAPI.Task.Run(() =>
                     {
-                        foreach(Player p in Settings.LoggedInPlayers)
+                        player.TriggerEvent("TeleportEditor:Close");
+                        foreach (Player p in Settings.LoggedInPlayers)
                         {
                             EPlayer.UpdateTeleports(p, teleportsList);
                         }

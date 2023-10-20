@@ -72,6 +72,21 @@ mp.events.add("TeleportEditor:CreateNewTeleport", (tpSettings) => {
     tpSet.FromPosition.x, tpSet.FromPosition.y, tpSet.FromPosition.z, tpSet.FromPosition.h, 
     tpSet.ToPosition.x, tpSet.ToPosition.y, tpSet.ToPosition.z, tpSet.ToPosition.h);    
 });
+mp.events.add("TeleportEditor:EditTeleport", (tpID, tpSettings) => {
+    const tpSet = JSON.parse(tpSettings);
+    let isOutside = (tpSet.Dimension === "Outside");
+    let iplList = '';
+    tpSet.IPLArray.map((ipl) => { iplList += (ipl + ",")});
+    iplList = removeTrailingComma(iplList);
+
+    mp.events.callRemote("TPEditor:EditTeleport", tpID, tpSet.Name, tpSet.BlipID, tpSet.SideEntrance, isOutside, iplList, tpSet.FreezeTime,
+    tpSet.FromPosition.x, tpSet.FromPosition.y, tpSet.FromPosition.z, tpSet.FromPosition.h, 
+    tpSet.ToPosition.x, tpSet.ToPosition.y, tpSet.ToPosition.z, tpSet.ToPosition.h);    
+});
+mp.events.add("TeleportEditor:DeleteTeleport", (tpID) => {
+    mp.events.callRemote("TPEditor:DeleteTeleport", tpID);
+});
+
 function removeTrailingComma(inputString) {
     // Use a regular expression to replace the trailing comma with an empty string
     return inputString.replace(/,$/, '');
