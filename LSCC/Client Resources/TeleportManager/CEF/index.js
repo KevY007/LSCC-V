@@ -11,6 +11,12 @@ const DEFAULT_TP_SETTINGS = {
 };
 var TP_SETTINGS = DEFAULT_TP_SETTINGS;
 
+function clearSelection()
+{
+ if (window.getSelection) {window.getSelection().removeAllRanges();}
+ else if (document.selection) {document.selection.empty();}
+}
+
 var IsNewTeleport = true;
 var ExistingTeleportSearch = document.getElementById("new_teleport_name_input");
 var ExistingSearchResults = document.getElementById("teleport_existing_search_results");
@@ -258,15 +264,19 @@ UtilityButton.addEventListener("click", (e) => toggleUtilityPanel());
 //     }
 // }
 BlipIDInput.addEventListener("change", (e) => {
+    clearSelection();
     TP_SETTINGS.BlipID = BlipIDInput.value;
 });
 SideEntranceInput.addEventListener("change", (e) => {
+    clearSelection();
     TP_SETTINGS.SideEntrance = SideEntranceInput.value;
 });
 FreezeTimeInput.addEventListener("change", (e) => {
+    clearSelection();
     TP_SETTINGS.FreezeTime = FreezeTimeInput.value;
 });
 DimOutsideButton.addEventListener("click", (e) => {
+    clearSelection();
     TP_SETTINGS.Dimension = "Outside";
     DimOutsideButton.style.backgroundColor = "white";
     DimOutsideButton.style.color = "black";
@@ -275,6 +285,7 @@ DimOutsideButton.addEventListener("click", (e) => {
     DimInsideButton.style.color = "white";
 });
 DimInsideButton.addEventListener("click", (e) => {
+    clearSelection();
     TP_SETTINGS.Dimension = "Inside";
     DimInsideButton.style.backgroundColor = "white";
     DimInsideButton.style.color = "black";
@@ -283,6 +294,7 @@ DimInsideButton.addEventListener("click", (e) => {
     DimOutsideButton.style.color = "white";
 });
 IPLButtonAdd.addEventListener("click", (e) => {
+    clearSelection();
     if(!IPLNameInput.value) return;
     if(IPLNameInput.value.includes(',')) return;
     if(TP_SETTINGS.IPLArray.includes(IPLNameInput.value)) return;
@@ -312,6 +324,8 @@ function removeIPL(name){
 
     if(TP_SETTINGS.IPLArray.includes(name))
         TP_SETTINGS.IPLArray.splice(TP_SETTINGS.IPLArray.indexOf(name), 1);
+
+    mp.trigger("TeleportEditor:UnloadIPL", name);
 }
 
 var TopButtonsetNew = document.getElementById("top_buttonset_create");
@@ -322,42 +336,58 @@ var EditTPButton = document.getElementById("teleport_finish_edit_button");
 var DeleteTPButton = document.getElementById("teleport_finish_delete_button");
 
 TPButtonFrom.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:TeleportToPosition", TP_SETTINGS.FromPosition.x, TP_SETTINGS.FromPosition.y, TP_SETTINGS.FromPosition.z, TP_SETTINGS.FromPosition.h);
 });
 TPButtonTo.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:TeleportToPosition", TP_SETTINGS.ToPosition.x, TP_SETTINGS.ToPosition.y, TP_SETTINGS.ToPosition.z, TP_SETTINGS.ToPosition.h);
 });
 TPButton.addEventListener("click", (e) => {
+    clearSelection();
     if(!InputTPX.value || !InputTPY.value || !InputTPZ.value) return;
     mp.trigger("TeleportEditor:TeleportToPosition", InputTPX.value, InputTPY.value, InputTPZ.value, 0);
 });
 NoclipButton.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:ToggleNoclip");
 });
 SetFromButton.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:RequestSetFromPosition");
 });
 SetToButton.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:RequestSetToPosition");
 });
 CreateTPButton.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:CreateNewTeleport", JSON.stringify(TP_SETTINGS));
 });
 EditTPButton.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:EditTeleport", JSON.stringify(TP_SETTINGS));
 });
 DeleteTPButton.addEventListener("click", (e) => {
+    clearSelection();
     mp.trigger("TeleportEditor:DeleteTeleport", JSON.stringify(TP_SETTINGS));
 });
 function existingTeleportClick(isEdit, tpID){
+    clearSelection();
     mp.trigger("TeleportEditor:SearchResultAction", isEdit, tpID);   
 }
+CloseButton.addEventListener("click", (e) => {
+    clearSelection();
+    mp.trigger("TeleportEditor:Close");
+});
 
 mp.events.add("SetFromPosition", (x, y, z, h) => {
-    TP_SETTINGS.FromPosition = {x, y, z, h};
+    TP_SETTINGS.FromPosition = {x:Number(x), y:Number(y), z:Number(z), h:Number(h)};
+    FromDisplayPos.innerHTML = `X:${Number(x).toFixed(2)} Y:${Number(y).toFixed(2)} Z:${Number(z).toFixed(2)} H:${Number(h).toFixed(2)}`;
 });
 mp.events.add("SetToPosition", (x, y, z, h) => {
-    TP_SETTINGS.ToPosition = {x, y, z, h};
+    TP_SETTINGS.ToPosition = {x:Number(x), y:Number(y), z:Number(z), h:Number(h)};
+    ToDisplayPos.innerHTML = `X:${Number(x).toFixed(2)} Y:${Number(y).toFixed(2)} Z:${Number(z).toFixed(2)} H:${Number(h).toFixed(2)}`;
 });
 mp.events.add("LoadTeleports", (tpData) => {
     const TPData = JSON.parse(tpData);

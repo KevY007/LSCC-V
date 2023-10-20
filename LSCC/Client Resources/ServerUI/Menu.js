@@ -435,6 +435,8 @@ function ToggleMenu() {
       global.WeaponEditorActive == true) ||
     (global.ActionMenuActive !== undefined &&
       global.ActionMenuActive == true) ||
+    (global.TeleportEditorOpen !== undefined && 
+      global.TeleportEditorOpen == true) ||
     (global.ClothingEditorActive !== undefined &&
       global.ClothingEditorActive == true) ||
     (global.isHotwiring !== undefined && global.isHotwiring == true)

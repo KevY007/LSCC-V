@@ -4262,6 +4262,12 @@ namespace RNC
 
         }
 
+        [RemoteEvent("TPEditor:RequestNoclip")]
+        public static void TPEditor_OnNoclipRequest(Player player)
+        {
+            Commands.cmd_noclip(player);
+        }
+
         [RemoteEvent("RequestResetPassword")]
         public static void OnRequestResetPassword(Player player, string code, string newPassword)
         {

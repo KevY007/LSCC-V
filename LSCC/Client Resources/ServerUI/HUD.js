@@ -243,7 +243,7 @@ mp.events.add('actionMenu:close', () => {
 });
 mp.events.add('actionMenu:open', () => {
     if(global.isInPunishmentDialog) return;
-    if(global.chatStatus == true || global.isHeliCamActive() || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
+    if(global.chatStatus == true || global.TeleportEditorOpen == true || global.isHeliCamActive() || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
         || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.StationPickerToggled == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
 
         if(!global.ServerUI) return;
@@ -799,6 +799,7 @@ mp.keys.bind(0x54, true, function() { // T key
         return;
     }
     if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    (global.TeleportEditorOpen !== undefined && global.TeleportEditorOpen == true) ||
     (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
     (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
     (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
@@ -1689,6 +1690,7 @@ function ScoreboardKeyTrigger()
 {
     if(mp.players.local.getVariable("pLogged") === undefined || mp.players.local.getVariable("pLogged") == false) return;
     if(Date.now() - global.lastChatToggle <= 500) return;
+    if(global.TeleportEditorOpen == true) return;
     if(global.menuToggled !== undefined && global.menuToggled) return;
     if(global.chatStatus && !global.scoreboardToggled) return;
     if(global.menuToggled) return;

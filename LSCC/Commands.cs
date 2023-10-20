@@ -1655,12 +1655,12 @@ namespace RNC
         }
 
         [Command("noclip", "!{#AFAFAF}[USAGE] noclip", GreedyArg = true)]
-        public void cmd_noclip(Player player)
+        public static void cmd_noclip(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 5)
+            if (EPlayer.GetAccount(player).Admin < 4)
             {
                 if (player.GetSharedDataSafe<int>("InLobby") != -3 || player.Dimension < 256 || player.Dimension > 512)
                 {
