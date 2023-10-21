@@ -53,8 +53,8 @@ const Language = {
     "VOICE_CHAT": "Chat de voz",
     "CLIMB_PROTECTION": "CLIMB PROTECTION",
     "EARLY_UNFREEZE_TIP": "Puedes presionar <strong>ALT</strong> para descongelarte ahora.",
-    "COP_CANT_ENTER_INTERORS": "!{#ff6347}[!] !{#ffffff}¡Los policías no pueden entrar en edificios antes que los fugitivos!",
-    "COP_CANT_ENTER_INTERORS_TIMED": "!{#ff6347}[!] !{#ffffff}No puedes entrar en edificios durante {SECONDS} segundos más.",
+    "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}¡Los policías no pueden entrar en edificios antes que los fugitivos!",
+    "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}No puedes entrar en edificios durante {SECONDS} segundos más.",
     "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}¡Ahora puedes entrar en edificios!"
 
 }

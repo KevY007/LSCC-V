@@ -53,8 +53,8 @@ const Language = {
     "VOICE_CHAT": "Voice Chat",
     "CLIMB_PROTECTION": "CLIMB PROTECTION",
     "EARLY_UNFREEZE_TIP": "Bạn có thể nhấn <strong>ALT</strong> để tự mình bóc đông bây giờ.",
-    "COP_CANT_ENTER_INTERORS": "!{#ff6347}[!] !{#ffffff}Cảnh sát không thể vào tòa nhà trước tội phạm!",
-    "COP_CANT_ENTER_INTERORS_TIMED": "!{#ff6347}[!] !{#ffffff}Bạn không thể vào tòa nhà thêm {SECONDS} giây nữa.",
+    "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}Cảnh sát không thể vào tòa nhà trước tội phạm!",
+    "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}Bạn không thể vào tòa nhà thêm {SECONDS} giây nữa.",
     "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}Bạn có thể vào tòa nhà bây giờ!"
 
 }

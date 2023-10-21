@@ -22,7 +22,7 @@ mp.events.add("Teleport:SetAbleToEnterDelayed", (seconds) => {
 
         if(!mp.players.local) return;
 
-        if(TimeUntilCopCanEnter <= 0){
+        if(TimeUntilCopCanEnter <= 1){
             if(mp.players.local.getVariable("Team") == 1 && !COP_ABLE_TO_ENTER){
                 COP_ABLE_TO_ENTER = true;
                 mp.gui.chat.push(Translate("COP_CAN_ENTER_INTERIOR"));
