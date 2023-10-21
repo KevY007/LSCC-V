@@ -246,6 +246,20 @@ namespace RNC
             return;
         }
 
+        [Command("playerstatus", "!{#AFAFAF}[USAGE] playerstatus (target)")]
+        public void cmd_playerstatus(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            player.SendChatMessage($"~y~Name: ~w~{target.Name} ~g~| ~y~HP|AR: ~w~{target.Health}|{target.Armor} ~g~| ~y~DIM: ~w~{target.Dimension}");
+        }
+
         [Command("dbgcreatepickup")]
         public void cmd_createpickup(Player player, string model, int r, int g, int b, int range, int intensity, int shadow)
         {

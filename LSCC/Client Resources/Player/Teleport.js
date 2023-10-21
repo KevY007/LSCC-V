@@ -1,8 +1,31 @@
 var global = require('./globals');
 const {TranslateMessage: Translate} = require('./Translator');
 
+var LAST_TELEPORT_INDICATOR_DIM = -1;
+var INDICATORS_CLEARED = false;
+
 mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
-    
+    global.TeleportData = JSON.parse(value);
+    refreshTeleportIndicators();
+});
+mp.events.add("OneSecondEvent", () => {
+    // Check for dimension changes and reload indicators if needed
+    if(mp.players.local.getVariable("Team") !== 0 &&
+       mp.players.local.getVariable("Team") !== 1 &&
+       mp.players.local.getVariable("InLobby") !== -3)
+    {
+        if(INDICATORS_CLEARED) return;
+        clearTeleportIndicators();
+        INDICATORS_CLEARED = true;
+        return;
+    }
+    if(mp.players.local.dimension === LAST_TELEPORT_INDICATOR_DIM) return;
+
+    LAST_TELEPORT_INDICATOR_DIM = mp.players.local.dimension;
+    INDICATORS_CLEARED = false;
+    refreshTeleportIndicators();
+});
+function clearTeleportIndicators(){
     for(let i = 0 ; i < global.TeleportIndicators.length ; i++){
         const indicator = global.TeleportIndicators[i];
         if(indicator.blip){
@@ -16,9 +39,9 @@ mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
         }
     }
     global.TeleportIndicators = [];
-
-    global.TeleportData = JSON.parse(value);
-
+}
+function refreshTeleportIndicators(){
+    clearTeleportIndicators();
     for(let i = 0 ; i < global.TeleportData.length ; i++){
         const tp = global.TeleportData[i];
 
@@ -50,7 +73,7 @@ mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
 
         global.TeleportIndicators.push(indicator);
     }
-});
+}
 
 var IsEnteringExiting = false;
 var EnterExitTimeout = null;
@@ -77,6 +100,14 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
             mp.players.local.position = new mp.Vector3(enterTP.ToX, enterTP.ToY, enterTP.ToZ);
             mp.players.local.setHeading(enterTP.ToHeading);
             return;
+        }
+        if(enterTP.IPLs.length > 0){
+            var iplList = enterTP.IPLs.split(',');
+            if(iplList.length > 0){
+                for(let i = 0 ; i < iplList.length ; i++){
+                    mp.game.streaming.requestIpl(iplList[i]);
+                }
+            }
         }
 
         IsEnteringExiting = true;
