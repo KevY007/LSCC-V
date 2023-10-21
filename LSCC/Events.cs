@@ -4287,6 +4287,15 @@ namespace RNC
                 uint targetDimension = (uint)(teleportDimension + lobbyID + 1000);
                 player.Dimension = targetDimension;
 
+                if(player.GetSharedDataSafe<int>("Team") == 0)
+                {
+                    PlayerRequestShotTag(player);
+                }
+                foreach(Player cop in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == lobbyID
+                                                                       && p.GetSharedDataSafe<int>("Team") == 1))
+                {
+                    cop.TriggerEvent("Teleport:SetAbleToEnterDelayed", 10);
+                }
                 return;
             }
         }

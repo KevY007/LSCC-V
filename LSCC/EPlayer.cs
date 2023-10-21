@@ -2210,6 +2210,8 @@ namespace RNC
         {
             NAPI.Task.Run(() =>
             {
+                if (player == null) return;
+
                 if (points > 0)
                     EPlayer.ScreenNotify(player, $"+{points} Points", "success", "bottom-center");
                 else EPlayer.ScreenNotify(player, $"{points} Points", "error", "bottom-center");

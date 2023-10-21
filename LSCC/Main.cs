@@ -3572,6 +3572,7 @@ namespace RNC
                             }
                         }
 
+                        player.TriggerEvent("Teleport:ResetCopCanEnter");
                         player.ResetSharedData("InteriorsEntered");
                         player.SetSharedData("IsBeingCuffed", false);
                         player.SetSharedData("IsCuffed", false);

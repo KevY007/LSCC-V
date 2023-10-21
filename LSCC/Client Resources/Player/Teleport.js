@@ -4,6 +4,38 @@ const {TranslateMessage: Translate} = require('./Translator');
 var LAST_TELEPORT_INDICATOR_DIM = -1;
 var INDICATORS_CLEARED = false;
 
+var COP_ABLE_TO_ENTER = false;
+var TimeUntilCopCanEnter = -1;
+var CopEnterInterval = null;
+mp.events.add("Teleport:ResetCopCanEnter", () => {
+    if(CopEnterInterval) clearInterval(CopEnterInterval);
+   CopEnterInterval = null;
+
+   TimeUntilCopCanEnter = -1;
+   COP_ABLE_TO_ENTER = false;
+});
+mp.events.add("Teleport:SetAbleToEnterDelayed", (seconds) => {
+    if(COP_ABLE_TO_ENTER == true) return;
+
+    TimeUntilCopCanEnter = seconds;
+    CopEnterInterval = setInterval(() => {
+
+        if(!mp.players.local) return;
+
+        if(TimeUntilCopCanEnter <= 0){
+            if(mp.players.local.getVariable("Team") == 1 && !COP_ABLE_TO_ENTER){
+                COP_ABLE_TO_ENTER = true;
+                mp.gui.chat.push("~g~You can now enter interiors!");
+            }
+            clearInterval(CopEnterInterval);
+            CopEnterInterval = null;
+            return;
+        }
+        TimeUntilCopCanEnter--;
+    }, 1000);
+});
+
+
 mp.events.addDataHandler("TELEPORT:Data", (entity, value, oldValue) => {
     global.TeleportData = JSON.parse(value);
     refreshTeleportIndicators();
@@ -85,6 +117,14 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
     if(mp.players.local.isInAnyVehicle(true)) return;
     if(mp.players.local.getVariable("Wounded") > 0) return;
     if(IsEnteringExiting === true) return;
+    if(mp.players.local.getVariable("Team") == 1 && COP_ABLE_TO_ENTER == false){
+        if(TimeUntilCopCanEnter == -1){
+            mp.gui.chat.push("You can't enter interiors as a Cop until a fugitive entered one first!");
+            return;
+        }
+        mp.gui.chat.push(`You can't enter interiors for ${TimeUntilCopCanEnter} more seconds!`);
+        return;
+    }
 
     const teleportsWithDistance = global.TeleportData.map((tp) => {
         const enterDistance = mp.game.system.vdist2(mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z,
