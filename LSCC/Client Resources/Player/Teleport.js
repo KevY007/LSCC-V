@@ -115,7 +115,8 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
         mp.events.callRemote("Teleport:OnPlayerEnter", enterTP.SQL_ID, enterTP.ToDimension);
         mp.events.callRemote("ChangePlayerAlpha", 0);
         mp.game.cam.doScreenFadeOut(250);
-        mp.players.local.setInvincible(true);
+        //mp.players.local.setInvincible(true);
+        mp.events.callRemote("SetInvincible", true);
         mp.players.local.freezePosition(true);
 
         EnterExitTimeout = setTimeout(() => {
@@ -132,7 +133,8 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
             global.ServerUI.call('notification_send', Translate("EARLY_UNFREEZE_TIP"), "info", enterTP.FreezeTime);
             EnterExitFinishTimeout = setTimeout(() => {
                 mp.players.local.freezePosition(false);
-                mp.players.local.setInvincible(false);
+                //mp.players.local.setInvincible(false);
+                mp.events.callRemote("SetInvincible", false);
                 mp.events.callRemote("ChangePlayerAlpha", 255);
 
                 IsEnteringExiting = false;
@@ -157,7 +159,8 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
         mp.events.callRemote("Teleport:OnPlayerExit", exitTP.SQL_ID, exitTP.FromDimension);
         mp.events.callRemote("ChangePlayerAlpha", 0);
         mp.game.cam.doScreenFadeOut(250);
-        mp.players.local.setInvincible(true);
+        //mp.players.local.setInvincible(true);
+        mp.events.callRemote("SetInvincible", true);
         mp.players.local.freezePosition(true);
 
         EnterExitTimeout = null;
@@ -175,7 +178,8 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
             global.ServerUI.call('notification_send', Translate("EARLY_UNFREEZE_TIP"), "info", exitTP.FreezeTime);
             EnterExitFinishTimeout = setTimeout(() => {
                 mp.players.local.freezePosition(false);
-                mp.players.local.setInvincible(false);
+                //mp.players.local.setInvincible(false);
+                mp.events.callRemote("SetInvincible", false);
                 mp.events.callRemote("ChangePlayerAlpha", 255);
 
                 IsEnteringExiting = false;
@@ -193,6 +197,7 @@ mp.keys.bind(0xA4, true, () => {
     if(IsEnteringExiting && CanUnfreezeEarly){
         mp.players.local.freezePosition(false);
         mp.players.local.setInvincible(false);
+        mp.events.callRemote("SetInvincible", false);
         mp.events.callRemote("ChangePlayerAlpha", 255);
 
         IsEnteringExiting = false;
@@ -203,3 +208,24 @@ mp.keys.bind(0xA4, true, () => {
     }
 });
 
+mp.events.add("render", () => {
+    if(!IsEnteringExiting) return;
+
+    disableShootingAndAiming();
+});
+
+
+function disableShootingAndAiming(){
+    mp.game.controls.disableControlAction(32, 25, true);
+    mp.game.controls.disableControlAction(32, 68, true);
+    mp.game.controls.disableControlAction(32, 70, true);
+    mp.game.controls.disableControlAction(32, 91, true);
+
+    mp.game.controls.disableControlAction(32, 24, true);
+    mp.game.controls.disableControlAction(32, 140, true);
+    mp.game.controls.disableControlAction(32, 141, true);
+    mp.game.controls.disableControlAction(32, 142, true);
+    mp.game.controls.disableControlAction(32, 257, true);
+    mp.game.controls.disableControlAction(32, 263, true);
+    mp.game.controls.disableControlAction(32, 264, true);   
+}

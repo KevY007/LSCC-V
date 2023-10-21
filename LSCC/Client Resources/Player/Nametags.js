@@ -268,6 +268,20 @@ mp.events.add('render', (nametags) => {
                             outline: true
                         });
                     }
+                    else if((player.getVariable("Team") == 0 || player.getVariable("Team") == 1)  && player.getVariable("Invincible") === true){
+                        var typingStr = "(( DAMAGE PROTECTION ))";
+                        if(timerCount == 0) typingStr = "(( DAMAGE PROTECTION ))";
+                        else if(timerCount == 1) typingStr = "( DAMAGE PROTECTION )";
+                        else if(timerCount == 2) timerCount = 0;
+                
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                        {
+                            font: 0,
+                            color: [100, 255, 0, 228],
+                            scale: [0.21, 0.21],
+                            outline: true
+                        });
+                    }
                         
                     var nameToDisplay = player.name.replace('_');
                     if(player.getVariable("FakeNameOn") === true && player.getVariable("FakeName") && player.getVariable("FakeName").length > 0)
