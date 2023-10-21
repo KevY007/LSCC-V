@@ -52,6 +52,9 @@ const Language = {
     "ACTION_MENU": "Action Menu",
     "VOICE_CHAT": "Voice Chat",
     "CLIMB_PROTECTION": "CLIMB PROTECTION",
-    "EARLY_UNFREEZE_TIP": "You can press <strong>ALT</strong> to unfreeze yourself now."
+    "EARLY_UNFREEZE_TIP": "You can press <strong>ALT</strong> to unfreeze yourself now.",
+    "COP_CANT_ENTER_INTERORS": "!{#ff6347}[!] !{#ffffff}Cops can't enter buildings before Fugitives!",
+    "COP_CANT_ENTER_INTERORS_TIMED": "!{#ff6347}[!] !{#ffffff}You can't enter buildings for {SECONDS} more seconds.",
+    "COP_CAN_ENTER_INTERIOR":"!{#00ff00}[>] !{#ffffff}You can now enter buildings!"
 }
 exports.Language = Language;

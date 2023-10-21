@@ -25,7 +25,7 @@ mp.events.add("Teleport:SetAbleToEnterDelayed", (seconds) => {
         if(TimeUntilCopCanEnter <= 0){
             if(mp.players.local.getVariable("Team") == 1 && !COP_ABLE_TO_ENTER){
                 COP_ABLE_TO_ENTER = true;
-                mp.gui.chat.push("~g~You can now enter interiors!");
+                mp.gui.chat.push(Translate("COP_CAN_ENTER_INTERIOR"));
             }
             clearInterval(CopEnterInterval);
             CopEnterInterval = null;
@@ -119,10 +119,10 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
     if(IsEnteringExiting === true) return;
     if(mp.players.local.getVariable("Team") == 1 && COP_ABLE_TO_ENTER == false){
         if(TimeUntilCopCanEnter == -1){
-            mp.gui.chat.push("You can't enter interiors as a Cop until a fugitive entered one first!");
+            mp.gui.chat.push(Translate("COP_CANT_ENTER_INTERIORS"));
             return;
         }
-        mp.gui.chat.push(`You can't enter interiors for ${TimeUntilCopCanEnter} more seconds!`);
+        mp.gui.chat.push(Translate("COP_CANT_ENTER_INTERIORS_TIMED", [TimeUntilCopCanEnter]));
         return;
     }
 
@@ -170,12 +170,13 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
 
             mp.players.local.setAlpha(255);
             CanUnfreezeEarly = true;
-            global.ServerUI.call('notification_send', Translate("EARLY_UNFREEZE_TIP"), "info", enterTP.FreezeTime);
+            global.ServerUI.call('notification_send', Translate("EARLY_UNFREEZE_TIP"), "info", enterTP.FreezeTime, 'early_unfreeze_tip');
             EnterExitFinishTimeout = setTimeout(() => {
                 mp.players.local.freezePosition(false);
                 //mp.players.local.setInvincible(false);
                 mp.events.callRemote("SetInvincible", false);
                 mp.events.callRemote("ChangePlayerAlpha", 255);
+                if(global.ServerUI) global.ServerUI.call('notification_dismiss', 'early_unfreeze_tip');
 
                 IsEnteringExiting = false;
                 CanUnfreezeEarly = false;
@@ -215,7 +216,7 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
 
             mp.players.local.setAlpha(255);
             CanUnfreezeEarly = true;
-            global.ServerUI.call('notification_send', Translate("EARLY_UNFREEZE_TIP"), "info", exitTP.FreezeTime);
+            global.ServerUI.call('notification_send', Translate("EARLY_UNFREEZE_TIP"), "info", exitTP.FreezeTime, 'early_unfreeze_tip');
             EnterExitFinishTimeout = setTimeout(() => {
                 mp.players.local.freezePosition(false);
                 //mp.players.local.setInvincible(false);
@@ -224,7 +225,7 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
 
                 IsEnteringExiting = false;
                 CanUnfreezeEarly = false;
-
+                if(global.ServerUI) global.ServerUI.call('notification_dismiss', 'early_unfreeze_tip');
                 EnterExitFinishTimeout = null;
                 EnterExitTimeout = null;
             }, exitTP.FreezeTime);
@@ -239,6 +240,7 @@ mp.keys.bind(0xA4, true, () => {
         mp.players.local.setInvincible(false);
         mp.events.callRemote("SetInvincible", false);
         mp.events.callRemote("ChangePlayerAlpha", 255);
+        if(global.ServerUI) global.ServerUI.call('notification_dismiss', 'early_unfreeze_tip');
 
         IsEnteringExiting = false;
         CanUnfreezeEarly = false;

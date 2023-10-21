@@ -52,6 +52,10 @@ const Language = {
     "ACTION_MENU": "Menu des actions",
     "VOICE_CHAT": "Chat vocal",
     "CLIMB_PROTECTION": "CLIMB PROTECTION",
-    "EARLY_UNFREEZE_TIP": "Vous pouvez appuyer sur <strong>ALT</strong> pour vous dégeler maintenant."
+    "EARLY_UNFREEZE_TIP": "Vous pouvez appuyer sur <strong>ALT</strong> pour vous dégeler maintenant.",
+    "COP_CANT_ENTER_INTERORS": "!{#ff6347}[!] !{#ffffff}Les policiers ne peuvent pas entrer dans les bâtiments avant les fugitifs !",
+    "COP_CANT_ENTER_INTERORS_TIMED": "!{#ff6347}[!] !{#ffffff}Vous ne pouvez pas entrer dans les bâtiments pendant {SECONDS} secondes de plus.",
+    "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}Vous pouvez maintenant entrer dans les bâtiments !"
+
 }
 exports.Language = Language;
