@@ -657,6 +657,7 @@ namespace RNC
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
+        public static int MaxTeleports = 400; // Used for dimension calculations
 
         // Connection Settings
         public const string MySQL_Host = "panel.gm.miami";

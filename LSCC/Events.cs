@@ -4284,7 +4284,7 @@ namespace RNC
                 if (teleportDimension == -1) return; // if it's an outside teleport, don't change dimensions
 
                 int lobbyID = player.GetSharedDataSafe<int>("InLobby");
-                uint targetDimension = (uint)(teleportDimension + lobbyID + 1000);
+                uint targetDimension = (uint)(teleportDimension + (lobbyID * Settings.MaxTeleports) + 1000);
                 player.Dimension = targetDimension;
 
                 if(player.GetSharedDataSafe<int>("Team") == 0)
