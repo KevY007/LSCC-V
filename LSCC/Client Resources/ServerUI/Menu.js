@@ -28,6 +28,7 @@ if (
   mp.storage.data.menu.VoiceMode = 0;
   mp.storage.data.menu.InactiveChatOpacity = 0.5;
   mp.storage.data.menu.ActiveChatOpacity = 1.0;
+  mp.storage.data.menu.ownNametag = 0;
   mp.storage.data.menu.ShowInactiveChat = true;
   mp.storage.data.menu.AutoLogin = true;
   mp.storage.data.menu.RealtimeSpeedo = false;
@@ -793,6 +794,27 @@ function updateMenuSettingsTab() {
             description: "Enable/disable nametags.",
           },
           {
+            id: 36,
+            type: 2,
+            name: "ownnametag",
+            label: "Display My Nametag",
+            description: "Toggles whether to show your nametag (& all labels, e.g. 'Shot Tag') on your screen.",
+            options: [
+              {
+                label: "Disabled",
+                value: "0",
+              },
+              {
+                label: "Head-Based",
+                value: "1",
+              },
+              {
+                label: "Position-Based",
+                value: "2",
+              },
+            ],
+          },
+          {
             id: 33,
             type: 1,
             name: "damageindicator",
@@ -1057,6 +1079,11 @@ function updateMenuSettingsTab() {
       35,
       String.fromCharCode(global.curEnterExitBind)
     );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      36,
+      mp.storage.data.menu.ownNametag.toString()
+    );
 
     // global.ServerUI.call(
     //   "mainmenu_setting_value_set",
@@ -1186,6 +1213,9 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
   }
   else if(id == 35){
     changeEnterExitBind(value);
+  }
+  else if(id == 36){
+    mp.storage.data.menu.ownNametag = Number(value);
   }
 
   if (global.ServerUI != null) {

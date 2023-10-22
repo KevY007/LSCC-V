@@ -1415,3 +1415,7 @@ mp.events.add('resetBuildingBlips', () => {
 mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
   mp.events.callLocal('resetBuildingBlips');
 });
+
+mp.events.addDataHandler("IsChatOpen", (entity, value, oldValue) => {
+  entity.isChatActive = value;
+});

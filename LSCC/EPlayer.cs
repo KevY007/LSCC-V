@@ -719,6 +719,7 @@ namespace RNC
                 player.SetSharedData("DonatorPoints", 0);
                 player.SetSharedData("Invincible", false);
                 player.SetSharedData("ShowDamaged", false);
+                player.SetSharedData("IsChatOpen", false);
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
                 player.ResetData("CompNoRefundWarn");

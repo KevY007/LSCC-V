@@ -4545,6 +4545,9 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.ShowInactiveChat == undefined){
         mp.storage.data.menu.ShowInactiveChat = true;
     }
+    if(mp.storage.data.menu.ownNametag == undefined){
+        mp.storage.data.menu.ownNametag = 0;
+    }
     if(mp.storage.data.menu.AutoLogin == undefined){
         mp.storage.data.menu.AutoLogin = true;
     }

@@ -5376,6 +5376,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             player.SetData("TUA_LT", 0);
+            player.SetSharedData("IsChatOpen", toggle);
         }
 
         [RemoteEvent("SetWaypoint")]

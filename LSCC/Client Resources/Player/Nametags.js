@@ -107,16 +107,257 @@ mp.events.add("nt_adjust", (type, value) => {
     }
 });
 
-mp.events.add('render', (nametags) => {
-    const graphics = mp.game.graphics;
-    const screenRes = graphics.getScreenResolution(0, 0);
-
+function renderNametag(player, x, y, distance){
     if(Date.now() - timerValue >= 1000)
     {
         timerValue = Date.now();
         timerCount++;
         if(timerCount >= 3) timerCount = 0;
     }
+
+    const screenRes = mp.game.graphics.getScreenResolution(0);
+
+    if((global.specState || global.isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32) || mp.players.local.getVariable("NametagHack") == true) {	   
+            
+        let distWithAdjust = 0 + distance;
+        let maxDistWithAdjust = 0 + maxDistance;
+        
+        if(global.specState) {
+            distWithAdjust -= 20;
+            maxDistWithAdjust += 20*20;
+        } 
+        if(global.isNoClip) {
+            distWithAdjust -= 35;
+            maxDistWithAdjust = 35*35;
+        }
+
+        if(mp.players.local.getVariable("NametagHack") == true)
+        {
+            maxDistWithAdjust += 999999.9;
+        }
+        
+        if((distWithAdjust <= (maxDistWithAdjust)) || (global.specState || global.isNoClip) || mp.players.local.getVariable("NametagHack") == true)
+        {
+            let scale = (distWithAdjust / (maxDistWithAdjust));
+            if(scale < NT_SCALE) scale = NT_SCALE;
+
+            //var health = player.getHealth() / 100;
+        
+            //var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
+            
+            y -= ((scale * (NT_MULTIPLIER   * (screenRes.y / 1080))) + NT_OFFSET);
+
+            if(global.renderNametags == true) {
+                if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !global.BankRobberyOn)
+                {
+                    mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.02],
+                    {
+                        font: 0,
+                        color: [237, 212, 52, 255],
+                        scale: [0.23, 0.23],
+                        outline: true
+                    });
+                }
+
+                if(global.AFKStage > 0){
+                    var typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
+                    if(timerCount == 0) typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
+                    else if(timerCount == 1) typingStr = `( IDLE [${SecondsSinceLastKeyPress}s/1500s] )`;
+                    else if(timerCount == 2) timerCount = 0;
+            
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                    {
+                        font: 0,
+                        color: [92, 255, 206, 228],
+                        scale: [0.21, 0.21],
+                        outline: true
+                    });                        
+                }
+                else if(player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true)
+                {
+                    var typingStr = `(( ${NAMETAG_MESSAGES.TASE_PROTECTION} ))`;
+                    if(timerCount == 0) typingStr = `(( ${NAMETAG_MESSAGES.TASE_PROTECTION} ))`;
+                    else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.TASE_PROTECTION} )`;
+                    else if(timerCount == 2) timerCount = 0;
+            
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                    {
+                        font: 0,
+                        color: [20, 103, 219, 228],
+                        scale: [0.21, 0.21],
+                        outline: true
+                    });
+                }
+                else if(player.getVariable("ClimbProtection") == true)
+                {
+                    var typingStr = `(( ${NAMETAG_MESSAGES.LADDER_PROTECTION} ))`;
+                    if(timerCount == 0) typingStr = `(( ${NAMETAG_MESSAGES.LADDER_PROTECTION} ))`;
+                    else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.LADDER_PROTECTION} )`;
+                    else if(timerCount == 2) timerCount = 0;
+            
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                    {
+                        font: 0,
+                        color: [20, 103, 219, 228],
+                        scale: [0.23, 0.23],
+                        outline: true
+                    });
+                }                   
+                else if((player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2))
+                {
+                    var typingStr = "";
+                    if(player.getVariable("Team") === mp.players.local.getVariable("Team")){
+                        typingStr = NAMETAG_MESSAGES.PLAYER_INJURED;
+
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                            {
+                                font: 0,
+                                color: [255, 99, 71, 228],
+                                scale: [0.245, 0.245],
+                                outline: true
+                            });  
+                    }
+                    else{
+                        typingStr = NAMETAG_MESSAGES.ENEMY_INJURED;
+                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                            {
+                                font: 0,
+                                color: [255, 25, 25, 200],
+                                scale: [0.2, 0.2],
+                                outline: true
+                            });  
+                    }
+                                        
+                }
+                else if((player.isChatActive !== undefined && player.isChatActive == true) || player.isVoiceActive == true)
+                {
+                    var typingStr = "[...]";
+                    if(timerCount == 0) typingStr = "[.]";
+                    else if(timerCount == 1) typingStr = "[..]";
+                    else if(timerCount == 2) typingStr = "[...]";
+
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.03],
+                    {
+                        font: 0,
+                        color: [210, 133, 31, 200],
+                        scale: [0.26, 0.26],
+                        outline: true
+                    });
+                }
+                else if((player.getVariable("Team") == 0 || player.getVariable("Team") == 1)  && player.getVariable("Invincible") === true){
+                    var typingStr = "(( DAMAGE PROTECTION ))";
+                    if(timerCount == 0) typingStr = "(( DAMAGE PROTECTION ))";
+                    else if(timerCount == 1) typingStr = "( DAMAGE PROTECTION )";
+                    else if(timerCount == 2) timerCount = 0;
+            
+                    mp.game.graphics.drawText(typingStr, [x, y - 0.015],
+                    {
+                        font: 0,
+                        color: [100, 255, 0, 228],
+                        scale: [0.21, 0.21],
+                        outline: true
+                    });
+                }
+                    
+                var nameToDisplay = player.name.replace('_');
+                if(player.getVariable("FakeNameOn") === true && player.getVariable("FakeName") && player.getVariable("FakeName").length > 0)
+                    nameToDisplay = player.getVariable("FakeName");
+
+                if(!global.isInInterior){
+                    if(player.getVariable("ShowDamaged") === false){
+                        if(player.col)
+                        {
+                            mp.game.graphics.drawText(nameToDisplay, [x, y],
+                            {
+                            font: 4,
+                            color: [player.col_r, player.col_g, player.col_b, player.col_a],
+                            scale: [0.395, 0.395],
+                            outline: true
+                            });
+                        }
+                        else
+                        {
+                            mp.game.graphics.drawText(nameToDisplay, [x, y],
+                            {
+                            font: 4,
+                            color: defaultcolor,
+                            scale: [0.395, 0.395],
+                            outline: true
+                            });
+                        }
+                    }  
+                    else{
+                        mp.game.graphics.drawText(nameToDisplay, [x, y],
+                        {
+                        font: 4,
+                        color: [248, 113, 113, 255],
+                        scale: [0.395, 0.395],
+                        outline: true
+                        });
+                    }     
+                }
+                           
+
+                /*
+                if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
+                {
+                    let y2 = y + 0.056;
+                    
+                    graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
+                    graphics.drawRect(x, y2, width, height, 176, 12, 12, 255);
+                    graphics.drawRect(x - width / 2 * (1 - health), y2, width * health, height, 245, 73, 73, 200);
+                    
+                    if(armour > 0) 
+                    {
+                        y2 -= 0.012;
+                        graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
+                        graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
+                        graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
+                    }
+                }
+                if(showHPStatus == 3)
+                {
+                    if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
+                        player.getVariable("BustedProgress") >= 0.0 && global.chaseRunning) // -1.0 is used if busted.
+                    {
+                        health = player.getVariable("BustedProgress") / 100;
+                        let y2 = y + 0.056;
+                        
+                        graphics.drawRect(x, y2, (0.02 + width) + border * 2, (0.003 + height) + border * 2, 0, 0, 0, 200);
+                        graphics.drawRect(x, y2, (0.02 + width), (0.003 + height), 0, 13, 128, 255);
+                        graphics.drawRect(x - (width + 0.02) / 2 * (1 - health), y2, (0.02 + width) * health, (0.003 + height), 92, 95, 242, 200);
+                    }
+                }
+                */
+            }
+
+            if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
+                mp.players.local.weapon != 2725352035 && mp.players.local.weapon != 0xA2719263) // 2725352035/hex = fist 
+            {
+                if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1 && global.chaseRunning)
+                {
+                    mp.events.callRemote("GivePlayerShotTag");
+                }
+            }
+        }
+        else
+        {
+            if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && global.renderNametags == true && global.chaseRunning && !global.BankRobberyOn)
+            {
+                // They out of distance but still try?
+                mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y],
+                {
+                    font: 0,
+                    color: [237, 212, 52, 255],
+                    scale: [0.2, 0.2],
+                    outline: true
+                });
+            }
+        }
+    }
+}
+
+mp.events.add('render', (nametags) => {
 
     if((mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true) == false)
     {
@@ -126,258 +367,26 @@ mp.events.add('render', (nametags) => {
     nametags.forEach(nametag => {
         let [player, x, y, distance] = nametag;
     
-        if((global.specState || global.isNoClip) || (isPlayerInLOS(player) == true && player.getAlpha() > 32) || mp.players.local.getVariable("NametagHack") == true) {	   
-            
-            let distWithAdjust = 0 + distance;
-            let maxDistWithAdjust = 0 + maxDistance;
-            
-            if(global.specState) {
-                distWithAdjust -= 20;
-                maxDistWithAdjust += 20*20;
-            } 
-            if(global.isNoClip) {
-                distWithAdjust -= 35;
-                maxDistWithAdjust = 35*35;
+        renderNametag(player, x, y, distance);
+    });
+
+    if(mp.storage.data.menu.ownNametag == 1){
+        const localHeadPos = mp.players.local.getBoneCoords(12844, 0.4, 0, 0);
+        if(localHeadPos){
+            let localPlayer2Dpos = mp.game.graphics.world3dToScreen2d(localHeadPos);
+            if(localPlayer2Dpos && localPlayer2Dpos.x && localPlayer2Dpos.y){
+                renderNametag(mp.players.local, localPlayer2Dpos.x, localPlayer2Dpos.y, 0);
             }
-
-            if(mp.players.local.getVariable("NametagHack") == true)
-            {
-                maxDistWithAdjust += 999999.9;
-            }
-            
-            if((distWithAdjust <= (maxDistWithAdjust)) || (global.specState || global.isNoClip) || mp.players.local.getVariable("NametagHack") == true)
-            {
-                let scale = (distWithAdjust / (maxDistWithAdjust));
-                if(scale < NT_SCALE) scale = NT_SCALE;
-
-                //var health = player.getHealth() / 100;
-            
-                //var armour = (player.getArmour() > 100 ? 100 : player.getArmour()) / 100;
-                
-                y -= ((scale * (NT_MULTIPLIER   * (screenRes.y / 1080))) + NT_OFFSET);
-
-                if(global.renderNametags == true) {
-                    if(player.getVariable("Team") !== undefined && player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && !global.BankRobberyOn)
-                    {
-                        mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y - 0.02],
-                        {
-                            font: 0,
-                            color: [237, 212, 52, 255],
-                            scale: [0.23, 0.23],
-                            outline: true
-                        });
-                    }
-
-                    if(global.AFKStage > 0){
-                        var typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
-                        if(timerCount == 0) typingStr = `(( IDLE [${SecondsSinceLastKeyPress}s/1500s] ))`;
-                        else if(timerCount == 1) typingStr = `( IDLE [${SecondsSinceLastKeyPress}s/1500s] )`;
-                        else if(timerCount == 2) timerCount = 0;
-                
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                        {
-                            font: 0,
-                            color: [92, 255, 206, 228],
-                            scale: [0.21, 0.21],
-                            outline: true
-                        });                        
-                    }
-                    else if(player.getVariable("Team") == 0 && player.getVariable("TaseProtection") == true)
-                    {
-                        var typingStr = `(( ${NAMETAG_MESSAGES.TASE_PROTECTION} ))`;
-                        if(timerCount == 0) typingStr = `(( ${NAMETAG_MESSAGES.TASE_PROTECTION} ))`;
-                        else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.TASE_PROTECTION} )`;
-                        else if(timerCount == 2) timerCount = 0;
-                
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                        {
-                            font: 0,
-                            color: [20, 103, 219, 228],
-                            scale: [0.21, 0.21],
-                            outline: true
-                        });
-                    }
-                    else if(player.getVariable("ClimbProtection") == true)
-                    {
-                        var typingStr = `(( ${NAMETAG_MESSAGES.LADDER_PROTECTION} ))`;
-                        if(timerCount == 0) typingStr = `(( ${NAMETAG_MESSAGES.LADDER_PROTECTION} ))`;
-                        else if(timerCount == 1) typingStr = `( ${NAMETAG_MESSAGES.LADDER_PROTECTION} )`;
-                        else if(timerCount == 2) timerCount = 0;
-                
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                        {
-                            font: 0,
-                            color: [20, 103, 219, 228],
-                            scale: [0.23, 0.23],
-                            outline: true
-                        });
-                    }                   
-                    else if((player.getVariable("Wounded") == 1 || player.getVariable("Wounded") == 2))
-                    {
-                        var typingStr = "";
-                        if(player.getVariable("Team") === mp.players.local.getVariable("Team")){
-                            typingStr = NAMETAG_MESSAGES.PLAYER_INJURED;
-
-                            mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                                {
-                                    font: 0,
-                                    color: [255, 99, 71, 228],
-                                    scale: [0.245, 0.245],
-                                    outline: true
-                                });  
-                        }
-                        else{
-                            typingStr = NAMETAG_MESSAGES.ENEMY_INJURED;
-                            mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                                {
-                                    font: 0,
-                                    color: [255, 25, 25, 200],
-                                    scale: [0.2, 0.2],
-                                    outline: true
-                                });  
-                        }
-                                            
-                    }
-                    else if(player.getVariable("IsTabbed") !== undefined && player.getVariable("IsTabbed") == true)
-                    {
-                        var typingStr = "(( TABBED ))";
-                        if(timerCount == 0) typingStr = "(( TABBED ))";
-                        else if(timerCount == 1) typingStr = "( TABBED )";
-                        else if(timerCount == 2) timerCount = 0;
-                
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                        {
-                            font: 0,
-                            color: [255, 99, 71, 228],
-                            scale: [0.21, 0.21],
-                            outline: true
-                        });
-                    }
-                    else if(player.isTypingInTextChat || player.isVoiceActive == true)
-                    {
-                        var typingStr = "( ... )";
-                        if(timerCount == 0) typingStr = "( . )";
-                        else if(timerCount == 1) typingStr = "( .. )";
-                        else if(timerCount == 2) typingStr = "( ... )";
-
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.03],
-                        {
-                            font: 0,
-                            color: [228, 240, 48, 228],
-                            scale: [0.26, 0.26],
-                            outline: true
-                        });
-                    }
-                    else if((player.getVariable("Team") == 0 || player.getVariable("Team") == 1)  && player.getVariable("Invincible") === true){
-                        var typingStr = "(( DAMAGE PROTECTION ))";
-                        if(timerCount == 0) typingStr = "(( DAMAGE PROTECTION ))";
-                        else if(timerCount == 1) typingStr = "( DAMAGE PROTECTION )";
-                        else if(timerCount == 2) timerCount = 0;
-                
-                        mp.game.graphics.drawText(typingStr, [x, y - 0.015],
-                        {
-                            font: 0,
-                            color: [100, 255, 0, 228],
-                            scale: [0.21, 0.21],
-                            outline: true
-                        });
-                    }
-                        
-                    var nameToDisplay = player.name.replace('_');
-                    if(player.getVariable("FakeNameOn") === true && player.getVariable("FakeName") && player.getVariable("FakeName").length > 0)
-                        nameToDisplay = player.getVariable("FakeName");
-
-                    if(!global.isInInterior){
-                        if(player.getVariable("ShowDamaged") === false){
-                            if(player.col)
-                            {
-                                mp.game.graphics.drawText(nameToDisplay, [x, y],
-                                {
-                                font: 4,
-                                color: [player.col_r, player.col_g, player.col_b, player.col_a],
-                                scale: [0.395, 0.395],
-                                outline: true
-                                });
-                            }
-                            else
-                            {
-                                mp.game.graphics.drawText(nameToDisplay, [x, y],
-                                {
-                                font: 4,
-                                color: defaultcolor,
-                                scale: [0.395, 0.395],
-                                outline: true
-                                });
-                            }
-                        }  
-                        else{
-                            mp.game.graphics.drawText(nameToDisplay, [x, y],
-                            {
-                            font: 4,
-                            color: [248, 113, 113, 255],
-                            scale: [0.395, 0.395],
-                            outline: true
-                            });
-                        }     
-                    }
-                               
-
-                    /*
-                    if(showHPStatus == 1 || (mp.game.player.isFreeAimingAtEntity(player.handle) && showHPStatus == 2))
-                    {
-                        let y2 = y + 0.056;
-                        
-                        graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
-                        graphics.drawRect(x, y2, width, height, 176, 12, 12, 255);
-                        graphics.drawRect(x - width / 2 * (1 - health), y2, width * health, height, 245, 73, 73, 200);
-                        
-                        if(armour > 0) 
-                        {
-                            y2 -= 0.012;
-                            graphics.drawRect(x, y2, width + border * 2, height + border * 2, 0, 0, 0, 200);
-                            graphics.drawRect(x, y2, width, height, 143, 143, 143, 255);
-                            graphics.drawRect(x - width / 2 * (1 - armour), y2, width * armour, height, 255, 255, 255, 200);
-                        }
-                    }
-                    if(showHPStatus == 3)
-                    {
-                        if(player.getVariable("BustedProgress") !== undefined && player.getVariable("Team") != undefined && player.getVariable("Team") == 0 && 
-                            player.getVariable("BustedProgress") >= 0.0 && global.chaseRunning) // -1.0 is used if busted.
-                        {
-                            health = player.getVariable("BustedProgress") / 100;
-                            let y2 = y + 0.056;
-                            
-                            graphics.drawRect(x, y2, (0.02 + width) + border * 2, (0.003 + height) + border * 2, 0, 0, 0, 200);
-                            graphics.drawRect(x, y2, (0.02 + width), (0.003 + height), 0, 13, 128, 255);
-                            graphics.drawRect(x - (width + 0.02) / 2 * (1 - health), y2, (0.02 + width) * health, (0.003 + height), 92, 95, 242, 200);
-                        }
-                    }
-                    */
-                }
-
-                if(mp.game.player.isFreeAimingAtEntity(player.handle) && mp.players.local.weaponAmmo > 1 && 
-                    mp.players.local.weapon != 2725352035 && mp.players.local.weapon != 0xA2719263) // 2725352035/hex = fist 
-                {
-                    if(mp.players.local.getVariable("HasShot") == false && mp.players.local.getVariable("Team") == 0 && player.getVariable("Team") == 1 && global.chaseRunning)
-                    {
-                        mp.events.callRemote("GivePlayerShotTag");
-                    }
-                }
-            }
-            else
-            {
-                if(player.getVariable("Team") == 0 && player.getVariable("HasShot") == true && global.renderNametags == true && global.chaseRunning && !global.BankRobberyOn)
-                {
-                    // They out of distance but still try?
-                    mp.game.graphics.drawText(NAMETAG_MESSAGES.PLAYER_SHOT, [x, y],
-                    {
-                        font: 0,
-                        color: [237, 212, 52, 255],
-                        scale: [0.2, 0.2],
-                        outline: true
-                    });
-                }
-            }
+        } 
+        return;
+    }
+    if(mp.storage.data.menu.ownNametag == 2){
+        localPlayer2Dpos = mp.game.graphics.world3dToScreen2d(new mp.Vector3(mp.players.local.position.x,
+                                                                             mp.players.local.position.y,
+                                                                             mp.players.local.position.z + 1));
+        if(localPlayer2Dpos && localPlayer2Dpos.x && localPlayer2Dpos.y){
+            renderNametag(mp.players.local, localPlayer2Dpos.x, localPlayer2Dpos.y, 0);
         }
-    })
+        return;
+    }    
 })
