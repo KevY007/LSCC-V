@@ -416,6 +416,31 @@ namespace RNC
             }
         }
 
+        public async static Task<SavedOutfit> SetActiveOutfit(Player player, Account account, int outfitID, int teamID)
+        {
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                SavedOutfit _old = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == account.SQL_ID && o.Team == teamID);
+                SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.Team == teamID);
+                if (_new == null) return null;
+
+                _new.IsActive = true;
+
+                if (_old != null)
+                    _old.IsActive = false;
+
+                await context.SaveChangesAsync();
+
+                /*
+                NAPI.Task.Run(() =>
+                {                    
+                    player.TriggerEvent("OutfitCreator:SetActive", outfitID, teamID);
+                });
+                await NAPI.Task.WaitForMainThread();
+                */
+                return _new;
+            }
+        }
 
         public static Character GetCharacter(Player player)
         {
@@ -429,6 +454,36 @@ namespace RNC
             if (player == null) return null;
 
             return new Character(player, null, null);
+        }
+
+        public async static Task<SavedOutfit> CreateOutfit(Account account, int outfitTeam, bool isMale, Outfit outfitInfo)
+        {
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                SavedOutfit outfit = new SavedOutfit()
+                {
+                    AccountID = account.SQL_ID,
+                    Data = NAPI.Util.ToJson(outfitInfo),
+                    Team = outfitTeam,
+                    IsActive = true,
+                    IsMale = isMale,
+                };
+
+                await context.SavedOutfits.AddAsync(outfit);
+                await context.SaveChangesAsync();
+
+                CharacterSlot slot = await context.CharacterSlots.AsQueryable().FirstOrDefaultAsync(s => s.AccountID == account.SQL_ID);
+                if (slot != null)
+                {
+                    List<int> outfitIDs = NAPI.Util.FromJson<List<int>>(slot.Outfits);
+                    outfitIDs.Add(outfit.SQL_ID);
+                    slot.Outfits = NAPI.Util.ToJson(outfitIDs);
+                }
+
+                await context.SaveChangesAsync();
+
+                return outfit;
+            }
         }
 
         public static Outfit ApplyOutfit(Player player, bool isMale, int team, SavedOutfit outfit = null)

@@ -16,6 +16,7 @@ mp.events.add("mainmenu_inventory_outfits_edit", (id, team) => {
 
 // Server -> Clientside
 mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
+    mp.events.callRemote("ServerConsoleOutput", outfitData);
     const outfitArray = JSON.parse(outfitData);
     const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
 

@@ -7113,6 +7113,59 @@ namespace RNC
             Commands.cmd_report(player, targetPlayer, reason);
         }
 
+        [RemoteEvent("OutfitCreator:Create")]
+        public void OutfitEditor_OnCreateNew(Player player, int outfitTeam)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            bool isMale = Character.GetCharacter(player).CurrentAppearance.IsMale;
+
+            Character.Outfit newOutfit = new Character.Outfit($"Outfit Name", "icon", isMale, outfitTeam);
+
+            Task.Run(async () =>
+            {
+                SavedOutfit savedOutfit = await Character.CreateOutfit(acc, outfitTeam, isMale, newOutfit);
+                if (savedOutfit != null)
+                {
+                    await Character.SetActiveOutfit(player, acc, savedOutfit.SQL_ID, outfitTeam);
+                    NAPI.Task.Run(() =>
+                    {
+                        Character.ApplyOutfit(player, isMale, outfitTeam, savedOutfit);
+                        EPlayer.Notify(player, "Outfit created successfully with ID " + savedOutfit.SQL_ID, "green", "icon", false, 3000);
+                    });
+                }
+            });
+        }
+        [RemoteEvent("OutfitCreator:SaveActive")]
+        public void OutfitEditor_OnSetActive(Player player, int outfitID, int team)
+        {
+            Account acc = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                SavedOutfit outfit = await Character.SetActiveOutfit(player, acc, outfitID, team);
+                if(outfit != null)
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        Character.ApplyOutfit(player, outfit.IsMale, outfit.Team, outfit);
+                    });
+                }
+                else
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Outfit not found!");
+                    });
+                }
+            });
+        }
+        [RemoteEvent("OutfitCreator:Edit")]
+        public void OutfitEditor_OnEdit(Player player, int outfitID, int team)
+        {
+
+        }
+
         [RemoteEvent("Menu_RequestTabData")]
         public void OnPlayerRequestMenuTabData(Player player, string tab)
         {
