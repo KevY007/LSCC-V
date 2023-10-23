@@ -24,20 +24,47 @@ namespace RNC
         }        
 
         [RemoteEvent("AC_SendWeaponHackAlert")]
-        public void AC_OnReceiveWeaponHackAlert(Player player, string hackedWeaponStr)
+        public void AC_OnReceiveWeaponHackAlert(Player player, string hackedWeaponStr, int type)
         {
+            string modeStr = "Lobby";
+            if(player.GetSharedDataSafe<int>("InLobby") >= 0)
+            {
+                if(player.GetSharedDataSafe<int>("Team") == 1 || player.GetSharedDataSafe<int>("Team") == 0)
+                {
+                    modeStr = $"Copchase (Team: {player.GetSharedDataSafe<int>("Team")})";
+                }
+                if(player.GetSharedDataSafe<int>("Wounded") > 0)
+                {
+                    modeStr += " (Wounded)";
+                }
+
+                if(player.GetSharedDataSafe<int>("InDM") > -1)
+                {
+                    modeStr = $"Deathmatch (Arena: {player.GetSharedDataSafe<int>("InDM")})";
+                }
+            }
+            else if(player.GetSharedDataSafe<int>("InLobby") == -1)
+            {
+                modeStr = "Freeroam";
+            }
+
+            if (player.Dead)
+            {
+                modeStr += " (Dead/Respawning)";
+            }
+
             long hackedWeapon = Int64.Parse(hackedWeaponStr);
             string weaponName = "";
             bool weaponFound = Main.WeaponReasons.TryGetValue(hackedWeapon, out weaponName);
             if (weaponFound)
             {
-                EPlayer.SendMessageToAllAdmins($"[ANTICHEAT] {player.Name} might be using a hacked weapon! ({weaponName.ToUpper()})");
-                DiscordBot.SendAlert($"**[ANTICHEAT]** {player.Name} might be using weapon hacks! *({weaponName.ToUpper()})*", DiscordBot.EmbedType.Warning);
+                EPlayer.SendMessageToAllAdmins($"[ANTICHEAT] {player.Name} might be using a hacked weapon! ({weaponName.ToUpper()}) ({type} | {modeStr})");
+                DiscordBot.SendAlert($"**[ANTICHEAT]** {player.Name} might be using weapon hacks! *({weaponName.ToUpper()})* *({type} | {modeStr})*", DiscordBot.EmbedType.Warning);
             }
             else
             {
-                EPlayer.SendMessageToAllAdmins($"[ANTICHEAT] {player.Name} might be using a hacked weapon! ({hackedWeapon.ToString()})");
-                DiscordBot.SendAlert($"**[ANTICHEAT]** {player.Name} might be using weapon hacks! *({hackedWeapon.ToString()})*", DiscordBot.EmbedType.Warning);
+                EPlayer.SendMessageToAllAdmins($"[ANTICHEAT] {player.Name} might be using a hacked weapon! ({hackedWeapon.ToString()}) ({type} | {modeStr})");
+                DiscordBot.SendAlert($"**[ANTICHEAT]** {player.Name} might be using weapon hacks! *({hackedWeapon.ToString()})* *({type} | {modeStr})*", DiscordBot.EmbedType.Warning);
             }
 
         }
