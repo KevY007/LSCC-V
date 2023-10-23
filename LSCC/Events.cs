@@ -1,5 +1,4 @@
-﻿using GTANetworkAPI;
-using System;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
@@ -18,6 +17,7 @@ using System.Diagnostics;
 using RNC;
 using RNC.Data;
 using System.Collections;
+using GTANetworkAPI;
 
 namespace RNC
 {
@@ -724,7 +724,6 @@ namespace RNC
                     else player.Health = pHP + 60;
 
                     player.SendChatMessage(Translate(player, "USED_MEDKIT_SUCCESS", (pHP + 60 > 100 ? 100 : pHP + 60)));
-                    player.SetSharedData("Bleeding_WasShot", false);
                     break;
                 case "painkiller":
                     EPlayer.GetAccount(player).Painkillers--;
@@ -8088,6 +8087,17 @@ namespace RNC
             player.SetSharedData("DonatorPoints", EPlayer.GetAccount(player).DonatorPoints);
         }
 
+        [RemoteEvent("Bleeding:SpawnBloodDecal")]
+        public static void Bleeding_RequestBloodDecal(Player player)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+            
+            foreach(Player streamed in Settings.LoggedInPlayers.Where(p => p.Dimension == player.Dimension
+                                                                        && p.GetSharedDataSafe<int>("InLobby") == player.GetSharedDataSafe<int>("InLobby"))){
+                streamed.TriggerEvent("Bleeding:AddBloodDecal", player.Position.X, player.Position.Y, player.Position.Z, false);
+            }
+        }
+
         [RemoteEvent("SetIsDamaged")]
         public void SetIsPlayerDamaged(Player player)
         {
@@ -8193,6 +8203,12 @@ namespace RNC
                 //target.SendChatMessage($"!{{white}}You've been hit by !{{red}}{player.Name} !{{white}}for !{{red}}{damageToDeal} DMG!{{white}}!");
                 SetIsPlayerDamaged(target);
                 player.TriggerEvent("showDamageIndicatorOnPosition", damageToDeal, target, boneIndex, armorStatus);
+
+                if(playerTeam != -1 && targetTeam != -1)
+                {
+                    target.TriggerEvent("Bleeding:SetActive", true);
+                    Bleeding_RequestBloodDecal(target); // spawn blood decal near target when they get shot
+                }
             }
 
 
@@ -8297,26 +8313,12 @@ namespace RNC
             }
             if (target.GetSharedDataSafe<int>("Team") >= 0 && target.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team"))
             {
-                target.SetSharedData("Bleeding_WasShot", true);
-                target.TriggerEvent("Bleeding_RequestShot");
 
                 if (target.GetSharedDataSafe<int>("Wounded") == 2)
                 {
                     target.Health = 0;
                 }
             }
-        }
-        [RemoteEvent("Bleeding_AddShotBlood")]
-        public void Bleeding_AddShotBlood(Player player, Player target)
-        {
-            target.TriggerEvent("Bleeding_OnShot", player);
-        }
-
-        [RemoteEvent("SetWasShot")]
-        public void SetWasShot(Player player, int option)
-        {
-            if (option == 1) player.SetSharedData("Bleeding_WasShot", true);
-            else player.SetSharedData("Bleeding_WasShot", false);
         }
 
         [RemoteEvent("SetHealth")]
@@ -9197,8 +9199,6 @@ namespace RNC
                 OnStopAnimPositioner(player);
             }
 
-            player.TriggerEvent("Bleeding_ClearAll");
-            player.SetSharedData("Bleeding_WasShot", false);
             player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
             player.ResetData("Dead");

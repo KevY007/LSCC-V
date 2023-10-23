@@ -38,6 +38,7 @@ require('./Player/BankRobbery.js');
 require('./Player/Actions.js');
 require("./Player/Nametags.js");
 require("./Player/SyncScripts/Aim");
+require("./Player/Bleeding.js");
 require("./Player/SyncScripts/Flashlight");
 require("./Player/SyncScripts/Laser");
 require('./Player/DamageIndicator/damage_indicator');

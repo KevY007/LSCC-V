@@ -3378,14 +3378,15 @@ namespace RNC
                     i.TriggerEvent("BankRob_SetMusic", -1);
                     i.TriggerEvent("StopHotwire");
                     i.ResetSharedData("Handgun_Hash");
+
+                    i.TriggerEvent("Bleeding:SetActive", false);
+                    i.TriggerEvent("Bleeding:ClearAllDecals");
                     i.SetSharedData("IsBeingCuffed", false);
                     i.SetSharedData("IsCuffed", false);
                     i.TriggerEvent("stopLockpicking");
                     i.TriggerEvent("hideMDC");
                     i.TriggerEvent("ClearClimbTaseProtection", true);
 
-                    i.TriggerEvent("Bleeding_ClearAll");
-                    i.SetSharedData("Bleeding_WasShot", false);
 
                     i.ResetData("DragoutVehicle");
                     i.ResetData("ExitedDragoutVehicle");
@@ -3580,13 +3581,16 @@ namespace RNC
                         player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
                         player.TriggerEvent("PoliceHeliCam_ClearFugitives");
                         player.TriggerEvent("hideMDC");
+
+                        player.TriggerEvent("Bleeding:ClearAllDecals");
+                        player.TriggerEvent("Bleeding:SetActive", false);
+
                         player.TriggerEvent("MDC:RemoveAllBlips");
                         player.TriggerEvent("ClearClimbTaseProtection", true);
                         player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
 
                         player.SetData("IsClanPartnered", false);
 
-                        player.SetSharedData("Bleeding_WasShot", false);
                     }
                     lobbyPlayers.RemoveAll(player => bannedCCplayers.Contains(player));
 

@@ -745,7 +745,6 @@ namespace RNC
                 player.SetSharedData("FakeNamePing", 0);
                 player.SetSharedData("FakeNameLevel", 0);
 
-                player.SetSharedData("Bleeding_WasShot", false);
                 player.SetSharedData("Menu_LastClanPageID", 0);
                 player.SetSharedData("AutoOOC", false);
 
@@ -833,6 +832,7 @@ namespace RNC
                 player.SetData("Anonymous", false);
                 player.SetSharedData("Team", -1);
                 player.TriggerEvent("ToggleHud", false);
+                player.TriggerEvent("Bleeding:ClearAllDecals");
                 player.SetData("GPS", false);
                 player.SetSharedData("Packetloss", 65535.0); // Unknown/Unable to count as this is calculated in JS serverside since the function player.PacketLoss doesnt exist in C# RAGEMP
 
