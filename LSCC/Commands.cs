@@ -12,6 +12,7 @@ using System.ServiceModel.Channels;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RNC
 {
@@ -3103,6 +3104,25 @@ namespace RNC
         {
             bool sex = new Random().Next(10) > 4;
             EPlayer.ActionEx(player, $"flips a coin that lands on {(sex ? "Heads" : "Tails")}");
+        }
+
+        [Command("walkstyle", "!{#AFAFAF}[USAGE] walkstyle (option: normal,brave,confident,drunk,fat,gangster,hurry,injured,intimidated,quick,sad,tough)")]
+        public static void cmd_walkstyle(Player player, string option)
+        {
+            string[] options = { "normal", "brave", "confident", "drunk", "fat", "gangster", "hurry", "injured", "intimidated", "quick", "sad", "tough" };
+            if(EPlayer.GetAccount(player).DonatorLevel < 2)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_RANK_GENERIC", EPlayer.GetDonatorLevelName(2, true)));
+                return;
+            }
+            if (!options.Contains(option.ToLower()))
+            {
+                player.SendChatMessage("!{#ff6347}[!] ~y~Options: ~w~normal,brave,confident,drunk,fat,gangster,hurry,injured,intimidated,quick,sad,tough");
+                return;
+            }
+
+            player.TriggerEvent("Walkstyle:RequestSetCS", option);
+            player.SendChatMessage("~g~Walkstyle: ~w~" + option.ToUpper());
         }
 
         [Command("weaponeditor")]

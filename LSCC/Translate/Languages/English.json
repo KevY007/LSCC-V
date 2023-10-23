@@ -592,6 +592,8 @@
   "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}Target does not have the shot tag!",
   "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}You can't do this to a {RANK NAME}~w~!",
   "ACTION_EJECT": "pushes {TARGET NAME} out of the vehicle.",
-  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}You have been ejected from the vehicle by {PLAYER NAME}!"
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}You have been ejected from the vehicle by {PLAYER NAME}!",
+  "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}You must be at least a {RANK NAME} ~w~to use this!",
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "You must be at least a <strong>{RANK NAME}</strong> to use this!"
 
 }

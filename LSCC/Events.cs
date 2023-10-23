@@ -8229,6 +8229,12 @@ namespace RNC
                 return;
             }
             player.SetSharedData("Walkstyle", clipset);
+
+            if (isDonatorSet)
+            {
+                EPlayer.GetAccount(player).WalkstyleClipset = clipset;
+                EPlayer.Save(player, false);
+            }
         }
 
 

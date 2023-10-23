@@ -587,5 +587,7 @@
   "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}La cible n'a pas l'étiquette de tir !",
   "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}Vous ne pouvez pas faire cela à un {RANK NAME}~w~ !",
   "ACTION_EJECT": "pousse {TARGET NAME} hors du véhicule.",
-  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Vous avez été éjecté du véhicule par {PLAYER NAME} !"
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Vous avez été éjecté du véhicule par {PLAYER NAME} !",
+  "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}Vous devez être au moins un {RANK NAME} wpour utiliser ceci !",
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Vous devez être au moins un <strong>{RANK NAME}</strong> pour utiliser ceci !"
 }

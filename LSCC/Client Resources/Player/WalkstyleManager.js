@@ -15,6 +15,13 @@ const walkingStyles = [
     {Name: "Tough", AnimSet: "move_m@tool_belt@a"}
 ];
 
+mp.events.add("Walkstyle:RequestSetCS", (styleName) => {
+    const walkstyle = walkingStyles.find(w => w.Name.toLowerCase() == styleName.toLowerCase());
+    if(!walkstyle) return;
+
+    mp.events.callRemote("Walkstyle:Set", walkstyle.AnimSet, true);
+});
+
 mp.events.add('entityStreamIn', (entity) => {
     if(entity.type !== 'player') return;
 

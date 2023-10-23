@@ -587,6 +587,8 @@
   "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}Mục tiêu không có thẻ bắn!",
   "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}Bạn không thể làm điều này với một {RANK NAME}~w~!",
   "ACTION_EJECT": "đẩy {TARGET NAME} ra khỏi xe.",
-  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Bạn đã bị đẩy ra khỏi xe bởi {PLAYER NAME}!"
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Bạn đã bị đẩy ra khỏi xe bởi {PLAYER NAME}!",
+  "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}Bạn phải ít nhất là một {RANK NAME} wđể sử dụng điều này !",
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Bạn phải ít nhất là một <strong>{RANK NAME}</strong> để sử dụng điều này !"
 
 }

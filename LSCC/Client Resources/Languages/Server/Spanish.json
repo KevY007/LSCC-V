@@ -587,6 +587,8 @@
   "ERROR_TARGET_NO_SHOT_TAG": "!{#FF6347}[!] !{#FFFFFF}El objetivo no tiene la etiqueta de tiro.",
   "ERROR_TARGET_IS_RANK": "!{#FF6347}[!] !{#FFFFFF}No puedes hacer esto a un {RANK NAME}~w~.",
   "ACTION_EJECT": "empuja a {TARGET NAME} fuera del vehículo.",
-  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Has sido expulsado del vehículo por {PLAYER NAME}."
+  "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Has sido expulsado del vehículo por {PLAYER NAME}.",
+  "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}Debes ser al menos un {RANK NAME} wpara usar esto !",
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Debes ser al menos un <strong>{RANK NAME}</strong> para usar esto !"
 
 }
