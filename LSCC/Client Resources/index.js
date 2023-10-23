@@ -36,6 +36,7 @@ require('./Player/Character.js');
 require('./Player/Achievements.js');
 require('./Player/BankRobbery.js');
 require('./Player/Actions.js');
+require('./Player/WalkstyleManager.js');
 require("./Player/Nametags.js");
 require("./Player/SyncScripts/Aim");
 require("./Player/Bleeding.js");

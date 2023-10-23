@@ -55,7 +55,9 @@ const Language = {
     "EARLY_UNFREEZE_TIP": "Puedes presionar <strong>ALT</strong> para descongelarte ahora.",
     "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}¡Los policías no pueden entrar en edificios antes que los fugitivos!",
     "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}No puedes entrar en edificios durante {SECONDS} segundos más.",
-    "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}¡Ahora puedes entrar en edificios!"
+    "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}¡Ahora puedes entrar en edificios!",
+    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Comienzas a sentirte mareado y cansado; deberías usar un Medkit o analgésicos."
+
 
 }
 exports.Language = Language;

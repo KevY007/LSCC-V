@@ -66,6 +66,7 @@ namespace RNC
         public string DeathmatchBanReason { get; set; }
         public long FreeroamBanTime { get; set; }
         public string FreeroamBanReason { get; set; }
+        public string WalkstyleClipset { get; set; }
         public int Warns { get; set; }
         public int Kills { get; set; }
         public int Deaths { get; set; }

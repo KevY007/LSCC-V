@@ -55,7 +55,9 @@ const Language = {
     "EARLY_UNFREEZE_TIP": "Bạn có thể nhấn <strong>ALT</strong> để tự mình bóc đông bây giờ.",
     "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}Cảnh sát không thể vào tòa nhà trước tội phạm!",
     "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}Bạn không thể vào tòa nhà thêm {SECONDS} giây nữa.",
-    "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}Bạn có thể vào tòa nhà bây giờ!"
+    "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}Bạn có thể vào tòa nhà bây giờ!",
+    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Bạn bắt đầu cảm thấy hoa mắt và mệt mỏi; bạn nên sử dụng Máy cấp cứu hoặc Thuốc giảm đau!"
+
 
 }
 exports.Language = Language;

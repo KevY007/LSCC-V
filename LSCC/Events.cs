@@ -7868,6 +7868,7 @@ namespace RNC
                                     ChallengeInfo = jsonChallengeData,
                                     AutoLogin = true,
                                     Admin = 0,
+                                    WalkstyleClipset = "null",
                                     RegisterHWID = player.Serial,
                                     RegisterIP = player.Address,
                                     RegisterRID = player.SocialClubId,
@@ -8215,6 +8216,19 @@ namespace RNC
 
             //target.SendChatMessage($"~r~[DAMAGE] ~w~You've been hit by ~y~{player.Name} ~w~for ~r~{damageToDeal} ~w~damage. ~b~[AR:{ARtoset}|HP:{HPtoset}]");
             //player.SendChatMessage($"~g~[DAMAGE] ~w~You hit ~y~{target.Name} ~w~for ~r~{damageToDeal}~w~ damage, they now have ~r~{HPtoset}~w~ health ~b~(AR: {ARtoset})~w~!");
+        }
+
+        [RemoteEvent("Walkstyle:Set")]
+        public static void SetWalkstyle(Player player, string clipset, bool isDonatorSet = false)
+        {
+            if (EPlayer.GetAccount(player).DonatorLevel >= 2 && !isDonatorSet) return; // Prevent overwriting for Silver Donators+
+
+            if(clipset == "null")
+            {
+                player.ResetSharedData("Walkstyle");
+                return;
+            }
+            player.SetSharedData("Walkstyle", clipset);
         }
 
 

@@ -832,6 +832,7 @@ namespace RNC
                 player.SetData("Anonymous", false);
                 player.SetSharedData("Team", -1);
                 player.TriggerEvent("ToggleHud", false);
+                player.ResetSharedData("Walkstyle");
                 player.TriggerEvent("Bleeding:ClearAllDecals");
                 player.SetData("GPS", false);
                 player.SetSharedData("Packetloss", 65535.0); // Unknown/Unable to count as this is calculated in JS serverside since the function player.PacketLoss doesnt exist in C# RAGEMP
@@ -2811,6 +2812,8 @@ namespace RNC
                 EPlayer.Freeze(player, false);
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));
                 EPlayer.Save(player, false);
+
+                Events.SetWalkstyle(player, EPlayer.GetAccount(player).WalkstyleClipset, true);
 
             }
             catch(Exception ex)

@@ -55,5 +55,6 @@
   "EARLY_UNFREEZE_TIP": "You can press <strong>ALT</strong> to unfreeze yourself now.",
   "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}Cops can't enter buildings before Fugitives!",
   "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}You can't enter buildings for {SECONDS} more seconds.",
-  "COP_CAN_ENTER_INTERIOR":"!{#00ff00}[>] !{#ffffff}You can now enter buildings!"
+  "COP_CAN_ENTER_INTERIOR":"!{#00ff00}[>] !{#ffffff}You can now enter buildings!",
+  "UNDER_50_HP_WARNING":"!{#C3A3DB}* You start feeling dizzy & tired; you should use a Medkit or Painkillers!"
 }
