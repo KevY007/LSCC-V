@@ -7112,6 +7112,39 @@ namespace RNC
             Commands.cmd_report(player, targetPlayer, reason);
         }
 
+        [RemoteEvent("OutfitCreator:OnChangeType")]
+        public void OutfitEditor_OnChangeType(Player player, int type, bool isProp)
+        {
+            if (!player.HasData("OUTFIT:Editing")) return;
+
+            Character.Outfit outfit = player.GetData<Character.Outfit>("OUTFIT:Editing");
+            if (outfit == null) return;
+
+            if (isProp)
+            {
+                Character.PropData propData = outfit.Props.FirstOrDefault(p => p.Index == type);
+                if (propData == null)
+                    player.TriggerEvent("OutfitCreator:ChangeType", type, -1, 0, true);
+                else
+                    player.TriggerEvent("OutfitCreator:ChangeType", type, propData.Drawable, propData.Texture, true);
+            }
+            else
+            {
+                try
+                {
+                    Character.ComponentData componentData = outfit.Components[type];
+                    if(componentData == null)
+                        player.TriggerEvent("OutfitCreator:ChangeType", type, -1, 0, false);
+                    else player.TriggerEvent("OutfitCreator:ChangeType", type, componentData.Drawable, componentData.Texture, false);
+                }
+                catch(Exception ex)
+                {
+                    NAPI.Util.ConsoleOutput(ex.ToString());
+                    return;
+                }
+            }
+        }
+
         [RemoteEvent("OutfitCreator:Create")]
         public void OutfitEditor_OnCreateNew(Player player, int outfitTeam)
         {
@@ -7132,6 +7165,8 @@ namespace RNC
                     {
                         Character.ApplyOutfit(player, isMale, outfitTeam, savedOutfit);
                         EPlayer.Notify(player, "Outfit created successfully with ID " + savedOutfit.SQL_ID, "green", "icon", false, 3000);
+
+                        Character.OpenOutfitEditor(player, savedOutfit);
                     });
                 }
             });

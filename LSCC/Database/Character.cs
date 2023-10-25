@@ -385,6 +385,17 @@ namespace RNC
             });
         }
 
+        public static void OpenOutfitEditor(Player player, SavedOutfit outfit)
+        {
+            Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
+            PropData propData = _o.Props.FirstOrDefault(p => p.Index == (int)PropData.Prop.Bracelet);
+            if(propData != null)
+                player.TriggerEvent("OutfitCreator:OpenEditor", propData.Drawable, propData.Texture);
+            else player.TriggerEvent("OutfitCreator:OpenEditor", -1, 0);
+
+            player.SetData<Outfit>("OUTFIT:Editing", _o);
+        }
+
         public async static Task<List<SavedOutfit>> GetOutfits(Account account)
         {
             using(MainDatabase context = ContextFactory.CreateContext())
@@ -420,14 +431,15 @@ namespace RNC
         {
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                SavedOutfit _old = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == account.SQL_ID && o.Team == teamID);
-                SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.Team == teamID);
+                SavedOutfit _old = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == account.SQL_ID && o.Team == teamID && o.IsActive == true);
+                SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.Team == teamID && o.IsActive == false);
                 if (_new == null) return null;
-
-                _new.IsActive = true;
 
                 if (_old != null)
                     _old.IsActive = false;
+
+                _new.IsActive = true;
+
 
                 await context.SaveChangesAsync();
 

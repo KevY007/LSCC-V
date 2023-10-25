@@ -11661,7 +11661,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            if (EPlayer.GetAccount(player).Admin < 3)
+            if (EPlayer.GetAccount(player).Admin < 5)
             {
                 player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
                 return;
