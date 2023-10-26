@@ -7115,7 +7115,7 @@ namespace RNC
         [RemoteEvent("OutfitCreator:OnChangeType")]
         public void OutfitEditor_OnChangeType(Player player, int type, bool isProp)
         {
-            if (!player.HasData("OUTFIT:Editing")) return;
+            if (!player.HasSharedData("OUTFIT:Editing")) return;
 
             Character.Outfit outfit = player.GetData<Character.Outfit>("OUTFIT:Editing");
             if (outfit == null) return;

@@ -8,6 +8,7 @@ const PropTypeMappings = [
     {uiID:-1, realID:0},
 ];
 var CURRENT_EDIT_ITEM = {isProp:true, index:7, drawable:-1, texture:0};
+var CURRENT_OUTFIT_DATA = {};
 
 // OUTFITS
 // Menu -> Clientside
@@ -22,39 +23,80 @@ mp.events.add("mainmenu_inventory_outfits_edit", (id, team) => {
     mp.events.callRemote("OutfitCreator:Edit", id, team);
 });
 
+function getRealPropID(uiID){
+    const prop = PropTypeMappings.find(p => p.uiID == uiID);
+    if(prop) return prop.realID;
+    return -1;
+}
+function getPropUIID(realID){
+    const prop = PropTypeMappings.find(p => p.realID == realID);
+    if(prop) return prop.uiID;
+    return -1;
+}
+
 mp.events.add("dialog_clothing_editor_change_id", (value) => {
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, drawable:value};
 
     if(CURRENT_EDIT_ITEM.isProp){
         mp.players.local.setPropIndex(CURRENT_EDIT_ITEM.index, value, 0, true);
+        if(CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index)){
+            CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Drawable = value;
+            CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Texture = 0;
+
+            mp.events.callLocal("dialog_clothing_editor_change_type", getPropUIID(CURRENT_EDIT_ITEM.index));
+        }
     }
     else{
         mp.players.local.setComponentVariation(CURRENT_EDIT_ITEM.index, value, 0, 0);
-    }
+        if(CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index]){
+            CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index].Drawable = value;
+            CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index].Texture = 0;
 
+            mp.events.callLocal("dialog_clothing_editor_change_type", CURRENT_EDIT_ITEM.index);
+        }
+    }
 });
 mp.events.add("dialog_clothing_editor_change_texture", (value) => {
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, texture:value};
 
     if(CURRENT_EDIT_ITEM.isProp){
         mp.players.local.setPropIndex(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, value, true);
+
+        if(CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index)){
+            CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Texture = value;
+        }
     }
     else{
         mp.players.local.setComponentVariation(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, value, 0);
+        if(CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index]){
+            CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index].Texture = value;
+            mp.events.callRemote(`ServerConsoleOutput`, `Set ${CURRENT_EDIT_ITEM.index} texture to ${value}`);
+        }
     }
 });
 mp.events.add("dialog_clothing_editor_change_type", (value) => {
     if(value < 0){
-        const propType = PropTypeMappings.find(u => u.uiID === value);
-        if(!propType) return;
+        const realID = getRealPropID(value);
 
-        CURRENT_EDIT_ITEM = {isProp:true, index:propType.realID, drawable:0, texture:0}; // drawable & texture to be loaded
-        mp.events.callRemote("OutfitCreator:OnChangeType", propType.realID, true);
+        const PropData = CURRENT_OUTFIT_DATA.Props.find(p => p.Index == realID);
+        if(PropData){
+            CURRENT_EDIT_ITEM = {isProp:true, index:realID, drawable:PropData.Drawable, texture:PropData.Texture}; // drawable & texture to be loaded
+            onOutfitCreatorChangeType(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, CURRENT_EDIT_ITEM.texture, CURRENT_EDIT_ITEM.isProp);
+            return;
+        }
+        CURRENT_EDIT_ITEM = {isProp:true, index:realID, drawable:0, texture:0}; // drawable & texture to be loaded
+        onOutfitCreatorChangeType(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, CURRENT_EDIT_ITEM.texture, CURRENT_EDIT_ITEM.isProp);
         return;
     }
 
-    CURRENT_EDIT_ITEM = {isProp:false, index:value, drawable:0, texture:0}; // drawable & texture to be loaded
-    mp.events.callRemote("OutfitCreator:OnChangeType", value, false);
+    const ComponentData = CURRENT_OUTFIT_DATA.Components[value];
+    if(!ComponentData){
+        CURRENT_EDIT_ITEM = {isProp:false, index:value, drawable:0, texture:0}; // drawable & texture to be loaded
+        onOutfitCreatorChangeType(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, CURRENT_EDIT_ITEM.texture, CURRENT_EDIT_ITEM.isProp);
+        return;
+    }
+    CURRENT_EDIT_ITEM = {isProp:false, index:value, drawable:ComponentData.Drawable, texture:ComponentData.Texture};
+    onOutfitCreatorChangeType(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, CURRENT_EDIT_ITEM.texture, CURRENT_EDIT_ITEM.isProp);
 
 });
 mp.events.add("dialog_clothing_editor_close", (value) => {
@@ -72,13 +114,11 @@ mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
 });
 mp.events.add("OutfitCreator:SetActive", (id, team) => { // Loading defaults
 
-    mp.events.callRemote("ServerConsoleOutput", `Setting active: ID ${id} team ${team}`);
-
     if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set_active", id, team);
 });
 
+function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
 
-mp.events.add("OutfitCreator:ChangeType", (componentID, inputID, inputTexture, isProp) => {
     const max_drawable = (isProp ? 
         mp.players.local.getNumberOfPropDrawableVariations(componentID) : 
         mp.players.local.getNumberOfDrawableVariations(componentID));
@@ -96,7 +136,8 @@ mp.events.add("OutfitCreator:ChangeType", (componentID, inputID, inputTexture, i
             max:max_texture
         }
     });
-});
+}
+mp.events.add("OutfitCreator:ChangeType", onOutfitCreatorChangeType);
 mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture) => {
     mp.events.callLocal("ForceCloseMenu");
 
@@ -107,6 +148,12 @@ mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture) => {
     mp.gui.cursor.show(true, true);
 
     CURRENT_EDIT_ITEM = {isProp:true, index:7, drawable:inputID, texture:inputTexture};
+
+    if(!mp.players.local.hasVariable("OUTFIT:Editing")) return;
+    CURRENT_OUTFIT_DATA = JSON.parse(mp.players.local.getVariable("OUTFIT:Editing"));
+    if(!CURRENT_OUTFIT_DATA) return;
+
+
     if(global.ServerUI) global.ServerUI.call("dialog_clothing_editor_open", inputID, inputTexture, {
         id:{
             min:0,

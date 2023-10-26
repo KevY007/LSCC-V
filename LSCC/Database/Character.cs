@@ -388,12 +388,13 @@ namespace RNC
         public static void OpenOutfitEditor(Player player, SavedOutfit outfit)
         {
             Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
+            player.SetSharedData("OUTFIT:Editing", NAPI.Util.ToJson(_o));
+
             PropData propData = _o.Props.FirstOrDefault(p => p.Index == (int)PropData.Prop.Bracelet);
             if(propData != null)
                 player.TriggerEvent("OutfitCreator:OpenEditor", propData.Drawable, propData.Texture);
             else player.TriggerEvent("OutfitCreator:OpenEditor", -1, 0);
 
-            player.SetData<Outfit>("OUTFIT:Editing", _o);
         }
 
         public async static Task<List<SavedOutfit>> GetOutfits(Account account)
