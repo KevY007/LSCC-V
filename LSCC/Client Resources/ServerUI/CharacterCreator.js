@@ -101,6 +101,9 @@ mp.events.add("dialog_clothing_editor_change_type", (value) => {
 });
 mp.events.add("dialog_clothing_editor_close", (value) => {
     mp.gui.cursor.show(false, false);
+
+    // For debugging purposes: save outfit edits
+    mp.events.callRemote("OutfitCreator:SaveOutfitChanges", JSON.stringify(CURRENT_OUTFIT_DATA));
 });
 
 

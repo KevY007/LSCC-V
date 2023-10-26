@@ -7145,6 +7145,25 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("OutfitCreator:SaveOutfitChanges")]
+        public void OutfitEditor_SaveOutfitChanges(Player player, string outfitData)
+        {
+            if (!player.HasData("OUTFIT:EditingID")) return;
+
+            int outfitSQLID = player.GetData<int>("OUTFIT:EditingID");
+            Character.Outfit outfit = NAPI.Util.FromJson<Character.Outfit>(outfitData);
+            Account acc = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                SavedOutfit _o = await Character.SaveOutfitChanges(acc, outfitSQLID, outfit);
+                NAPI.Task.Run(() =>
+                {
+                    Character.ApplyOutfit(player, _o.IsMale, _o.Team, _o);
+                    EPlayer.Notify(player, "Outfit saved successfully!", "green", "success", false, 3000);
+                });
+            });
+        }
+
         [RemoteEvent("OutfitCreator:Create")]
         public void OutfitEditor_OnCreateNew(Player player, int outfitTeam)
         {
@@ -7197,7 +7216,33 @@ namespace RNC
         [RemoteEvent("OutfitCreator:Edit")]
         public void OutfitEditor_OnEdit(Player player, int outfitID, int team)
         {
+            Account acc = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    SavedOutfit savedOutfit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.AccountID == acc.SQL_ID);
+                    if (savedOutfit != null)
+                    {
+                        await Character.SetActiveOutfit(player, acc, savedOutfit.SQL_ID, team);
+                        NAPI.Task.Run(() =>
+                        {
+                            Character.ApplyOutfit(player, savedOutfit.IsMale, team, savedOutfit);
+                            EPlayer.Notify(player, "You are now <strong>editing</strong> outfit " + savedOutfit.SQL_ID, "yellow", "icon", false, 3000);
 
+                            Character.OpenOutfitEditor(player, savedOutfit);
+                        });
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Outfit not found!");
+                        });
+                    }
+                }
+
+            });
         }
 
         [RemoteEvent("Menu_RequestTabData")]

@@ -389,12 +389,25 @@ namespace RNC
         {
             Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
             player.SetSharedData("OUTFIT:Editing", NAPI.Util.ToJson(_o));
+            player.SetData<int>("OUTFIT:EditingID", outfit.SQL_ID);
 
             PropData propData = _o.Props.FirstOrDefault(p => p.Index == (int)PropData.Prop.Bracelet);
             if(propData != null)
                 player.TriggerEvent("OutfitCreator:OpenEditor", propData.Drawable, propData.Texture);
             else player.TriggerEvent("OutfitCreator:OpenEditor", -1, 0);
+        }
 
+        public async static Task<SavedOutfit> SaveOutfitChanges(Account account, int outfitSQLID, Outfit outfit)
+        {
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                SavedOutfit savedOutfit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == account.SQL_ID && o.SQL_ID == outfitSQLID);
+                if (savedOutfit == null) return null;
+
+                savedOutfit.Data = NAPI.Util.ToJson(outfit);
+                await context.SaveChangesAsync();
+                return savedOutfit;
+            }
         }
 
         public async static Task<List<SavedOutfit>> GetOutfits(Account account)

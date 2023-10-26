@@ -64,10 +64,10 @@ function applyOutfitData(entity, data){
         entity.setComponentVariation(i, Component.Drawable, Component.Texture, Component.Palette);
 
     }
-    for(let i = 0 ; i < OutfitData.Props.Length; i++){
-
+    for(let i = 0 ; i < OutfitData.Props.length; i++){
         const Prop = OutfitData.Props[i];
-        entity.setProp(Prop.Index, Prop.Drawable, Prop.Texture);
+        entity.clearProp(Prop.Index);
+        entity.setPropIndex(Prop.Index, Prop.Drawable, Prop.Texture, true);
     }
 
 
