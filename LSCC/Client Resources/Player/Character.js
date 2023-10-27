@@ -4,6 +4,18 @@ mp.events.addDataHandler("CHARACTER:Appearance", (entity, value, oldValue) => {
 mp.events.addDataHandler("CHARACTER:Outfit", (entity, value, oldValue) => {
     applyOutfitData(entity, value);
 });
+mp.events.add('entityStreamIn', (entity) => {
+
+    streamIn_OutfitCheck(entity);
+});
+function streamIn_AppearanceCheck(entity){
+    if(!entity || entity.type !== 'player' || !entity.hasVariable("CHARACTER:Appearance")) return;
+    applyAppearanceData(entity, entity.getVariable('CHARACTER:Appearance'));
+}
+function streamIn_OutfitCheck(entity){
+    if(!entity || entity.type !== 'player' || !entity.hasVariable("CHARACTER:Outfit")) return;
+    applyOutfitData(entity, entity.getVariable('CHARACTER:Outfit'));
+}
 
 function applyAppearanceData(entity, data){
 
