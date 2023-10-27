@@ -441,7 +441,16 @@ namespace RNC
             }
         }
 
-        
+        public static void SetTeamOutfit(Player player, int teamID)
+        {
+            SavedOutfit outfit = GetOutfitByTeam(player, teamID);
+            if (outfit == null)
+            {
+                EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Could not find active outfit for team " + teamID);
+                // Will apply default outfit if outfit is null
+            }
+            ApplyOutfit(player, outfit.IsMale, teamID, outfit);
+        }
         public async static Task UpdateActiveOutfitVariables(Player player, Account account)
         {
             List<SavedOutfit> outfits = await GetOutfits(account);

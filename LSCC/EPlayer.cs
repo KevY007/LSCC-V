@@ -2709,7 +2709,11 @@ namespace RNC
                 {
                     ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
-                    EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
+                    //EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
+
+
+                    // New Outfit Shit
+                    Character.SetTeamOutfit(player, EPlayer.GetAccount(player).LobbyClothing);
                 }
                 catch (Exception ex)
                 {

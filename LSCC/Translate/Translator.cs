@@ -6,7 +6,6 @@ using System.IO;
 using GTANetworkAPI;
 
 using Newtonsoft.Json;
-using GTANetworkMethods;
 
 namespace RNC
 {

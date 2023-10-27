@@ -3434,6 +3434,8 @@ namespace RNC
                         Account a = EPlayer.GetAccount(i);
                         CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
                         EPlayer.ApplyCharacter(i, cd, a.LobbyClothing);
+
+                        Character.SetTeamOutfit(i, a.LobbyClothing);
                     }
                     if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
                     {
@@ -3938,6 +3940,8 @@ namespace RNC
                                             ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
                                             EPlayer.ApplyCharacter(player, ConvChar, 1);
+
+                                            Character.SetTeamOutfit(player, 1);
                                         }
                                         catch { }
 
@@ -4260,6 +4264,8 @@ namespace RNC
                                             ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
                                             EPlayer.ApplyCharacter(player, ConvChar, 0);
+
+                                            Character.SetTeamOutfit(player, 0);
                                         }
                                         catch { }
 
@@ -5154,6 +5160,8 @@ namespace RNC
                                             ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
                                             EPlayer.ApplyCharacter(player, ConvChar, 1);
+
+                                            Character.SetTeamOutfit(player, 1);
                                         }
                                         catch { }
 
@@ -5243,6 +5251,8 @@ namespace RNC
                                                 CharacterData ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
 
                                                 EPlayer.ApplyCharacter(player, ConvChar, 0);
+
+                                                Character.SetTeamOutfit(player, 0);
                                             }
                                             catch { }
                                             NAPI.Util.ConsoleOutput("ZAMN! BankRob fugi outfit fail: " + ex.ToString());
@@ -5430,6 +5440,9 @@ namespace RNC
                                                                     CharacterData ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(p).Character);
 
                                                                     EPlayer.ApplyCharacter(p, ConvChar, 1);
+
+
+                                                                    Character.SetTeamOutfit(p, 1);
                                                                 }
                                                                 catch { }
 
@@ -5482,6 +5495,9 @@ namespace RNC
                                                                     CharacterData ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(p).Character);
 
                                                                     EPlayer.ApplyCharacter(p, ConvChar, 1);
+
+
+                                                                    Character.SetTeamOutfit(p, 1);
                                                                 }
                                                                 catch { }
                                                                 NAPI.Util.ConsoleOutput("ZAMN! BANKROB FIB FAIL: " + ex.ToString());

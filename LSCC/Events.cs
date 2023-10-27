@@ -4141,6 +4141,9 @@ namespace RNC
                             ConvChar = NAPI.Util.FromJson<CharacterData>(acc.Character);
 
                             EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
+
+                            // New Outfit Shit
+                            Character.SetTeamOutfit(player, acc.LobbyClothing);
                             EPlayer.Spawn(player);
                             player.TriggerEvent("DestroyLoginScene");
                             player.TriggerEvent("login_StopMusic");
@@ -9344,7 +9347,6 @@ namespace RNC
                     player.TriggerEvent("SetHandcuffs", false);
 
                     CharacterData ConvChar = new CharacterData();
-
                     try
                     {
                         if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-9 sending to creation."));
@@ -9357,6 +9359,10 @@ namespace RNC
                     }
 
                     EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
+
+                    // New Outfit Shit
+                    Character.SetTeamOutfit(player, acc.LobbyClothing);
+
                     player.ResetData("Cuffed");
                 }
                 if (player.HasData("Handsup"))
