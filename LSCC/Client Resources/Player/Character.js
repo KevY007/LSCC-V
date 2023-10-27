@@ -5,7 +5,7 @@ mp.events.addDataHandler("CHARACTER:Outfit", (entity, value, oldValue) => {
     applyOutfitData(entity, value);
 });
 mp.events.add('entityStreamIn', (entity) => {
-
+    streamIn_AppearanceCheck(entity);
     streamIn_OutfitCheck(entity);
 });
 function streamIn_AppearanceCheck(entity){
