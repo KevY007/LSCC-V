@@ -441,6 +441,37 @@ namespace RNC
             }
         }
 
+        
+        public async static Task UpdateActiveOutfitVariables(Player player, Account account)
+        {
+            List<SavedOutfit> outfits = await GetOutfits(account);
+            if (outfits == null || outfits.Count == 0) return;
+
+            SavedOutfit activeCopOutfit = outfits.FirstOrDefault(o => o.Team == 1 && o.IsActive == true);
+            SavedOutfit activeFugitiveOutfit = outfits.FirstOrDefault(o => o.Team == 0 && o.IsActive == true);
+
+            if (activeCopOutfit == null || activeFugitiveOutfit == null) return;
+
+            NAPI.Task.Run(() =>
+            {
+                player.SetSharedData("CHARACTER:PoliceOutfit", NAPI.Util.ToJson(activeCopOutfit));
+                player.SetSharedData("CHARACTER:FugitiveOutfit", NAPI.Util.ToJson(activeFugitiveOutfit));
+            });
+            await NAPI.Task.WaitForMainThread();
+        }
+        public static void UpdateActiveOutfitVariable(Player player, SavedOutfit outfit, int teamID)
+        {
+            if(teamID == 0)
+            {
+                player.SetSharedData("CHARACTER:FugitiveOutfit", NAPI.Util.ToJson(outfit));
+            }
+            else
+            {
+                player.SetSharedData("CHARACTER:PoliceOutfit", NAPI.Util.ToJson(outfit));
+            }
+        }
+        
+
         public async static Task<SavedOutfit> SetActiveOutfit(Player player, Account account, int outfitID, int teamID)
         {
             using (MainDatabase context = ContextFactory.CreateContext())
@@ -456,14 +487,11 @@ namespace RNC
 
 
                 await context.SaveChangesAsync();
-
-                /*
                 NAPI.Task.Run(() =>
-                {                    
-                    player.TriggerEvent("OutfitCreator:SetActive", outfitID, teamID);
+                {
+                    UpdateActiveOutfitVariable(player, _new, teamID);
                 });
                 await NAPI.Task.WaitForMainThread();
-                */
                 return _new;
             }
         }
@@ -545,6 +573,21 @@ namespace RNC
         private static void ApplyOutfitData(Player player, Outfit outfit)
         {
             player.SetSharedData("CHARACTER:Outfit", NAPI.Util.ToJson(outfit));
+        }
+
+        public static Outfit GetOutfitByTeam(Player player, int team)
+        {
+            if(team == 0)
+            {
+                if (!player.HasSharedData("CHARACTER:FugitiveOutfit")) return null;
+                return NAPI.Util.FromJson<Outfit>(player.GetSharedData<string>("CHARACTER:FugitiveOutfit"));
+            }
+            if(team == 1)
+            {
+                if (!player.HasSharedData("CHARACTER:PoliceOutfit")) return null;
+                return NAPI.Util.FromJson<Outfit>(player.GetSharedData<string>("CHARACTER:PoliceOutfit"));
+            }
+            return null;
         }
     }
 }

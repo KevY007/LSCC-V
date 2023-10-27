@@ -4016,6 +4016,7 @@ namespace RNC
                     NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc);  });
                     await NAPI.Task.WaitForMainThread();
                 }
+                await Character.UpdateActiveOutfitVariables(player, acc);
 
                 string pClanName = "";
                 string pClanCreated = "NULL";
@@ -5512,7 +5513,7 @@ namespace RNC
                     NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc); });
                     await NAPI.Task.WaitForMainThread();
                 }
-
+                await Character.UpdateActiveOutfitVariables(player, acc);
                 
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
