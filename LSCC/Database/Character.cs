@@ -575,17 +575,17 @@ namespace RNC
             player.SetSharedData("CHARACTER:Outfit", NAPI.Util.ToJson(outfit));
         }
 
-        public static Outfit GetOutfitByTeam(Player player, int team)
+        public static SavedOutfit GetOutfitByTeam(Player player, int team)
         {
             if(team == 0)
             {
                 if (!player.HasSharedData("CHARACTER:FugitiveOutfit")) return null;
-                return NAPI.Util.FromJson<Outfit>(player.GetSharedData<string>("CHARACTER:FugitiveOutfit"));
+                return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:FugitiveOutfit"));
             }
             if(team == 1)
             {
                 if (!player.HasSharedData("CHARACTER:PoliceOutfit")) return null;
-                return NAPI.Util.FromJson<Outfit>(player.GetSharedData<string>("CHARACTER:PoliceOutfit"));
+                return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:PoliceOutfit"));
             }
             return null;
         }
