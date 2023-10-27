@@ -9360,9 +9360,6 @@ namespace RNC
 
                     EPlayer.ApplyCharacter(player, ConvChar, acc.LobbyClothing);
 
-                    // New Outfit Shit
-                    Character.SetTeamOutfit(player, acc.LobbyClothing);
-
                     player.ResetData("Cuffed");
                 }
                 if (player.HasData("Handsup"))
@@ -9442,6 +9439,9 @@ namespace RNC
 
                 if (player.GetSharedDataSafe<int>("InLobby") == -3) // Freeroam
                 {
+                    // New Outfit Shit
+                    Character.SetTeamOutfit(player, acc.LobbyClothing);
+
                     SpawnSet spawnCoords = new SpawnSet(0, 1061.547f, -720.113f, 56.786f, 130.497f);
 
                     Settings.FreeroamSpawns.ForEach(spawn =>
@@ -9558,6 +9558,10 @@ namespace RNC
 
                 if (player.GetSharedDataSafe<int>("InLobby") > -1) // Copchase Lobby
                 {
+                    // New Outfit Shit
+                    Character.SetTeamOutfit(player, acc.LobbyClothing);
+
+
                     EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedDataSafe<int>("InLobby")}] Waiting as {player.Name}");
 
                     player.RemoveAllWeapons();
@@ -9590,6 +9594,9 @@ namespace RNC
 
                     if (arenaID > -1 && lobby != null && lobby.gameStatus != 2) // DM
                     {
+                        // New Outfit Shit
+                        Character.SetTeamOutfit(player, acc.LobbyClothing);
+
                         Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 
                         int spawnID = rand.Next(Settings.DMSpawns[arenaID].GetLength(0));
