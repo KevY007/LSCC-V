@@ -122,18 +122,196 @@ mp.events.add("OutfitCreator:SetActive", (id, team) => { // Loading defaults
     if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set_active", id, team);
 });
 
+
+var OUTFIT_EDITOR_DATA = {
+    isMale:true,
+    team:1
+};
 function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
 
-    const max_drawable = (isProp ? 
-        mp.players.local.getNumberOfPropDrawableVariations(componentID) : 
-        mp.players.local.getNumberOfDrawableVariations(componentID));
+    const isDonator = (mp.players.local.hasVariable("Donator") && mp.players.local.getVariable("Donator") >= 3);
+    const isMale = OUTFIT_EDITOR_DATA.isMale;
+    const team = OUTFIT_EDITOR_DATA.team;
+    
+
+    var min_drawable = 0;
+    var max_drawable = 0;
+
+    if(isMale){
+        if(isDonator){
+            if(team == 1){
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_MALE["police_donator"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }
+            else{
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_MALE["fugitive_donator"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }
+        }
+        else{
+            if(team == 1){
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_MALE["police"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }
+            else{
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_MALE["fugitive"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }            
+        }
+    }
+    else{
+        if(isDonator){
+            if(team == 1){
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_MALE["police_donator"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }
+            else{
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_MALE["fugitive_donator"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }
+        }
+        else{
+            if(team == 1){
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_FEMALE["police"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }
+            else{
+                var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
+
+                const data = CLOTHING_EDITOR_LIMITS_FEMALE["fugitive"][idToCheck.toString()];
+                if(data){
+                    min_drawable = data.min;
+
+                    if(!isProp)
+                        max_drawable = (data.max == -2 ? mp.players.local.getNumberOfDrawableVariations(componentID) : data.max);
+                    else max_drawable = (data.max == -2 ? mp.players.local.getNumberOfPropDrawableVariations(componentID) : data.max);
+                }
+                else{
+                    min_drawable = -1;
+
+                    if(!isProp)
+                        max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
+                    else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
+                }
+            }            
+        }       
+    }
+
+    // const max_drawable = (isProp ? 
+    //     mp.players.local.getNumberOfPropDrawableVariations(componentID) : 
+    //     mp.players.local.getNumberOfDrawableVariations(componentID));
     const max_texture = (isProp ? 
         mp.players.local.getNumberOfPropTextureVariations(componentID, inputID) :
         mp.players.local.getNumberOfTextureVariations(componentID, inputID));
 
     if(global.ServerUI) global.ServerUI.call("dialog_clothing_editor_open", inputID, inputTexture, {
         id:{
-            min:0,
+            min:min_drawable,
             max:max_drawable
         },
         texture:{
@@ -143,16 +321,16 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
     });
 }
 mp.events.add("OutfitCreator:ChangeType", onOutfitCreatorChangeType);
-mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture) => {
+mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture, isMale, team) => {
     mp.events.callLocal("ForceCloseMenu");
 
     // the editor opens with bracelets selected by default?
-    const max_bracelets = mp.players.local.getNumberOfPropDrawableVariations(7);
-    const max_bracelet_texture = mp.players.local.getNumberOfPropTextureVariations(7, inputID);
-
+    onOutfitCreatorChangeType(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, CURRENT_EDIT_ITEM.texture, CURRENT_EDIT_ITEM.isProp);
+    OUTFIT_EDITOR_DATA = {
+        isMale:isMale,
+        team:team
+    }
     mp.gui.cursor.show(true, true);
-
-    CURRENT_EDIT_ITEM = {isProp:true, index:7, drawable:inputID, texture:inputTexture};
 
     if(!mp.players.local.hasVariable("OUTFIT:Editing")) return;
     CURRENT_OUTFIT_DATA = JSON.parse(mp.players.local.getVariable("OUTFIT:Editing"));
@@ -161,12 +339,12 @@ mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture) => {
 
     if(global.ServerUI) global.ServerUI.call("dialog_clothing_editor_open", inputID, inputTexture, {
         id:{
-            min:0,
-            max:max_bracelets
+            min:-1,
+            max:-1
         },
         texture:{
-            min:0,
-            max:max_bracelet_texture
+            min:-1,
+            max:-1
         }
     });
 });
@@ -214,3 +392,160 @@ mp.events.add("CharacterEditor:DestroyScene", () => {
     CanRotateInEditor = false;
     mp.events.callLocal('ToggleHud', true);
 });
+
+const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, max -2 means all/limit
+    "police":{ // this category's max values need updating if custom fugitive clothes are ever added.
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:195, max:-2}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-1}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:191, max:214}, // pants
+        "5":{min:111, max:172}, // bags/hands
+        "6":{min:25, max:25}, // shoes
+        "7":{min:143, max:-2}, // accessories
+        "8":{min:0, max:328}, // undershirts
+        "9":{min:-1, max:125}, // armors
+        "10":{min:-1, max:222}, // decals
+        "11":{min:535, max:633}, // tops
+    },
+    "police_donator":{
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:-1, max:-2}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-2}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:-2}, // pants
+        "5":{min:0, max:-2}, // bags/hands
+        "6":{min:1, max:-2}, // shoes
+        "7":{min:-1, max:-2}, // accessories
+        "8":{min:0, max:-2}, // undershirts
+        "9":{min:-1, max:-2}, // armors
+        "10":{min:-1, max:-2}, // decals
+        "11":{min:0, max:-2}, // tops        
+    },
+    "fugitive_donator":{
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:-1, max:195}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-2}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:190}, // pants
+        "5":{min:0, max:110}, // bags/hands
+        "6":{min:1, max:-2}, // shoes
+        "7":{min:-1, max:142}, // accessories
+        "8":{min:0, max:244}, // undershirts
+        "9":{min:-1, max:57}, // armors
+        "10":{min:-1, max:186}, // decals
+        "11":{min:0, max:533}, // tops        
+    },
+    "fugitive":{
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:-1, max:10}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-1}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:10}, // pants
+        "5":{min:0, max:10}, // bags/hands
+        "6":{min:1, max:10}, // shoes
+        "7":{min:-1, max:10}, // accessories
+        "8":{min:0, max:240}, // undershirts
+        "9":{min:-1, max:-1}, // armors
+        "10":{min:-1, max:-1}, // decals
+        "11":{min:0, max:10}, // tops        
+    }
+}
+const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max -2 means all/limit
+    "police":{ // this category's max values need updating if custom fugitive clothes are ever added.
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:195, max:-2}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-1}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:177, max:197}, // pants
+        "5":{min:111, max:156}, // bags/hands
+        "6":{min:25, max:25}, // shoes
+        "7":{min:175, max:197}, // accessories
+        "8":{min:0, max:258}, // undershirts
+        "9":{min:-1, max:104}, // armors
+        "10":{min:-1, max:208}, // decals
+        "11":{min:499, max:572}, // tops
+    },
+    "police_donator":{
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:-1, max:-2}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-2}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:-2}, // pants
+        "5":{min:0, max:-2}, // bags/hands
+        "6":{min:1, max:-2}, // shoes
+        "7":{min:-1, max:-2}, // accessories
+        "8":{min:0, max:-2}, // undershirts
+        "9":{min:-1, max:-2}, // armors
+        "10":{min:-1, max:-2}, // decals
+        "11":{min:0, max:-2}, // tops        
+    },
+    "fugitive_donator":{
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:-1, max:196}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-2}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:176}, // pants
+        "5":{min:0, max:110}, // bags/hands
+        "6":{min:1, max:-2}, // shoes
+        "7":{min:-1, max:174}, // accessories
+        "8":{min:0, max:198}, // undershirts
+        "9":{min:-1, max:57}, // armors
+        "10":{min:-1, max:169}, // decals
+        "11":{min:0, max:494}, // tops        
+    },
+    "fugitive":{
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:-1, max:10}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-1}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:10}, // pants
+        "5":{min:0, max:10}, // bags/hands
+        "6":{min:1, max:10}, // shoes
+        "7":{min:-1, max:10}, // accessories
+        "8":{min:0, max:190}, // undershirts
+        "9":{min:-1, max:-1}, // armors
+        "10":{min:-1, max:-1}, // decals
+        "11":{min:0, max:10}, // tops        
+    }
+}

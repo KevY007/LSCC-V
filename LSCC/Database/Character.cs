@@ -393,8 +393,8 @@ namespace RNC
 
             PropData propData = _o.Props.FirstOrDefault(p => p.Index == (int)PropData.Prop.Bracelet);
             if(propData != null)
-                player.TriggerEvent("OutfitCreator:OpenEditor", propData.Drawable, propData.Texture);
-            else player.TriggerEvent("OutfitCreator:OpenEditor", -1, 0);
+                player.TriggerEvent("OutfitCreator:OpenEditor", propData.Drawable, propData.Texture, outfit.IsMale,outfit.Team);
+            else player.TriggerEvent("OutfitCreator:OpenEditor", -1, 0, outfit.IsMale, outfit.Team);
 
             SendPlayerToEditorScene(player, outfit.Team, true);
         }
