@@ -7168,6 +7168,13 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("CharacterEditor:CloseEvent")]
+        public void CharacterEditor_OnClose(Player player)
+        {
+            player.TriggerEvent("CharacterEditor:DestroyScene");
+            Commands.cmd_lobby(player);
+        }
+
         [RemoteEvent("OutfitCreator:Create")]
         public void OutfitEditor_OnCreateNew(Player player, int outfitTeam)
         {

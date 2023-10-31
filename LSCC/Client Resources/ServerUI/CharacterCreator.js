@@ -104,6 +104,8 @@ mp.events.add("dialog_clothing_editor_close", (value) => {
 
     // For debugging purposes: save outfit edits
     mp.events.callRemote("OutfitCreator:SaveOutfitChanges", JSON.stringify(CURRENT_OUTFIT_DATA));
+
+    mp.events.callRemote("CharacterEditor:CloseEvent");
 });
 
 
@@ -167,4 +169,48 @@ mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture) => {
             max:max_bracelet_texture
         }
     });
+});
+
+
+var EditorCamera = null;
+var CanRotateInEditor = false;
+function rotatePlayer(z_value){
+    const rotation = mp.players.local.getHeading();
+    mp.players.local.setHeading(rotation+z_value);
+}
+mp.events.add('render', () => {
+    if(!CanRotateInEditor) return;
+
+    if(mp.keys.isDown(69))
+        return rotatePlayer(1);
+
+    if(mp.keys.isDown(81))
+        return rotatePlayer(-1);
+});
+
+/* Character Editor Scene Setup */
+mp.events.add("CharacterEditor:SceneSetup", (camX, camY, camZ, camRX, camRY, camRZ) => {
+    if(EditorCamera){
+        EditorCamera.destroy();
+        EditorCamera = null;
+    }
+
+    EditorCamera = mp.cameras.new('default', new mp.Vector3(camX, camY, camZ), new mp.Vector3(camRX, camRY, camRZ), 40);
+    EditorCamera.setActive(true);
+    mp.game.cam.renderScriptCams(true, false, 0, true, false);
+
+    CanRotateInEditor = true;
+    mp.events.callLocal('ToggleHud', false);
+});
+
+mp.events.add("CharacterEditor:DestroyScene", () => {
+    if(EditorCamera){
+        EditorCamera.setActive(false);
+        EditorCamera.destroy();
+        EditorCamera = null;
+    }
+    mp.game.cam.renderScriptCams(false, false, 0, true, false);
+
+    CanRotateInEditor = false;
+    mp.events.callLocal('ToggleHud', true);
 });

@@ -86,8 +86,6 @@ function applyOutfitData(entity, data){
 }
 
 
-
-
 var hairDecalsList = [
 
     [ // male
