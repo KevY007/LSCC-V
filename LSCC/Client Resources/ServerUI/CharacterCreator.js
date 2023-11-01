@@ -404,14 +404,14 @@ const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, m
         "1":{min:-1, max:-1}, // masks - set to anything for donators
         "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
         "3":{min:0, max:-2}, // torsos
-        "4":{min:191, max:214}, // pants
-        "5":{min:111, max:172}, // bags/hands
+        "4":{min:191, max:221}, // pants
+        "5":{min:111, max:183}, // bags/hands
         "6":{min:25, max:25}, // shoes
         "7":{min:143, max:-2}, // accessories
-        "8":{min:0, max:328}, // undershirts
-        "9":{min:-1, max:125}, // armors
-        "10":{min:-1, max:222}, // decals
-        "11":{min:535, max:633}, // tops
+        "8":{min:0, max:335}, // undershirts
+        "9":{min:-1, max:143}, // armors
+        "10":{min:-1, max:240}, // decals
+        "11":{min:535, max:654}, // tops
     },
     "police_donator":{
         "-5":{min:-1, max:-2}, // bracelets
