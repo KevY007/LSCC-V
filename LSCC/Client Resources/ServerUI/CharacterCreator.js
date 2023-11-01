@@ -38,7 +38,10 @@ mp.events.add("dialog_clothing_editor_change_id", (value) => {
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, drawable:value};
 
     if(CURRENT_EDIT_ITEM.isProp){
-        mp.players.local.setPropIndex(CURRENT_EDIT_ITEM.index, value, 0, true);
+        if(value !== -1)
+            mp.players.local.setPropIndex(CURRENT_EDIT_ITEM.index, value, 0, true);
+        else mp.players.local.clearProp(CURRENT_EDIT_ITEM.index);
+
         if(CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index)){
             CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Drawable = value;
             CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Texture = 0;
@@ -70,7 +73,6 @@ mp.events.add("dialog_clothing_editor_change_texture", (value) => {
         mp.players.local.setComponentVariation(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, value, 0);
         if(CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index]){
             CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index].Texture = value;
-            mp.events.callRemote(`ServerConsoleOutput`, `Set ${CURRENT_EDIT_ITEM.index} texture to ${value}`);
         }
     }
 });
