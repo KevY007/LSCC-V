@@ -410,7 +410,7 @@ namespace RNC
 
             if(team == 0)
             {
-                player.Position = new Vector3(402.76282f, -996.4929f, -99.00027f);
+                player.Position = new Vector3(403.2427f, -996.3667f, -99.00027f);
                 player.Heading = 180;
                 player.TriggerEvent("CharacterEditor:SceneSetup", 403.731, -1000.14, -98.357, -9, 0, 0);
             }
@@ -418,7 +418,7 @@ namespace RNC
             {
                 player.Position = new Vector3(401.8617f, -1005.00226f, -99.00403f);
                 player.Heading = -4;
-                player.TriggerEvent("CharacterEditor:SceneSetup", 401.669, -1002.175, -98.35124, -9, 0, 180);
+                player.TriggerEvent("CharacterEditor:SceneSetup", 401.4128, -1000.874, -97.888069, -9, 0, 180);
             }
         }
 
