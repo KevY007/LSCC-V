@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using GTANetworkAPI;
 using System.Linq;
+using System.Numerics;
 
 namespace RNC
 {
@@ -199,6 +200,73 @@ namespace RNC
             return true;
         }
         
+
+        public async static Task BanEvadeCheck(Player player, Account acc)
+        {
+            List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+            var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                bool banEvadingAccountNotFound = false;
+                IEnumerable<int> linkedSQLList = linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID));
+                if (linkedSQLList.Any())
+                {
+                    BanData _banInfo = await context.Bans.AsQueryable().FirstOrDefaultAsync(b => linkedSQLList.Contains(b.AccountSQLID));
+                    if (_banInfo != null)
+                    {
+                        Account _accData = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _banInfo.AccountSQLID);
+                        if (_accData != null)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
+
+                                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+
+                                player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans. (Banned Account: {_accData.Username})");
+                                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+
+                                Logs.AddToAdminRecord(_accData.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade under username: {acc.Username}", "Permanent");
+
+                                player.SetData("Kicked", true);
+                                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                            });
+                        }
+                        else
+                        {
+                            banEvadingAccountNotFound = true;
+                        }
+                    }
+                    else banEvadingAccountNotFound = true;
+
+                    if (banEvadingAccountNotFound)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                            player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
+
+                            EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+
+                            player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
+                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+
+
+                            player.SetData("Kicked", true);
+                            NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                        });
+                    }
+                }
+            }
+           
+        }
 
         public async static Task<bool> ClearForeignKeys(Account acc)
         {

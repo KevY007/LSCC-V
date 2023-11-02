@@ -175,6 +175,9 @@ namespace RNC
             string pAddress = player.Address;
             ulong pSCID = player.SocialClubId;
             //NAPI.Notification.SendNotificationToPlayer(player, "Welcome to ~y~Race ~w~'n ~b~Chase~w~. Please wait...");
+
+            // No longer checking for ban evaders on connect so we can catch their alts!
+            /*
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -198,6 +201,7 @@ namespace RNC
 
                             EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Your ban ID is {ban.SQL_ID}.</p>", "red", "fas fa-ban", true, 30000);
 
+                            Logs.AddToAdminRecord(evadeAcc.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade as {player.Name}", "Permanent");
 
                             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
                             NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
@@ -209,6 +213,7 @@ namespace RNC
                     }
                 }
             });
+            */
 
         }
 
@@ -4026,6 +4031,7 @@ namespace RNC
                 List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
+                await AccountManager.BanEvadeCheck(player, acc);
 
                 Clan pClan = null;
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -4045,24 +4051,62 @@ namespace RNC
                         isClanPublic = (pClan.ClanAccess == 1);
                     }
 
-                    if (linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID)).Any())
+                    bool banEvadingAccountNotFound = false;
+                    IEnumerable<int> linkedSQLList = linkedSQLs.Intersect(context.Bans.AsQueryable().Select(bans => bans.AccountSQLID));
+                    if (linkedSQLList.Any())
                     {
-                        NAPI.Task.Run(() =>
+                        BanData _banInfo = await context.Bans.AsQueryable().FirstOrDefaultAsync(b => linkedSQLList.Contains(b.AccountSQLID));
+                        if (_banInfo != null)
                         {
-                            EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+                            Account _accData = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == _banInfo.AccountSQLID);
+                            if (_accData != null)
+                            {
+                                NAPI.Task.Run(() =>
+                                {
+                                    EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
 
-                            player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
+                                    player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
 
-                            EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+                                    EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
 
-                            player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+                                    player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
-                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+                                    EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans. (Banned Account: {_accData.Username})");
+                                    NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
-                            player.SetData("Kicked", true);
-                            NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
-                        });
+                                    Logs.AddToAdminRecord(_accData.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade under username: {acc.Username}", "Permanent");
+
+                                    player.SetData("Kicked", true);
+                                    NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                                });
+                            }
+                            else
+                            {
+                                banEvadingAccountNotFound = true;
+                            }
+                        }
+                        else banEvadingAccountNotFound = true;
+
+                        if (banEvadingAccountNotFound)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.SetDiscordStatus(player, "Gazing at the 'BANNED' screen.");
+
+                                player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
+
+                                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+
+                                player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
+
+                                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
+                                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+
+
+                                player.SetData("Kicked", true);
+                                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                            });
+                        }
                         return;
                     }
                 }
@@ -5510,6 +5554,8 @@ namespace RNC
             }
             Task.Run(async () =>
             {
+                await AccountManager.BanEvadeCheck(player, acc);
+
                 List<SavedAppearance> appearances = await Character.GetAppearances(acc);
                 if (appearances == null)
                 {

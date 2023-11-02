@@ -351,25 +351,25 @@ namespace RNC
             //modelBuilder.Entity<Account>().Property(u => u.Character).IsRequired(false);
 
 
-            modelBuilder.Entity<OwnedLoadoutData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
-            modelBuilder.Entity<OwnedVehData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
-
-            modelBuilder.Entity<PlayerTunings>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
-            modelBuilder.Entity<PlayerOutfit>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
-
-            modelBuilder.Entity<BanData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
-            // Delete the ban if the account got deleted. What's the point now?
-
-            modelBuilder.Entity<Logs_Session>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
-            modelBuilder.Entity<Logs_Admin>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
-
-            modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
-
-            modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
-
-            // But if were the admin, don't delete shit and let them suffer... in null. We better add checks for these tho // Oh I just realised ban uses string for admin name, gucci. they remain
-            modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
-            modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
+            //modelBuilder.Entity<OwnedLoadoutData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<OwnedVehData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            //
+            //modelBuilder.Entity<PlayerTunings>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<PlayerOutfit>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            //
+            //modelBuilder.Entity<BanData>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountSQLID).OnDelete(DeleteBehavior.ClientCascade);
+            //// Delete the ban if the account got deleted. What's the point now?
+            //
+            //modelBuilder.Entity<Logs_Session>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<Logs_Admin>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            //
+            //modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            //
+            //modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AccountID).OnDelete(DeleteBehavior.ClientCascade);
+            //
+            //// But if were the admin, don't delete shit and let them suffer... in null. We better add checks for these tho // Oh I just realised ban uses string for admin name, gucci. they remain
+            //modelBuilder.Entity<AdminNote>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
+            //modelBuilder.Entity<Logs_AdminRecord>().HasOne<Account>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.AdminID).OnDelete(DeleteBehavior.ClientSetNull);
 
             // DM ARENAS
             //modelBuilder.Entity<CustomDMArenaSpawns>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
@@ -377,7 +377,7 @@ namespace RNC
             //modelBuilder.Entity<CustomDMArenaTeams>().HasOne<CustomDMArenas>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.ArenaID).OnDelete(DeleteBehavior.ClientCascade);
 
             // MAP
-            modelBuilder.Entity<MapSpawn>().HasOne<Map>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.mapID).OnDelete(DeleteBehavior.ClientCascade);
+            //modelBuilder.Entity<MapSpawn>().HasOne<Map>().WithMany().HasPrincipalKey(ug => ug.SQL_ID).HasForeignKey(u => u.mapID).OnDelete(DeleteBehavior.ClientCascade);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
