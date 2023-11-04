@@ -3541,7 +3541,7 @@ namespace RNC
                     a.GetData<int>("EditingClothing") == -1 &&
                     a.GetSharedDataSafe<int>("InDM") == -1 &&
                     a.GetSharedDataSafe<int>("InLobby") >= 0 &&
-                    !a.GetSharedDataSafe<bool>("global.WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
+                    !a.GetSharedDataSafe<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
                     pCount = lobbyPlayers.Count;
                     if (pCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyid + "] Total players less than two, failed to start"); return; }
 
