@@ -709,6 +709,60 @@ namespace RNC
             return player.Name;
         }
 
+        public static void ResetCopchaseVariables(Player player)
+        {
+            EPlayer.StopCarry(player);
+            player.TriggerEvent("Teleport:ResetCopCanEnter");
+            player.ResetSharedData("InteriorsEntered");
+
+            player.SetSharedData("IsBeingCuffed", false);
+            player.SetSharedData("IsCuffed", false);
+            player.SetSharedData("CuffedBy", "n/a");
+            player.TriggerEvent("forceStopCuffing");
+
+            player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
+            player.TriggerEvent("PoliceHeliCam_ClearFugitives");
+
+            player.TriggerEvent("hideMDC");
+            player.TriggerEvent("MDC:RemoveAllBlips");
+
+            player.TriggerEvent("Bleeding:ClearAllDecals");
+            player.TriggerEvent("Bleeding:SetActive", false);
+
+            player.TriggerEvent("ClearClimbTaseProtection", true);
+            player.SetSharedData("ClimbProtection", false);
+            player.SetData("LastClimbProtection", Environment.TickCount64 - 30000);
+            player.SetData("ClimbProtectionProcs", 0);
+            player.SetData("ClimbProtectionEnd", Environment.TickCount64);
+
+            player.SetData("IsClanPartnered", false);
+
+            player.TriggerEvent("resetBuildingBlips");      
+            player.TriggerEvent("ResetKillFeed");
+
+            player.SetSharedData("HeistLeader", false);
+            player.TriggerEvent("BankRob_ClearFugiCarBlips");
+            player.TriggerEvent("BankRob_ClearFinishMarker");
+            player.TriggerEvent("BankRob_SetMusic", -1);
+
+            player.ResetSharedData("Handgun_Hash");
+
+            player.TriggerEvent("stopLockpicking");
+            player.TriggerEvent("StopHotwire");
+
+            player.ResetData("DragoutVehicle");
+            player.ResetData("ExitedDragoutVehicle");
+
+            player.SetSharedData("BustedProgress", 0.0);
+            player.ResetData("BustSupporters");
+
+            player.SetSharedData("Wounded", 0);
+            player.SetSharedData("LastKiller", "n/a");
+            player.SetSharedData("BeingRevived", false);
+            player.SetSharedData("ReviveTarget", "n/a");
+
+        }
+
         public static void ResetPlayerData(Player player)
         {
             lock (player)
