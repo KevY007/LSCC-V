@@ -387,6 +387,8 @@ namespace RNC
 
         public static void OpenOutfitEditor(Player player, SavedOutfit outfit)
         {
+            player.SetData("CHARACTER:EditorOpen", true);
+
             Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
             player.SetSharedData("OUTFIT:Editing", NAPI.Util.ToJson(_o));
             player.SetData<int>("OUTFIT:EditingID", outfit.SQL_ID);

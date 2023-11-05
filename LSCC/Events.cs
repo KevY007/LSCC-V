@@ -7217,6 +7217,8 @@ namespace RNC
         [RemoteEvent("CharacterEditor:CloseEvent")]
         public void CharacterEditor_OnClose(Player player)
         {
+            player.ResetData("CHARACTER:EditorOpen");
+
             player.TriggerEvent("CharacterEditor:DestroyScene");
             Commands.cmd_lobby(player);
         }

@@ -722,6 +722,7 @@ namespace RNC
                 player.SetSharedData("IsChatOpen", false);
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
+                player.ResetData("CHARACTER:EditorOpen");
                 player.ResetData("CompNoRefundWarn");
                 player.ResetData("AttachedComponents");
                 player.SetSharedData("NametagHack", false);

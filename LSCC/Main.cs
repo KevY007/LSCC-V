@@ -3538,7 +3538,7 @@ namespace RNC
                     !a.HasData("Spectating") &&
                     a.GetSharedDataSafe<bool>("AutoJoin") == true &&
                     !a.Dead &&
-                    a.GetData<int>("EditingClothing") == -1 &&
+                    !a.HasData("CHARACTER:EditorOpen") &&
                     a.GetSharedDataSafe<int>("InDM") == -1 &&
                     a.GetSharedDataSafe<int>("InLobby") >= 0 &&
                     !a.GetSharedDataSafe<bool>("WeaponEditorActive")).OrderBy(c => Guid.NewGuid()).ToList();
