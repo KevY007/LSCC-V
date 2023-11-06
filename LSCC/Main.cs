@@ -3546,7 +3546,13 @@ namespace RNC
             return fugitives;
         }
 
-        public static Vehicle CreatePoliceVehicle(Player owner, Vector3 spawnPosition, float spawnHeading, LobbyData lobby)
+        public static bool IsHelicopter(string carModel)
+        {
+            return NAPI.Vehicle.GetVehicleClass((VehicleHash)NAPI.Util.GetHashKey(carModel)) == 15 
+                || carModel.Equals("polmav") 
+                || carModel.Equals("as350");
+        }
+        public static Vehicle CreatePoliceVehicle(Player owner, List<MapSpawn> policeSpawns, List<MapSpawn> heliSpawns, LobbyData lobby, int spawnIndex)
         {
             Account acc = EPlayer.GetAccount(owner);
 
@@ -3555,6 +3561,25 @@ namespace RNC
             int col2 = 111;
             float enginePower = 1.0f;
             string vehSpeedClass = "Average";
+
+            Vector3 spawnPosition = null;
+            float spawnHeading = 0.0f;
+
+            // Class 15 = helicopters
+            if (IsHelicopter(acc.CarCop))
+            {
+                if(spawnIndex >= heliSpawns.Count) spawnIndex = 0;
+                spawnPosition = new Vector3(heliSpawns[spawnIndex].spawnX, heliSpawns[spawnIndex].spawnY, heliSpawns[spawnIndex].spawnZ);
+                spawnHeading = heliSpawns[spawnIndex].spawnA;
+            }
+            else
+            {
+                if (spawnIndex >= policeSpawns.Count) spawnIndex = 0;
+
+                spawnPosition = new Vector3(policeSpawns[spawnIndex].spawnX, policeSpawns[spawnIndex].spawnY, policeSpawns[spawnIndex].spawnZ);
+                spawnHeading = policeSpawns[spawnIndex].spawnA;
+            }
+
             if(acc.CarCop.Length < 3)
             {
                 switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
@@ -3782,7 +3807,7 @@ namespace RNC
             return pVehicle;
         }
 
-        public static void StartCopchase(LobbyData lobby, List<Player> CopchasePlayers, Map map, List<MapSpawn> copSpawns, List<MapSpawn> fugitiveSpawns)
+        public static void StartCopchase(LobbyData lobby, List<Player> CopchasePlayers, Map map, List<MapSpawn> copSpawns, List<MapSpawn> fugitiveSpawns, List<MapSpawn> heliSpawns)
         {
             if (lobby == null || CopchasePlayers.Count == 0) return;
             if (map == null)
@@ -3840,8 +3865,8 @@ namespace RNC
 
             int spawnLocCop = 0;
             int spawnLocFugitive = 0;
+            int spawnLocHeli = 0;
             int currentFugiSeats = 0;
-            int currentCopSeats = 0;
             Vehicle currentFugitiveCar = null;
 
             /*
@@ -3902,8 +3927,11 @@ namespace RNC
                 }
                 if (lobby.Cops.Contains(player))
                 {
+                    player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + 1.0f);
+
                     int clanID = EPlayer.GetAccount(player).ClanID;
                     bool isClanPartneringEnabled = EPlayer.GetAccount(player).ClanPartnering;
+                    string carModel = EPlayer.GetAccount(player).CarCop;
 
                     // Clan Pairing
                     if(clanID != -1 && isClanPartneringEnabled)
@@ -3911,14 +3939,21 @@ namespace RNC
                         KeyValuePair<int, Vehicle> clanVehicle = PairedClanVehicles.FirstOrDefault(p => p.Key == clanID);
                         if(clanVehicle.Equals(default(KeyValuePair<int, Vehicle>))) // if null
                         {
-                            MapSpawn spawn = copSpawns[spawnLocCop];
-                            spawnLocCop++;
-                            if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
-
-                            Vector3 spawnVector = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
-                            player.Position = spawnVector.Around(10.0f);
-
-                            Vehicle policeClanCar = CreatePoliceVehicle(player, spawnVector, spawn.spawnA, lobby);
+                            carModel = EPlayer.GetAccount(player).CarCop;
+                            Vehicle policeClanCar = null;
+                            if (IsHelicopter(carModel)) // If helicopter, use the helicopter spawn index
+                            {
+                                policeClanCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocHeli);
+                                spawnLocHeli++;
+                                if (spawnLocHeli >= heliSpawns.Count) spawnLocHeli = 0;
+                            }
+                            else // Otherwise just use the normal car spawns
+                            {
+                                policeClanCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocCop);
+                                spawnLocCop++;
+                                if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+                            }
+                            player.Position = policeClanCar.Position.Around(10.0f);
 
                             PairedClanVehicles.Add(new KeyValuePair<int, Vehicle>(clanID, policeClanCar));
                             continue;
@@ -3934,14 +3969,21 @@ namespace RNC
                             {
                                 PairedClanVehicles.Remove(clanVehicle);
 
-                                MapSpawn spawn = copSpawns[spawnLocCop];
-                                spawnLocCop++;
-                                if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
-
-                                Vector3 spawnVector = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
-                                player.Position = spawnVector.Around(10.0f);
-
-                                Vehicle policeClanCar = CreatePoliceVehicle(player, spawnVector, spawn.spawnA, lobby);
+                                carModel = EPlayer.GetAccount(player).CarCop;
+                                Vehicle policeClanCar = null;
+                                if (IsHelicopter(carModel))
+                                {
+                                    policeClanCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocHeli);
+                                    spawnLocHeli++;
+                                    if (spawnLocHeli >= heliSpawns.Count) spawnLocHeli = 0;
+                                }
+                                else
+                                {
+                                    policeClanCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocCop);
+                                    spawnLocCop++;
+                                    if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+                                }
+                                player.Position = policeClanCar.Position.Around(10.0f);
 
                                 PairedClanVehicles.Add(new KeyValuePair<int, Vehicle>(clanID, policeClanCar));
                                 continue;
@@ -3964,14 +4006,21 @@ namespace RNC
 
 
                     // Normal car spawning, no partners
-                    MapSpawn nSpawn = copSpawns[spawnLocCop];
-                    spawnLocCop++;
-                    if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+                    Vehicle noPartnerCar = null;
+                    if (IsHelicopter(carModel))
+                    {
+                        noPartnerCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocHeli);
+                        spawnLocHeli++;
+                        if (spawnLocHeli >= heliSpawns.Count) spawnLocHeli = 0;
+                    }
+                    else
+                    {
+                        noPartnerCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocCop);
+                        spawnLocCop++;
+                        if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+                    }
+                    player.Position = noPartnerCar.Position.Around(10.0f);
 
-                    Vector3 nSpawnVector = new Vector3(nSpawn.spawnX, nSpawn.spawnY, nSpawn.spawnZ);
-                    player.Position = nSpawnVector.Around(10.0f);
-
-                    Vehicle policeVehicle = CreatePoliceVehicle(player, nSpawnVector, nSpawn.spawnA, lobby);
                     continue;
                 }
             }
@@ -4035,7 +4084,7 @@ namespace RNC
                                 NAPI.Task.Run(() =>
                                 {
                                     // If a map isn't found, set null as map so it doesn't proceed
-                                    StartCopchase(lobby, CopchasePlayers, null, null, null);
+                                    StartCopchase(lobby, CopchasePlayers, null, null, null, null);
                                 });
                                 return;
                             }
@@ -4051,11 +4100,12 @@ namespace RNC
                             List<MapSpawn> mapSpawns = await context.MapSpawns.AsQueryable().Where(m => m.mapID == mapToStart.SQL_ID).ToListAsync();
                             List<MapSpawn> policeSpawns = mapSpawns.Where(s => s.spawnTeam == 1).ToList();
                             List<MapSpawn> fugitiveSpawns = mapSpawns.Where(s => s.spawnTeam == 0).ToList();
+                            List<MapSpawn> heliSpawns = mapSpawns.Where(s => s.spawnTeam == 2).ToList();
 
                             NAPI.Task.Run(() =>
                             {
                                 // Once all database operations are complete, start copchase on main thread with all data you fetched
-                                StartCopchase(lobby, CopchasePlayers, mapToStart, policeSpawns, fugitiveSpawns);
+                                StartCopchase(lobby, CopchasePlayers, mapToStart, policeSpawns, fugitiveSpawns, heliSpawns);
                             });
                         }
                     });
