@@ -169,6 +169,7 @@ namespace RNC
             Starting = 2
         };
 
+        public Map CurrentMap { get; set; }
         public string Name { get; set; } = "";
         public int LobbyOwnerSQLID { get; set; }
 
@@ -213,6 +214,8 @@ namespace RNC
 
         public LobbyData()
         {
+            CurrentMap = null;
+
             Name = "";
             Cops = new List<Player>();
             Fugitives = new List<Player>();
@@ -3637,15 +3640,15 @@ namespace RNC
 
             // ------------- Finalizing copchase variables ------------- //
             lobby.FugitiveShowCounter = 47;
-            lobby.LastSeenCounter = -13;
-            lobby.GameProgress = -13;
+            lobby.LastSeenCounter = -5;
+            lobby.GameProgress = -5;
             lobby.CollisionCounter = 20;
             lobby.gameStatus = (int)LobbyData.GameStatus.Active;
 
             int gameRunTime = 900;
             foreach (Player player in participants)
             {
-                player.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                player.TriggerEvent("StartChaseTimer", -5, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
             }
         }
 
@@ -4218,16 +4221,17 @@ namespace RNC
             }
 
             // ------------- Finalizing copchase variables ------------- //
+            lobby.CurrentMap = map;
             lobby.FugitiveShowCounter = 47;
-            lobby.LastSeenCounter = -13;
-            lobby.GameProgress = -13;
+            lobby.LastSeenCounter = -5;
+            lobby.GameProgress = -5;
             lobby.CollisionCounter = 48;
             lobby.gameStatus = (int)LobbyData.GameStatus.Active;
 
             int gameRunTime = Settings.GameRunTime;
             foreach (Player player in CopchasePlayers)
             {
-                player.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                player.TriggerEvent("StartChaseTimer", -5, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
             }
 
             NAPI.Util.ConsoleOutput($"[Lobby ${lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
@@ -4331,6 +4335,161 @@ namespace RNC
             }
         }
 
+        public static void CopchaseSecondTick(LobbyData lobby, int secondsElapsed)
+        {
+            List<Player> CopchasePlayers = lobby.Fugitives;
+            CopchasePlayers.AddRange(lobby.Cops);
+
+            // Pre-game setups -> putting players into vehicles, toggling collisions, etc.
+            if (secondsElapsed == -3)
+            {
+                foreach (Player player in CopchasePlayers)
+                {
+                    try
+                    {
+                        if (player == null) continue;
+
+                        Vehicle playerVehicle = player.GetData<Vehicle>("ChaseVehicle");
+                        int vehicleSeat = player.GetData<int>("ChaseVehicleSeat");
+
+                        player.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                        player.SetIntoVehicle(playerVehicle, vehicleSeat);
+                        EPlayer.Freeze(player, true);
+                        player.TriggerEvent("stopLoadingScreen");
+
+                        playerVehicle.SetSharedData("Collisions", false);
+
+                        player.SetSharedData("Collisions", false);
+
+                        if (lobby.Fugitives.Contains(player))
+                        {
+                            player.TriggerEvent("ToggleCollisionsForEnt", playerVehicle, false);
+
+                            continue;
+                        }
+                        if (lobby.Cops.Contains(player))
+                        {
+
+                            continue;
+                        }
+                    }
+                    catch { }
+                }
+                return;
+            }
+
+            // Actual game start -> unfreezing fugitives, etc.
+            if(secondsElapsed == 0)
+            {
+                if (lobby.gameMode == GameModes.STANDARD)
+                {
+                    EPlayer.SendMessageToAll("COPCHASE_STARTED", lobby.lobbyId, lobby.Cops.Count, lobby.Fugitives.Count, lobby.CurrentMap.Name);
+                }
+                else if (lobby.gameMode == GameModes.BUSTED)
+                {
+                    EPlayer.SendMessageToAll("BUSTED_STARTED", lobby.lobbyId, lobby.Cops.Count, lobby.Fugitives.Count, lobby.CurrentMap.Name);
+                }
+
+
+                foreach (Player player in CopchasePlayers)
+                {
+                    try
+                    {
+                        if (player == null) continue;
+
+                        Vehicle playerVehicle = player.GetData<Vehicle>("ChaseVehicle");
+                        int vehicleSeat = player.GetData<int>("ChaseVehicleSeat");
+
+                        player.SetIntoVehicle(playerVehicle, vehicleSeat);
+
+                        player.TriggerEvent("ToggleNametags", true);
+                        player.TriggerEvent("ToggleCanExitVehicle", false);
+
+                        player.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
+                        player.SetSharedData("Collisions", false);
+                        player.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
+
+                        player.RemoveAllWeaponsAC();
+
+                        player.Health = 100;
+                        player.Armor = 0;
+
+                        player.TriggerEvent("ResetKillFeed");
+
+                        if (lobby.gameMode == GameModes.STANDARD)
+                        {
+                            player.SendChatMessage(Translate(player, "COPS_10S_UNFREEZE"));
+                        }
+                        else if (lobby.gameMode == GameModes.BUSTED)
+                        {
+                            player.SendChatMessage(Translate(player, "START_BUSTED_MSG_1"));
+                            player.SendChatMessage(Translate(player, "START_BUSTED_MSG_2"));
+                            player.SendChatMessage(Translate(player, "START_BUSTED_MSG_3"));
+                            player.SendChatMessage(Translate(player, "START_BUSTED_MSG_4"));
+                            player.SendChatMessage(Translate(player, "START_BUSTED_MSG_5"));
+                        }
+
+                        if (lobby.Fugitives.Contains(player))
+                        {
+                            EPlayer.Freeze(player, false);
+                            continue;
+                        }
+                        if (lobby.Cops.Contains(player))
+                        {
+                            EPlayer.Notify(player, Translate(player, "UNFREEZE_10S_NOTIFY"), "orange", "fas fa-hourglass-start", false, 10000);
+                            continue;
+                        }
+                    }
+                    catch { }
+                }
+                foreach (Vehicle vehicle in lobby.Vehicles)
+                {
+                    if (vehicle == null) continue;
+
+                    vehicle.SetSharedData("Collisions", false);
+                    CopchasePlayers.ForEach((p) =>
+                    {
+                        if (p.Position.DistanceTo(vehicle.Position) < 500.0)
+                        {
+                            p.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
+                        }
+                    });
+                }
+                return;
+            }
+
+            // After 10 seconds -> unfreeze the cops, everyone can exit vehicles
+            if(secondsElapsed == 10)
+            {
+                foreach(Player player in CopchasePlayers)
+                {
+                    player.SendNotification("~y~You can now exit vehicles.");
+                    player.TriggerEvent("ToggleCanExitVehicle", true);
+                    EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.CopchaseRounds, "N/A");
+                    EPlayer.Freeze(player, false);
+
+                    if (player.IsInVehicle && player.Vehicle != null)
+                    {
+                        player.Vehicle.Repair();
+                    }
+
+                    if (lobby.Fugitives.Contains(player))
+                    {
+                        continue;
+                    }
+                    if (lobby.Cops.Contains(player))
+                    {
+                        player.SendNotification("~b~You may begin the chase now.");
+                        continue;
+                    }
+                }
+            }
+        }
+        public static void BankRobberySecondTick(LobbyData lobby, int secondsElapsed)
+        {
+
+        }
+
 
         public static void GameUpdate()
         {
@@ -4354,6 +4513,16 @@ namespace RNC
                         lock (lobby)
                         {
                             lobby.GameProgress++;
+                            if(lobby.gameMode == GameModes.STANDARD || lobby.gameMode == GameModes.BUSTED)
+                            {
+                                CopchaseSecondTick(lobby, lobby.GameProgress);
+                                continue;
+                            }
+                            if(lobby.gameMode == GameModes.BANKROBBERY)
+                            {
+                                BankRobberySecondTick(lobby, lobby.GameProgress);
+                                continue;
+                            }
 
                             if (lobby.GameProgress == -10)
                             {
@@ -5328,7 +5497,7 @@ namespace RNC
                         }
 
                         int gameRunTime = Settings.GameRunTime;
-                        if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 600;
+                        if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 900;
                         if (lobby.GameProgress >= gameRunTime)
                         {
                             StopGame(lobby.lobbyId, 1);
