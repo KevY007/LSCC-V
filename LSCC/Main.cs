@@ -3812,29 +3812,17 @@ namespace RNC
             if (lobby == null || CopchasePlayers.Count == 0) return;
             if (map == null)
             {
-                foreach(Player pl in CopchasePlayers)
-                {
-                    pl.TriggerEvent("stopLoadingScreen");
-                }
                 NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Failed to start copchase - no map found!");
                 return;
             }
             if((copSpawns == null || copSpawns.Count == 0) || (fugitiveSpawns == null || fugitiveSpawns.Count == 0))
             {
-                foreach (Player pl in CopchasePlayers)
-                {
-                    pl.TriggerEvent("stopLoadingScreen");
-                }
                 NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Failed to start copchase - Map {map.Name} is missing spawns for both teams!");
                 return;
             }
             int fugitives = GetFugitivesCount(lobby, CopchasePlayers.Count); // GetFugitivesCount calculates number of fugitives from %
             if(fugitives == 0)
             {
-                foreach (Player pl in CopchasePlayers)
-                {
-                    pl.TriggerEvent("stopLoadingScreen");
-                }
                 NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Failed to start copchase - not enough fugitives");
                 return;
             }
@@ -3882,6 +3870,8 @@ namespace RNC
             foreach(Player player in CopchasePlayers)
             {
                 if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) continue;
+                EPlayer.ResetCopchaseVariables(player);
+                player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
 
                 player.RemoveAllWeaponsAC();
                 player.Health = 100;
@@ -4093,9 +4083,6 @@ namespace RNC
                         BannedCopchasePlayers.Add(player);
                         continue;
                     }
-
-                    player.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
-                    EPlayer.ResetCopchaseVariables(player);
                 }
                 CopchasePlayers.RemoveAll(player => BannedCopchasePlayers.Contains(player));
 
