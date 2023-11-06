@@ -3651,6 +3651,8 @@ namespace RNC
             pVehicle.SetData("SpawnA", spawnHeading);
             pVehicle.Rotation.Z = spawnHeading;
 
+            pVehicle.SetData<int>("LeftoverSeats", (GetMaxSeats(carName)-1));
+
             owner.TriggerEvent("SetChaseVehicle", pVehicle.Id, 0);
             owner.SetData("ChaseVehicle", pVehicle);
             owner.SetData("ChaseVehicleSeat", 0);
@@ -3842,6 +3844,17 @@ namespace RNC
             int currentCopSeats = 0;
             Vehicle currentFugitiveCar = null;
 
+            /*
+             Brief explanation of how this works:
+             When creating cop cars, the player's clan is checked. If they are in a clan, it will check if their clan is in the list.
+             If their clan is FOUND in the list, it will assigned them to the "clan vehicle" aka partner them with the clan member.
+             If their clan ISN'T FOUND in the list, it will create a new "clan vehicle" in the list for others to join if found.
+             All this is done ONLY if they have Clan Copchase Partnering enabled.
+
+             The "Squad Pairing" works in the same way, except it checks for the squad ID instead of clan ID.
+             */
+            List<KeyValuePair<int, Vehicle>> PairedClanVehicles = new List<KeyValuePair<int, Vehicle>>();
+
             foreach(Player player in CopchasePlayers)
             {
                 if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) continue;
@@ -3870,11 +3883,15 @@ namespace RNC
                         currentFugitiveCar = CreateFugitiveVehicle(player, spawnVector, spawn.spawnA, lobby);
 
                         // Setting leftover seats to Max-1 since one is already taken by the driver, pro maths
-                        if (GetMaxSeats(EPlayer.GetAccount(player).CarFugitive) != 0) currentFugiSeats = GetMaxSeats(EPlayer.GetAccount(player).CarFugitive)-1;
-                        else currentFugiSeats = currentFugitiveCar.MaxOccupants-1;
+
+                        currentFugiSeats = (GetMaxSeats(EPlayer.GetAccount(player).CarFugitive)-1);
+
+                        //if (GetMaxSeats(EPlayer.GetAccount(player).CarFugitive) != 0) currentFugiSeats = GetMaxSeats(EPlayer.GetAccount(player).CarFugitive)-1;
+                        //else currentFugiSeats = currentFugitiveCar.MaxOccupants-1;
                     }
                     else
                     {
+                        player.Position = currentFugitiveCar.Position.Around(10.0f);
                         player.TriggerEvent("SetChaseVehicle", currentFugitiveCar.Id, currentFugiSeats);
                         player.SetData("ChaseVehicle", currentFugitiveCar);
                         player.SetData("ChaseVehicleSeat", currentFugiSeats);
@@ -3885,7 +3902,76 @@ namespace RNC
                 }
                 if (lobby.Cops.Contains(player))
                 {
+                    int clanID = EPlayer.GetAccount(player).ClanID;
+                    bool isClanPartneringEnabled = EPlayer.GetAccount(player).ClanPartnering;
 
+                    // Clan Pairing
+                    if(clanID != -1 && isClanPartneringEnabled)
+                    {
+                        KeyValuePair<int, Vehicle> clanVehicle = PairedClanVehicles.FirstOrDefault(p => p.Key == clanID);
+                        if(clanVehicle.Equals(default(KeyValuePair<int, Vehicle>))) // if null
+                        {
+                            MapSpawn spawn = copSpawns[spawnLocCop];
+                            spawnLocCop++;
+                            if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+
+                            Vector3 spawnVector = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
+                            player.Position = spawnVector.Around(10.0f);
+
+                            Vehicle policeClanCar = CreatePoliceVehicle(player, spawnVector, spawn.spawnA, lobby);
+
+                            PairedClanVehicles.Add(new KeyValuePair<int, Vehicle>(clanID, policeClanCar));
+                            continue;
+                        }
+                        else
+                        {
+                            Vehicle clanCar = clanVehicle.Value;
+                            int leftoverSeats = 0;
+                            if (clanCar.HasData("LeftoverSeats"))
+                                leftoverSeats = clanCar.GetData<int>("LeftoverSeats");
+
+                            if(leftoverSeats == 0) // If no seats are found in the last clan car, create a new one
+                            {
+                                PairedClanVehicles.Remove(clanVehicle);
+
+                                MapSpawn spawn = copSpawns[spawnLocCop];
+                                spawnLocCop++;
+                                if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+
+                                Vector3 spawnVector = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
+                                player.Position = spawnVector.Around(10.0f);
+
+                                Vehicle policeClanCar = CreatePoliceVehicle(player, spawnVector, spawn.spawnA, lobby);
+
+                                PairedClanVehicles.Add(new KeyValuePair<int, Vehicle>(clanID, policeClanCar));
+                                continue;
+                            }
+                            else // If there's more leftover seats, set player in the next free seat
+                            {
+                                player.Position = clanCar.Position.Around(10.0f);
+                                player.TriggerEvent("SetChaseVehicle", clanCar.Id, leftoverSeats);
+                                player.SetData("ChaseVehicle", clanCar);
+                                player.SetData("ChaseVehicleSeat", leftoverSeats);
+
+                                leftoverSeats--;
+                                clanCar.SetData<int>("LeftoverSeats", leftoverSeats);
+                                continue;
+                            }
+                        }
+                    }
+
+                    // To Add: Squad Pairing
+
+
+                    // Normal car spawning, no partners
+                    MapSpawn nSpawn = copSpawns[spawnLocCop];
+                    spawnLocCop++;
+                    if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+
+                    Vector3 nSpawnVector = new Vector3(nSpawn.spawnX, nSpawn.spawnY, nSpawn.spawnZ);
+                    player.Position = nSpawnVector.Around(10.0f);
+
+                    Vehicle policeVehicle = CreatePoliceVehicle(player, nSpawnVector, nSpawn.spawnA, lobby);
                     continue;
                 }
             }
