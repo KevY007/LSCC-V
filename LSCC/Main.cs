@@ -3843,6 +3843,7 @@ namespace RNC
 
                 lobby.Fugitives.Add(nextFugitive);
                 fugitiveListOrdered.Remove(nextFugitive);
+                fugitives--;
             }
             fugitives = lobby.Fugitives.Count;
 
@@ -4122,17 +4123,25 @@ namespace RNC
                                 mapToStart = maps.OrderBy(c => Guid.NewGuid()).FirstOrDefault();
 
                             lobby.lastMapId = mapToStart.SQL_ID;
-
-                            List<MapSpawn> mapSpawns = await context.MapSpawns.AsQueryable().Where(m => m.mapID == mapToStart.SQL_ID).ToListAsync();
-                            List<MapSpawn> policeSpawns = mapSpawns.Where(s => s.spawnTeam == 1).ToList();
-                            List<MapSpawn> fugitiveSpawns = mapSpawns.Where(s => s.spawnTeam == 0).ToList();
-                            List<MapSpawn> heliSpawns = mapSpawns.Where(s => s.spawnTeam == 2).ToList();
-
-                            NAPI.Task.Run(() =>
+                            try
                             {
-                                // Once all database operations are complete, start copchase on main thread with all data you fetched
-                                StartCopchase(lobby, CopchasePlayers, mapToStart, policeSpawns, fugitiveSpawns, heliSpawns);
-                            });
+                                List<MapSpawn> mapSpawns = await context.MapSpawns.AsQueryable().Where(m => m.mapID == mapToStart.SQL_ID).ToListAsync();
+
+                                List<MapSpawn> policeSpawns = mapSpawns.Where(s => s.spawnTeam == 1).ToList();
+                                List<MapSpawn> fugitiveSpawns = mapSpawns.Where(s => s.spawnTeam == 0).ToList();
+                                List<MapSpawn> heliSpawns = mapSpawns.Where(s => s.spawnTeam == 2).ToList();
+
+                                NAPI.Task.Run(() =>
+                                {
+                                    NAPI.Util.ConsoleOutput($"CC: {CopchasePlayers.Count} | P: {policeSpawns.Count} | F: {fugitiveSpawns.Count} | H: {heliSpawns.Count}");
+                                    // Once all database operations are complete, start copchase on main thread with all data you fetched
+                                    StartCopchase(lobby, CopchasePlayers, mapToStart, policeSpawns, fugitiveSpawns, heliSpawns);
+                                });
+                            }
+                            catch(Exception ex)
+                            {
+                                NAPI.Util.ConsoleOutput(ex.ToString());
+                            }
                         }
                     });
                     return;

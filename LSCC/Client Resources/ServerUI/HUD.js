@@ -579,7 +579,7 @@ mp.events.add("startLoadingScreen", (time, message) => {
     }
 
     if(time == -1){
-        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', -1);
+        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 999999999999999);
         if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
     }
     else{
