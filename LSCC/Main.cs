@@ -3837,6 +3837,7 @@ namespace RNC
             while(fugitives > 0)
             {
                 if (infiniteLoopKillswitch > 1000) { NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Stuck picking fugitives (1000 loops), breaking loop."); break; }                infiniteLoopKillswitch++;
+                if (fugitiveListOrdered.Count == 0) break;
 
                 Player nextFugitive = fugitiveListOrdered.First();
                 if (lobby.Fugitives.Contains(nextFugitive)) continue;
@@ -4133,7 +4134,6 @@ namespace RNC
 
                                 NAPI.Task.Run(() =>
                                 {
-                                    NAPI.Util.ConsoleOutput($"CC: {CopchasePlayers.Count} | P: {policeSpawns.Count} | F: {fugitiveSpawns.Count} | H: {heliSpawns.Count}");
                                     // Once all database operations are complete, start copchase on main thread with all data you fetched
                                     StartCopchase(lobby, CopchasePlayers, mapToStart, policeSpawns, fugitiveSpawns, heliSpawns);
                                 });
