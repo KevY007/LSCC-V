@@ -680,7 +680,7 @@ namespace RNC
                         return;
                     }
 
-                    Main.StartGame(value);
+                    Main.StartGameNew(value);
                     player.SendChatMessage("~y~Attempting to start copchase. ~w~If it doesn't start, it could be due to ~y~lack of (autojoin-active) players~w~ or a ~y~round is already active~w~!");
                     Logs.LogAdmin(player, $"Attempted to force-start copchase in lobby {value}.");
                     EPlayer.SendMessageToAll("MSGALL_ASTARTCOPCHASE", EPlayer.GetAdminName(player), value);

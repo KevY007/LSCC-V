@@ -2765,7 +2765,7 @@ namespace RNC
                     }
                     else
                     {
-                        StartGame(lobbyid);
+                        StartGameNew(lobbyid);
                     }
                 }
             }
