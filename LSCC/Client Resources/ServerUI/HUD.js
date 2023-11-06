@@ -579,7 +579,7 @@ mp.events.add("startLoadingScreen", (time, message) => {
     }
 
     if(time == -1){
-        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 5000);
+        if(global.ServerUI) global.ServerUI.call('loadingscreen_start', -1);
         if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
         setTimeout(() => {
             if(mp.players.local != null && mp.players.exists(mp.players.local))
@@ -613,6 +613,7 @@ mp.events.add("stopLoadingScreen", () => {
         return;
     }
 
+    if(global.ServerUI) global.ServerUI.call('loadingscreen_start', 0);
     IsInInfiniteLoading = false;
     CanSkipLoading = false;
 });
