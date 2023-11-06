@@ -3543,6 +3543,29 @@ namespace RNC
                 totalSeats += 2;
             }
 
+            // Selecting a heist leader & co-leader
+            Random randomSelect = new Random();
+            int leaderIdx = 0;
+            int coLeaderIdx = 0;
+            leaderIdx = randomSelect.Next(0, lobby.Fugitives.Count);
+            int leaderLoopKillswitch = 0;
+            do
+            {
+                if (leaderLoopKillswitch > 1000) break;
+                leaderLoopKillswitch++;
+                coLeaderIdx = randomSelect.Next(0, lobby.Fugitives.Count);
+            }
+            while (coLeaderIdx == leaderIdx);
+
+            Player leader = lobby.BankRobbery.HeistLeader = lobby.Fugitives[leaderIdx];
+            Player coleader = lobby.BankRobbery.CoLeader = lobby.Fugitives[coLeaderIdx];
+
+            leader.Position = BankRobberyData.LeaderPos;
+            leader.Heading = BankRobberyData.LeaderHeading;
+            coleader.Position = BankRobberyData.CoLeaderPos;
+            coleader.Heading = BankRobberyData.CoLeaderHeading;
+
+            // Variables to keep track of how many cops are spawned per vehicle
             int leftoverSeatsInCurrentCar = 2;
             int currentPoliceCarIndex = 0;
             int seatToPutIn = 0;
@@ -3610,6 +3633,19 @@ namespace RNC
                     seatToPutIn++;
                     continue;
                 }
+            }
+
+            // ------------- Finalizing copchase variables ------------- //
+            lobby.FugitiveShowCounter = 47;
+            lobby.LastSeenCounter = -13;
+            lobby.GameProgress = -13;
+            lobby.CollisionCounter = 20;
+            lobby.gameStatus = (int)LobbyData.GameStatus.Active;
+
+            int gameRunTime = 900;
+            foreach (Player player in participants)
+            {
+                player.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
             }
         }
 
@@ -4192,7 +4228,6 @@ namespace RNC
             foreach (Player player in CopchasePlayers)
             {
                 player.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
-                player.TriggerEvent("stopLoadingScreen");
             }
 
             NAPI.Util.ConsoleOutput($"[Lobby ${lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
