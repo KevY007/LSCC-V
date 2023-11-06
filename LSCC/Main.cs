@@ -3854,7 +3854,6 @@ namespace RNC
                 if (lobby.Fugitives.Contains(nextFugitive)) continue;
 
                 lobby.Fugitives.Add(nextFugitive);
-                nextFugitive.SetSharedData("FugitiveChance", 10.0);
                 fugitiveListOrdered.Remove(nextFugitive);
             }
             fugitives = lobby.Fugitives.Count;
@@ -3887,16 +3886,35 @@ namespace RNC
                 player.RemoveAllWeaponsAC();
                 player.Health = 100;
                 player.Armor = 0;
-                player.Dimension = Convert.ToUInt32(player.Id + 699);
+                player.Dimension = Convert.ToUInt32(lobby.lobbyId);
 
                 player.TriggerEvent("ToggleNametags", false);
                 player.SetSharedData("Collisions", false);
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
+                
+                EPlayer.Freeze(player, true);
+
+                player.SetData("GPS", false);
+                player.TriggerEvent("SetActorInvulnerable", false);
+                player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+                player.SetSharedData("CuffedBy", "n/a");
+                player.ResetData("Handsup");
+                player.ResetData("Cuffed");
+                player.SetSharedData("HasShot", false);
+
+                EPlayer.UpdateTeleports(player);
 
                 if (lobby.Fugitives.Contains(player))
                 {
-                    if(currentFugiSeats == 0)
+                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {player.Name}");
+                    EPlayer.SetColor(player, new Color(255, 174, 0), 0);
+                    player.SetSharedData("Team", 0);
+                    player.SetSharedData("VisibleBlip", true);
+
+                    player.SetSharedData("FugitiveChance", 10.0);
+
+                    if (currentFugiSeats == 0)
                     {
                         MapSpawn spawn = fugitiveSpawns[spawnLocFugitive];
                         spawnLocFugitive++;
@@ -3927,6 +3945,10 @@ namespace RNC
                 }
                 if (lobby.Cops.Contains(player))
                 {
+                    EPlayer.SetColor(player, new Color(100, 100, 255), 0);
+                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name}");
+                    player.SetSharedData("Team", 1);
+
                     player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + 1.0f);
 
                     int clanID = EPlayer.GetAccount(player).ClanID;
@@ -4024,6 +4046,22 @@ namespace RNC
                     continue;
                 }
             }
+
+            // ------------- Finalizing copchase variables ------------- //
+            lobby.FugitiveShowCounter = 47;
+            lobby.LastSeenCounter = -13;
+            lobby.GameProgress = -13;
+            lobby.CollisionCounter = 48;
+            lobby.gameStatus = (int)LobbyData.GameStatus.Active;
+
+            int gameRunTime = Settings.GameRunTime;
+            foreach (Player player in CopchasePlayers)
+            {
+                player.TriggerEvent("StartChaseTimer", -13, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+            }
+
+            NAPI.Util.ConsoleOutput($"[Lobby ${lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**[Lobby ${lobby.lobbyId}]** {ConvertGameMode(lobby.gameMode)} started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count} fugitives** on map *{(map == null ? "EVENT" : map.Name)}*!");
         }
 
         public static void StartGameNew(int lobbyID)
