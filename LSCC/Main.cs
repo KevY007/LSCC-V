@@ -502,23 +502,29 @@ namespace RNC
 
     public class BankRobberyData
     {
+        public enum State
+        {
+            None = -1,
+            Starting = 0,
+            StealingMoney = 1,
+            GettingToVehicle = 2,
+            DeliveringMoney = 3,
+        }
+        public enum Hideout
+        {
+            MurrietaHeights = 1,
+            BaytreeCanyonRoad = 2,
+        }
+
         public static readonly Vector3[] Hideouts =
         {
-            new Vector3(1066.9955f, -2384.7617f, 30.421745f), // El Burro Heights
-            new Vector3(-181.55147f, -1327.5475f, 31.198029f) // Strawberry
+            new Vector3(1488.5116f, -1924.0371f, 71.16769f), // Murrieta Heights
+            new Vector3(824.71844f, 2193.029f, 52.32432f) // Baytree Canyon Road
         };
         public static readonly string[] HideoutNames =
         {
-            "El Burro Heights", "Strawberry"
+            "Murrieta Heights", "Baytree Canyon Road"
         };
-
-        public static readonly Vector3 BankCheckpointPos = new Vector3(207.33696f, 194.81523f, 105.56393f);
-
-        public static readonly Vector3 SniperPos = new Vector3(267.78983f, 245.49059f, 138.19551f);
-        public static readonly float SniperHeading = 161.013f;
-        public static readonly Vector3 LeaderPos = new Vector3(263.71643f, 214.61465f, 101.68339f);
-        public static readonly float LeaderHeading = 252.69729f;
-
         public static readonly object[,] FugitiveSpawns = new object[,]
         {
             { new Vector3(250.89134f, 219.42146f, 101.68343f), -48.746826f },
@@ -531,12 +537,21 @@ namespace RNC
             { new Vector3(246.8318f, 223.12218f, 106.286736f), 160.70934f }
         };
 
-        public class BR_FugitiveVehicleData
+
+
+        public static readonly Vector3 BankCheckpointPos = new Vector3(207.33696f, 194.81523f, 105.56393f);
+
+        public static readonly Vector3 LeaderPos = new Vector3(263.71643f, 214.61465f, 101.68339f);
+        public static readonly float LeaderHeading = 252.69729f;
+        public static readonly Vector3 CoLeaderPos = new Vector3(263.8176f, 212.4389f, 101.68339f);
+        public static readonly float CoLeaderHeading = 161.5344f;
+
+        public class BR_VehicleData
         {
             public Vector3 Position;
             public float Heading;
             public string Name;
-            public BR_FugitiveVehicleData(Vector3 pos, float head, string name)
+            public BR_VehicleData(Vector3 pos, float head, string name)
             {
                 this.Position = pos;
                 this.Heading = head;
@@ -544,83 +559,42 @@ namespace RNC
             }
         }
 
-        public static BR_FugitiveVehicleData[] FugitiveVehicleData =
+        public static BR_VehicleData[] FugitiveVehicleData =
         {
-            new BR_FugitiveVehicleData(new Vector3(300.0705f, 262.5568f, 105.376785f), -105.05242f, "burrito3"),
-            new BR_FugitiveVehicleData(new Vector3(294.0118f, 264.40457f, 105.40566f), -110.0321f, "burrito3"),
-            new BR_FugitiveVehicleData(new Vector3(287.0754f, 266.7743f, 105.404945f), -108.04021f, "burrito3"),
-            new BR_FugitiveVehicleData(new Vector3(308.86548f, 261.9242f, 104.85302f), -85.801796f, "burrito3"),
-            new BR_FugitiveVehicleData(new Vector3(104.54904f, 246.66824f, 107.74905f), 69.642006f, "stretch"),
-            new BR_FugitiveVehicleData(new Vector3(111.98483f, 244.39029f, 107.418335f), 68.90393f, "cognoscenti"),
-            new BR_FugitiveVehicleData(new Vector3(123.95057f, 239.9692f, 107.08887f), 69.3799f, "cognoscenti"),
-            new BR_FugitiveVehicleData(new Vector3(95.74224f, 250.45674f, 107.93961f), 68.840904f, "cognoscenti"),
-            new BR_FugitiveVehicleData(new Vector3(83.43303f, 254.90424f, 108.37654f), 67.456f, "cognoscenti"),
-            new BR_FugitiveVehicleData(new Vector3(236.19055f, 115.73223f, 102.24549f), -36.028374f, "slamvan3"),
-            new BR_FugitiveVehicleData(new Vector3(240.58038f, 129.90594f, 102.196754f), 160.48413f, "glendale2"),
-            new BR_FugitiveVehicleData(new Vector3(226.4308f, 118.67955f, 101.97867f), 151.46762f, "impaler"),
-            new BR_FugitiveVehicleData(new Vector3(237.09787f, 130.90378f, 102.12132f), 159.22339f, "kalahari"),
-            new BR_FugitiveVehicleData(new Vector3(229.15312f, 127.188934f, 102.29818f), -111.604225f, "fugitive"),
-            new BR_FugitiveVehicleData(new Vector3(289.6261f, 177.25037f, 103.936134f), 71.79052f, "tourbus")
+            new BR_VehicleData(new Vector3(265.71365f, 69.81996f, 93.9544f), -21.32815f, "gauntlet"),
+            new BR_VehicleData(new Vector3(272.52008f, 67.94361f, 93.7648f), -20.796246f, "sultan"),
+            new BR_VehicleData(new Vector3(93.724525f, 163.9236f, 104.2377f), 47.72873f, "tailgater"),
+            new BR_VehicleData(new Vector3(91.666145f, 159.95593f, 104.19193f), 41.80119f, "asterope"),
+            new BR_VehicleData(new Vector3(359.73273f, 271.6067f, 102.900795f), -18.211304f, "burrito2"),
+            new BR_VehicleData(new Vector3(364.7055f, 270.201f, 102.88683f), -23.34409f, "burrito2")
         };
-
-        public static readonly Vector3[] PatrolPositions =
+        public static BR_VehicleData[] PoliceVehicleData =
         {
-            new Vector3(407.99747f, -989.2855f, 28.872591f),
-            new Vector3(407.65045f, -997.8775f, 28.872187f),
-            new Vector3(407.9964f, -980.1574f, 28.875753f),
-            new Vector3(417.89395f, -952.3943f, 28.975674f),
-            new Vector3(429.78812f, -952.223f, 28.800528f),
-            new Vector3(399.7428f, -937.24005f, 28.958307f),
-        };
-        public static readonly float[] PatrolHeadings =
-        {
-             49.752483f,
-             48.555405f,
-            51.68575f ,
-             90.1135f ,
-            88.55487f ,
-            179.61603f,
-        };
-        public static readonly Vector3[] FbiSuvPositions =
-        {
-            new Vector3(452.21127f, -1015.2985f, 28.092287f),
-            new Vector3(454.08533f, -1023.79486f, 28.091333f),
-            new Vector3(423.2366f, -1014.0081f, 28.66856f)
-        };
-        public static readonly float[] FbiSuvHeadings =
-        {
-            98.04166f,
-            91.55372f,
-            116.714745f
-        };
-        public static readonly Vector3[] FbiBuffaloPositions =
-        {
-            new Vector3(408.27548f, -1007.90894f, 28.913239f),
-            new Vector3(406.23038f, -1003.2062f, 28.91233f)
-        };
-        public static readonly float[] FbiBuffaloHeadings =
-        {
-            123.24947f,
-            125.129906f
+            new BR_VehicleData(new Vector3(-626.6653f, -395.2306f, 34.564323f), 1.5066698f, "police3"),
+            new BR_VehicleData(new Vector3(-806.84973f, -85.16195f, 37.53779f), -63.391445f, "polscout"),
+            new BR_VehicleData(new Vector3(-1109.0085f, 257.55493f, 64.34868f), -88.857796f, "polscout"),
+            new BR_VehicleData(new Vector3(-311.73505f, -407.8586f, 29.781143f), -95.15733f, "intcept"),
+            new BR_VehicleData(new Vector3(-230.17188f, -658.8686f, 33.02503f), 70.92625f, "buffalosxpol"),
+            new BR_VehicleData(new Vector3(109.85292f, -595.0444f, 43.791832f), -21.20643f, "lspdunm"),
+            new BR_VehicleData(new Vector3(407.90063f, -979.61176f, 29.025034f), 50.401356f, "police2"),
+            new BR_VehicleData(new Vector3(416.9311f, -1024.644f, 29.113342f), 91.243935f, "bcat") // Special car - make sure it's last in array!
         };
 
         public List<Vehicle> FugitiveVehicles = new List<Vehicle>();
         public List<Vehicle> PoliceVehicles = new List<Vehicle>();
         public Player HeistLeader = null;
-        public Player Sniper = null;
-        public int State = 0;
-        public int Hideout = 0;
-        public int LeaderLives = 2;
+        public Player CoLeader = null;
+        public State GameState = State.None;
+        public Hideout HideoutLocation = Hideout.MurrietaHeights;
 
         public BankRobberyData()
         {
             HeistLeader = null;
-            Sniper = null;
+            CoLeader = null;
             FugitiveVehicles = new List<Vehicle>();
             PoliceVehicles = new List<Vehicle>();
-            State = 0;
-            Hideout = 0;
-            LeaderLives = 2;
+            GameState = State.Starting;
+            HideoutLocation = Hideout.MurrietaHeights;
         }
     }
 
@@ -3492,9 +3466,157 @@ namespace RNC
 
         public static void StartEvent_BankRobbery(LobbyData lobby, List<Player> participants)
         {
+            if (lobby == null || participants.Count == 0) return;
+            if(participants.Count < 4)
+            {
+                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - at least 4 players are required!");
+                return;
+            }
 
+            int fugitives = GetFugitivesCount(lobby, participants.Count);
+            if(fugitives < 2) // At least 2 fugitives are required for the Bank Robbery mode!
+            {
+                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - min. 2 fugitives are required!");
+                return;
+            }
+
+            // Get fugitive list -> "GrantFugitive" have priority, then order by fugitive chance
+            List<Player> fugitiveListOrdered = participants.OrderByDescending(p => p.HasData("GrantFugitive"))
+                                                              .ThenByDescending(p => p.GetSharedDataSafe<float>("FugitiveChance"))
+                                                              .ToList();
+
+            int infiniteLoopKillswitch = 0;
+            // Adding fugitives to the Fugitive list in lobby and resetting their data
+            while (fugitives > 0)
+            {
+                if (infiniteLoopKillswitch > 1000) { NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Stuck picking fugitives (1000 loops), breaking loop."); break; }
+                infiniteLoopKillswitch++;
+                if (fugitiveListOrdered.Count == 0) break;
+
+                Player nextFugitive = fugitiveListOrdered.First();
+                if (lobby.Fugitives.Contains(nextFugitive)) continue;
+
+                lobby.Fugitives.Add(nextFugitive);
+                fugitiveListOrdered.Remove(nextFugitive);
+                fugitives--;
+            }
+            fugitives = lobby.Fugitives.Count;
+
+            // Setting cops to all players who aren't in fugitives, aka the rest
+            lobby.Cops = participants.Where(p => !lobby.Fugitives.Contains(p)).ToList();
+
+            // Setting up custom BANK ROBBERY vehicles
+            lobby.BankRobbery.FugitiveVehicles.Clear();
+            lobby.BankRobbery.PoliceVehicles.Clear();
+            lobby.BankRobbery = new BankRobberyData();
+
+            for(int i = 0; i < BankRobberyData.FugitiveVehicleData.Length; i++)
+            {
+                BankRobberyData.BR_VehicleData vehData = BankRobberyData.FugitiveVehicleData[i];
+
+                Vehicle fugiVehicle = CreateGameVehicle(vehData.Name, vehData.Position, vehData.Heading, lobby, false, true, "Fast", 0, true, 5.0f);
+                lobby.BankRobbery.FugitiveVehicles.Add(fugiVehicle);
+            }
+
+            int totalSeats = 0;
+            bool isBearcatActive = false;
+            if(lobby.Cops.Count > 4) // is more than 4 cops are in bank robbery, spawn in a bearcat to be filled and we can have some patrol cars
+            {
+                totalSeats = 4;
+                isBearcatActive = true;
+                BankRobberyData.BR_VehicleData vehData = BankRobberyData.PoliceVehicleData[BankRobberyData.PoliceVehicleData.Length-1];
+
+                Vehicle bearcatVehicle = CreateGameVehicle(vehData.Name, vehData.Position, vehData.Heading, lobby, true, false, "Fast+", 1, true, 20.0f, 0, 111);
+                lobby.BankRobbery.PoliceVehicles.Add(bearcatVehicle);
+            }
+
+            int currentCopVehicle = 0;
+            while(totalSeats < lobby.Cops.Count)
+            {
+                BankRobberyData.BR_VehicleData vehData = BankRobberyData.PoliceVehicleData[currentCopVehicle];
+                currentCopVehicle++;
+                if (currentCopVehicle >= BankRobberyData.PoliceVehicleData.Length-1) currentCopVehicle = 0; // check all patrols except BCAT
+
+                Vehicle policeVehicle = CreateGameVehicle(vehData.Name, vehData.Position.Around(3.0f), vehData.Heading, lobby, true, false, "Fast+", 1, true, 10.0f, 0, 111);
+                lobby.BankRobbery.PoliceVehicles.Add(policeVehicle);
+
+                totalSeats += 2;
+            }
+
+            int leftoverSeatsInCurrentCar = 2;
+            int currentPoliceCarIndex = 0;
+            int seatToPutIn = 0;
+            foreach (Player player in participants)
+            {
+                if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) continue;
+                EPlayer.ResetCopchaseVariables(player);
+                player.TriggerEvent("startLoadingScreen", -1, "Loading bank robbery...");
+
+                player.RemoveAllWeaponsAC();
+                player.Health = 100;
+                player.Armor = 100;
+                player.Dimension = Convert.ToUInt32(lobby.lobbyId);
+
+                player.TriggerEvent("ToggleNametags", false);
+                player.SetSharedData("Collisions", false);
+                player.ResetData("Seatbelt");
+                player.TriggerEvent("ToggleSeatbelt", false);
+
+                EPlayer.Freeze(player, true);
+
+                player.SetData("GPS", false);
+                player.TriggerEvent("SetActorInvulnerable", false);
+                player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+                player.SetSharedData("CuffedBy", "n/a");
+                player.ResetData("Handsup");
+                player.ResetData("Cuffed");
+                player.SetSharedData("HasShot", false);
+
+                EPlayer.UpdateTeleports(player);
+
+                if (lobby.Fugitives.Contains(player))
+                {
+                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Robbing bank as {player.Name}");
+                    EPlayer.SetColor(player, new Color(255, 174, 0), 0);
+                    player.SetSharedData("Team", 0);
+                    player.SetSharedData("VisibleBlip", true);
+
+                    player.SetSharedData("FugitiveChance", 10.0);
+                    continue;
+                }
+                if (lobby.Cops.Contains(player))
+                {
+                    EPlayer.SetColor(player, new Color(100, 100, 255), 0);
+                    EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name} in Bank Robbery");
+                    player.SetSharedData("Team", 1);
+
+                    player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + 1.0f);
+
+                    if(leftoverSeatsInCurrentCar == 0)
+                    {
+                        seatToPutIn = 0;
+                        leftoverSeatsInCurrentCar = 2;
+                        currentPoliceCarIndex++;
+                    }
+                    if (isBearcatActive && currentPoliceCarIndex == 0) // since bearcat is the first car created, it's index 0
+                        leftoverSeatsInCurrentCar = 4;
+
+                    Vehicle toPutIn = lobby.BankRobbery.PoliceVehicles[currentPoliceCarIndex];
+                    player.TriggerEvent("SetChaseVehicle", toPutIn.Id, seatToPutIn);
+                    player.SetData("ChaseVehicle", toPutIn);
+                    player.SetData("ChaseVehicleSeat", seatToPutIn);
+
+                    leftoverSeatsInCurrentCar--;
+                    seatToPutIn++;
+                    continue;
+                }
+            }
         }
 
+        public static string GenerateRandomVehiclePlate()
+        {
+            return $"SA-{new Random(DateTimeOffset.UtcNow.Millisecond).Next(1000, 9999)}";
+        }
         public static bool IsCopchaseBanned(Player player)
         {
             bool isCopchaseBanned = false;
@@ -3552,6 +3674,26 @@ namespace RNC
                 || carModel.Equals("polmav") 
                 || carModel.Equals("as350");
         }
+
+        public static Vehicle CreateGameVehicle(string modelName, Vector3 spawnPosition, float spawnHeading, LobbyData lobby, bool engineOn = false, bool isLocked = true, string speedClass = "Average", int team = -1, bool collisionsActive = true, float enginePower = 1.0f, int color1 = -1, int color2 = -2)
+        {
+            Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(modelName), spawnPosition, spawnHeading, color1, color2,
+                                                         GenerateRandomVehiclePlate(), 255, isLocked, engineOn, Convert.ToUInt32(lobby.lobbyId));
+
+            pVehicle.EngineStatus = engineOn;
+            pVehicle.SetSharedData("Engine", engineOn);
+            pVehicle.SetSharedData("Fuel", 100.0);
+            pVehicle.SetSharedData("Locked", isLocked);
+            pVehicle.Locked = isLocked;
+            pVehicle.SetSharedData("DirtLevel", 0.0);
+            pVehicle.SetSharedData("Team", team);
+            pVehicle.SetSharedData("SpeedInfo", speedClass);
+            lobby.Vehicles.Add(pVehicle);
+            pVehicle.SetSharedData("Collisions", collisionsActive);
+
+            return pVehicle;
+        }
+
         public static Vehicle CreatePoliceVehicle(Player owner, List<MapSpawn> policeSpawns, List<MapSpawn> heliSpawns, LobbyData lobby, int spawnIndex)
         {
             Account acc = EPlayer.GetAccount(owner);
@@ -4153,6 +4295,7 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"[STARTGAME - {lobbyID}] {ex.ToString()}");
             }
         }
+
 
         public static void StartGame(int lobbyid)
         {
