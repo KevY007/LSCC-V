@@ -3670,6 +3670,7 @@ namespace RNC
             lobby.GameProgress = -5;
             lobby.CollisionCounter = 20;
             lobby.gameStatus = (int)LobbyData.GameStatus.Active;
+            lobby.BankRobbery.GameState = BankRobberyData.State.Starting;
 
             int gameRunTime = 900;
             foreach (Player player in participants)
@@ -4679,7 +4680,7 @@ namespace RNC
 
                         player.GetData<Vehicle>("ChaseVehicle").SetSharedData("Collisions", false);
                         player.SetSharedData("Collisions", false);
-                        player.TriggerEvent("ToggleCollisionsForEnt", p.GetData<Vehicle>("ChaseVehicle"), false);
+                        player.TriggerEvent("ToggleCollisionsForEnt", playerVehicle, false);
 
                         player.RemoveAllWeaponsAC();
 
@@ -4762,7 +4763,7 @@ namespace RNC
             int seventyPercentSeconds = Convert.ToInt32(Settings.GameRunTime * 0.7);
 
             // 60 seconds before the 70% of the game -> used to send early warning to fugitives
-            if(secondsElapsed ==  seventyPercentSeconds-60) 
+            if(secondsElapsed ==  seventyPercentSeconds- 60 && lobby.gameMode != GameModes.BUSTED) 
             {
                 if (!lobby.EarlyFugitiveWarningSent)
                 {
@@ -4779,7 +4780,7 @@ namespace RNC
             }
 
             // 70% of the game elapsed
-            if(secondsElapsed == seventyPercentSeconds)
+            if(secondsElapsed == seventyPercentSeconds && lobby.gameMode != GameModes.BUSTED)
             {
                 foreach(Player player in CopchasePlayers)
                 {
@@ -4875,6 +4876,8 @@ namespace RNC
                             player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
                             player.GiveWeaponAC(WeaponHash.Smg_mk2, 150);
                             player.GiveWeaponAC(WeaponHash.Carbinerifle_mk2, 150);
+
+                            Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                         }
                         else if(player == lobby.BankRobbery.CoLeader)
                         {
@@ -4884,6 +4887,8 @@ namespace RNC
                             player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
                             player.GiveWeaponAC(WeaponHash.Smg_mk2, 150);
                             player.GiveWeaponAC(WeaponHash.Carbinerifle, 150);
+
+                            Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                         }
                         else
                         {
@@ -4927,7 +4932,42 @@ namespace RNC
             // Bank Robbery started!
             if(secondsElapsed == 10)
             {
+                lobby.BankRobbery.GameState = BankRobberyData.State.StealingMoney;
+                foreach (Player player in CopchasePlayers)
+                {
+                    player.TriggerEvent("EVENTS:SetBankRobberyActive", true);
+                    // Stop the custom loading screen
+                    if (lobby.Fugitives.Contains(player))
+                    {
+                        if(lobby.BankRobbery.HeistLeader != player && lobby.BankRobbery.CoLeader != player)
+                        {
+                            EPlayer.Freeze(player, false);
+                        }
 
+                        EPlayer.Notify(player, Translate(player, "STEALING_MONEY"), "green", "fa-cash", false, 40000, "bottom-center");
+                        continue;
+                    }
+                    if (lobby.Cops.Contains(player))
+                    {
+                        EPlayer.Freeze(player, false);
+
+                        player.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
+                        player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
+                        continue;
+                    }
+                }
+            }
+
+            // 40 seconds after the round started aka 50th second => leader steals money, advance to next stage
+            if(secondsElapsed == 50)
+            {
+
+            }
+
+            // 15 minutes passed => end bank robbery
+            if (lobby.GameProgress >= 900)
+            {
+                StopGame(lobby.lobbyId, 1);
             }
         }
 
@@ -4965,6 +5005,7 @@ namespace RNC
                                 continue;
                             }
 
+                            /*
                             if (lobby.GameProgress == -10)
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -5622,6 +5663,7 @@ namespace RNC
                                     }
                                 }
                             }
+                            */
                             if (lobby.GameProgress == 10)
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -5937,16 +5979,17 @@ namespace RNC
                             }
                         }
 
+                        /*
                         int gameRunTime = Settings.GameRunTime;
                         if (lobby.gameMode == GameModes.BANKROBBERY) gameRunTime = 900;
                         if (lobby.GameProgress >= gameRunTime)
                         {
                             StopGame(lobby.lobbyId, 1);
                         }
-
-
-                        // Some code to start chase timer every 5 seconds, unnecessary?
+                        */
                         /*
+                        // Some code to start chase timer every 5 seconds, unnecessary?
+                        
                         if (lobby.GameProgress % 5 == 0) // Every 5 seconds/multiple during collision phase
                         {
 
@@ -5961,7 +6004,7 @@ namespace RNC
                                 catch { }
                             }
                         }
-                        */
+                        
 
                         // Unused in bank robbery
                         if (lobby.CollisionCounter > 0)
@@ -6145,6 +6188,7 @@ namespace RNC
                                 }
                             }
                         }
+                        */
                     }
                 }
             }

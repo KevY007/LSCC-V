@@ -711,6 +711,7 @@ namespace RNC
 
         public static void ResetCopchaseVariables(Player player)
         {
+            player.TriggerEvent("EVENTS:SetBankRobberyActive", false);
             EPlayer.StopCarry(player);
             player.TriggerEvent("Teleport:ResetCopCanEnter");
             player.ResetSharedData("InteriorsEntered");
@@ -2732,6 +2733,7 @@ namespace RNC
                     EPlayer.Error(player, "<strong>CHARACTER EDITOR</strong> You need to edit your character's appearance.");
                 }
 
+                player.TriggerEvent("EVENTS:SetBankRobberyActive", false);
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
                 player.TriggerEvent("stopCopchaseTimerEarlyWarningEffect");
