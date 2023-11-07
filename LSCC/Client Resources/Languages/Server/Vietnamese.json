@@ -589,6 +589,10 @@
   "ACTION_EJECT": "đẩy {TARGET NAME} ra khỏi xe.",
   "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Bạn đã bị đẩy ra khỏi xe bởi {PLAYER NAME}!",
   "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}Bạn phải ít nhất là một {RANK NAME} wđể sử dụng điều này !",
-  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Bạn phải ít nhất là một <strong>{RANK NAME}</strong> để sử dụng điều này !"
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Bạn phải ít nhất là một <strong>{RANK NAME}</strong> để sử dụng điều này !",
+  "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}Lãnh đạo {PLAYER NAME} đã giao tiền! Hãy giúp lãnh đạo khác giao phần của họ để nhận thưởng thêm!",
+  "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}Một lãnh đạo đã giao tiền! Dừng lãnh đạo còn lại để nhận thưởng!",
+  "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}Cảnh sát đã thành công trong việc loại bỏ một trong những lãnh đạo trong vụ cướp!",
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Hoàn hảo! Các tội phạm đã thành công trong việc giao cả hai túi tiền về nơi ẩn náu của họ!"
 
 }

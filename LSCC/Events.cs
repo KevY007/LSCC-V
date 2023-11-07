@@ -2474,6 +2474,72 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterColshape)]
         public void OnPlayerEnterColshape(ColShape shape, Player player)
         {
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
+            if(lobby != null)
+            {
+                if(lobby.gameMode == GameModes.BANKROBBERY && shape == lobby.BankRobbery.BankRobberyFinishMarker
+                    && player.GetSharedDataSafe<bool>("HeistLeader") == true && player.GetSharedDataSafe<int>("Team") == 0)
+                {
+                    EPlayer.RemovePlayerFromCopchase(player, lobby, 0, 6);
+                    EPlayer.GrantXP(player, 4);
+                    EPlayer.GivePoints(player, 4);
+
+                    /*
+                     If no bag was delivered yet, and after removing the first leader from CC, the other leader is still alive..
+                     .. then it means there's a chance for them to lose, aka not get a flawless win.
+
+                     If one bag was already delivered at the time of checking, it means the first leader delivered it.
+                     This means the other leader delivered the bag, aka flawless victory.
+
+                     In the future: to make more than 2 heist leaders possible, add variables to keep track of moneybags delivered
+                     and the maximum amount of moneybags aka heist leaders.
+                     */
+                    if (lobby.BankRobbery.IsMoneybagDelivered == false)
+                    {
+                        lobby.BankRobbery.IsMoneybagDelivered = true;
+                        // If the other leader is still alive after the first one delivered the money
+                        if (Main.BankRobbery_AnyLeadersAlive(lobby))
+                        {
+                            foreach (Player fugitive in lobby.Fugitives)
+                            {
+                                fugitive.SendChatMessage(Translate(fugitive, "BANKROB_ONE_LEADER_DELIVERED", player.Name));
+                            }
+                            foreach (Player cop in lobby.Cops)
+                            {
+                                cop.SendChatMessage(Translate(cop, "BANKROB_ONE_LEADER_DELIVERED_POLICE"));
+                            }
+                        }
+                        else
+                        {
+                            // If the second leader already isn't alive at the time of bag delivering, stop the match and fugis win.
+                            // No bonus
+                            Main.StopGame(lobby.lobbyId, 6);
+                        }
+                    }
+                    else
+                    {
+                        if (!Main.BankRobbery_AnyLeadersAlive(lobby))
+                        {
+                            List<Player> CopchasePlayers = lobby.Cops;
+                            CopchasePlayers.AddRange(lobby.Fugitives);
+                            foreach (Player cPlayer in CopchasePlayers)
+                            {
+                                cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_FULL_WIN"));
+
+                                // Bonus for delivering both money bags
+                                if (lobby.Fugitives.Contains(cPlayer))
+                                {
+                                    EPlayer.GrantXP(cPlayer, 4);
+                                    EPlayer.GivePoints(cPlayer, 4);
+                                }
+                            }
+                            Main.StopGame(lobby.lobbyId, 6);
+                        }
+                    }
+                } 
+            }
+
+            // Stingers
             if (player.IsInVehicle && player.HasSharedData("Team") && player.GetSharedDataSafe<int>("Team") == 0 && player.VehicleSeat == 0)
             {
                 if (shape.HasData("LinkedStingerObject") && shape.HasData("StingerID"))
@@ -2713,7 +2779,24 @@ namespace RNC
                         {
                             if (lobby.gameMode == GameModes.BANKROBBERY)
                             {
-                                Main.BankRobbery_CheckAliveLeaders(lobby);
+                                if (!Main.BankRobbery_AnyLeadersAlive(lobby))
+                                {
+                                    if (lobby.BankRobbery.IsMoneybagDelivered)
+                                    {
+                                        List<Player> CopchasePlayers = lobby.Cops;
+                                        CopchasePlayers.AddRange(lobby.Fugitives);
+                                        foreach (Player cPlayer in CopchasePlayers)
+                                        {
+                                            cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_NEUTRALIZED"));
+                                        }
+                                        Main.StopGame(lobby.lobbyId, 6);
+                                    }
+                                    else
+                                    {
+                                        Main.StopGame(lobby.lobbyId, 5);
+                                    }
+
+                                }
                             }
 
                         }
@@ -3239,7 +3322,30 @@ namespace RNC
                                             }
                                             EPlayer.GrantXP(killer, 2);
                                         }
-                                        Main.BankRobbery_CheckAliveLeaders(lobby);
+                                        if (!Main.BankRobbery_AnyLeadersAlive(lobby))
+                                        {
+                                            if (lobby.BankRobbery.IsMoneybagDelivered)
+                                            {
+                                                List<Player> CopchasePlayers = lobby.Cops;
+                                                CopchasePlayers.AddRange(lobby.Fugitives);
+                                                foreach (Player cPlayer in CopchasePlayers)
+                                                {
+                                                    cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_NEUTRALIZED"));
+
+                                                    // Bonus for eliminating the second leader before they deliver the money
+                                                    if (lobby.Cops.Contains(cPlayer))
+                                                    {
+                                                        EPlayer.GrantXP(cPlayer, 4);
+                                                        EPlayer.GivePoints(cPlayer, 4);
+                                                    }
+                                                }
+                                                Main.StopGame(lobby.lobbyId, 6);
+                                            }
+                                            else
+                                            {
+                                                Main.StopGame(lobby.lobbyId, 5);
+                                            }
+                                        }
                                     }
                                 }
 
@@ -5164,6 +5270,7 @@ namespace RNC
                 {
                     cPlayer.TriggerEvent("EVENT:ClearObjectiveBlips");
                     cPlayer.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
+                    cPlayer.TriggerEvent("EVENT:AddBankRobberyFinishMarker", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z)
                     if (lobby.Fugitives.Contains(cPlayer))
                     {
                         if(cPlayer != lobby.BankRobbery.HeistLeader && cPlayer != lobby.BankRobbery.CoLeader)

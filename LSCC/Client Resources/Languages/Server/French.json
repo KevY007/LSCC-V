@@ -589,5 +589,9 @@
   "ACTION_EJECT": "pousse {TARGET NAME} hors du véhicule.",
   "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Vous avez été éjecté du véhicule par {PLAYER NAME} !",
   "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}Vous devez être au moins un {RANK NAME} wpour utiliser ceci !",
-  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Vous devez être au moins un <strong>{RANK NAME}</strong> pour utiliser ceci !"
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Vous devez être au moins un <strong>{RANK NAME}</strong> pour utiliser ceci !",
+  "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}Le chef {PLAYER NAME} a livré l'argent ! Aidez l'autre chef à livrer sa part pour une récompense bonus !",
+  "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}Un chef a déjà livré l'argent ! Arrêtez l'autre pour obtenir une récompense !",
+  "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}La police a réussi à neutraliser l'un des chefs du braquage !",
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Impeccable ! Les fugitifs ont livré avec succès les deux sacs d'argent à leur repaire !"
 }

@@ -589,6 +589,10 @@
   "ACTION_EJECT": "empuja a {TARGET NAME} fuera del vehículo.",
   "TARGET_EJECT_MESSAGE": "!{#FF6347}[!] !{#FFFFFF}Has sido expulsado del vehículo por {PLAYER NAME}.",
   "ERROR_NOT_RANK_GENERIC": "!{#FF6347}[!] !{#FFFFFF}Debes ser al menos un {RANK NAME} wpara usar esto !",
-  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Debes ser al menos un <strong>{RANK NAME}</strong> para usar esto !"
+  "ERROR_NOT_RANK_GENERIC_NOCOLOR": "Debes ser al menos un <strong>{RANK NAME}</strong> para usar esto !",
+  "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}El líder {PLAYER NAME} ha entregado el dinero. ¡Ayuda al otro líder a entregar su parte para una recompensa adicional!",
+  "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}Un líder ya ha entregado el dinero. ¡Detén al otro para obtener una recompensa!",
+  "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}La policía ha logrado neutralizar a uno de los líderes del atraco!",
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}¡Perfecto! Los fugitivos han entregado con éxito ambos sacos de dinero en su escondite!"
 
 }

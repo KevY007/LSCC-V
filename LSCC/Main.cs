@@ -597,9 +597,11 @@ namespace RNC
         public State GameState = State.None;
         public Hideout HideoutLocation = Hideout.MurrietaHeights;
         public ColShape BankRobberyFinishMarker = null;
+        public bool IsMoneybagDelivered = false;
 
         public BankRobberyData()
         {
+            IsMoneybagDelivered = false;
             BankRobberyFinishMarker = null;
             HeistLeader = null;
             CoLeader = null;
@@ -3361,74 +3363,7 @@ namespace RNC
 
                 foreach (Player i in Settings.LoggedInPlayers)
                 {
-                    if (i.GetSharedDataSafe<int>("InLobby") != lobby.lobbyId) continue;
-
-                    EPlayer.ResetCopchaseVariables(i);
-
-                    if (lobby.Cops.Contains(i) && winnerTeam == 1)
-                    {
-                        EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "cop");
-                    }
-                    if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
-                    {
-                        EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "fugitive");
-
-                        if (lobby.gameMode != GameModes.BANKROBBERY && reason == 1)
-                        {
-                            EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "first_escape");
-                        }
-                    }
-
-                    if (i.GetData<bool>("ShotsFired") == false)
-                    {
-                        if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
-                        {
-                            EPlayer.UnlockAchievement(i, "no_shooting_win");
-                        }
-                    }
-                    if (lobby.gameMode == GameModes.BUSTED && winnerTeam == 0 && reason == 1 && lobby.Fugitives.Contains(i))
-                    {
-                        EPlayer.UnlockAchievement(i, "first_busted");
-                    }
-
-                    i.SetData<bool>("ShotsFired", false);
-
-                    if (i.HasSharedData("Wounded"))
-                    {
-                        if (i.GetSharedDataSafe<int>("Wounded") == 2)
-                        {
-                            Events.RequestClearAnimation(i);
-                            i.StopAnimation();
-                        }
-                    }
-                    Events.OnPlayerWounded(i, 0, -1);
-
-                    if (lobby.gameMode == GameModes.BANKROBBERY)
-                    {
-                        Account a = EPlayer.GetAccount(i);
-                        CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                        EPlayer.ApplyCharacter(i, cd, a.LobbyClothing);
-
-                        Character.SetTeamOutfit(i, a.LobbyClothing);
-                    }
-                    if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
-                    {
-                        Commands.cmd_specoff(i);
-                    }
-
-                    i.TriggerEvent("HideChaseTimer");
-                    if (lobby.Cops.Contains(i))
-                    {
-                        lobby.Cops.Remove(i);
-                        EPlayer.Spawn(i);
-                    }
-                    if (lobby.Fugitives.Contains(i))
-                    {
-                        lobby.Fugitives.Remove(i);
-                        EPlayer.Spawn(i);
-                    }
-                    i.SetSharedData("HeistLeader", false);
-                    EPlayer.Save(i);
+                    EPlayer.RemovePlayerFromCopchase(i, lobby, winnerTeam, reason);
                 }
 
                 for (int i = lobby.Vehicles.Count - 1; i >= 0; i--)
@@ -4821,7 +4756,7 @@ namespace RNC
 
         }
 
-        public static void BankRobbery_CheckAliveLeaders(LobbyData lobby)
+        public static bool BankRobbery_AnyLeadersAlive(LobbyData lobby)
         {
             int aliveLeaders = 0;
             if(lobby.BankRobbery.HeistLeader != null)
@@ -4844,10 +4779,12 @@ namespace RNC
             }
 
             if(aliveLeaders == 0)
-            { 
+            {
                 // Stop game if no leaders are left alive
-                StopGame(lobby.lobbyId, 5);
+                //StopGame(lobby.lobbyId, 5);
+                return false;
             }
+            return true;
         }
 
         private static void BankRobberySecondTick(LobbyData lobby, int secondsElapsed)

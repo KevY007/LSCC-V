@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
 using RNC;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace RNC
 {
@@ -707,6 +708,82 @@ namespace RNC
             }
 
             return player.Name;
+        }
+
+        public static void RemovePlayerFromCopchase(Player i, LobbyData lobby, int winnerTeam = -1, int reason = -1)
+        {
+            if (i.GetSharedDataSafe<int>("InLobby") != lobby.lobbyId) return;
+
+            EPlayer.ResetCopchaseVariables(i);
+
+            if(winnerTeam != -1)
+            {
+                if (lobby.Cops.Contains(i) && winnerTeam == 1)
+                {
+                    EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "cop");
+                }
+                if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
+                {
+                    EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "fugitive");
+
+                    if (lobby.gameMode != GameModes.BANKROBBERY && reason == 1)
+                    {
+                        EPlayer.TryAdvanceChallenge(i, Challenge.ChallengeType.Win, "first_escape");
+                    }
+                }
+            }
+   
+
+            if (i.GetData<bool>("ShotsFired") == false)
+            {
+                if (lobby.Fugitives.Contains(i) && winnerTeam == 0)
+                {
+                    EPlayer.UnlockAchievement(i, "no_shooting_win");
+                }
+            }
+            if (lobby.gameMode == GameModes.BUSTED && winnerTeam == 0 && reason == 1 && lobby.Fugitives.Contains(i))
+            {
+                EPlayer.UnlockAchievement(i, "first_busted");
+            }
+
+            i.SetData<bool>("ShotsFired", false);
+
+            if (i.HasSharedData("Wounded"))
+            {
+                if (i.GetSharedDataSafe<int>("Wounded") == 2)
+                {
+                    Events.RequestClearAnimation(i);
+                    i.StopAnimation();
+                }
+            }
+            Events.OnPlayerWounded(i, 0, -1);
+
+            if (lobby.gameMode == GameModes.BANKROBBERY)
+            {
+                Account a = EPlayer.GetAccount(i);
+                CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
+                EPlayer.ApplyCharacter(i, cd, a.LobbyClothing);
+
+                Character.SetTeamOutfit(i, a.LobbyClothing);
+            }
+            if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
+            {
+                Commands.cmd_specoff(i);
+            }
+
+            i.TriggerEvent("HideChaseTimer");
+            if (lobby.Cops.Contains(i))
+            {
+                lobby.Cops.Remove(i);
+                EPlayer.Spawn(i);
+            }
+            if (lobby.Fugitives.Contains(i))
+            {
+                lobby.Fugitives.Remove(i);
+                EPlayer.Spawn(i);
+            }
+            i.SetSharedData("HeistLeader", false);
+            EPlayer.Save(i);
         }
 
         public static void ResetCopchaseVariables(Player player)
