@@ -3578,10 +3578,15 @@ namespace RNC
             int leftoverSeatsInCurrentCar = 2;
             int currentPoliceCarIndex = 0;
             int seatToPutIn = 0;
+
+            int fugiSpawnToPick = 0;
+
             foreach (Player player in participants)
             {
                 if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) continue;
                 EPlayer.ResetCopchaseVariables(player);
+                
+                // Replace with custom loading screen for the Bank Robbery event
                 player.TriggerEvent("startLoadingScreen", -1, "Loading bank robbery...");
 
                 player.RemoveAllWeaponsAC();
@@ -3614,6 +3619,17 @@ namespace RNC
                     player.SetSharedData("VisibleBlip", true);
 
                     player.SetSharedData("FugitiveChance", 10.0);
+
+                    if(player != leader && player != coleader)
+                    {
+                        Vector3 spawnPos = (Vector3)BankRobberyData.FugitiveSpawns[fugiSpawnToPick, 0];
+                        float spawnHeading = (float)BankRobberyData.FugitiveSpawns[fugiSpawnToPick, 1];
+                        player.Position = spawnPos;
+                        player.Heading = spawnHeading;
+
+                        fugiSpawnToPick++;
+                        if (fugiSpawnToPick >= BankRobberyData.FugitiveSpawns.Length) fugiSpawnToPick = 0;
+                    }
                     continue;
                 }
                 if (lobby.Cops.Contains(player))
@@ -3624,14 +3640,18 @@ namespace RNC
 
                     player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + 1.0f);
 
-                    if(leftoverSeatsInCurrentCar == 0)
+                    player.SetData<bool>("BR_IsBearcatUnit", false);
+                    if (leftoverSeatsInCurrentCar == 0)
                     {
                         seatToPutIn = 0;
                         leftoverSeatsInCurrentCar = 2;
                         currentPoliceCarIndex++;
                     }
                     if (isBearcatActive && currentPoliceCarIndex == 0) // since bearcat is the first car created, it's index 0
+                    {
                         leftoverSeatsInCurrentCar = 4;
+                        player.SetData<bool>("BR_IsBearcatUnit", true);
+                    }
 
                     Vehicle toPutIn = lobby.BankRobbery.PoliceVehicles[currentPoliceCarIndex];
                     player.TriggerEvent("SetChaseVehicle", toPutIn.Id, seatToPutIn);
@@ -4790,7 +4810,125 @@ namespace RNC
         }
         public static void BankRobberySecondTick(LobbyData lobby, int secondsElapsed)
         {
+            List<Player> CopchasePlayers = lobby.Fugitives;
+            CopchasePlayers.AddRange(lobby.Cops);
 
+            // Just placing cops into their vehicles at the beginning, game still not started. Setting dimension too.
+            if (secondsElapsed == -3)
+            {
+                foreach (Player player in CopchasePlayers)
+                {
+                    try
+                    {
+                        if (player == null) continue;
+
+                        player.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                        player.TriggerEvent("ToggleCanExitVehicle", true);
+                        player.TriggerEvent("SetActorInvulnerable", false);
+                        player.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+
+                        player.SetSharedData("CuffedBy", "n/a");
+                        player.ResetData("Cuffed");
+                        player.ResetData("Handsup");
+
+                        if (lobby.Fugitives.Contains(player))
+                        {
+                            EPlayer.SetColor(player, new Color(255, 174, 0), 0);
+                            player.SetSharedData("Team", 0);
+                            player.SetSharedData("VisibleBlip", true);
+                            player.SetSharedData("HasShot", true);
+                            continue;
+                        }
+                        if (lobby.Cops.Contains(player))
+                        {
+                            EPlayer.SetColor(player, new Color(0, 151, 255), 0);
+                            player.SetData("GPS", false);
+                            player.SetSharedData("Team", 1);
+
+                            Vehicle playerVehicle = player.GetData<Vehicle>("ChaseVehicle");
+                            int vehicleSeat = player.GetData<int>("ChaseVehicleSeat");
+                            player.SetIntoVehicle(playerVehicle, vehicleSeat);
+                            EPlayer.Freeze(player, true);
+                            continue;
+                        }
+                    }
+                    catch { }
+                }
+                return;
+            }
+
+            // Setting up the basics -> team outfits, weapons, health, armor, etc
+            if(secondsElapsed == 0)
+            {
+                foreach(Player player in CopchasePlayers)
+                {
+                    player.Health = 100;
+
+                    if (lobby.Fugitives.Contains(player))
+                    {
+
+                        if(player == lobby.BankRobbery.HeistLeader)
+                        {
+                            player.Armor = 100;
+
+                            player.GiveWeaponAC(WeaponHash.Pistol_mk2, 75);
+                            player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
+                            player.GiveWeaponAC(WeaponHash.Smg_mk2, 150);
+                            player.GiveWeaponAC(WeaponHash.Carbinerifle_mk2, 150);
+                        }
+                        else if(player == lobby.BankRobbery.CoLeader)
+                        {
+                            player.Armor = 100;
+
+                            player.GiveWeaponAC(WeaponHash.Pistol_mk2, 75);
+                            player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
+                            player.GiveWeaponAC(WeaponHash.Smg_mk2, 150);
+                            player.GiveWeaponAC(WeaponHash.Carbinerifle, 150);
+                        }
+                        else
+                        {
+                            player.Armor = 75;
+
+                            player.GiveWeaponAC(WeaponHash.Pistol, 75);
+                            player.GiveWeaponAC(WeaponHash.Sawnoffshotgun, 50);
+                            player.GiveWeaponAC(WeaponHash.Assaultrifle, 150);
+                        }
+                        continue;
+                    }
+                    if (lobby.Cops.Contains(player))
+                    {
+                        bool isBearcatUnit = false;
+                        if (player.HasData("BR_IsBearcatUnit")) isBearcatUnit = player.GetData<bool>("BR_IsBearcatUnit");
+
+                        if (isBearcatUnit)
+                        {
+                            player.Armor = 150;
+
+                            player.GiveWeaponAC(WeaponHash.Nightstick, 1);
+                            player.GiveWeaponAC(WeaponHash.Heavypistol, 100);
+                            player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
+                            player.GiveWeaponAC((WeaponHash)3347935668, 200); // Heavy Rifle
+                            player.GiveWeaponAC(WeaponHash.Smg, 200);
+                        }
+                        else
+                        {
+                            player.Armor = 100;
+
+                            player.GiveWeaponAC(WeaponHash.Nightstick, 1);
+                            player.GiveWeaponAC(WeaponHash.Combatpistol, 100);
+                            player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
+                            player.GiveWeaponAC(WeaponHash.Carbinerifle, 150);
+                        }
+                        continue;
+                    }
+                }
+            }
+
+            // Bank Robbery started!
+            if(secondsElapsed == 10)
+            {
+
+            }
         }
 
 
