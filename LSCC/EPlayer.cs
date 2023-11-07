@@ -1667,45 +1667,7 @@ namespace RNC
 
             if (lobby == null) { return; }
 
-            if (lobby.gameMode == GameModes.BANKROBBERY)
-            {
-                if(lobby.BankRobbery.HeistLeader == player)
-                {
-                    player.Health = 100;
-                    player.Armor = 100;
 
-                    player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Pistol50);
-                    player.GiveWeaponAC(WeaponHash.Pistol50, 100);
-                    player.GiveWeaponAC(WeaponHash.Heavyshotgun, 50);
-                    player.GiveWeaponAC(WeaponHash.Smg, 250);
-                    player.GiveWeaponAC(WeaponHash.Specialcarbine, 250);
-                    player.GiveWeaponAC(WeaponHash.Molotov, 1);
-                }
-                else if(lobby.BankRobbery.Sniper == player)
-                {
-                    player.Health = 100;
-                    player.Armor = 50;
-
-                    player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Snspistol);
-                    player.GiveWeaponAC(WeaponHash.Snspistol, 100);
-                    player.GiveWeaponAC(WeaponHash.Sawnoffshotgun, 50);
-                    player.GiveWeaponAC(WeaponHash.Assaultrifle, 90);
-                    player.GiveWeaponAC(WeaponHash.Marksmanrifle, 5);
-                    player.GiveWeaponAC(WeaponHash.Molotov, 1);
-                }
-                else
-                {
-                    player.Health = 100;
-                    player.Armor = 50;
-
-                    player.SetSharedData("Handgun_Hash", (uint)WeaponHash.Pistol);
-                    player.GiveWeaponAC(WeaponHash.Pistol, 100);
-                    player.GiveWeaponAC(WeaponHash.Pumpshotgun, 50);
-                    player.GiveWeaponAC(WeaponHash.Microsmg, 200);
-                    player.GiveWeaponAC(WeaponHash.Assaultrifle, 300);
-                }
-                return;
-            }
             if (lobby.gameMode != GameModes.BUSTED)
             {
                 if (EPlayer.GetAccount(player).LoadoutFugitive.Length >= 2)

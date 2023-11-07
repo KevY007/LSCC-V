@@ -419,7 +419,7 @@ namespace RNC
             LobbyData ld = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (ld != null)
             {
-                if (ld.gameMode == GameModes.BANKROBBERY && player.GetSharedDataSafe<int>("Team") == 0 && ld.BankRobbery.State < 1)
+                if (ld.gameMode == GameModes.BANKROBBERY && player.GetSharedDataSafe<int>("Team") == 0 && ld.BankRobbery.GameState < BankRobberyData.State.GettingToVehicle)
                 {
                     player.SendChatMessage(Translate(player, "ERROR_CANT_UNLOCK_BANKROB"));
                     return;

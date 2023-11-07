@@ -3569,8 +3569,10 @@ namespace RNC
             Player leader = lobby.BankRobbery.HeistLeader = lobby.Fugitives[leaderIdx];
             Player coleader = lobby.BankRobbery.CoLeader = lobby.Fugitives[coLeaderIdx];
 
+            leader.SetSharedData("HeistLeader", true);
             leader.Position = BankRobberyData.LeaderPos;
             leader.Heading = BankRobberyData.LeaderHeading;
+            coleader.SetSharedData("HeistLeader", true);
             coleader.Position = BankRobberyData.CoLeaderPos;
             coleader.Heading = BankRobberyData.CoLeaderHeading;
 
@@ -4605,7 +4607,7 @@ namespace RNC
             }
         }
 
-        public static void CopchaseSecondTick(LobbyData lobby, int secondsElapsed)
+        private static void CopchaseSecondTick(LobbyData lobby, int secondsElapsed)
         {
             HandleFugitiveShowCounters(lobby);
             HandleCollisionCounters(lobby);
@@ -4809,7 +4811,37 @@ namespace RNC
             }
 
         }
-        public static void BankRobberySecondTick(LobbyData lobby, int secondsElapsed)
+
+        public static void BankRobbery_CheckAliveLeaders(LobbyData lobby)
+        {
+            int aliveLeaders = 0;
+            if(lobby.BankRobbery.HeistLeader != null)
+            {
+                if (lobby.Fugitives.Contains(lobby.BankRobbery.HeistLeader) 
+                    && !lobby.BankRobbery.HeistLeader.Dead 
+                    && lobby.BankRobbery.HeistLeader.GetSharedDataSafe<int>("Team") == 0)
+                {
+                    aliveLeaders++;
+                }
+            }
+            if (lobby.BankRobbery.CoLeader != null)
+            {
+                if (lobby.Fugitives.Contains(lobby.BankRobbery.CoLeader)
+                    && !lobby.BankRobbery.CoLeader.Dead
+                    && lobby.BankRobbery.CoLeader.GetSharedDataSafe<int>("Team") == 0)
+                {
+                    aliveLeaders++;
+                }
+            }
+
+            if(aliveLeaders == 0)
+            { 
+                // Stop game if no leaders are left alive
+                StopGame(lobby.lobbyId, 5);
+            }
+        }
+
+        private static void BankRobberySecondTick(LobbyData lobby, int secondsElapsed)
         {
             List<Player> CopchasePlayers = lobby.Fugitives;
             CopchasePlayers.AddRange(lobby.Cops);
@@ -4870,6 +4902,7 @@ namespace RNC
 
                         if(player == lobby.BankRobbery.HeistLeader)
                         {
+                            player.SetSharedData("BR_IsHeistLeader", true);
                             player.Armor = 100;
 
                             player.GiveWeaponAC(WeaponHash.Pistol_mk2, 75);
@@ -4877,10 +4910,11 @@ namespace RNC
                             player.GiveWeaponAC(WeaponHash.Smg_mk2, 150);
                             player.GiveWeaponAC(WeaponHash.Carbinerifle_mk2, 150);
 
-                            Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
+                            Events.RequestPlayAnimation(player, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                         }
                         else if(player == lobby.BankRobbery.CoLeader)
                         {
+                            player.SetSharedData("BR_IsHeistLeader", true);
                             player.Armor = 100;
 
                             player.GiveWeaponAC(WeaponHash.Pistol_mk2, 75);
@@ -4888,10 +4922,11 @@ namespace RNC
                             player.GiveWeaponAC(WeaponHash.Smg_mk2, 150);
                             player.GiveWeaponAC(WeaponHash.Carbinerifle, 150);
 
-                            Events.RequestPlayAnimation(p, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
+                            Events.RequestPlayAnimation(player, "mp_missheist_ornatebank", "stand_cash_in_bag_loop", 1);
                         }
                         else
                         {
+                            player.SetSharedData("IsHeistLeader", false);
                             player.Armor = 75;
 
                             player.GiveWeaponAC(WeaponHash.Pistol, 75);
@@ -4967,13 +5002,23 @@ namespace RNC
             if(secondsElapsed == 50)
             {
                 lobby.BankRobbery.GameState = BankRobberyData.State.GettingToVehicle;
+
+                int hideoutLocation = new Random().Next(0, BankRobberyData.HideoutNames.Length);
+                lobby.BankRobbery.HideoutLocation = (BankRobberyData.Hideout)hideoutLocation;
+
                 foreach(Player player in CopchasePlayers)
                 {
 
                     if (lobby.Fugitives.Contains(player))
                     {
+                        player.SendChatMessage(Translate(player, "BANK_ROB_CASH_TAKEN", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
+                        player.SendChatMessage(Translate(player, "BANK_ROB_ESCORT_1"));
+                        player.SendChatMessage(Translate(player, "BANK_ROB_ESCORT_2", BankRobberyData.HideoutNames[hideoutLocation]));
+
                         if (lobby.BankRobbery.HeistLeader == player || lobby.BankRobbery.CoLeader == player)
                         {
+                            EPlayer.Action(player, "ACTION_BANKROB_GRAB_BAG");
+                            player.TriggerEvent("ClearTaskNotFalling");
                             EPlayer.Freeze(player, false);
                             Events.RequestClearAnimation(player);
 
@@ -4989,6 +5034,9 @@ namespace RNC
                     }
                     if (lobby.Cops.Contains(player))
                     {
+                        player.SendChatMessage(Translate(player, "BANK_ROB_COP_CASH_TAKEN"));
+                        player.SendChatMessage(Translate(player, "BANK_ROB_COP_CASH_1"));
+                        player.SendChatMessage(Translate(player, "BANK_ROB_COP_CASH_2"));
                         player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR");
                         continue;
                     }

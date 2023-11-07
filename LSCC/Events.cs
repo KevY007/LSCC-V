@@ -2549,28 +2549,6 @@ namespace RNC
 
                     player.SendNotification("~r~You cannot enter a vehicle that has an opposition team driver!");
                 }
-
-                if (player.GetSharedDataSafe<int>("Team") == 0)
-                {
-                    LobbyData l = Settings.Lobbies.FirstOrDefault(f => f.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
-                    if (l == null) return;
-                    if (l.gameMode == GameModes.BANKROBBERY && l.BankRobbery.HeistLeader == player)
-                    {
-                        BankRobberyData brob = l.BankRobbery;
-                        if (brob.FugitiveVehicles.Contains(vehicle))
-                        {
-                            Events.BankRobbery_SetState(player, 2);
-                        }
-                        else if (brob.PoliceVehicles.Contains(vehicle))
-                        {
-                            foreach (Player f in l.Fugitives)
-                            {
-                                f.SendChatMessage(Translate(f, "BANKROB_RADIO_TAKE_COP_CAR", EPlayer.Name(player)));
-                            }
-                            Events.BankRobbery_SetState(player, 2);
-                        }
-                    }
-                }
             }
 
             if (Settings.Dynamics.OnfootCollision == false)
@@ -2735,48 +2713,8 @@ namespace RNC
                         {
                             if (lobby.gameMode == GameModes.BANKROBBERY)
                             {
-                                if (lobby.BankRobbery.State > 0)
-                                {
-                                    lobby.BankRobbery.LeaderLives--;
-                                    if (lobby.BankRobbery.LeaderLives <= 0 || (lobby.Fugitives.Count - 1) <= 0)
-                                    {
-                                        Main.StopGame(lobby.lobbyId, 5);
-                                    }
-                                    else
-                                    {
-
-                                        BankRobberyData _brob = lobby.BankRobbery;
-                                        _brob.HeistLeader = null;
-                                        int unfuck = 0;
-                                        while (_brob.HeistLeader == null)
-                                        {
-                                            _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-
-                                            unfuck++;
-                                            if (unfuck > 50)
-                                            {
-                                                Main.StopGame(lobby.lobbyId, 5);
-                                                break;
-                                            }
-                                        }
-                                        _brob.HeistLeader.SetSharedData("HeistLeader", true);
-                                        lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
-
-                                        foreach (Player f in lobby.Fugitives)
-                                        {
-                                            f.SendChatMessage(Translate(f, "HEIST_LEADER_DISCONNECT", EPlayer.Name(_brob.HeistLeader)));
-
-                                            f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", EPlayer.Name(_brob.HeistLeader), EPlayer.Name(player)));
-                                        }
-                                        _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
-                                    }
-                                }
-                                else
-                                {   // if leader exits within first minute, fuck his tight little pussy up and stop the game
-                                    Main.StopGame(lobby.lobbyId, 5);
-                                }
+                                Main.BankRobbery_CheckAliveLeaders(lobby);
                             }
-
 
                         }
                     }
@@ -3282,7 +3220,6 @@ namespace RNC
                                     }
                                 }
 
-                                bool select_new_leader = false;
                                 if (lobby.gameMode == GameModes.BANKROBBERY)
                                 {
                                     if ((lobby.Fugitives.Count - 1) <= 0) // in case all fugis die 
@@ -3290,26 +3227,19 @@ namespace RNC
                                         Main.StopGame(lobby.lobbyId, 3);
                                     }
 
-                                    if (lobby.BankRobbery.HeistLeader == player)
+                                    if (lobby.BankRobbery.HeistLeader == player || lobby.BankRobbery.CoLeader == player)
                                     {
-                                        lobby.BankRobbery.LeaderLives--;
-                                        if (lobby.BankRobbery.LeaderLives <= 0)
+
+                                        if (killer != null)
                                         {
-                                            Main.StopGame(lobby.lobbyId, 5);
-                                        }
-                                        else
-                                        {
-                                            if (killer != null)
+                                            killer.SendChatMessage(Translate(killer, "KILLED_HEIST_LEADER_BONUS"));
+                                            foreach (Player c in lobby.Cops)
                                             {
-                                                killer.SendChatMessage(Translate(killer, "KILLED_HEIST_LEADER_BONUS"));
-                                                foreach (Player c in lobby.Cops)
-                                                {
-                                                    c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", EPlayer.Name(killer)));
-                                                }
-                                                EPlayer.GrantXP(killer, 2);
+                                                c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", EPlayer.Name(killer)));
                                             }
-                                            select_new_leader = true;
+                                            EPlayer.GrantXP(killer, 2);
                                         }
+                                        Main.BankRobbery_CheckAliveLeaders(lobby);
                                     }
                                 }
 
@@ -3319,34 +3249,6 @@ namespace RNC
                                 if (lobby.Fugitives.Count <= 0)
                                 {
                                     Main.StopGame(lobby.lobbyId, 3);
-                                }
-
-                                if (select_new_leader)
-                                {
-                                    BankRobberyData _brob = lobby.BankRobbery;
-                                    _brob.HeistLeader = null;
-                                    int unfuck = 0;
-                                    while (_brob.HeistLeader == null)
-                                    {
-                                        _brob.HeistLeader = lobby.Fugitives[new Random().Next(lobby.Fugitives.Count)];
-
-                                        unfuck++;
-                                        if (unfuck > 50)
-                                        {
-                                            Main.StopGame(lobby.lobbyId, 5);
-                                            break;
-                                        }
-                                    }
-                                    _brob.HeistLeader.SetSharedData("HeistLeader", true);
-                                    lobby.BankRobbery.HeistLeader = _brob.HeistLeader;
-
-                                    foreach (Player f in lobby.Fugitives)
-                                    {
-                                        f.SendChatMessage(Translate(f, "HEIST_LEADER_DEATH", EPlayer.Name(_brob.HeistLeader)));
-
-                                        f.SendChatMessage(Translate(f, "NEW_HEIST_LEADER_RADIO", EPlayer.Name(_brob.HeistLeader), EPlayer.Name(player)));
-                                    }
-                                    _brob.HeistLeader.SendChatMessage(Translate(_brob.HeistLeader, "NEW_HEIST_LEADER_MSG"));
                                 }
                             }
 
@@ -5236,171 +5138,64 @@ namespace RNC
             player.SetAccessories(0, drawable, texture);
         }
 
-        [RemoteEvent("BankRob_ContinueState")]
-        public static void BankRobbery_SetState(Player player, int state)
-        {
-            try
-            {
-                LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
-                if (lobby == null) return;
-                NAPI.Util.ConsoleOutput("Continuing state bank rob for " + player.Name + " state ID " + state);
-                lobby.BankRobbery.State = state;
-                lobby.BankRobbery.Hideout = new Random().Next(BankRobberyData.Hideouts.Length);
-                switch (state)
-                {
-                    case 0: { return; }
-                    case 1: // One minute passed, leader robbed the bank
-                        {
-                            foreach (Player f in lobby.Fugitives)
-                            {
-                                f.SendChatMessage(Translate(f, "BANK_ROB_CASH_TAKEN", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
-                                f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_1"));
-                                f.SendChatMessage(Translate(f, "BANK_ROB_ESCORT_2", BankRobberyData.HideoutNames[lobby.BankRobbery.Hideout]));
-
-                                f.TriggerEvent("BankRob_SetMusic", 1);
-                                f.TriggerEvent("BankDoorLocked", false);
-
-                                if (f == lobby.BankRobbery.HeistLeader)
-                                {
-                                    Events.RequestClearAnimation(f);
-                                    player.TriggerEvent("ClearTaskNotFalling");
-                                    EPlayer.Freeze(f, false);
-                                }
-                                EPlayer.GiveFugitiveWeapons(f);
-                            }
-                            Player leader = lobby.BankRobbery.HeistLeader;
-                            Account la = EPlayer.GetAccount(leader);
-                            CharacterData cd = NAPI.Util.FromJson<CharacterData>(la.Character);
-
-
-                            if (cd.Clothing.Length >= 1)
-                            {
-                                cd.Clothing[0].Clothes[5].Drawable = 40;
-                                cd.Clothing[0].Clothes[5].Texture = 0;
-                                cd.Clothing[0].Hat = 62;
-                                cd.Clothing[0].HatTxt = 9;
-                            }
-                            if (cd.Clothing.Length >= 3)
-                            {
-                                cd.Clothing[2].Clothes[5].Drawable = 40;
-                                cd.Clothing[2].Clothes[5].Texture = 0;
-                                cd.Clothing[2].Hat = 62;
-                                cd.Clothing[2].HatTxt = 9;
-                            }
-
-                            EPlayer.ApplyCharacter(leader, cd, 0);
-                            EPlayer.Action(leader, "ACTION_BANKROB_GRAB_BAG");
-
-                            //
-                            foreach (Player c in lobby.Cops)
-                            {
-                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CASH_TAKEN"));
-                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CASH_1"));
-                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CASH_2"));
-                                c.TriggerEvent("BankRob_SetMusic", 1);
-                                c.TriggerEvent("BankDoorLocked", false);
-                                EPlayer.GiveCopWeapons(c);
-                            }
-
-                            foreach (Vehicle v in lobby.BankRobbery.FugitiveVehicles)
-                            {
-                                v.Locked = false;
-                                v.EngineStatus = true;
-                            }
-                        }
-                        break;
-                    case 2:
-                        {
-                            Vector3 hp = BankRobberyData.Hideouts[lobby.BankRobbery.Hideout];
-                            foreach (Player f in lobby.Fugitives)
-                            {
-                                f.TriggerEvent("playerCreateWaypoint", hp);
-                                f.SendChatMessage(Translate(f, "BANK_ROB_CAR_RADIO", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
-                                if (f.IsInVehicle && f.Vehicle.Occupants.Contains(lobby.BankRobbery.HeistLeader))
-                                {
-                                    f.SendChatMessage(Translate(f, "BANK_ROB_CAR_1"));
-                                }
-                                else f.SendChatMessage(Translate(f, "BANK_ROB_CAR_2"));
-
-                                f.TriggerEvent("BankRob_CreateFinishMarker", hp.X, hp.Y, hp.Z);
-
-                            }
-                            foreach (Player c in lobby.Cops)
-                            {
-                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CAR_RADIO"));
-                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CAR_RADIO_2"));
-                                c.SendChatMessage(Translate(c, "BANK_ROB_COP_CAR_MSG"));
-                            }
-                        }
-                        break;
-                    case 3:
-                        {
-                            Main.StopGame(lobby.lobbyId, 6);
-                        }
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                NAPI.Util.ConsoleOutput("ERROR IN BANKROB SETSTATE SHOWMEDAWAE.EXE:" + ex.ToString());
-            }
-        }
-
-        [RemoteEvent("BankRob_SendMessage")]
-        public void BankRobbery_SendMessage(Player player, int teamID, int msgID)
+        [RemoteEvent("EVENT:BankRobbery_LeaderEnterVehicle")]
+        public static void BankRobbery_OnLeaderEnterVehicle(Player player, Vehicle vehicle, int vehicleTeam)
         {
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby == null) return;
-            if (teamID == 0)
+
+            List<Player> CopchasePlayers = lobby.Cops;
+            CopchasePlayers.AddRange(lobby.Fugitives);
+
+            player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER",
+                                     BankRobberyData.HideoutNames[(int)lobby.BankRobbery.HideoutLocation]);
+
+            // If none of the leaders have entered the vehicle yet, this is the first time one did
+            if (lobby.BankRobbery.GameState == BankRobberyData.State.GettingToVehicle)
             {
-                switch (msgID)
+                lobby.BankRobbery.GameState = BankRobberyData.State.DeliveringMoney;
+                foreach(Player cPlayer in CopchasePlayers)
                 {
-                    case 0:
-                        foreach (Player f in lobby.Fugitives)
+                    if (lobby.Fugitives.Contains(cPlayer))
+                    {
+                        if(cPlayer != lobby.BankRobbery.HeistLeader && cPlayer != lobby.BankRobbery.CoLeader)
                         {
-                            f.SendChatMessage("");
-                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_1"));
-                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_2"));
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[0].Position.X, BankRobberyData.FugitiveVehicleData[0].Position.Y, BankRobberyData.FugitiveVehicleData[0].Position.Z);
+                            cPlayer.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT",
+                                     lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name,
+                                     BankRobberyData.HideoutNames[(int)lobby.BankRobbery.HideoutLocation]);
                         }
-                        break;
-                    case 1:
-                        foreach (Player f in lobby.Fugitives)
+
+                        // Easter egg message if the heist leader steals a police vehicle
+                        if(vehicleTeam == 1)
                         {
-                            f.SendChatMessage("");
-                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_3"));
-                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_4"));
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[4].Position.X, BankRobberyData.FugitiveVehicleData[4].Position.Y, BankRobberyData.FugitiveVehicleData[4].Position.Z);
+                            cPlayer.SendChatMessage(Translate(player, "BANKROB_RADIO_TAKE_COP_CAR", EPlayer.Name(player)));
                         }
-                        break;
-                    case 2:
-                        foreach (Player f in lobby.Fugitives)
+
+                        cPlayer.SendChatMessage(Translate(cPlayer, "BANK_ROB_CAR_RADIO", player.Name));
+                        if (cPlayer.IsInVehicle && cPlayer.Vehicle.Occupants.Contains(player))
                         {
-                            f.SendChatMessage("");
-                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_5"));
-                            f.SendChatMessage(Translate(f, "BANK_ROB_SCOUT_6"));
-                            f.TriggerEvent("BankRob_SetFugiCarBlip", msgID, BankRobberyData.FugitiveVehicleData[11].Position.X, BankRobberyData.FugitiveVehicleData[11].Position.Y, BankRobberyData.FugitiveVehicleData[11].Position.Z);
+                            cPlayer.SendChatMessage(Translate(cPlayer, "BANK_ROB_CAR_1"));
                         }
-                        break;
+                        else cPlayer.SendChatMessage(Translate(cPlayer, "BANK_ROB_CAR_2"));
+                        continue;
+                    }
+                    if (lobby.Cops.Contains(cPlayer))
+                    {
+                        cPlayer.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT");
+
+                        cPlayer.SendChatMessage(Translate(cPlayer, "BANK_ROB_COP_CAR_RADIO"));
+                        cPlayer.SendChatMessage(Translate(cPlayer, "BANK_ROB_COP_CAR_RADIO_2"));
+                        cPlayer.SendChatMessage(Translate(cPlayer, "BANK_ROB_COP_CAR_MSG"));
+                        continue;
+                    }
                 }
             }
             else
             {
-                switch (msgID)
-                {
-                    case 0:
-                        {
-                            foreach (Player c in lobby.Cops)
-                            {
-                                c.SendChatMessage(Translate(c, "BANK_ROB_DISPATCH_CCTV_1", lobby.Fugitives.Count));
-                                c.SendChatMessage(Translate(c, "BANK_ROB_DISPATCH_CCTV_2", lobby.Fugitives.Count));
-                            }
-                        }
-                        break;
-                }
+                // If one of the leaders is already in the vehicle, run some code when the other one enters too
             }
         }
-
+  
         [RemoteEvent("UpdateTabbedState")]
         public void OnRequestUpdateTabState(Player player, bool toggle)
         {
