@@ -555,6 +555,7 @@ namespace RNC
         public static readonly Vector3 CoLeaderPos = new Vector3(263.8176f, 212.4389f, 101.68339f);
         public static readonly float CoLeaderHeading = 161.5344f;
 
+
         public class BR_VehicleData
         {
             public Vector3 Position;
@@ -595,9 +596,11 @@ namespace RNC
         public Player CoLeader = null;
         public State GameState = State.None;
         public Hideout HideoutLocation = Hideout.MurrietaHeights;
+        public ColShape BankRobberyFinishMarker = null;
 
         public BankRobberyData()
         {
+            BankRobberyFinishMarker = null;
             HeistLeader = null;
             CoLeader = null;
             FugitiveVehicles = new List<Vehicle>();
@@ -3161,6 +3164,12 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
             Stinger.ClearStingers(lobby);
 
+
+            if (lobby.gameMode == GameModes.BANKROBBERY && lobby.BankRobbery.BankRobberyFinishMarker != null)
+            {
+                NAPI.ColShape.DeleteColShape(lobby.BankRobbery.BankRobberyFinishMarker);
+            }
+
             foreach (Blip blip in lobby.ParkedVehicleBlips)
             {
                 blip.Delete();
@@ -4989,10 +4998,12 @@ namespace RNC
                     {
                         EPlayer.Freeze(player, false);
 
-                        player.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
                         player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
 
                         player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
+
+                        player.TriggerEvent("EVENT:SetBankRobberyWaypoint", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
+                        player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
                         continue;
                     }
                 }
@@ -5008,7 +5019,7 @@ namespace RNC
 
                 foreach(Player player in CopchasePlayers)
                 {
-
+                    player.TriggerEvent("EVENT:ClearObjectiveBlips");
                     if (lobby.Fugitives.Contains(player))
                     {
                         player.SendChatMessage(Translate(player, "BANK_ROB_CASH_TAKEN", EPlayer.Name(lobby.BankRobbery.HeistLeader)));
@@ -5028,6 +5039,13 @@ namespace RNC
                         {
                             player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR",
                                                 lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name);
+                        }
+
+                        foreach(BankRobberyData.BR_VehicleData fugiVeh in BankRobberyData.FugitiveVehicleData)
+                        {
+                            player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", fugiVeh.Position.X,
+                                                                                     fugiVeh.Position.Y,
+                                                                                     fugiVeh.Position.Z);
                         }
 
                         continue;

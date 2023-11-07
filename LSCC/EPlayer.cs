@@ -712,6 +712,8 @@ namespace RNC
         public static void ResetCopchaseVariables(Player player)
         {
             player.TriggerEvent("EVENTS:SetBankRobberyActive", false);
+            player.SetSharedData("HeistLeader", false);
+
             EPlayer.StopCarry(player);
             player.TriggerEvent("Teleport:ResetCopCanEnter");
             player.ResetSharedData("InteriorsEntered");

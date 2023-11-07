@@ -5147,15 +5147,23 @@ namespace RNC
             List<Player> CopchasePlayers = lobby.Cops;
             CopchasePlayers.AddRange(lobby.Fugitives);
 
+            player.TriggerEvent("EVENT:ClearObjectiveBlips");
             player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER",
                                      BankRobberyData.HideoutNames[(int)lobby.BankRobbery.HideoutLocation]);
+
+            Vector3 hideoutPosition = BankRobberyData.Hideouts[(int)lobby.BankRobbery.HideoutLocation];
+            player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
 
             // If none of the leaders have entered the vehicle yet, this is the first time one did
             if (lobby.BankRobbery.GameState == BankRobberyData.State.GettingToVehicle)
             {
+                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateCylinderColShape(hideoutPosition, 10.0f, 10.0f, Convert.ToUInt32(lobby.lobbyId));
+
                 lobby.BankRobbery.GameState = BankRobberyData.State.DeliveringMoney;
                 foreach(Player cPlayer in CopchasePlayers)
                 {
+                    cPlayer.TriggerEvent("EVENT:ClearObjectiveBlips");
+                    cPlayer.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
                     if (lobby.Fugitives.Contains(cPlayer))
                     {
                         if(cPlayer != lobby.BankRobbery.HeistLeader && cPlayer != lobby.BankRobbery.CoLeader)
