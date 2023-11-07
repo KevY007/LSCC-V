@@ -56,7 +56,15 @@ const Language = {
     "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}Les policiers ne peuvent pas entrer dans les bâtiments avant les fugitifs !",
     "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}Vous ne pouvez pas entrer dans les bâtiments pendant {SECONDS} secondes de plus.",
     "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}Vous pouvez maintenant entrer dans les bâtiments !",
-    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Vous commencez à vous sentir étourdi et fatigué ; vous devriez utiliser un Medkit ou des analgésiques !"
+    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Vous commencez à vous sentir étourdi et fatigué ; vous devriez utiliser un Medkit ou des analgésiques !",
+    "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY": "~w~Attendez les meneurs, ~b~{NAME} ~w~et ~b~{NAME}~w~, pour voler l'~g~argent~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR": "~w~Escortez ~b~{NAME}~w~ et ~b~{NAME} ~w~jusqu'à l'un des ~y~véhicules de fuite~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR_LEADER": "~w~Rejoignez l'un des ~y~véhicules de fuite~w~ avec votre ~b~équipe~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT": "~w~Escortez ~b~{NAME}~w~ et ~b~{NAME} ~w~jusqu'au ~y~repaire~w~ à {STREET NAME}.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER": "~w~Livrez l'~g~argent ~w~au ~y~repaire~w~ à {STREET NAME}.",
+    "BANKROB_COP_OBJECTIVE_GET_TO_BANK": "~w~Allez à la ~y~Banque Pacific Standard~w~ et neutralisez les ~r~fugitifs~w~.",
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR": "~w~Empêchez les ~r~fugitifs~w~ d'atteindre les véhicules de fuite~w~ !",
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~Arrêtez les ~r~fugitifs~w~ avant qu'ils n'atteignent leur repaire~w~ !"
 
 
 }

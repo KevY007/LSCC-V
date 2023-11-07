@@ -4945,6 +4945,9 @@ namespace RNC
                         }
 
                         EPlayer.Notify(player, Translate(player, "STEALING_MONEY"), "green", "fa-cash", false, 40000, "bottom-center");
+
+                        player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY",
+                                            lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name);
                         continue;
                     }
                     if (lobby.Cops.Contains(player))
@@ -4953,6 +4956,8 @@ namespace RNC
 
                         player.TriggerEvent("playerCreateWaypoint", BankRobberyData.BankCheckpointPos);
                         player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
+
+                        player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
                         continue;
                     }
                 }
@@ -4961,7 +4966,33 @@ namespace RNC
             // 40 seconds after the round started aka 50th second => leader steals money, advance to next stage
             if(secondsElapsed == 50)
             {
+                lobby.BankRobbery.GameState = BankRobberyData.State.GettingToVehicle;
+                foreach(Player player in CopchasePlayers)
+                {
 
+                    if (lobby.Fugitives.Contains(player))
+                    {
+                        if (lobby.BankRobbery.HeistLeader == player || lobby.BankRobbery.CoLeader == player)
+                        {
+                            EPlayer.Freeze(player, false);
+                            Events.RequestClearAnimation(player);
+
+                            player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR_LEADER");
+                        }
+                        else
+                        {
+                            player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR",
+                                                lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name);
+                        }
+
+                        continue;
+                    }
+                    if (lobby.Cops.Contains(player))
+                    {
+                        player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR");
+                        continue;
+                    }
+                }
             }
 
             // 15 minutes passed => end bank robbery

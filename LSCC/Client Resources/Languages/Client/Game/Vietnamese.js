@@ -56,7 +56,15 @@ const Language = {
     "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}Cảnh sát không thể vào tòa nhà trước tội phạm!",
     "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}Bạn không thể vào tòa nhà thêm {SECONDS} giây nữa.",
     "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}Bạn có thể vào tòa nhà bây giờ!",
-    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Bạn bắt đầu cảm thấy hoa mắt và mệt mỏi; bạn nên sử dụng Máy cấp cứu hoặc Thuốc giảm đau!"
+    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Bạn bắt đầu cảm thấy hoa mắt và mệt mỏi; bạn nên sử dụng Máy cấp cứu hoặc Thuốc giảm đau!",
+    "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY": "~w~Đợi các lãnh đạo, ~b~{NAME} ~w~và ~b~{NAME}~w~, để đánh cắp ~g~tiền~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR": "~w~Hộ tống ~b~{NAME}~w~ và ~b~{NAME} ~w~đến một trong những ~y~phương tiện thoát khỏi~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR_LEADER": "~w~Đạt được một trong những ~y~phương tiện thoát khỏi~w~ cùng với ~b~đội~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT": "~w~Hộ tống ~b~{NAME}~w~ và ~b~{NAME} ~w~đến ~y~nơi ẩn náu~w~ tại {STREET NAME}.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER": "~w~Giao ~g~tiền ~w~tới ~y~nơi ẩn náu~w~ tại {STREET NAME}.",
+    "BANKROB_COP_OBJECTIVE_GET_TO_BANK": "~w~Đi đến ~y~Ngân hàng Pacific Standard~w~ và loại bỏ ~r~tội phạm~w~.",
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR": "~w~Ngăn chặn ~r~tội phạm~w~ trước khi đến được các phương tiện thoát khỏi~w~ !",
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~Ngăn chặn ~r~tội phạm~w~ trước khi đến nơi ẩn náu của họ~w~ !"
 
 
 }

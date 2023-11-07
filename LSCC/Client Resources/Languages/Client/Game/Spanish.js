@@ -56,7 +56,15 @@ const Language = {
     "COP_CANT_ENTER_INTERIORS": "!{#ff6347}[!] !{#ffffff}¡Los policías no pueden entrar en edificios antes que los fugitivos!",
     "COP_CANT_ENTER_INTERIORS_TIMED": "!{#ff6347}[!] !{#ffffff}No puedes entrar en edificios durante {SECONDS} segundos más.",
     "COP_CAN_ENTER_INTERIOR": "!{#00ff00}[>] !{#ffffff}¡Ahora puedes entrar en edificios!",
-    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Comienzas a sentirte mareado y cansado; deberías usar un Medkit o analgésicos."
+    "UNDER_50_HP_WARNING": "!{#C3A3DB}* Comienzas a sentirte mareado y cansado; deberías usar un Medkit o analgésicos.",
+    "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY": "~w~Espera a los líderes, ~b~{NAME} ~w~y ~b~{NAME}~w~, para robar el ~g~dinero~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR": "~w~Escolta a ~b~{NAME}~w~ y ~b~{NAME} ~w~hasta uno de los ~y~vehículos de escape~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_CAR_LEADER": "~w~Alcanza uno de los ~y~vehículos de escape~w~ con tu ~b~escuadra~w~.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT": "~w~Escolta a ~b~{NAME}~w~ y ~b~{NAME} ~w~hasta el ~y~escondite~w~ en {STREET NAME}.",
+    "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER": "~w~Entrega el ~g~dinero ~w~al ~y~escondite~w~ en {STREET NAME}.",
+    "BANKROB_COP_OBJECTIVE_GET_TO_BANK": "~w~Ve al ~y~Banco Pacific Standard~w~ y neutraliza a los ~r~fugitivos~w~.",
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR": "~w~¡Detén a los ~r~fugitivos~w~ antes de que lleguen a los vehículos de escape~w~ !",
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~¡Detén a los ~r~fugitivos~w~ antes de que lleguen a su escondite~w~ !"
 
 
 }
