@@ -2544,7 +2544,6 @@ namespace RNC
             {
                 if (shape.HasData("LinkedStingerObject") && shape.HasData("StingerID"))
                 {
-                    LobbyData lobby = Settings.Lobbies.Find(a => a.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
                     if (lobby == null) return;
                     string stingerKey = shape.GetData<string>("LinkedStingerObject");
                     int stingerID = shape.GetData<int>("StingerID");
@@ -5270,7 +5269,7 @@ namespace RNC
                 {
                     cPlayer.TriggerEvent("EVENT:ClearObjectiveBlips");
                     cPlayer.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
-                    cPlayer.TriggerEvent("EVENT:AddBankRobberyFinishMarker", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z)
+                    cPlayer.TriggerEvent("EVENT:AddBankRobberyFinishMarker", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
                     if (lobby.Fugitives.Contains(cPlayer))
                     {
                         if(cPlayer != lobby.BankRobbery.HeistLeader && cPlayer != lobby.BankRobbery.CoLeader)
