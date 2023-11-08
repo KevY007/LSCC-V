@@ -551,3 +551,854 @@ const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max
         "11":{min:0, max:10}, // tops        
     }
 }
+
+
+// Appearance Editor
+var APPEARANCE_IsMale = true;
+
+mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender) => {
+    APPEARANCE_IsMale = gender;
+    if(global.ServerUI) global.ServerUI.call('character_editor_toggle', toggle);
+
+    setAppearanceEditorCategories();
+});
+
+function setAppearanceEditorCategories(){
+    const options = [
+        {
+            id:"c_heritage",
+            name:"Heritage"
+        },
+        {
+            id:"c_features",
+            name:"Facial Features"
+        },
+        {
+            id:"c_overlays",
+            name:"Head Overlays"
+        },
+        {
+            id:"c_hair",
+            name:"Hair"
+        },  
+        {
+            id:"c_tattoos",
+            name:"Tattoos"
+        },
+    ];
+    if(global.ServerUI) global.ServerUI.call('character_editor_set_categories', options);
+}
+// /triggerjs mp.events.callLocal("CharacterEditor:ToggleAppearanceEditor", true)
+function setAppearanceEditorOptions(category){
+    var options = [];
+    const categoryJSON = OptionsPerCategory.find(c => c.category === category);
+    if(!categoryJSON) return;
+
+    options = categoryJSON.options;
+    if(category === "c_hair"){
+        const overlaysToGet = getHairOverlaysForGender(APPEARANCE_IsMale);
+        const overlaysToSet = overlaysToGet.map((o) => {
+            return {id:`hair_overlay_${overlaysToGet.indexOf(o).toString()}`, name:o.name};
+        });
+        
+        var optionToSet = options.find(o => o.id === "hair_overlay");
+        if(optionToSet !== undefined && optionToSet.values) optionToSet.values = overlaysToSet;
+    }
+
+    if(global.ServerUI) global.ServerUI.call('character_editor_set_options', options);
+}
+
+// LAST NUMBER IN FACE FEATURES CATEGORY = INDEX TO CHANGE
+const OptionsPerCategory = [
+    {
+        category:"c_heritage",
+        options:[
+            {
+                type: "toggle",
+                id: "gender_option",
+                name: "Gender",
+                value: false,
+                labels: ["Male", "Female"]
+            },
+            {
+                type: "slider",
+                id: "shape_parent_1",
+                name: "Parent 1",
+                value: 0,
+                min: 0,
+                max: 45,
+                step: 1,
+            },
+            {
+                type: "slider",
+                id: "shape_parent_2",
+                name: "Parent 2",
+                value: 0,
+                min: 0,
+                max: 45,
+                step: 1,
+            },
+            {
+                type: "slider",
+                id: "shape_parent_3",
+                name: "Mix Parent",
+                value: 0,
+                min: 0,
+                max: 45,
+                step: 1,
+            },
+            {
+                type: "slider",
+                id: "skin_parent_1",
+                name: "Skin Parent 1",
+                value: 0,
+                min: 0,
+                max: 45,
+                step: 1,
+            },
+            {
+                type: "slider",
+                id: "skin_parent_2",
+                name: "Skin Parent 2",
+                value: 0,
+                min: 0,
+                max: 45,
+                step: 1,
+            },
+            {
+                type: "slider",
+                id: "skin_parent_3",
+                name: "Skin Mix Parent",
+                value: 0,
+                min: 0,
+                max: 45,
+                step: 1,
+            },
+            {
+                type: "slider",
+                id: "shape_mix",
+                name: "Shape Mix",
+                value: 0.5,
+                min: 0,
+                max: 1.0,
+                step: 0.1,
+            },
+            {
+                type: "slider",
+                id: "skin_mix",
+                name: "Skin Mix",
+                value: 0.5,
+                min: 0,
+                max: 1.0,
+                step: 0.1,
+            },
+            {
+                type: "slider",
+                id: "third_mix",
+                name: "Third Mix",
+                value: 0.5,
+                min: 0,
+                max: 1.0,
+                step: 0.1,
+            },
+        ]
+    },
+    {
+        category:"c_features", 
+        options:[
+            {
+                "type": "slider",
+                "id": "face_feature_0",
+                "name": "Nose width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_1",
+                "name": "Nose height",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_2",
+                "name": "Nose length",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_3",
+                "name": "Nose bridge",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_4",
+                "name": "Nose tip",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_5",
+                "name": "Nose bridge shift",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_6",
+                "name": "Brow height",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_7",
+                "name": "Brow width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_8",
+                "name": "Cheekbone height",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_9",
+                "name": "Cheekbone width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_10",
+                "name": "Cheeks width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_11",
+                "name": "Eye size",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_12",
+                "name": "Lip size",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_13",
+                "name": "Jaw width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_14",
+                "name": "Jaw height",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_15",
+                "name": "Chin length",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_16",
+                "name": "Chin position",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_17",
+                "name": "Chin width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_18",
+                "name": "Chin shape",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "face_feature_19",
+                "name": "Neck width",
+                "value": 0,
+                "min": -1.0,
+                "max": 1.0,
+                "step": 0.1
+            }
+        ]
+    },
+    {
+        category:"c_overlays",
+        options:[
+            {
+                "type": "slider",
+                "id": "head_overlay_0",
+                "name": "Blemishes",
+                "value": 0,
+                "min": 0,
+                "max": 23,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_0",
+                "name": "Blemishes Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_0",
+                "name": "Blemishes Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_0",
+                "name": "Blemishes Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_1",
+                "name": "Facial Hair",
+                "value": 0,
+                "min": 0,
+                "max": 28,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_1",
+                "name": "Facial Hair Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_1",
+                "name": "Facial Hair Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_1",
+                "name": "Facial Hair Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_2",
+                "name": "Eyebrows",
+                "value": 0,
+                "min": 0,
+                "max": 33,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_2",
+                "name": "Eyebrows Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_2",
+                "name": "Eyebrows Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_2",
+                "name": "Eyebrows Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_3",
+                "name": "Ageing",
+                "value": 0,
+                "min": 0,
+                "max": 14,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_3",
+                "name": "Ageing Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_3",
+                "name": "Ageing Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_3",
+                "name": "Ageing Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_4",
+                "name": "Makeup",
+                "value": 0,
+                "min": 0,
+                "max": 74,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_4",
+                "name": "Makeup Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_4",
+                "name": "Makeup Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_4",
+                "name": "Makeup Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_5",
+                "name": "Blush",
+                "value": 0,
+                "min": 0,
+                "max": 32,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_5",
+                "name": "Blush Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_5",
+                "name": "Blush Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_5",
+                "name": "Blush Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_6",
+                "name": "Complexion",
+                "value": 0,
+                "min": 0,
+                "max": 11,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_6",
+                "name": "Complexion Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_6",
+                "name": "Complexion Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_6",
+                "name": "Complexion Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_7",
+                "name": "Sun Damage",
+                "value": 0,
+                "min": 0,
+                "max": 10,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_7",
+                "name": "Sun Damage Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_7",
+                "name": "Sun Damage Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_7",
+                "name": "Sun Damage Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_8",
+                "name": "Lipstick",
+                "value": 0,
+                "min": 0,
+                "max": 9,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_8",
+                "name": "Lipstick Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_8",
+                "name": "Lipstick Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_8",
+                "name": "Lipstick Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_9",
+                "name": "Moles/Freckles",
+                "value": 0,
+                "min": 0,
+                "max": 17,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_9",
+                "name": "Moles/Freckles Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_9",
+                "name": "Moles/Freckles Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_9",
+                "name": "Moles/Freckles Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_10",
+                "name": "Chest Hair",
+                "value": 0,
+                "min": 0,
+                "max": 16,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_10",
+                "name": "Chest Hair Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_10",
+                "name": "Chest Hair Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_10",
+                "name": "Chest Hair Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                "type": "slider",
+                "id": "head_overlay_11",
+                "name": "Body Blemishes",
+                "value": 0,
+                "min": 0,
+                "max": 11,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color1_head_overlay_11",
+                "name": "Body Blemishes Color 1",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "color2_head_overlay_11",
+                "name": "Body Blemishes Color 2",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                "type": "slider",
+                "id": "opacity_head_overlay_11",
+                "name": "Body Blemishes Opacity",
+                "value": 1.0,
+                "min": 0,
+                "max": 1.0,
+                "step": 0.1
+            },
+            {
+                type: "toggle",
+                id: "body_blemishes_toggle",
+                name: "Body Blemishes",
+                value: false,
+                labels: ["Disabled", "Enabled"]
+            }
+        ]
+    },
+    {
+        category:"c_hair",
+        options:[
+            {
+                "type": "slider",
+                "id": "hair_id",
+                "name": "Hair",
+                "value": 0,
+                "min": 0,
+                "max": 140,
+                "step": 1
+            },      
+            {
+                "type": "slider",
+                "id": "hair_color1",
+                "name": "Color",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },  
+            {
+                "type": "slider",
+                "id": "hair_color2",
+                "name": "Highlight Color",
+                "value": 0,
+                "min": 0,
+                "max": 100,
+                "step": 1
+            },
+            {
+                type:"checkbox",
+                id:"hair_overlay",
+                name:"Hair Overlays",
+                value:[],
+                values:[
+                    // Filled out on runtime depending on gender
+                ]
+            }   
+        ]
+    }
+];
+
+function getHairOverlaysForGender(isMale){
+    var overlays = [];
+    if(isMale) overlays = global.hairDecalsList[0];
+    else overlays = global.hairDecalsList[1];
+
+    return overlays;
+}
+
+mp.events.add("character_editor_set_active_category_id", (id) => {
+    mp.events.callRemote(`ServerConsoleOutput`, `[CHAR EDITOR] Category set active to ${id}`);
+
+});
+mp.events.add("character_editor_change_category", (id) => {
+    mp.events.callRemote(`ServerConsoleOutput`, `[CHAR EDITOR] Category changed to ${id}`);
+    setAppearanceEditorOptions(id);
+});
+mp.events.add("character_editor_close", () => {
+    
+});
+mp.events.add("character_editor_change_option", (id, value) => {
+    mp.events.callRemote(`ServerConsoleOutput`, `[CHAR EDITOR] Changed option: ${id} to ${value}`);
+
+    if(id === "gender_option"){
+        APPEARANCE_IsMale = !value; // True is female, false is male, therefore invert
+    }
+});
+
