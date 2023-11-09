@@ -3562,6 +3562,7 @@ namespace RNC
 
                 if (lobby.Fugitives.Contains(player))
                 {
+                    Character.SetTeamOutfit(player, 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Robbing bank as {player.Name}");
                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
                     player.SetSharedData("Team", 0);
@@ -3583,6 +3584,7 @@ namespace RNC
                 }
                 if (lobby.Cops.Contains(player))
                 {
+                    Character.SetTeamOutfit(player, 1);
                     EPlayer.SetColor(player, new Color(100, 100, 255), 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name} in Bank Robbery");
                     player.SetSharedData("Team", 1);
@@ -4056,6 +4058,7 @@ namespace RNC
 
                 if (lobby.Fugitives.Contains(player))
                 {
+                    Character.SetTeamOutfit(player, 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {player.Name}");
                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
                     player.SetSharedData("Team", 0);
@@ -4094,6 +4097,7 @@ namespace RNC
                 }
                 if (lobby.Cops.Contains(player))
                 {
+                    Character.SetTeamOutfit(player, 1);
                     EPlayer.SetColor(player, new Color(100, 100, 255), 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name}");
                     player.SetSharedData("Team", 1);

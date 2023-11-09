@@ -8774,6 +8774,9 @@ namespace RNC
                 OnStopAnimPositioner(player);
             }
 
+            Character.ApplyAppearance(player, Character.GetCharacter(player).SavedAppearance);
+            Character.SetTeamOutfit(player, EPlayer.GetAccount(player).LobbyClothing);
+
             player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
             player.ResetData("Dead");
@@ -8816,9 +8819,6 @@ namespace RNC
                 if (player.HasData("Cuffed"))
                 {
                     player.TriggerEvent("SetHandcuffs", false);
-
-                    SavedOutfit outfit = Character.GetOutfitByTeam(player, acc.LobbyClothing);
-                    Character.ApplyOutfit(player, outfit.IsMale, outfit.Team, outfit);
 
                     player.ResetData("Cuffed");
                 }
@@ -8899,8 +8899,6 @@ namespace RNC
 
                 if (player.GetSharedDataSafe<int>("InLobby") == -3) // Freeroam
                 {
-                    // New Outfit Shit
-                    Character.SetTeamOutfit(player, acc.LobbyClothing);
 
                     SpawnSet spawnCoords = new SpawnSet(0, 1061.547f, -720.113f, 56.786f, 130.497f);
 
@@ -9018,8 +9016,6 @@ namespace RNC
 
                 if (player.GetSharedDataSafe<int>("InLobby") > -1) // Copchase Lobby
                 {
-                    // New Outfit Shit
-                    Character.SetTeamOutfit(player, acc.LobbyClothing);
 
 
                     EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedDataSafe<int>("InLobby")}] Waiting as {player.Name}");
