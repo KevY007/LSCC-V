@@ -822,181 +822,181 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "face_feature_0",
                 "name": "Nose width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_1",
                 "name": "Nose height",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_2",
                 "name": "Nose length",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_3",
                 "name": "Nose bridge",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_4",
                 "name": "Nose tip",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_5",
                 "name": "Nose bridge shift",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_6",
                 "name": "Brow height",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_7",
                 "name": "Brow width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_8",
                 "name": "Cheekbone height",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_9",
                 "name": "Cheekbone width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_10",
                 "name": "Cheeks width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_11",
                 "name": "Eye size",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_12",
                 "name": "Lip size",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_13",
                 "name": "Jaw width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_14",
                 "name": "Jaw height",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_15",
                 "name": "Chin length",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_16",
                 "name": "Chin position",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_17",
                 "name": "Chin width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_18",
                 "name": "Chin shape",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
                 "id": "face_feature_19",
                 "name": "Neck width",
-                "value": 0,
-                "min": -1.0,
-                "max": 1.0,
-                "step": 0.1
+                "value": 50,
+                "min": -100,
+                "max": 100,
+                "step": 1
             }
         ]
     },
@@ -1034,10 +1034,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_0",
                 "name": "Blemishes Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1070,10 +1070,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_1",
                 "name": "Facial Hair Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1106,10 +1106,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_2",
                 "name": "Eyebrows Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1142,10 +1142,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_3",
                 "name": "Ageing Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1178,10 +1178,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_4",
                 "name": "Makeup Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1214,10 +1214,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_5",
                 "name": "Blush Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1250,10 +1250,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_6",
                 "name": "Complexion Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1286,10 +1286,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_7",
                 "name": "Sun Damage Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1322,10 +1322,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_8",
                 "name": "Lipstick Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1358,10 +1358,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_9",
                 "name": "Moles/Freckles Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1394,10 +1394,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_10",
                 "name": "Chest Hair Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 "type": "slider",
@@ -1430,10 +1430,10 @@ const OptionsPerCategory = [
                 "type": "slider",
                 "id": "opacity_head_overlay_11",
                 "name": "Body Blemishes Opacity",
-                "value": 1.0,
+                "value": 100,
                 "min": 0,
-                "max": 1.0,
-                "step": 0.1
+                "max": 100,
+                "step": 1
             },
             {
                 type: "toggle",
@@ -1516,6 +1516,74 @@ mp.events.add("character_editor_change_option", (id, value) => {
 
     if(id === "gender_option"){
         APPEARANCE_IsMale = !value; // True is female, false is male, therefore invert
+        let genderHash = "mp_m_freemode_01"
+        if (!APPEARANCE_IsMale)
+            genderHash = "mp_f_freemode_01"
+        let genderModel = mp.game.joaat(genderHash)
+        mp.players.local.model = genderModel;
+
+        CURRENT_APPEARANCE_DATA.IsMale = !value;
+
+        return;
     }
+    if(id.includes("face_feature")){
+        let faceFeatureID = getLastNumber(id);
+
+        let realValue = (value/100)
+
+        CURRENT_APPEARANCE_DATA.FaceFeatures[faceFeatureID].Scale = realValue;
+        mp.players.local.setFaceFeature(faceFeatureID, realValue);
+        return;
+    }
+    if(id.includes("head_overlay")){
+        let overlayID = getLastNumber(id);
+        let realValue = value;
+
+
+        if(id.startsWith("opacity")){
+            realValue = (value/100);
+            CURRENT_APPEARANCE_DATA.HeadOverlays[overlayID].Opacity = realValue;
+        }
+        else if(id.startsWith("color1")) CURRENT_APPEARANCE_DATA.HeadOverlays[overlayID].FirstColor = value;
+        else if(id.startsWith("color2")) CURRENT_APPEARANCE_DATA.HeadOverlays[overlayID].SecondColor = value;
+        else CURRENT_APPEARANCE_DATA.HeadOverlays[overlayID].Index = value;
+
+        const HeadOverlay = CURRENT_APPEARANCE_DATA.HeadOverlays[overlayID];
+        mp.players.local.setHeadOverlay(overlayID, HeadOverlay.Index, HeadOverlay.Opacity, HeadOverlay.FirstColor, HeadOverlay.SecondColor);
+
+        return;
+    }
+    if(id == "hair_id"){
+        CURRENT_APPEARANCE_DATA.Hair.Index = value;
+
+        mp.players.local.setComponentVariation(2, value, 0, 0);
+        mp.players.local.setHairColor(CURRENT_APPEARANCE_DATA.Hair.Color, CURRENT_APPEARANCE_DATA.Hair.HighlightColor);
+
+        return;
+    }
+    if(hair == "hair_color1"){
+        CURRENT_APPEARANCE_DATA.Hair.Color = value;
+
+        mp.players.local.setHairColor(CURRENT_APPEARANCE_DATA.Hair.Color, CURRENT_APPEARANCE_DATA.Hair.HighlightColor);
+
+        return;
+    }
+    if(hair == "hair_color2"){
+        CURRENT_APPEARANCE_DATA.Hair.HighlightColor = value;
+
+        mp.players.local.setHairColor(CURRENT_APPEARANCE_DATA.Hair.Color, CURRENT_APPEARANCE_DATA.Hair.HighlightColor);
+
+        return;
+    }
+
+
 });
 
+function getLastNumber(str) {
+    if(!str) return;
+    const matches = str.match(/\d+$/);
+    if (matches) {
+        return parseInt(matches[0], 10);
+    }
+    return null; // Return null or handle the case when no number is found.
+}

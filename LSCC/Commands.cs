@@ -385,6 +385,8 @@ namespace RNC
         [Command("charedit")]
         public static void cmd_charedit(Player player)
         {
+            Character.SendPlayerToEditorScene(player, 0, false);
+
             Character character = Character.GetCharacter(player);
             string appData = NAPI.Util.ToJson(character.CurrentAppearance);
             player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", true, character.CurrentAppearance.IsMale, appData);

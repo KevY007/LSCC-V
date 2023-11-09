@@ -400,7 +400,7 @@ namespace RNC
 
             SendPlayerToEditorScene(player, outfit.Team, true);
         }
-        private static void SendPlayerToEditorScene(Player player, int team, bool isOutfitEditor)
+        public static void SendPlayerToEditorScene(Player player, int team, bool isOutfitEditor)
         {
             if (!isOutfitEditor)
             {
