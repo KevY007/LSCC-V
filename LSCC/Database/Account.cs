@@ -296,17 +296,13 @@ namespace RNC
 
         public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }
 
-        public static void Add(Account _a)
+        public async static Task Add(Account _a)
         {
-            Task.Run(async () =>
-            {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
                     await context.Accounts.AddAsync(_a);
                     await context.SaveChangesAsync();
                 }
-            });
-
         }
         public static bool Login(Account _target, string password, bool _crypted = false, bool _useOldPassword = false)
         {

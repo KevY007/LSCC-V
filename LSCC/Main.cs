@@ -964,6 +964,9 @@ namespace RNC
 
         public static void AddChallengesForPlayer(Player player)
         {
+            NAPI.Util.ConsoleOutput($"{player.Name} fuck challenges");
+            return;
+
             string desc = "";
             Account acc = EPlayer.GetAccount(player);
             List<ChallengeData> cdInfo = NAPI.Util.FromJson<List<ChallengeData>>(acc.ChallengeInfo);

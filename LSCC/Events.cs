@@ -18,6 +18,7 @@ using RNC;
 using RNC.Data;
 using System.Collections;
 using GTANetworkAPI;
+using System.Net.Mime;
 
 namespace RNC
 {
@@ -3630,8 +3631,7 @@ namespace RNC
             EPlayer.GetAccount(player).Language = languageID;
             player.TriggerEvent("DestroyLoginScene");
 
-            // TO-DO: send player to char editor after tutorial
-
+            Character.OpenAppearanceEditor(player, Character.GetCharacter(player).CurrentAppearance);
         }        
 
         [RemoteEvent("SpectateChangeHPAR")]
@@ -4013,7 +4013,10 @@ namespace RNC
                 SavedAppearance activeAppearance = null;
                 if(appearances == null)
                 {
-                    NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc);  });
+                    NAPI.Task.Run(() =>
+                    {
+                        Character.InitializeCharacter(player, acc);
+                    });
                     await NAPI.Task.WaitForMainThread();
                 }
                 else
@@ -4887,14 +4890,14 @@ namespace RNC
             {
                 await AccountManager.BanEvadeCheck(player, acc);
 
-                List<SavedAppearance> appearances = await Character.GetAppearances(acc);
-                SavedAppearance activeAppearance = null;
-                if (appearances == null)
+                NAPI.Task.Run(() =>
                 {
-                    NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc); });
-                    await NAPI.Task.WaitForMainThread();
-                }
-                else activeAppearance = appearances.FirstOrDefault(a => a.IsActive == true);
+                    Character.InitializeCharacter(player, acc);
+                });
+                await NAPI.Task.WaitForMainThread();
+
+                List<SavedAppearance> appearances = await Character.GetAppearances(acc);
+                SavedAppearance activeAppearance = appearances.FirstOrDefault(a => a.IsActive == true);
                 await Character.UpdateActiveOutfitVariables(player, acc);
                 
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -6540,6 +6543,7 @@ namespace RNC
             Task.Run(async () =>
             {
                 SavedOutfit _o = await Character.SaveOutfitChanges(acc, outfitSQLID, outfit);
+                await Character.UpdateActiveOutfitVariables(player, acc);
                 NAPI.Task.Run(() =>
                 {
                     Character.ApplyOutfit(player, _o.IsMale, _o.Team, _o);
@@ -6548,12 +6552,91 @@ namespace RNC
             });
         }
 
+        [RemoteEvent("CharacterEditor:CloseAppearanceEditor")]
+        public void CharacterEditor_OnCloseAppearanceEditor(Player player)
+        {
+            if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true) return;
+            player.ResetData("CHARACTER:EditorOpen");
+            player.TriggerEvent("CharacterEditor:DestroyScene");
+            Commands.cmd_lobby(player);
+        }
+
+        [RemoteEvent("CharacterEditor:SaveAppearance")]
+        public void CharacterEditor_SaveAppearance(Player player, string appearanceData)
+        {
+            Account acc = EPlayer.GetAccount(player);
+            Character.Appearance appearance = NAPI.Util.FromJson<Character.Appearance>(appearanceData);
+
+            bool isNew_changeOutfitGender = false;
+            if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true && appearance.IsMale == false)
+                isNew_changeOutfitGender = true;
+
+            Character.Outfit copFit = new Character.Outfit("Default Cop", "", false, 1);
+            Character.Outfit fugiFit = new Character.Outfit("Default Fugitive", "", false, 0);
+            if (isNew_changeOutfitGender)
+            {
+                NAPI.Util.ConsoleOutput($"[CHARACTER EDITOR] {player.Name} ({player.Nametag}) switched gender to FEMALE! Setting them up..");
+                Character.GetOutfitByTeam(player, 0).Data = NAPI.Util.ToJson(fugiFit);
+                Character.GetOutfitByTeam(player, 0).IsMale = false;
+                Character.GetOutfitByTeam(player, 1).Data = NAPI.Util.ToJson(copFit);
+                Character.GetOutfitByTeam(player, 1).IsMale = false;
+            }
+
+            Task.Run(async () =>
+            {
+                SavedOutfit savedCop = null;
+                SavedOutfit savedFugi = null;
+                if (isNew_changeOutfitGender)
+                {
+                    using (MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        savedCop = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == 1);
+                        savedFugi = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == 0);
+
+                        savedCop.Data = NAPI.Util.ToJson(copFit);
+                        savedCop.IsMale = false;
+
+                        savedFugi.Data = NAPI.Util.ToJson(fugiFit);
+                        savedFugi.IsMale = false;
+
+                        await context.SaveChangesAsync();
+                    }
+                }
+                SavedAppearance _a = await Character.SaveAppearanceChanges(acc, appearance);
+                NAPI.Task.Run(() =>
+                {
+                    Character.ApplyAppearance(player, _a);
+                    EPlayer.Notify(player, "Appearance saved successfully!", "green", "success", false, 3000);
+
+                    if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true)
+                    {
+                        if (isNew_changeOutfitGender)
+                        {
+                            Character.ApplyOutfit(player, false, 0, savedFugi);
+                            Character.ApplyOutfit(player, false, 1, savedCop);
+                        }
+
+                        Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 1));
+                        EPlayer.Notify(player, "Editing <strong>Police Outfit</strong>", "blue", "", false, 5000);
+                    }
+                });
+            });
+        }
+
         [RemoteEvent("CharacterEditor:CloseEvent")]
         public void CharacterEditor_OnClose(Player player)
         {
             player.ResetData("CHARACTER:EditorOpen");
-
             player.TriggerEvent("CharacterEditor:DestroyScene");
+
+            // If the outfit editor is closed & the char is still new, it means they haven't edited fugitive yet! hehe
+            if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true)
+            {
+                Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 0));
+                EPlayer.Notify(player, "Editing <strong>Fugitive Outfit</strong>", "yellow", "", false, 5000);
+                player.ResetData("CHARACTER:IsNew");
+                return;
+            }
             Commands.cmd_lobby(player);
         }
 
@@ -7401,8 +7484,14 @@ namespace RNC
                                     TattooList = "[]",
                                     SelectedBadgeData = "{id:0, name:\"\"}",
                                 };
-                                AccountManager.Add(_new);
-                                OnPlayerRegister(player, _new);
+                                Task.Run(async () =>
+                                {
+                                    await AccountManager.Add(_new);
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        OnPlayerRegister(player, _new);
+                                    });
+                                });
                             });
                         }
                         else

@@ -197,7 +197,7 @@ namespace RNC
                 EyeColor = 0;
                 for(int i = 0; i < 13; i++)
                 {
-                    HeadOverlays.Add(new HeadOverlayData((HeadOverlayData.Overlay)i, 0, 0f, 0, 0));
+                    HeadOverlays.Add(new HeadOverlayData((HeadOverlayData.Overlay)i, -1, 1.0f, 0, 0));
                 }
                 for(int i = 0; i < 20; i++)
                 {
@@ -290,6 +290,8 @@ namespace RNC
 
         public Appearance CurrentAppearance;
         public Outfit CurrentOutfit;
+        public SavedAppearance SavedAppearance;
+        public SavedOutfit SavedOutfit;
 
         public Character()
         {
@@ -297,92 +299,121 @@ namespace RNC
         }
         public Character(Player player, SavedAppearance appearance = null, SavedOutfit outfit = null)
         {
-            this.CurrentAppearance = ApplyAppearance(player, appearance);
+            this.SavedAppearance = appearance;
+            this.SavedOutfit = outfit;
+
+            this.CurrentAppearance = ApplyAppearance(player, appearance, false);
             if (outfit == null)
-                this.CurrentOutfit = ApplyOutfit(player, this.CurrentAppearance.IsMale, 1, null);
+                this.CurrentOutfit = ApplyOutfit(player, this.CurrentAppearance.IsMale, 1, null, false);
             else
             {
                 Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
-                this.CurrentOutfit = ApplyOutfit(player, _o.IsMale, _o.Team, outfit);
+                this.CurrentOutfit = ApplyOutfit(player, _o.IsMale, _o.Team, outfit, false);
             }
 
             player.SetData<Character>("CHARACTER:Character", this);
+
         }
 
-        public static void InitializeCharacter(Player player, Account acc = null)
+        public static void InitializeCharacter(Player player, Account acc)
         {
-            int AccountSQLID = (acc == null ? EPlayer.GetAccount(player).SQL_ID : acc.SQL_ID);
-            if(AccountSQLID == -1)
+            NAPI.Util.ConsoleOutput($"Called char init");
+            try
             {
-                NAPI.Util.ConsoleOutput($"[ERROR INITIALING CHARACTER] {player.Name} has no Account SQLID!");
-                return;
-            }
-
-            NAPI.Util.ConsoleOutput($"Generating brand new character for {player.Name}!");
-            Character newCharacter = new Character(player, null, null);
-
-            SavedAppearance firstAppearance = new SavedAppearance()
-            {
-                IsActive = true,
-                IsMale = newCharacter.CurrentAppearance.IsMale,
-                Team = newCharacter.CurrentAppearance.Team,
-                AccountID = AccountSQLID,
-                Data = NAPI.Util.ToJson(newCharacter.CurrentAppearance)
-            };
-
-            Outfit defaultFugitive = new Outfit("Default Fugitive", "fugitive", newCharacter.CurrentAppearance.IsMale, 0);
-            Outfit defaultCop = new Outfit("Default Cop", "cop", newCharacter.CurrentAppearance.IsMale, 1);
-
-            SavedOutfit savedFugitive = new SavedOutfit()
-            {
-                IsActive = true,
-                IsMale = newCharacter.CurrentAppearance.IsMale,
-                Team = 0,
-                Data = NAPI.Util.ToJson(defaultFugitive),
-                AccountID = AccountSQLID
-            };
-            SavedOutfit savedCop = new SavedOutfit()
-            {
-                IsActive = true,
-                IsMale = newCharacter.CurrentAppearance.IsMale,
-                Team = 1,
-                Data = NAPI.Util.ToJson(defaultCop),
-                AccountID = AccountSQLID
-            };
-
-
-            List<SavedAppearance> appearances = new List<SavedAppearance>() { firstAppearance };
-            List<SavedOutfit> outfits = new List<SavedOutfit>() { savedCop, savedFugitive };
-
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
+                int AccountSQLID = acc.SQL_ID;
+                if (AccountSQLID == 0)
                 {
-                    await context.SavedAppearances.AddAsync(firstAppearance);
-                    await context.SavedOutfits.AddAsync(savedCop);
-                    await context.SavedOutfits.AddAsync(savedFugitive);
-
-                    await context.SaveChangesAsync();
-
-                    CharacterSlot character = new CharacterSlot()
-                    {
-                        AccountID = AccountSQLID,
-                        Outfits = NAPI.Util.ToJson(new List<int> { savedCop.SQL_ID, savedFugitive.SQL_ID }),
-                        Appearances = NAPI.Util.ToJson(new List<int> { firstAppearance.SQL_ID })
-                    };
-
-                    await context.CharacterSlots.AddAsync(character);
-
-                    await context.SaveChangesAsync();
-
-                    NAPI.Task.Run(() =>
-                    {
-                        ApplyAppearance(player, firstAppearance);
-                        ApplyOutfit(player, newCharacter.CurrentAppearance.IsMale, 1, savedCop);
-                        player.SetData<bool>("CHARACTER:IsNew", true);
-                    });
+                    NAPI.Util.ConsoleOutput($"Failed to init: acc SQLID is 0! {acc.SQL_ID} {acc.Username}");
+                    return;
                 }
-            });
+
+                Character newCharacter = new Character(player, null, null);
+                if(newCharacter == null)
+                {
+                    NAPI.Util.ConsoleOutput($"[CHARACTER EDITOR] New character was null during char creation!");
+                }
+
+                SavedAppearance firstAppearance = new SavedAppearance()
+                {
+                    IsActive = true,
+                    IsMale = true,
+                    Team = -1,
+                    AccountID = AccountSQLID,
+                    Data = NAPI.Util.ToJson(newCharacter.CurrentAppearance)
+                };
+
+                Outfit defaultFugitive = new Outfit("Default Fugitive", "fugitive", true, 0);
+                Outfit defaultCop = new Outfit("Default Cop", "cop", true, 1);
+
+                SavedOutfit savedFugitive = new SavedOutfit()
+                {
+                    IsActive = true,
+                    IsMale = newCharacter.CurrentAppearance.IsMale,
+                    Team = 0,
+                    Data = NAPI.Util.ToJson(defaultFugitive),
+                    AccountID = AccountSQLID
+                };
+                SavedOutfit savedCop = new SavedOutfit()
+                {
+                    IsActive = true,
+                    IsMale = newCharacter.CurrentAppearance.IsMale,
+                    Team = 1,
+                    Data = NAPI.Util.ToJson(defaultCop),
+                    AccountID = AccountSQLID
+                };
+
+
+                List<SavedAppearance> appearances = new List<SavedAppearance>() { firstAppearance };
+                List<SavedOutfit> outfits = new List<SavedOutfit>() { savedCop, savedFugitive };
+
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        using (MainDatabase context = ContextFactory.CreateContext())
+                        {
+                            await context.SavedAppearances.AddAsync(firstAppearance);
+                            await context.SavedOutfits.AddAsync(savedCop);
+                            await context.SavedOutfits.AddAsync(savedFugitive);
+
+                            await context.SaveChangesAsync();
+
+                            CharacterSlot character = new CharacterSlot()
+                            {
+                                AccountID = AccountSQLID,
+                                Outfits = NAPI.Util.ToJson(new List<int> { savedCop.SQL_ID, savedFugitive.SQL_ID }),
+                                Appearances = NAPI.Util.ToJson(new List<int> { firstAppearance.SQL_ID })
+                            };
+
+                            await context.CharacterSlots.AddAsync(character);
+
+                            await context.SaveChangesAsync();
+
+                            NAPI.Util.ConsoleOutput($"[CHARACTER] Added entries for {acc.Username}: [Appearance:] {firstAppearance.SQL_ID} | [Police Outfit:] {savedCop.SQL_ID} | [Fugitive Outfit:] {savedFugitive.SQL_ID}");
+
+                            NAPI.Task.Run(() =>
+                            {
+                                UpdateActiveOutfitVariable(player, savedFugitive, 0);
+                                UpdateActiveOutfitVariable(player, savedCop, 1);
+
+                                SetCharacter(player, firstAppearance, savedCop);
+
+                                ApplyAppearance(player, firstAppearance);
+                                ApplyOutfit(player, newCharacter.CurrentAppearance.IsMale, 1, savedCop);
+                                player.SetData<bool>("CHARACTER:IsNew", true);
+                            });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        NAPI.Util.ConsoleOutput("Inside try catch char error: " + ex.ToString());
+                    }
+                });
+            }
+            catch(Exception ex)
+            {
+                NAPI.Util.ConsoleOutput(ex.ToString());
+            }
         }
 
         public static void OpenAppearanceEditor(Player player, Appearance appearance)
@@ -435,6 +466,19 @@ namespace RNC
                 player.Position = new Vector3(401.8617f, -1005.00226f, -99.00403f);
                 player.Heading = -4;
                 player.TriggerEvent("CharacterEditor:SceneSetup", 401.4128, -1000.874, -97.888069, -9, 0, 180);
+            }
+        }
+
+        public async static Task<SavedAppearance> SaveAppearanceChanges(Account account, Appearance appearance)
+        {
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                SavedAppearance savedAppearance = await context.SavedAppearances.AsQueryable().FirstOrDefaultAsync(a => a.IsActive == true && a.AccountID == account.SQL_ID);
+                if (savedAppearance == null) return null;
+
+                savedAppearance.Data = NAPI.Util.ToJson(appearance);
+                await context.SaveChangesAsync();
+                return savedAppearance;
             }
         }
 
@@ -603,11 +647,7 @@ namespace RNC
                 return outfit;
             }
         }
-        public static void ApplyOutfit(Player player, Outfit outfit)
-        {
-            ApplyOutfitData(player, outfit);
-        }
-        public static Outfit ApplyOutfit(Player player, bool isMale, int team, SavedOutfit outfit = null)
+        public static Outfit ApplyOutfit(Player player, bool isMale, int team, SavedOutfit outfit = null, bool update_char = true)
         {
             if (outfit == null)
             {
@@ -615,15 +655,15 @@ namespace RNC
                 ApplyOutfitData(player, _newOutfit);
                 return _newOutfit;
             }
+
+            if(update_char)
+                SetCharacter(player, GetCharacter(player).SavedAppearance, outfit);
+
             Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
             ApplyOutfitData(player, _o);
             return _o;
         }
-        public static void ApplyAppearance(Player player, Appearance appearance)
-        {
-            ApplyAppearanceData(player, appearance);
-        }
-        public static Appearance ApplyAppearance(Player player, SavedAppearance appearance = null)
+        public static Appearance ApplyAppearance(Player player, SavedAppearance appearance = null, bool update_char = true)
         {
             if (appearance == null)
             {
@@ -631,6 +671,9 @@ namespace RNC
                 ApplyAppearanceData(player, _newAppearance);
                 return _newAppearance;
             }
+
+            if(update_char)
+                SetCharacter(player, appearance, GetCharacter(player).SavedOutfit);
 
             Appearance _a = NAPI.Util.FromJson<Appearance>(appearance.Data);
             ApplyAppearanceData(player, _a);

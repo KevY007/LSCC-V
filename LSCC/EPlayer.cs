@@ -426,7 +426,7 @@ namespace RNC
             {
                 Account a = EPlayer.GetAccount(i);
 
-                Character.ApplyAppearance(i, Character.GetCharacter(i).CurrentAppearance);
+                Character.ApplyAppearance(i, Character.GetCharacter(i).SavedAppearance);
                 Character.SetTeamOutfit(i, a.LobbyClothing);
             }
             if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
@@ -2155,15 +2155,7 @@ namespace RNC
                                 int savedEntries = 1;
                                 if (save_linked_entries)
                                 {
-                                    List<OwnedVehData> vehs = await context.OwnedVehicles.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
-                                    if(vehs.Count > 0)
-                                    {
-                                        vehs.ForEach(v =>
-                                        {
-                                            context.Entry(v).State = EntityState.Modified;
-                                            savedEntries++;
-                                        });
-                                    }
+
                                     List<OwnedLoadoutData> guns = await context.OwnedLoadouts.AsQueryable().Where(v => v.AccountSQLID == acc.SQL_ID).ToListAsync();
                                     if(guns.Count > 0)
                                     {
@@ -2293,7 +2285,11 @@ namespace RNC
 
                 if (player.HasData("CHARACTER:IsNew"))
                 {
-                    EPlayer.Error(player, "<strong>CHARACTER EDITOR</strong> You need to edit your character's appearance.");
+                    EPlayer.Error(player, "<strong>CHARACTER EDITOR</strong> - You need to edit your character's appearance!");
+                    EPlayer.Notify(player, "You can also <strong>import your character</strong> from <strong>Menyoo</strong> with <strong>/char import</strong>!", "blue", "", false, 7500);
+
+                    Character.OpenAppearanceEditor(player, Character.GetCharacter(player).CurrentAppearance);
+                    return;
                 }
 
                 player.TriggerEvent("EVENTS:SetBankRobberyActive", false);
@@ -2323,9 +2319,8 @@ namespace RNC
 
                 if (!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 
-                Character.ApplyAppearance(player, Character.GetCharacter(player).CurrentAppearance);
+                Character.ApplyAppearance(player, Character.GetCharacter(player).SavedAppearance);
                 Character.SetTeamOutfit(player, EPlayer.GetAccount(player).LobbyClothing);
-
 
                 Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
 

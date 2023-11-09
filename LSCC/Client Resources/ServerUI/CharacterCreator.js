@@ -381,6 +381,8 @@ mp.events.add("CharacterEditor:SceneSetup", (camX, camY, camZ, camRX, camRY, cam
 
     CanRotateInEditor = true;
     mp.events.callLocal('ToggleHud', false);
+    mp.players.local.taskPlayAnim("nm@hands", "hands_up", 1.0, 1.0, -1, 1, 1.0, true, true, true);
+    mp.players.local.freezePosition(true);
 });
 
 mp.events.add("CharacterEditor:DestroyScene", () => {
@@ -393,6 +395,8 @@ mp.events.add("CharacterEditor:DestroyScene", () => {
 
     CanRotateInEditor = false;
     mp.events.callLocal('ToggleHud', true);
+    mp.players.local.freezePosition(false);
+    mp.players.local.clearTasksImmediately();
 });
 
 const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, max -2 means all/limit
@@ -1008,7 +1012,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_0",
                 "name": "Blemishes",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 23,
                 "step": 1
             },
@@ -1044,7 +1048,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_1",
                 "name": "Facial Hair",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 28,
                 "step": 1
             },
@@ -1080,7 +1084,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_2",
                 "name": "Eyebrows",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 33,
                 "step": 1
             },
@@ -1116,7 +1120,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_3",
                 "name": "Ageing",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 14,
                 "step": 1
             },
@@ -1152,7 +1156,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_4",
                 "name": "Makeup",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 74,
                 "step": 1
             },
@@ -1188,7 +1192,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_5",
                 "name": "Blush",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 32,
                 "step": 1
             },
@@ -1224,7 +1228,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_6",
                 "name": "Complexion",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 11,
                 "step": 1
             },
@@ -1260,7 +1264,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_7",
                 "name": "Sun Damage",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 10,
                 "step": 1
             },
@@ -1296,7 +1300,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_8",
                 "name": "Lipstick",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 9,
                 "step": 1
             },
@@ -1332,7 +1336,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_9",
                 "name": "Moles/Freckles",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 17,
                 "step": 1
             },
@@ -1368,7 +1372,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_10",
                 "name": "Chest Hair",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 16,
                 "step": 1
             },
@@ -1404,7 +1408,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_11",
                 "name": "Body Blemishes",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 11,
                 "step": 1
             },
@@ -1440,7 +1444,7 @@ const OptionsPerCategory = [
                 "id": "head_overlay_12",
                 "name": "Add Body Blemishes",
                 "value": 1,
-                "min": 0,
+                "min": -1,
                 "max": 1,
                 "step": 1
             },
@@ -1454,7 +1458,7 @@ const OptionsPerCategory = [
                 "id": "hair_id",
                 "name": "Hair",
                 "value": 0,
-                "min": 0,
+                "min": -1,
                 "max": 140,
                 "step": 1
             },      
@@ -1491,7 +1495,6 @@ const OptionsPerCategory = [
 
 function getHairOverlaysForGender(isMale){
     if(!global.hairDecalsList){
-        mp.events.callRemote('ServerConsoleOutput', `Can't find hair decals list?!?!?!?!?!`);
         return;
     }
 
@@ -1503,18 +1506,16 @@ function getHairOverlaysForGender(isMale){
 }
 
 mp.events.add("character_editor_set_active_category_id", (id) => {
-    mp.events.callRemote(`ServerConsoleOutput`, `[CHAR EDITOR] Category set active to ${id}`);
 
 });
 mp.events.add("character_editor_change_category", (id) => {
-    mp.events.callRemote(`ServerConsoleOutput`, `[CHAR EDITOR] Category changed to ${id}`);
     setAppearanceEditorOptions(id);
 });
 mp.events.add("character_editor_close", () => {
-    
+    mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CURRENT_APPEARANCE_DATA))
+    mp.events.callRemote('CharacterEditor:CloseAppearanceEditor');
 });
 mp.events.add("character_editor_change_option", (id, value) => {
-    mp.events.callRemote(`ServerConsoleOutput`, `[CHAR EDITOR] Changed option: ${id} to ${value}`);
 
     if(id === "gender_option"){
         APPEARANCE_IsMale = !value; // True is female, false is male, therefore invert
