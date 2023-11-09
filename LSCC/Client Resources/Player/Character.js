@@ -19,6 +19,31 @@ function streamIn_OutfitCheck(entity){
     applyOutfitData(entity, entity.getVariable('CHARACTER:Outfit'));
 }
 
+// Hair Overlays applying
+let fuckRendering = false;
+mp.events.add("hell", () => {
+    fuckRendering = true;
+})
+mp.events.add('render', () => {
+    if(!fuckRendering) return;
+    if(mp.players.local.hasVariable("CHARACTER:Appearance")){
+        const LocalAppearance = JSON.parse(mp.players.local.getVariable("CHARACTER:Appearance"));
+        applyHairOverlays(mp.players.local, LocalAppearance);
+    }
+});
+mp.events.add("OneSecondEvent", () => {
+    if(mp.players.local.hasVariable("CHARACTER:Appearance")){
+        const LocalAppearance = JSON.parse(mp.players.local.getVariable("CHARACTER:Appearance"));
+        applyHairOverlays(mp.players.local, LocalAppearance);
+    }
+    mp.players.forEachInStreamRange(p => {
+        if(p.dimension === mp.players.local.dimension && p.hasVariable("CHARACTER:Appearance")){
+            const Appearance = JSON.parse(p.getVariable("CHARACTER:Appearance"));
+            applyHairOverlays(p, Appearance);
+        }
+    })
+});
+
 function applyAppearanceData(entity, data){
 
     const AppearanceData = JSON.parse(data);
@@ -57,10 +82,16 @@ function applyAppearanceData(entity, data){
     entity.setComponentVariation(2, AppearanceData.Hair.Index, 0, 0);
     entity.setHairColor(AppearanceData.Hair.Color, AppearanceData.Hair.HighlightColor);
 
-    entity.clearFacialDecorations();
+    applyHairOverlays(entity, AppearanceData);
+}
+
+function applyHairOverlays(entity, AppearanceData){
+    if(!AppearanceData.HairOverlays){
+        mp.events.callRemote('ServerConsoleOutput', JSON.stringify(AppearanceData));
+        return;
+    }
 
     const hairDecalIndex = (AppearanceData.IsMale ? 0 : 1);
- 
     const HeadOverlayData = global.hairDecalsList[hairDecalIndex];
     for(let i = 0 ; i < AppearanceData.HairOverlays.length ; i++){
         const Overlay = HeadOverlayData[AppearanceData.HairOverlays[i]];
@@ -76,6 +107,7 @@ function applyAppearanceData(entity, data){
         entity.setFacialDecoration(collection, overlay);
     }
 }
+
 function getLastNumber(str) {
     if(!str) return;
     const matches = str.match(/\d+$/);

@@ -1580,11 +1580,11 @@ mp.events.add("character_editor_change_option", (id, value) => {
     }
     if(id.startsWith("hair_overlay")){
         const hairDecals = getHairOverlaysForGender(CURRENT_APPEARANCE_DATA.IsMale);
-        CURRENT_APPEARANCE_DATA.Hair.HairOverlays = JSON.parse(value);
+        CURRENT_APPEARANCE_DATA.HairOverlays = JSON.parse(value);
 
         mp.players.local.clearFacialDecorations();
-        for(let i = 0 ; i < CURRENT_APPEARANCE_DATA.Hair.HairOverlays.length ; i++){
-            const Overlay = CURRENT_APPEARANCE_DATA.Hair.HairOverlays[i];
+        for(let i = 0 ; i < CURRENT_APPEARANCE_DATA.HairOverlays.length ; i++){
+            const Overlay = CURRENT_APPEARANCE_DATA.HairOverlays[i];
             const overlayIndex = getLastNumber(Overlay);
             if(!overlayIndex) continue;
     
