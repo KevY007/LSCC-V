@@ -555,13 +555,105 @@ const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max
 
 // Appearance Editor
 var APPEARANCE_IsMale = true;
+var CURRENT_APPEARANCE_DATA = undefined;
 
-mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender) => {
+mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appearanceData) => {
+    if(appearanceData.length !== 0) CURRENT_APPEARANCE_DATA = JSON.parse(appearanceData);
+    else CURRENT_APPEARANCE_DATA = undefined;
+
     APPEARANCE_IsMale = gender;
     if(global.ServerUI) global.ServerUI.call('character_editor_toggle', toggle);
 
     setAppearanceEditorCategories();
 });
+
+function updateCategoryOptionValues(category, options){
+    if(!CURRENT_APPEARANCE_DATA.length) return;
+    var OptionsOBJ = options;
+    if(category === "c_heritage"){
+        const HeadBlendData = CURRENT_APPEARANCE_DATA.HeadBlend;
+        // Exactly in order of the options in the category!
+        const DATA = [];
+        DATA.push(!CURRENT_APPEARANCE_DATA.IsMale); // This needs to be inverted because Male == false in the editor
+        DATA.push(HeadBlendData.FirstParentID);
+        DATA.push(HeadBlendData.SecondParentID);
+        DATA.push(HeadBlendData.MixParentID);
+        DATA.push(HeadBlendData.FirstSkinID);
+        DATA.push(HeadBlendData.SecondSkinID);
+        DATA.push(HeadBlendData.MixSkinID);
+        DATA.push(HeadBlendData.ShapeMix);
+        DATA.push(HeadBlendData.SkinMix);
+        DATA.push(HeadBlendData.ThirdMix);
+        DATA.push(CURRENT_APPEARANCE_DATA.EyeColor);
+        /*
+        const HeadBlendData = CURRENT_APPEARANCE_DATA.HeadBlend;
+        const IsMale = CURRENT_APPEARANCE_DATA.IsMale;
+        const Parent1 = HeadBlendData.FirstParentID;
+        const Parent2 = HeadBlendData.SecondParentID;
+        const Parent3 = HeadBlendData.MixParentID;
+        const Skin1 = HeadBlendData.FirstSkinID;
+        const Skin2 = HeadBlendData.SecondSkinID;
+        const Skin3 = HeadBlendData.MixSkinID;
+        const ShapeMix = HeadBlendData.ShapeMix;
+        const SkinMix = HeadBlendData.SkinMix;
+        const ThirdMix = HeadBlendData.ThirdMix;
+        const EyeColor = CURRENT_APPEARANCE_DATA.EyeColor;
+        */
+
+        for(let i = 0 ; i < DATA.length ; i++){
+            OptionsOBJ[i].value = DATA[i];
+        }
+
+        if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
+        return;
+    }
+    if(category === "c_features"){
+        const FaceFeatures = CURRENT_APPEARANCE_DATA.FaceFeatures;
+        for(let i = 0 ; i < FaceFeatures.length ; i++){
+            OptionsOBJ[i].value = FaceFeatures[i].Scale;
+        }
+
+        if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
+        return;
+    }
+
+    if(category === "c_overlays"){
+        const HeadOverlays = CURRENT_APPEARANCE_DATA.HeadOverlays;
+        for(let i = 0 ; i < HeadOverlays.length ; i++){
+            const Overlay = HeadOverlays[i];
+            const Index = Overlay.Index;
+            const Opacity = Overlay.Opacity;
+            const Color1 = Overlay.FirstColor;
+            const Color2 = Overlay.SecondColor;
+
+            OptionsOBJ.find(h => h.id == `head_overlay_${i}`).value = Index;
+            OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`).value = Opacity;
+            OptionsOBJ.find(h => h.id == `color1_head_overlay_${i}`).value = Color1;
+            OptionsOBJ.find(h => h.id == `color2_head_overlay_${i}`).value = Color2;
+        }
+
+        if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
+        return;
+    }
+
+    if(category === "c_hair"){
+        const HairData = CURRENT_APPEARANCE_DATA.Hair;
+        const HairOverlays = CURRENT_APPEARANCE_DATA.HairOverlays;
+
+        const Index = HairData.Index;
+        const Color = HairData.Color;
+        const HighlightColor = HairData.HighlightColor;
+
+        OptionsOBJ.find(o => o.id === "hair_id").value = Index;
+        OptionsOBJ.find(o => o.id === "hair_color1").value = Color;
+        OptionsOBJ.find(o => o.id === "hair_color2").value = HighlightColor;
+
+        OptionsOBJ.find(o => o.id === "hair_overlay").value = HairOverlays;
+
+        if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
+        return;
+    }
+}
 
 function setAppearanceEditorCategories(){
     const options = [
@@ -606,9 +698,12 @@ function setAppearanceEditorOptions(category){
     }
 
     if(global.ServerUI) global.ServerUI.call('character_editor_set_options', options);
+
+    updateCategoryOptionValues(category, options);
 }
 
 // LAST NUMBER IN FACE FEATURES CATEGORY = INDEX TO CHANGE
+// This can also serve as the DEFAULT VALUES!!
 const OptionsPerCategory = [
     {
         category:"c_heritage",
@@ -700,6 +795,15 @@ const OptionsPerCategory = [
                 min: 0,
                 max: 1.0,
                 step: 0.1,
+            },
+            {
+                type: "slider",
+                id: "eye_color",
+                name: "Eye Color",
+                value: 0,
+                min: 0,
+                max: 31,
+                step: 1,
             },
         ]
     },
