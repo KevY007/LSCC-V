@@ -315,9 +315,27 @@ namespace RNC
 
         }
 
+        public async static Task DeleteAllCharacterData(Account acc)
+        {
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                List<SavedOutfit> outfits = await context.SavedOutfits.AsQueryable().Where(o => o.AccountID == acc.SQL_ID).ToListAsync();
+                List<SavedAppearance> appearances = await context.SavedAppearances.AsQueryable().Where(o => o.AccountID == acc.SQL_ID).ToListAsync();
+                CharacterSlot slot = await context.CharacterSlots.AsQueryable().FirstOrDefaultAsync(s => s.AccountID == acc.SQL_ID);
+                if(slot != null)
+                    context.CharacterSlots.Remove(slot);
+
+                if(appearances != null)
+                    context.SavedAppearances.RemoveRange(appearances);
+
+                if(outfits != null)
+                    context.SavedOutfits.RemoveRange(outfits);
+
+                await context.SaveChangesAsync();
+            }
+        }
         public static void InitializeCharacter(Player player, Account acc)
         {
-            NAPI.Util.ConsoleOutput($"Called char init");
             try
             {
                 int AccountSQLID = acc.SQL_ID;

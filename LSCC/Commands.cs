@@ -11657,7 +11657,18 @@ namespace RNC
             {
                 if(action.StartsWith("reset confirm"))
                 {
-                    // TO-DO: reset all outfits and appearance function
+                    EPlayer.Error(player, "Resetting character...");
+                    Account acc = EPlayer.GetAccount(player);
+                    Task.Run(async () =>
+                    {
+                        await Character.DeleteAllCharacterData(acc);
+                        NAPI.Task.Run(() =>
+                        {
+                            Character.InitializeCharacter(player, acc);
+                            player.SetData<bool>("CHARACTER:IsNew", true);
+                            EPlayer.Spawn(player);
+                        });
+                    });
                     return;
                 }
                 player.SendChatMessage(Translate(player, "CHARACTER_RESET_WARNING_1"));
