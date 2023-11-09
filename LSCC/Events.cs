@@ -3630,20 +3630,7 @@ namespace RNC
             EPlayer.GetAccount(player).Language = languageID;
             player.TriggerEvent("DestroyLoginScene");
 
-            CharacterData ConvChar = new CharacterData();
-            try
-            {
-                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                ConvChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
-                ConvChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
-                ConvChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
-                ConvChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
-
-                player.SetData("cEditClothingData", ConvChar.Clothing);
-                EPlayer.ShowCharCreator(player, ConvChar, true);
-            }
-            catch { EPlayer.ShowCharCreator(player, null, true); }
+            // TO-DO: send player to char editor after tutorial
 
         }        
 
@@ -4229,25 +4216,6 @@ namespace RNC
                     }
                 });
 
-
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    if (await context.PlayerOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID) == null)
-                    {
-                        CharacterData[] defaultOutfits = new CharacterData[5];
-                        for (int i = 0; i < 5; i++)
-                        {
-                            defaultOutfits[i] = new CharacterData();
-                        }
-                        await context.PlayerOutfits.AddAsync(new PlayerOutfit()
-                        {
-                            AccountID = acc.SQL_ID,
-                            OutfitData = NAPI.Util.ToJson(defaultOutfits)
-                        });
-                        await context.SaveChangesAsync();
-                    }
-                }
-
                 List<string> cLoadouts = await EPlayer.GetOwnedLoadouts(acc, 1);
                 List<string> fLoadouts = await EPlayer.GetOwnedLoadouts(acc, 0);
                 int totalOwned = cLoadouts.Count + fLoadouts.Count + 2;
@@ -4666,68 +4634,7 @@ namespace RNC
         [RemoteEvent("HolsterAnimation_PistolCheck")]
         public void HolsterAnimation_PistolCheck(Player player, bool unholster)
         {
-            try
-            {
-                CharacterData cdata = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                if (cdata == null) return;
-
-
-                if (cdata.Gender == 0) // male
-                {
-                    if (cdata.Clothing[1].Clothes[7].Drawable != 183 && cdata.Clothing[1].Clothes[7].Drawable != 184) return;
-
-                    player.SetClothes(7, (unholster ? 184 : 183), 0);
-                }
-                else
-                {
-                    if (cdata.Clothing[3].Clothes[7].Drawable != 126 && cdata.Clothing[3].Clothes[7].Drawable != 127) return;
-
-                    player.SetClothes(7, (unholster ? 147 : 146), 0);
-                }
-            }
-            catch
-            {
-                // no big deal tbh
-            }
-        }
-
-        [RemoteEvent("RequestSetClothes")]
-        public void OnRequestSetClothes(Player player, int slot, int drawable, int texture)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            if (Main.BlacklistedClothing(slot, drawable))
-            {
-                player.SendNotification("~r~This clothing is blacklisted!");
-                return;
-            }
-
-            Account acc = EPlayer.GetAccount(player);
-
-            if ((slot == 1) && acc.DonatorLevel < 1)
-            {
-                player.SendNotification("~r~Only donators can use this itemgroup (masks).");
-                return;
-            }
-
-            if (player.GetData<int>("EditingClothing") != -1)
-            {
-                try
-                {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-6 edit clothes."));
-
-                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
-
-                    charData.Clothing[player.GetData<int>("EditingClothing")].Clothes[slot].Drawable = drawable;
-                    charData.Clothing[player.GetData<int>("EditingClothing")].Clothes[slot].Texture = texture;
-
-                    acc.Character = NAPI.Util.ToJson(charData);
-                }
-                catch { }
-            }
-
-            player.SetClothes(slot, drawable, texture);
-
+                // TO-DO: remove gun from holster if player has holster with gun, not priority
         }
 
         [RemoteEvent("FugitiveEnterInterior")]
@@ -4764,67 +4671,6 @@ namespace RNC
             // "ReportFugitiveEnterBuilding"
         }
 
-        [RemoteEvent("RequestSetGlasses")]
-        public void OnRequestSetGlasses(Player player, int drawable, int texture)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            if (Main.BlacklistedClothing(1, drawable))
-            {
-                player.SendNotification("~r~This clothing is blacklisted!");
-                return;
-            }
-
-            if (player.GetData<int>("EditingClothing") != -1)
-            {
-                Account acc = EPlayer.GetAccount(player);
-                try
-                {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-5 edit props."));
-
-                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
-
-                    charData.Clothing[player.GetData<int>("EditingClothing")].Glasses = drawable;
-                    charData.Clothing[player.GetData<int>("EditingClothing")].GlassesTxt = texture;
-
-                    acc.Character = NAPI.Util.ToJson(charData);
-                }
-                catch { }
-            }
-
-            player.SetAccessories(1, drawable, texture);
-        }
-
-        [RemoteEvent("RequestSetHat")]
-        public void OnRequestSetHat(Player player, int drawable, int texture)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            if (Main.BlacklistedClothing(0, drawable))
-            {
-                player.SendNotification("~r~This clothing is blacklisted!");
-                return;
-            }
-
-            if (player.GetData<int>("EditingClothing") != -1)
-            {
-                Account acc = EPlayer.GetAccount(player);
-                try
-                {
-                    if (acc.Character == null || acc.Character.Length < 10) throw (new System.Exception("Invalid characterdata-4 edit props."));
-
-                    CharacterData charData = NAPI.Util.FromJson<CharacterData>(acc.Character);
-
-                    charData.Clothing[player.GetData<int>("EditingClothing")].Hat = drawable;
-                    charData.Clothing[player.GetData<int>("EditingClothing")].HatTxt = texture;
-
-                    acc.Character = NAPI.Util.ToJson(charData);
-                }
-                catch { }
-            }
-
-            player.SetAccessories(0, drawable, texture);
-        }
 
         [RemoteEvent("EVENT:BankRobbery_LeaderEnterVehicle")]
         public static void BankRobbery_OnLeaderEnterVehicle(Player player, Vehicle vehicle, int vehicleTeam)
@@ -5037,13 +4883,6 @@ namespace RNC
 
             //EPlayer.ShowCharCreator(player);
 
-
-            // Adding the 5 default characters to the outfits section so he has his own entry in the outfits table bla bla boring
-            CharacterData[] defaultOutfits = new CharacterData[5];
-            for (int i = 0; i < 5; i++)
-            {
-                defaultOutfits[i] = new CharacterData();
-            }
             Task.Run(async () =>
             {
                 await AccountManager.BanEvadeCheck(player, acc);
@@ -7600,16 +7439,6 @@ namespace RNC
             EPlayer.Save(player, false);
         }
 
-        [RemoteEvent("char_ResetEcho")]
-        public void OnCharacterReset(Player player)
-        {
-            if (player.HasData("LastResetEchoEvent") && player.GetData<int>("LastResetEchoEvent") == 1)
-            {
-                EPlayer._ApplyCharacter(player, player.GetData<CharacterData>("ApplyChar"), player.GetData<int>("ApplyCharTeam"));
-            }
-
-            player.SetData("LastResetEchoEvent", 0);
-        }
 
         [RemoteEvent("OnLoadoutSelectorSelect")]
         public void OnSelectorSelectLoadout(Player player, int team, string ldname)

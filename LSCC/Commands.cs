@@ -7365,29 +7365,6 @@ namespace RNC
             player.SendChatMessage(Translate(player, "DONATOR_STATUS_TOGGLED", (EPlayer.GetAccount(player).DonatorStatus == true ? Translate(player, "ENABLED") : Translate(player, "DISABLED"))));
         }
 
-        [Command("tattoo")]
-        public void cmd_tattoo(Player player)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            CharacterData ConvChar = new CharacterData();
-            try
-            {
-                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-            }
-            catch
-            {
-                cmd_char(player, "reset");
-                return;
-            }
-
-            int gender = Convert.ToInt32(ConvChar.Gender);
-            string genderChar = "M";
-            if (gender == 1) genderChar = "F";
-
-            player.TriggerEvent("ShowTattooMenu", genderChar);
-        }
-
         [Command("clanchat", "!{#AFAFAF}[USAGE] clanchat (text)", Alias = "c", GreedyArg = true)]
         public void cmd_clanchat(Player player, string message)
         {
@@ -11664,69 +11641,6 @@ namespace RNC
             }
         }
 
-        [Command("dbgsetclothing")]
-        public void cmd_dbgsetclothing(Player player, string type, int drawable, int texture = 0)
-        {
-            if (!EPlayer.LoggedIn(player))
-                return;
-            if (EPlayer.GetAccount(player).Admin < 5) 
-                return;
-
-            CharacterData ConvChar = new CharacterData();
-            try
-            {
-                ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-            }
-            catch
-            {
-                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have a character created! (/char reset)");
-                return;
-            }
-
-            switch (type)
-            {
-                case "shirt":
-                    ConvChar.Clothing[0].Clothes[11].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[11].Texture = texture;
-                    player.SetClothes(11, drawable, texture);
-                    break;
-                case "undershirt":
-                    ConvChar.Clothing[0].Clothes[8].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[8].Texture = texture;
-                    player.SetClothes(8, drawable, texture);
-                    break;
-                case "pants":
-                    ConvChar.Clothing[0].Clothes[4].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[4].Texture = texture;
-                    player.SetClothes(4, drawable, texture);
-                    break;
-                case "shoes":
-                    ConvChar.Clothing[0].Clothes[6].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[6].Texture = texture;
-                    player.SetClothes(6, drawable, texture);
-                    break;
-                case "accessory":
-                    ConvChar.Clothing[0].Clothes[7].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[7].Texture = texture;
-                    player.SetClothes(7, drawable, texture);
-                    break;
-                case "bag":
-                    ConvChar.Clothing[0].Clothes[5].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[5].Texture = texture;
-                    player.SetClothes(5, drawable, texture);
-                    break;
-                case "mask":
-                    ConvChar.Clothing[0].Clothes[1].Drawable = drawable;
-                    ConvChar.Clothing[1].Clothes[1].Texture = texture;
-                    player.SetClothes(1, drawable, texture);
-                    break;
-                default:
-                    player.SendChatMessage("!{#C9C9C9}[OPTIONS] shirt/undershirt/pants/shoes/accessory/bag/mask");
-                    return;
-            }
-            player.SendChatMessage( $"~y~Done! You set your ~w~{type} ~y~to drawable ~w~{drawable} (TX:{texture})~w~!");
-            return;
-        }
 
         [Command("char", "!{#AFAFAF}[USAGE] character (option: edit, reset, lobbyteam)", GreedyArg = true, Alias = "character")]
         public static void cmd_char(Player player, string action)
