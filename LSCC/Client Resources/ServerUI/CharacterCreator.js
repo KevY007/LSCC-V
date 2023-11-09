@@ -1561,19 +1561,38 @@ mp.events.add("character_editor_change_option", (id, value) => {
 
         return;
     }
-    if(hair == "hair_color1"){
+    if(id == "hair_color1"){
         CURRENT_APPEARANCE_DATA.Hair.Color = value;
 
         mp.players.local.setHairColor(CURRENT_APPEARANCE_DATA.Hair.Color, CURRENT_APPEARANCE_DATA.Hair.HighlightColor);
 
         return;
     }
-    if(hair == "hair_color2"){
+    if(id == "hair_color2"){
         CURRENT_APPEARANCE_DATA.Hair.HighlightColor = value;
 
         mp.players.local.setHairColor(CURRENT_APPEARANCE_DATA.Hair.Color, CURRENT_APPEARANCE_DATA.Hair.HighlightColor);
 
         return;
+    }
+    if(id.startsWith("hair_overlay")){
+        const hairDecals = getHairOverlaysForGender(CURRENT_APPEARANCE_DATA.IsMale);
+        CURRENT_APPEARANCE_DATA.Hair.HairOverlays = JSON.parse(value);
+
+        mp.players.local.clearFacialDecorations();
+        for(let i = 0 ; i < CURRENT_APPEARANCE_DATA.Hair.HairOverlays.length ; i++){
+            const Overlay = CURRENT_APPEARANCE_DATA.Hair.HairOverlays[i];
+            const overlayIndex = getLastNumber(Overlay);
+            if(!overlayIndex) continue;
+    
+            const HairOverlay = hairDecals[overlayIndex];
+    
+            const collection = mp.game.gameplay.getHashKey(HairOverlay.collection);
+            if(!collection) continue;
+            const overlay = mp.game.gameplay.getHashKey(HairOverlay.overlay);
+            if(!overlay) continue;
+            mp.players.local.setFacialDecoration(collection, overlay);
+        }
     }
 
 
