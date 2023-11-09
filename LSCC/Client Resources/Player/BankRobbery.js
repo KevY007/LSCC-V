@@ -6,7 +6,7 @@ var ObjectiveData = {
   const {TranslateMessage: Translate} = require('./Translator');
 
 
-const BR_BLIPS = [];
+var BR_BLIPS = [];
 var FinishMarker = null;
 mp.events.add("EVENT:AddBankRobberyFinishMarker", (posX, posY, posZ) => {
     if(FinishMarker != null) return;
@@ -26,7 +26,8 @@ mp.events.add("EVENT:DestroyBankRobberyFinishMarker", () => {
 
 mp.events.add("EVENT:ClearObjectiveBlips", () => {
     for(let i = 0 ; i < BR_BLIPS.length ; i++){
-        BR_BLIPS[i].destroy();
+        if(BR_BLIPS[i])
+            BR_BLIPS[i].destroy();
     }
     BR_BLIPS = [];
 });
@@ -62,7 +63,7 @@ mp.events.add("EVENTS:SetBankRobberyActive", (value) => {
 });
 mp.events.add("EVENTS:SetBankRobberyObjective", (toggle, message_code, ...args) => {
 
-    const argsArray = (args.length > 0 ? args.toArray() : null);
+    const argsArray = (args.length > 0 ? args : null);
 
     ObjectiveData = {
         show:toggle,

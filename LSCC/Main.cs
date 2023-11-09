@@ -3461,6 +3461,8 @@ namespace RNC
             // Setting cops to all players who aren't in fugitives, aka the rest
             lobby.Cops = participants.Where(p => !lobby.Fugitives.Contains(p)).ToList();
 
+            NAPI.Util.ConsoleOutput($"LOBBY COPS: {lobby.Cops.Count} | FUGITIVES: ${lobby.Fugitives.Count}");
+
             // Setting up custom BANK ROBBERY vehicles
             lobby.BankRobbery.FugitiveVehicles.Clear();
             lobby.BankRobbery.PoliceVehicles.Clear();
@@ -4319,6 +4321,8 @@ namespace RNC
         // Handles when and when not to show fugitive blips on the map - run every second
         private static void HandleFugitiveShowCounters(LobbyData lobby)
         {
+            NAPI.Util.ConsoleOutput($"Fugitive Show Counter: {lobby.FugitiveShowCounter} | Last seen: {lobby.LastSeenCounter}");
+
             lobby.FugitiveShowCounter++;
             lobby.LastSeenCounter++;
 
@@ -4337,6 +4341,7 @@ namespace RNC
                             {
                                 if (a == null) continue;
                                 a.TriggerEvent("ReportLastSeen", fugi.Name, fugi.Position.X, fugi.Position.Y, fugi.Position.Z);
+                                NAPI.Util.ConsoleOutput($"Reporting last seen to {a.Name}");
                             }
                             catch { }
                         }
@@ -4378,6 +4383,7 @@ namespace RNC
                         fugi.SetSharedData("VisibleBlip", false);
 
                         EPlayer.Notify(fugi, Translate(fugi, "RADAR_INVISIBLE"), "green", "fas fa-walking", false, 3000);
+                        NAPI.Util.ConsoleOutput($"Reporting last seen to {fugi.Name}");
                     }
                 }
             }
@@ -4560,10 +4566,12 @@ namespace RNC
 
         private static void CopchaseSecondTick(LobbyData lobby, int secondsElapsed)
         {
+            NAPI.Util.ConsoleOutput($"Copchase second tick: {lobby.lobbyId} [secs: {secondsElapsed}] | {lobby.Cops.Count} fugs: {lobby.Fugitives.Count}");
             HandleFugitiveShowCounters(lobby);
             HandleCollisionCounters(lobby);
 
-            List<Player> CopchasePlayers = lobby.Fugitives;
+            List<Player> CopchasePlayers = new List<Player>();
+            CopchasePlayers.AddRange(lobby.Fugitives);
             CopchasePlayers.AddRange(lobby.Cops);
 
             // Pre-game setups -> putting players into vehicles, toggling collisions, etc.
@@ -4796,7 +4804,8 @@ namespace RNC
 
         private static void BankRobberySecondTick(LobbyData lobby, int secondsElapsed)
         {
-            List<Player> CopchasePlayers = lobby.Fugitives;
+            List<Player> CopchasePlayers = new List<Player>();
+            CopchasePlayers.AddRange(lobby.Fugitives);
             CopchasePlayers.AddRange(lobby.Cops);
 
             // Just placing cops into their vehicles at the beginning, game still not started. Setting dimension too.
@@ -4923,6 +4932,7 @@ namespace RNC
                 lobby.BankRobbery.GameState = BankRobberyData.State.StealingMoney;
                 foreach (Player player in CopchasePlayers)
                 {
+                    player.TriggerEvent("stopLoadingScreen");
                     player.TriggerEvent("EVENTS:SetBankRobberyActive", true);
                     // Stop the custom loading screen
                     if (lobby.Fugitives.Contains(player))

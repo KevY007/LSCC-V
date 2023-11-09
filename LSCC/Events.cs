@@ -2521,8 +2521,9 @@ namespace RNC
                     {
                         if (!Main.BankRobbery_AnyLeadersAlive(lobby))
                         {
-                            List<Player> CopchasePlayers = lobby.Cops;
+                            List<Player> CopchasePlayers = new List<Player>();
                             CopchasePlayers.AddRange(lobby.Fugitives);
+                            CopchasePlayers.AddRange(lobby.Cops);
                             foreach (Player cPlayer in CopchasePlayers)
                             {
                                 cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_FULL_WIN"));
@@ -2783,8 +2784,9 @@ namespace RNC
                                 {
                                     if (lobby.BankRobbery.IsMoneybagDelivered)
                                     {
-                                        List<Player> CopchasePlayers = lobby.Cops;
+                                        List<Player> CopchasePlayers = new List<Player>();
                                         CopchasePlayers.AddRange(lobby.Fugitives);
+                                        CopchasePlayers.AddRange(lobby.Cops);
                                         foreach (Player cPlayer in CopchasePlayers)
                                         {
                                             cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_NEUTRALIZED"));
@@ -3326,8 +3328,9 @@ namespace RNC
                                         {
                                             if (lobby.BankRobbery.IsMoneybagDelivered)
                                             {
-                                                List<Player> CopchasePlayers = lobby.Cops;
+                                                List<Player> CopchasePlayers = new List<Player>();
                                                 CopchasePlayers.AddRange(lobby.Fugitives);
+                                                CopchasePlayers.AddRange(lobby.Cops);
                                                 foreach (Player cPlayer in CopchasePlayers)
                                                 {
                                                     cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_NEUTRALIZED"));
@@ -4681,8 +4684,9 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if (lobby == null) return;
 
-            List<Player> CopchasePlayers = lobby.Cops;
+            List<Player> CopchasePlayers = new List<Player>();
             CopchasePlayers.AddRange(lobby.Fugitives);
+            CopchasePlayers.AddRange(lobby.Cops);
 
             player.TriggerEvent("EVENT:ClearObjectiveBlips");
             player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER",
