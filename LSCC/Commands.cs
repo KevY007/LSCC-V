@@ -388,6 +388,9 @@ namespace RNC
             Character.SendPlayerToEditorScene(player, 0, false);
 
             Character character = Character.GetCharacter(player);
+            Character.ApplyAppearance(player, character.CurrentAppearance);
+            Character.ApplyOutfit(player, character.CurrentOutfit);
+
             string appData = NAPI.Util.ToJson(character.CurrentAppearance);
             player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", true, character.CurrentAppearance.IsMale, appData);
         }

@@ -582,9 +582,9 @@ function updateCategoryOptionValues(category, options){
         DATA.push(HeadBlendData.FirstSkinID);
         DATA.push(HeadBlendData.SecondSkinID);
         DATA.push(HeadBlendData.MixSkinID);
-        DATA.push(HeadBlendData.ShapeMix);
-        DATA.push(HeadBlendData.SkinMix);
-        DATA.push(HeadBlendData.ThirdMix);
+        DATA.push(Math.round(HeadBlendData.ShapeMix*100));
+        DATA.push(Math.round(HeadBlendData.SkinMix*100));
+        DATA.push(Math.round(HeadBlendData.ThirdMix*100));
         DATA.push(CURRENT_APPEARANCE_DATA.EyeColor);
         /*
         const HeadBlendData = CURRENT_APPEARANCE_DATA.HeadBlend;
@@ -611,7 +611,7 @@ function updateCategoryOptionValues(category, options){
     if(category === "c_features"){
         const FaceFeatures = CURRENT_APPEARANCE_DATA.FaceFeatures;
         for(let i = 0 ; i < FaceFeatures.length ; i++){
-            OptionsOBJ[i].value = FaceFeatures[i].Scale;
+            OptionsOBJ[i].value = Math.round((FaceFeatures[i].Scale*100));
         }
 
         if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
@@ -631,7 +631,7 @@ function updateCategoryOptionValues(category, options){
                 OptionsOBJ.find(h => h.id == `head_overlay_${i}`).value = Index;
 
             if(OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`))
-                OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`).value = Opacity;
+                OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`).value = Math.round(Opacity*100);
    
             if(OptionsOBJ.find(h => h.id == `color1_head_overlay_${i}`))
                 OptionsOBJ.find(h => h.id == `color1_head_overlay_${i}`).value = Color1;
@@ -781,28 +781,28 @@ const OptionsPerCategory = [
                 type: "slider",
                 id: "shape_mix",
                 name: "Shape Mix",
-                value: 0.5,
+                value: 50,
                 min: 0,
-                max: 1.0,
-                step: 0.1,
+                max: 100,
+                step: 1,
             },
             {
                 type: "slider",
                 id: "skin_mix",
                 name: "Skin Mix",
-                value: 0.5,
+                value: 50,
                 min: 0,
-                max: 1.0,
-                step: 0.1,
+                max: 100,
+                step: 1,
             },
             {
                 type: "slider",
                 id: "third_mix",
                 name: "Third Mix",
-                value: 0.5,
+                value: 50,
                 min: 0,
-                max: 1.0,
-                step: 0.1,
+                max: 100,
+                step: 1,
             },
             {
                 type: "slider",
@@ -1436,12 +1436,14 @@ const OptionsPerCategory = [
                 "step": 1
             },
             {
-                type: "toggle",
-                id: "head_overlay_12",
-                name: "Body Blemishes",
-                value: false,
-                labels: ["Disabled", "Enabled"]
-            }
+                "type": "slider",
+                "id": "head_overlay_12",
+                "name": "Add Body Blemishes",
+                "value": 1,
+                "min": 0,
+                "max": 1,
+                "step": 1
+            },
         ]
     },
     {
@@ -1539,7 +1541,6 @@ mp.events.add("character_editor_change_option", (id, value) => {
         let overlayID = getLastNumber(id);
         let realValue = value;
 
-
         if(id.startsWith("opacity")){
             realValue = (value/100);
             CURRENT_APPEARANCE_DATA.HeadOverlays[overlayID].Opacity = realValue;
@@ -1595,8 +1596,68 @@ mp.events.add("character_editor_change_option", (id, value) => {
         }
     }
 
-
+    if(id == "shape_parent_1"){
+        CURRENT_APPEARANCE_DATA.HeadBlend.FirstParentID = value;
+        updateHeritageData();
+        return;
+    }
+    if(id == "shape_parent_2"){
+        CURRENT_APPEARANCE_DATA.HeadBlend.SecondParentID = value;
+        updateHeritageData();
+        return;
+    }
+    if(id == "shape_parent_3"){
+        CURRENT_APPEARANCE_DATA.HeadBlend.MixParentID = value;
+        updateHeritageData();
+        return;
+    }
+    if(id == "skin_parent_1"){
+        CURRENT_APPEARANCE_DATA.HeadBlend.FirstSkinID = value;
+        updateHeritageData();
+        return;
+    }
+    if(id == "skin_parent_2"){
+        CURRENT_APPEARANCE_DATA.HeadBlend.SecondSkinID = value;
+        updateHeritageData();
+        return;
+    }
+    if(id == "skin_parent_3"){
+        CURRENT_APPEARANCE_DATA.HeadBlend.MixSkinID = value;
+        updateHeritageData();
+        return;
+    }
+    if(id == "shape_mix"){
+        let realValue = (value/100);
+        CURRENT_APPEARANCE_DATA.HeadBlend.ShapeMix = realValue;
+        updateHeritageData();
+        return;
+    }
+    if(id == "skin_mix"){
+        let realValue = (value/100);
+        CURRENT_APPEARANCE_DATA.HeadBlend.SkinMix = realValue;
+        updateHeritageData();
+        return;
+    }
+    if(id == "third_mix"){
+        let realValue = (value/100);
+        CURRENT_APPEARANCE_DATA.HeadBlend.ThirdMix = realValue;
+        updateHeritageData();
+        return;
+    }
+    if(id == "eye_color"){
+        CURRENT_APPEARANCE_DATA.EyeColor = value;
+        mp.players.local.setEyeColor(value);
+        return;
+    }
 });
+
+function updateHeritageData(){
+    const entity = mp.players.local;
+    const HeadBlend = CURRENT_APPEARANCE_DATA.HeadBlend;
+    entity.setHeadBlendData(HeadBlend.FirstParentID, HeadBlend.SecondParentID, HeadBlend.MixParentID, 
+        HeadBlend.FirstSkinID, HeadBlend.SecondSkinID, HeadBlend.MixSkinID,
+        HeadBlend.ShapeMix, HeadBlend.SkinMix, HeadBlend.ThirdMix, HeadBlend.IsParent);
+}
 
 function getLastNumber(str) {
     if(!str) return;

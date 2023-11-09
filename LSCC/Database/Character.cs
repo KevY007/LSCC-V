@@ -589,7 +589,10 @@ namespace RNC
                 return outfit;
             }
         }
-
+        public static void ApplyOutfit(Player player, Outfit outfit)
+        {
+            ApplyOutfitData(player, outfit);
+        }
         public static Outfit ApplyOutfit(Player player, bool isMale, int team, SavedOutfit outfit = null)
         {
             if (outfit == null)
@@ -601,6 +604,10 @@ namespace RNC
             Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);
             ApplyOutfitData(player, _o);
             return _o;
+        }
+        public static void ApplyAppearance(Player player, Appearance appearance)
+        {
+            ApplyAppearanceData(player, appearance);
         }
         public static Appearance ApplyAppearance(Player player, SavedAppearance appearance = null)
         {
