@@ -5698,6 +5698,7 @@ namespace RNC
                                 }
                             }
                             */
+                            /*
                             if (lobby.GameProgress == 10)
                             {
                                 if (lobby.gameMode != GameModes.BANKROBBERY)
@@ -5765,7 +5766,7 @@ namespace RNC
                                                                 }
                                                                 catch { }
 
-                                                                /*
+                                                                
                                                                 CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
                                                                 
                                                                 int len = cd.Clothing.Length;
@@ -5805,7 +5806,7 @@ namespace RNC
                                                                     set_clothing_successfully = true;
                                                                 }
                                                                 EPlayer.ApplyCharacter(p, cd, 1);
-                                                                */
+                                                                
                                                             }
                                                             catch (Exception ex)
                                                             {
@@ -5895,6 +5896,7 @@ namespace RNC
                                     }
                                 }
                             }
+                            */
 
                             if (lobby.GameProgress >= (Convert.ToInt32(0.7 * Settings.GameRunTime) - 60) && lobby.gameMode != GameModes.BUSTED && lobby.gameMode != GameModes.BANKROBBERY)
                             {

@@ -598,6 +598,9 @@
   "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}Leader {PLAYER NAME} has delivered the money! Help the other leader deliver their share for a bonus reward!",
   "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}One leader has already delivered the money! Stop the other one to get a reward!",
   "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}The police have managed to neutralize one of the heist leaders!",
-  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Flawless! The fugitives have successfully delivered both money bags to their hideout!"
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Flawless! The fugitives have successfully delivered both money bags to their hideout!",
+  "CHARACTER_RESET_WARNING_1": "!{#FF6347}[!] !{#FFFFFF}This option will reset your appearance and ALL your outfits with no chance to restore them!",
+  "CHARACTER_RESET_WARNING_2": "!{#FF6347}[>] !{#FFFFFF}You can use !{#ffff00}/char edit !{#ffffff}to edit your appearance! Only use this if you wish to change your gender.",
+  "CHARACTER_RESET_WARNING_3": "!{#FF6347}[>] !{#FFFFFF}Use !{#ffff00}/char reset confirm !{#ffffff}to proceed with resetting your appearance & outfits."
 
 }

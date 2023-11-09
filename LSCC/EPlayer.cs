@@ -445,48 +445,6 @@ namespace RNC
             player.TriggerEvent("char_Reset");
         }
 
-        public static void ShowCharCreator(Player player, CharacterData charData = null, bool showClothingAfter = false, bool blockGenderChange = false)
-        {
-            if (!EPlayer.LoggedIn(player)) return;
-
-            player.SetSharedData("CharCreator_ShowClothingAfter", showClothingAfter);
-
-            player.TriggerEvent("DestroyPlayerCamera");
-            player.SetData("Creator_Using", true);
-
-            player.SetSkin(PedHash.FreemodeMale01);
-
-            foreach (LobbyData il in Settings.Lobbies)
-            {
-                il.Cops.Remove(player);
-                il.Fugitives.Remove(player);
-            }
-
-            player.SetSharedData("Team", -1);
-            player.SetSharedData("InLobby", -5);
-
-            player.Dimension = (uint)player.Id + 699;
-
-            CharacterData defaultChar = new CharacterData();
-            if (charData != null) defaultChar = charData;
-            else
-            {
-                defaultChar.Clothing[0] = new ClothingData(0, 0); // Fugitive MALE
-                defaultChar.Clothing[1] = new ClothingData(1, 0); // Cop MALE
-                defaultChar.Clothing[2] = new ClothingData(0, 1); // Fugitive FEMALE
-                defaultChar.Clothing[3] = new ClothingData(1, 1); // Cop FEMALE
-            }
-
-            EPlayer.ApplyCharacter(player, defaultChar);
-
-            player.Position = new Vector3(402.8664, -996.4108, -99.00027);
-            player.Heading = -185.0f;
-
-            player.TriggerEvent("toggleCreator", true, NAPI.Util.ToJson(defaultChar), blockGenderChange);
-
-            return;
-        }
-
         public static string GetAdminLevelName(int level, bool colored = false)
         {
             string name = "";
@@ -761,9 +719,8 @@ namespace RNC
             if (lobby.gameMode == GameModes.BANKROBBERY)
             {
                 Account a = EPlayer.GetAccount(i);
-                CharacterData cd = NAPI.Util.FromJson<CharacterData>(a.Character);
-                EPlayer.ApplyCharacter(i, cd, a.LobbyClothing);
 
+                Character.ApplyAppearance(i, Character.GetCharacter(i).CurrentAppearance);
                 Character.SetTeamOutfit(i, a.LobbyClothing);
             }
             if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)

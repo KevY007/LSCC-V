@@ -593,5 +593,8 @@
   "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}Le chef {PLAYER NAME} a livré l'argent ! Aidez l'autre chef à livrer sa part pour une récompense bonus !",
   "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}Un chef a déjà livré l'argent ! Arrêtez l'autre pour obtenir une récompense !",
   "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}La police a réussi à neutraliser l'un des chefs du braquage !",
-  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Impeccable ! Les fugitifs ont livré avec succès les deux sacs d'argent à leur repaire !"
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Impeccable ! Les fugitifs ont livré avec succès les deux sacs d'argent à leur repaire !",
+  "CHARACTER_RESET_WARNING_1": "!{#FF6347}[!] !{#FFFFFF}Cette option réinitialisera votre apparence et TOUS vos costumes sans possibilité de les restaurer !",
+  "CHARACTER_RESET_WARNING_2": "!{#FF6347}[>] !{#FFFFFF}Vous pouvez utiliser !{#ffff00}/char edit !{#ffffff}pour modifier votre apparence ! Utilisez cette option uniquement si vous souhaitez changer de sexe.",
+  "CHARACTER_RESET_WARNING_3": "!{#FF6347}[>] !{#FFFFFF}Utilisez !{#ffff00}/char reset confirm !{#ffffff} pour procéder à la réinitialisation de votre apparence et de vos costumes."
 }

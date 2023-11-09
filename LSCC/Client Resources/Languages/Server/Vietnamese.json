@@ -593,6 +593,9 @@
   "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}Lãnh đạo {PLAYER NAME} đã giao tiền! Hãy giúp lãnh đạo khác giao phần của họ để nhận thưởng thêm!",
   "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}Một lãnh đạo đã giao tiền! Dừng lãnh đạo còn lại để nhận thưởng!",
   "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}Cảnh sát đã thành công trong việc loại bỏ một trong những lãnh đạo trong vụ cướp!",
-  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Hoàn hảo! Các tội phạm đã thành công trong việc giao cả hai túi tiền về nơi ẩn náu của họ!"
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}Hoàn hảo! Các tội phạm đã thành công trong việc giao cả hai túi tiền về nơi ẩn náu của họ!",
+  "CHARACTER_RESET_WARNING_1": "!{#FF6347}[!] !{#FFFFFF}Lựa chọn này sẽ đặt lại ngoại hình và TẤT CẢ các trang phục của bạn mà không có khả năng khôi phục lại chúng!",
+  "CHARACTER_RESET_WARNING_2": "!{#FF6347}[>] !{#FFFFFF}Bạn có thể sử dụng !{#ffff00}/char edit !{#ffffff} để chỉnh sửa ngoại hình của bạn! Chỉ sử dụng điều này nếu bạn muốn thay đổi giới tính của mình.",
+  "CHARACTER_RESET_WARNING_3": "!{#FF6347}[>] !{#FFFFFF}Sử dụng !{#ffff00}/char reset confirm !{#ffffff} để tiến hành đặt lại ngoại hình và trang phục của bạn."
 
 }

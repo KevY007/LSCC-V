@@ -385,6 +385,20 @@ namespace RNC
             });
         }
 
+        public static void OpenAppearanceEditor(Player player, Appearance appearance)
+        {
+            player.SetData("CHARACTER:EditorOpen", true);
+            player.SetSharedData("APPEARANCE:Editing", NAPI.Util.ToJson(appearance));
+
+            player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", true, appearance.IsMale, NAPI.Util.ToJson(appearance));
+            SendPlayerToEditorScene(player, -1, false);
+        }
+        public static void OpenAppearanceEditor(Player player, SavedAppearance appearance)
+        {
+            Appearance _a = NAPI.Util.FromJson<Appearance>(appearance.Data);
+            OpenAppearanceEditor(player, _a);
+        }
+
         public static void OpenOutfitEditor(Player player, SavedOutfit outfit)
         {
             player.SetData("CHARACTER:EditorOpen", true);

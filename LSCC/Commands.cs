@@ -5326,27 +5326,9 @@ namespace RNC
 
             if (target.GetSharedDataSafe<int>("InLobby") == -5)
             {
-                if (target.GetData<bool>("Creator_Using") == true)
+                if (target.HasData("CHARACTER:EditorOpen") && target.GetData<bool>("CHARACTER:EditorOpen") == true)
                 {
-                    CharacterData ConvChar = new CharacterData();
-                    string PlayerChar = EPlayer.GetAccount(target).Character;
-
-                    try
-                    {
-                        if (PlayerChar == null || PlayerChar.Length < 10) throw (new System.Exception("Invalid characterdata-7 sending to creation."));
-                        ConvChar = NAPI.Util.FromJson<CharacterData>(PlayerChar);
-
-                        EPlayer.ApplyCharacter(target, ConvChar);
-                    }
-                    catch
-                    {
-                        CharacterData charp = new CharacterData();
-                        EPlayer.GetAccount(target).Character = "{}";
-                        EPlayer.ApplyCharacter(target, charp); // Give them the default CHAR.
-                    }
-
-                    target.SetData("Creator_Using", false);
-                    target.TriggerEvent("toggleCreator", false);
+                    // TO-DO: initialize their character or something
                 }
                 else if (target.GetData<bool>("Tuner_Using") == true)
                 {
@@ -5366,46 +5348,6 @@ namespace RNC
             cmd_lobby(target);
 
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has sent {target.Name} to lobby.");
-        }
-
-        [Command("resetclothing", "!{#AFAFAF}[USAGE] resetclothing (target)")]
-        public void cmd_resetclothing(Player player, Player target)
-        {
-            if (!EPlayer.LoggedIn(player) || !EPlayer.LoggedIn(target)) return;
-
-            if (EPlayer.GetAccount(player).Admin < 1)
-            {
-                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
-                return;
-            }
-
-            CharacterData ConvChar = new CharacterData();
-
-            try
-            {
-                if (EPlayer.GetAccount(target).Character != null && EPlayer.GetAccount(target).Character.Length > 10)
-                {
-                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-                }
-                else EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(ConvChar);
-            }
-            catch
-            {
-                ConvChar = new CharacterData();
-            }
-
-            try
-            {
-                CharacterData resetChar = EPlayer.ResetAllPlayerClothing(target, ConvChar);
-                EPlayer.GetAccount(target).Character = NAPI.Util.ToJson(resetChar);
-                EPlayer.ApplyCharacter(target, resetChar, EPlayer.GetAccount(target).LobbyClothing);
-                EPlayer.Save(player, false);
-
-                Logs.LogAdmin(player, $"Reset {target.Name}'s clothing.");
-
-                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has reset {target.Name}'s clothing.");
-            }
-            catch { player.SendChatMessage("!{#FF6347}[!!] Unknown error occured, ask kevy to check da cooomsole."); }
         }
 
         [Command("putinveh", "!{#AFAFAF}[USAGE] putinveh (target) (player) (optional: seatid) | \"Target\" is put inside \"player\"'s vehicle.", Alias = "piv, putinvehicle")]
@@ -5661,8 +5603,7 @@ namespace RNC
             }
             if (!EPlayer.LoggedIn(target)) return;
 
-            EPlayer.GetAccount(target).Character = "{}";
-            EPlayer.ShowCharCreator(target, null, true, false);
+            // TO-DO: RESET CHAR
 
             Logs.LogAdmin(player, $"Reset ${target.Name}'s character & clothing to the defaults.");
             //target.SendChatMessage($"!{{#FF6347}}[!] ~w~Admin {player.Name} has reset your character. Please create a new one.");
@@ -7756,6 +7697,8 @@ namespace RNC
             return;
         }
 
+        // TO-DO: This command is pending rewrite
+        /*
         [Command("setteam", "!{#AFAFAF}[USAGE] setteam (target) (team)", Alias = "steam")]
         public void cmd_setteam(Player player, Player target, string team)
         {
@@ -7786,7 +7729,7 @@ namespace RNC
             if (team.Contains("0")) teamID = 0;
             if (team.Contains("1")) teamID = 1;
 
-            /*
+            
             Map bruh = ContextFactory.Instance.Maps.ToList().Find(map => map.SQL_ID == lobby.lastMapId);
 
             if (bruh == null)
@@ -7794,7 +7737,7 @@ namespace RNC
                 player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Invalid map on that game!");
                 return;
             }
-            */
+            
 
             try
             {
@@ -8019,7 +7962,7 @@ namespace RNC
             catch { player.SendChatMessage("!{#FF6347}Very very internal error occured, please don't use this. -kEVy"); }
             return;
         }
-
+*/
         [Command("maps")]
         public void cmd_maps(Player player)
         {
@@ -11721,21 +11664,6 @@ namespace RNC
             }
         }
 
-        [Command("clothing", "!{#AFAFAF}[USAGE] clothing (option: reset, cop, fugitive)", GreedyArg = true)]
-        public void cmd_clothing(Player player, string team)
-        {
-            string parameters = "clothing " + team;
-
-            if(team.Contains("reset"))
-            {
-                cmd_char(player, $"resetclothing {team}");
-                return;
-            }
-
-            cmd_char(player, parameters);
-            return;
-        }
-
         [Command("dbgsetclothing")]
         public void cmd_dbgsetclothing(Player player, string type, int drawable, int texture = 0)
         {
@@ -11800,7 +11728,7 @@ namespace RNC
             return;
         }
 
-        [Command("char", "!{#AFAFAF}[USAGE] character (option: reset, edit, help, [reset]clothing, lobbyteam)", GreedyArg = true, Alias = "character")]
+        [Command("char", "!{#AFAFAF}[USAGE] character (option: edit, reset, lobbyteam)", GreedyArg = true, Alias = "character")]
         public static void cmd_char(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -11811,234 +11739,40 @@ namespace RNC
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
                 return;
             }
-
-            if (action.StartsWith("reset", StringComparison.OrdinalIgnoreCase) && !action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
+            if (action.StartsWith("edit"))
             {
-                EPlayer.GetAccount(player).Character = "{}";
-                EPlayer.ShowCharCreator(player, null, true);
+                Character.OpenAppearanceEditor(player, Character.GetCharacter(player).CurrentAppearance);
+                return;
             }
-            else if (action.StartsWith("edit", StringComparison.OrdinalIgnoreCase))
+            if (action.StartsWith("reset"))
             {
-                CharacterData ConvChar = new CharacterData();
-
-                try
+                if(action.StartsWith("reset confirm"))
                 {
-                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                    player.SetData("cEditClothingData", ConvChar.Clothing);
-                    EPlayer.ShowCharCreator(player, ConvChar, false, true);
-                    EPlayer.Notify(player, "Gender Change", "If you wish to change your gender, use <strong>/char reset</strong>!", "bottomRight", "replace");
-                }
-                catch { cmd_char(player, "reset"); }
-               
-            }
-            else if (action.StartsWith("help", StringComparison.OrdinalIgnoreCase))
-            {
-                player.SendChatMessage(Translate(player, "CHAR_OPTION_1"));
-                player.SendChatMessage(Translate(player, "CHAR_OPTION_2"));
-                player.SendChatMessage(Translate(player, "CHAR_OPTION_3"));
-                player.SendChatMessage(Translate(player, "CHAR_OPTION_4"));
-                player.SendChatMessage(Translate(player, "CHAR_OPTION_5"));
-            }
-            else if (action.StartsWith("clothing", StringComparison.OrdinalIgnoreCase))
-            {
-                CharacterData ConvChar = new CharacterData();
-
-                try
-                {
-                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                }
-                catch
-                {
-                    cmd_char(player, "reset");
+                    // TO-DO: reset all outfits and appearance function
                     return;
                 }
-
-                if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
-                {
-                    cmd_char(player, "reset");
-                    return;
-                }
-
-                string[] args = action.Split(' ');
-                if (args.Count() > 1)
-                {
-                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
-                        {
-                            EPlayer.ApplyCharacter(player, ConvChar, 1);
-                        }
-                        catch { return; }
-                        player.SetData<CharacterData>("CharacterBeforeEdit", ConvChar);
-                        player.SetData("EditingClothing", 1);
-                        player.SetData("LastEditedClothingTeam", 1);
-                        int gender = Convert.ToInt32(ConvChar.Gender);
-                        string genderChar = "M";
-                        if (gender == 1) genderChar = "F";
-
-                        int clothingDataID = (gender == 1 ? 3 : 1);
-                        string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
-                        player.TriggerEvent("ClothingEditor:show", 1, genderChar, clothingInfo, false);
-                    }
-                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-                    {
-                        try
-                        {
-                            EPlayer.ApplyCharacter(player, ConvChar, 0);
-                        }
-                        catch { return; }
-                        player.SetData<CharacterData>("CharacterBeforeEdit", ConvChar);
-                        player.SetData("EditingClothing", 0);
-                        player.SetData("LastEditedClothingTeam", 0);
-                        int gender = Convert.ToInt32(ConvChar.Gender);
-                        string genderChar = "M";
-                        if (gender == 1) genderChar = "F";
-
-                        int clothingDataID = (gender == 1 ? 2 : 0);
-                        string clothingInfo = NAPI.Util.ToJson(ConvChar.Clothing[clothingDataID]);
-                        player.TriggerEvent("ClothingEditor:show", 0, genderChar, clothingInfo, false);
-                    }
-                    else if (args[1].StartsWith("donatorcop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if(EPlayer.GetAccount(player).DonatorLevel < 3)
-                        {
-                            player.SendChatMessage(Translate(player, "ERROR_NOT_GOLD_DONATOR"));
-                            return;
-                        }
-
-                        try
-                        {
-                            EPlayer.ApplyCharacter(player, ConvChar, 1);
-                        }
-                        catch { return; }
-
-                        player.SetData("EditingClothing", 1);
-                        player.SetData("LastEditedClothingTeam", 1);
-                        player.TriggerEvent("ShowClothesMenu");
-                    }
-                    else if (args[1].StartsWith("donatorfugitive", StringComparison.OrdinalIgnoreCase))
-                    {
-                        if (EPlayer.GetAccount(player).DonatorLevel < 3)
-                        {
-                            player.SendChatMessage(Translate(player, "ERROR_NOT_GOLD_DONATOR"));
-                            return;
-                        }
-
-                        try
-                        {
-                            EPlayer.ApplyCharacter(player, ConvChar, 0);
-                        }
-                        catch { return; }
-
-                        player.SetData("EditingClothing", 0);
-                        player.SetData("LastEditedClothingTeam", 0);
-                        player.TriggerEvent("ShowClothesMenu");
-                    }
-                    else player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM"));
-                }
-                else player.SendChatMessage(Translate(player, "USAGE_CLOTHING"));
+                player.SendChatMessage(Translate(player, "CHARACTER_RESET_WARNING_1"));
+                player.SendChatMessage(Translate(player, "CHARACTER_RESET_WARNING_2"));
+                player.SendChatMessage(Translate(player, "CHARACTER_RESET_WARNING_3"));
             }
-            else if (action.StartsWith("resetclothing", StringComparison.OrdinalIgnoreCase))
+            if (action.StartsWith("lobbyteam"))
             {
-                CharacterData ConvChar = new CharacterData();
-
-                try
+                if(action.StartsWith("lobbyteam cop"))
                 {
-                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                }
-                catch
-                {
-                    cmd_char(player, "reset");
+                    EPlayer.GetAccount(player).LobbyClothing = 1;
+                    Character.SetTeamOutfit(player, 1);
+                    player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_COP"));
                     return;
                 }
-
-                if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
+                if (action.StartsWith("lobbyteam fugitive"))
                 {
-                    cmd_char(player, "reset");
+                    EPlayer.GetAccount(player).LobbyClothing = 0;
+                    Character.SetTeamOutfit(player, 0);
+                    player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_FUGITIVE"));
                     return;
                 }
-
-                string[] args = action.Split(' ');
-                if (args.Count() > 1)
-                {
-                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                        charData.Clothing[1] = new ClothingData();
-                        EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(charData);
-
-                        EPlayer.Spawn(player, false);
-
-                        player.SendChatMessage(Translate(player, "CLOTHING_RESET_COP"));
-                    }
-                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-                    {
-                        CharacterData charData = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                        charData.Clothing[0] = new ClothingData();
-                        EPlayer.GetAccount(player).Character = NAPI.Util.ToJson(charData);
-
-                        EPlayer.Spawn(player, false);
-
-                        player.SendChatMessage(Translate(player, "CLOTHING_RESET_FUGITIVE"));
-                    }
-                    else player.SendChatMessage(Translate(player, "USAGE_RESET_CLOTHING"));
-                }
-                else player.SendChatMessage(Translate(player, "USAGE_RESET_CLOTHING"));
+                player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM_2"));
             }
-            else if (action.StartsWith("lobbyteam", StringComparison.OrdinalIgnoreCase))
-            {
-                CharacterData ConvChar = new CharacterData();
-
-                try
-                {
-                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-                }
-                catch
-                {
-                    cmd_char(player, "reset");
-                    return;
-                }
-
-                if (EPlayer.GetAccount(player).Character.Length < 10 || EPlayer.GetAccount(player).Character == null)
-                {
-                    cmd_char(player, "reset");
-                    return;
-                }
-
-                string[] args = action.Split(' ');
-                if (args.Count() > 1)
-                {
-                    if (args[1].StartsWith("cop", StringComparison.OrdinalIgnoreCase))
-                    {
-                        EPlayer.GetAccount(player).LobbyClothing = 1;
-
-                        player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_COP"));
-                    }
-                    else if (args[1].StartsWith("fugitive", StringComparison.OrdinalIgnoreCase))
-                    {
-                        EPlayer.GetAccount(player).LobbyClothing = 0;
-
-                        player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_FUGITIVE"));
-                    }
-                    else player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM_2"));
-
-                    try
-                    {
-                        //ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(player).Character);
-
-                        //EPlayer.ApplyCharacter(player, ConvChar, EPlayer.GetAccount(player).LobbyClothing);
-
-
-                        // New Outfit Shit
-                        Character.SetTeamOutfit(player, EPlayer.GetAccount(player).LobbyClothing);
-                    }
-                    catch { return; }
-                }
-                else player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM_2"));
-            }
-
-            else player.SendChatMessage(Translate(player, "ERROR_CHAR_OPTIONS"));
 
             return;
         }

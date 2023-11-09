@@ -593,6 +593,9 @@
   "BANKROB_ONE_LEADER_DELIVERED": "!{#55FF55}[>] !{#FFFFFF}El líder {PLAYER NAME} ha entregado el dinero. ¡Ayuda al otro líder a entregar su parte para una recompensa adicional!",
   "BANKROB_ONE_LEADER_DELIVERED_POLICE": "!{#FF6347}[!] !{#FFFFFF}Un líder ya ha entregado el dinero. ¡Detén al otro para obtener una recompensa!",
   "BANKROB_ONE_LEADER_NEUTRALIZED": "!{#FF6347}[!] !{#FFFFFF}La policía ha logrado neutralizar a uno de los líderes del atraco!",
-  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}¡Perfecto! Los fugitivos han entregado con éxito ambos sacos de dinero en su escondite!"
+  "BANKROB_ONE_LEADER_FULL_WIN": "!{#55FF55}[>] !{#FFFFFF}¡Perfecto! Los fugitivos han entregado con éxito ambos sacos de dinero en su escondite!",
+  "CHARACTER_RESET_WARNING_1": "!{#FF6347}[!] !{#FFFFFF}¡Esta opción reiniciará tu apariencia y TODOS tus trajes sin posibilidad de restaurarlos!",
+  "CHARACTER_RESET_WARNING_2": "!{#FF6347}[>] !{#FFFFFF}Puedes usar !{#ffff00}/char edit !{#ffffff}para editar tu apariencia. Utiliza esto solo si deseas cambiar tu género.",
+  "CHARACTER_RESET_WARNING_3": "!{#FF6347}[>] !{#FFFFFF}Utiliza !{#ffff00}/char reset confirm !{#ffffff} para proceder con el reinicio de tu apariencia y trajes."
 
 }
