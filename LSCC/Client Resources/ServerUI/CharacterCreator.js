@@ -570,6 +570,7 @@ mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appeara
     if(global.ServerUI) global.ServerUI.call('character_editor_toggle', toggle);
 
     setAppearanceEditorCategories();
+    mp.gui.cursor.show(toggle, toggle);
 });
 
 function updateCategoryOptionValues(category, options){
