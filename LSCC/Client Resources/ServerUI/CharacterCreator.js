@@ -36,7 +36,6 @@ function getPropUIID(realID){
 
 mp.events.add("dialog_clothing_editor_change_id", (value) => {
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, drawable:value};
-    mp.events.callRemote(`ServerConsoleOutput`, `[EDITOR] Changed ID to ${value}`);
 
     if(CURRENT_EDIT_ITEM.isProp){
         if(value !== -1)
@@ -136,8 +135,6 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
     const isDonator = (mp.players.local.hasVariable("Donator") && mp.players.local.getVariable("Donator") >= 3);
     const isMale = OUTFIT_EDITOR_DATA.isMale;
     const team = OUTFIT_EDITOR_DATA.team;
-    mp.events.callRemote(`ServerConsoleOutput`, `[EDITOR] Gender is male: ${isMale.toString()} | Team: ${team} | Donator: ${isDonator.toString()}`);
-    
 
     var min_drawable = 0;
     var max_drawable = 0;

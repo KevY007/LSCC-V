@@ -6637,6 +6637,7 @@ namespace RNC
                 Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 0));
                 EPlayer.Notify(player, "Editing <strong>Fugitive Outfit</strong>", "yellow", "", false, 5000);
                 player.ResetData("CHARACTER:IsNew");
+                Character.ApplyOutfit(player, Character.GetOutfitByTeam(player, 0).IsMale, 0, Character.GetOutfitByTeam(player, 0));
                 return;
             }
             Commands.cmd_lobby(player);
