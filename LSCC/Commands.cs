@@ -382,22 +382,6 @@ namespace RNC
             EPlayer.GetAccount(player).Lockpicks--;
         }
 
-        [Command("charedit")]
-        public static void cmd_charedit(Player player)
-        {
-            Character.SendPlayerToEditorScene(player, 0, false);
-
-            Character character = Character.GetCharacter(player);
-            Character.ApplyAppearance(player, character.SavedAppearance);
-
-            if(character.SavedOutfit != null)
-                Character.ApplyOutfit(player, character.SavedOutfit.IsMale, character.SavedOutfit.Team,character.SavedOutfit);
-            else Character.ApplyOutfit(player, character.SavedAppearance.IsMale, 1, null);
-
-            string appData = NAPI.Util.ToJson(character.CurrentAppearance);
-            player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", true, character.CurrentAppearance.IsMale, appData);
-        }
-
         [Command("lock")]
         public static void cmd_lock(Player player)
         {
@@ -11645,7 +11629,7 @@ namespace RNC
         }
 
 
-        [Command("char", "!{#AFAFAF}[USAGE] character (option: edit, reset, lobbyteam)", GreedyArg = true, Alias = "character")]
+        [Command("char", "!{#AFAFAF}[USAGE] character (option: edit, reset, lobbyteam, import)", GreedyArg = true, Alias = "character")]
         public static void cmd_char(Player player, string action)
         {
             if (!EPlayer.LoggedIn(player))
@@ -11654,6 +11638,14 @@ namespace RNC
             if (player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") != -4)
             {
                 player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
+                return;
+            }
+            if (action.StartsWith("import"))
+            {
+                Character character = Character.GetCharacter(player);
+                Character.Appearance appearance = character.CurrentAppearance;
+
+                player.TriggerEvent("character_import_open", NAPI.Util.ToJson(appearance));
                 return;
             }
             if (action.StartsWith("edit"))

@@ -1,10 +1,14 @@
 var global = require('./globals');
 
-mp.events.add('character_import_open', () => {
+var CHARACTER_APPEARANCE_DATA = null;
+
+mp.events.add('character_import_open', (appearanceData) => {
     if(global.CharacterImportCEF){
         global.CharacterImportCEF.destroy();
         global.CharacterImportCEF = null;
     }
+
+    CHARACTER_APPEARANCE_DATA = JSON.parse(appearanceData);
 
     global.CharacterImportCEF = mp.browsers.new('package://charcreator/char_import/CEF/index.html');
     global.CharacterImportCEF.active = true;
@@ -25,7 +29,15 @@ mp.events.add('character_import_data', (gender, data) => {
         mp.events.callLocal("HUDError", data);
         return;
     }
-    mp.events.callLocal("HUDError", `Applying character data! (${gender})`);
+    if(gender == "M" && !CHARACTER_APPEARANCE_DATA.IsMale){
+        mp.events.callLocal("HUDError", "Your current character's gender is set to FEMALE! Please pick a different option or use <strong>/char reset</strong> and set it to MALE.");
+        return;
+    }
+    if(gender == "F" && CHARACTER_APPEARANCE_DATA.IsMale){
+        mp.events.callLocal("HUDError", "Your current character's gender is set to MALE! Please pick a different option or use <strong>/char reset</strong> and set it to FEMALE.");
+        return;
+    }
+    
     const CharacterDataJSON = JSON.parse(data);
     if(CharacterDataJSON.OutfitPedData){
         if(CharacterDataJSON.OutfitPedData.PedProperties){
@@ -33,30 +45,38 @@ mp.events.add('character_import_data', (gender, data) => {
                 if(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.FacialFeatures){
                     const FacialFeaturesArray = Object.values(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.FacialFeatures);
                     for(let i = 0; i < FacialFeaturesArray.length ; i++){
-                        mp.players.local.setFaceFeature(i, Number(FacialFeaturesArray[i]));
+                        CHARACTER_APPEARANCE_DATA.FaceFeatures[i].Scale = Number(FacialFeaturesArray[i]);
                     }
                 }
                 if(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.EyeColour){
-                    mp.players.local.setEyeColor(Number(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.EyeColour));
+                    CHARACTER_APPEARANCE_DATA.EyeColor = Number(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.EyeColour);
                 }
                 if(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.Overlays){
                     for(let i = 0 ; i < 13 ; i++){
                         const overlayData = CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.Overlays[`_${i}`];
-                        mp.players.local.setHeadOverlay(i, Number(overlayData['@index']), 
-                                                           Number(overlayData['@opacity']), 
-                                                           Number(overlayData['@colour']), 
-                                                           Number(overlayData['@colourSecondary']));
+
+                        CHARACTER_APPEARANCE_DATA.HeadOverlays[i].Index = Number(overlayData['@index']);
+                        CHARACTER_APPEARANCE_DATA.HeadOverlays[i].Opacity = Number(overlayData['@opacity']);
+                        CHARACTER_APPEARANCE_DATA.HeadOverlays[i].FirstColor = Number(overlayData['@colour']);
+                        CHARACTER_APPEARANCE_DATA.HeadOverlays[i].SecondColor = Number(overlayData['@colourSecondary']);
                     }
                 }
                 if(CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.ShapeAndSkinTone){
                     const _s = CharacterDataJSON.OutfitPedData.PedProperties.HeadFeatures.ShapeAndSkinTone;
-                    mp.players.local.setHeadBlendData(Number(_s.ShapeFatherId), Number(_s.ShapeMotherId), Number(_s.ShapeOverrideId),
-                    Number(_s.ToneFatherId), Number(_s.ToneMotherId), Number(_s.ToneOverrideId), Number(_s.ShapeVal),
-                    Number(_s.ToneVal), Number(_s.OverrideVal), Boolean(_s.IsP));
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.FirstParentID = Number(_s.ShapeFatherId);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.SecondParentID = Number(_s.ShapeMotherId);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.MixParentID = Number(_s.ShapeOverrideId);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.FirstSkinID = Number(_s.ToneFatherId);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.SecondSkinID = Number(_s.ToneMotherId);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.MixSkinID = Number(_s.ToneOverrideId);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.ShapeMix = Number(_s.ShapeVal);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.SkinMix = Number(_s.ToneVal);
+                    CHARACTER_APPEARANCE_DATA.HeadBlend.ThirdMix = Number(_s.OverrideVal);
                 }
             }
         }
     }
+    mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CHARACTER_APPEARANCE_DATA));
     mp.events.callLocal('character_import_close');
 
 });
