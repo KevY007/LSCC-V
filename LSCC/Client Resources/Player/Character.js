@@ -1,3 +1,5 @@
+var global = require('./globals');
+
 mp.events.addDataHandler("CHARACTER:Appearance", (entity, value, oldValue) => {
     applyAppearanceData(entity, value);
 });
@@ -58,15 +60,31 @@ function applyAppearanceData(entity, data){
     entity.clearFacialDecorations();
 
     const hairDecalIndex = (AppearanceData.IsMale ? 0 : 1);
+ 
     const HeadOverlayData = global.hairDecalsList[hairDecalIndex];
     for(let i = 0 ; i < AppearanceData.HairOverlays.length ; i++){
         const Overlay = HeadOverlayData[AppearanceData.HairOverlays[i]];
+        const overlayIndex = getLastNumber(Overlay);
+        if(!overlayIndex) continue;
 
-        const collection = mp.game.gameplay.getHashKey(Overlay.collection);
-        const overlay = mp.game.gameplay.getHashKey(Overlay.overlay);
+        const HairOverlay = HeadOverlayData[overlayIndex];
+
+        const collection = mp.game.gameplay.getHashKey(HairOverlay.collection);
+        if(!collection) continue;
+        const overlay = mp.game.gameplay.getHashKey(HairOverlay.overlay);
+        if(!overlay) continue;
         entity.setFacialDecoration(collection, overlay);
     }
 }
+function getLastNumber(str) {
+    if(!str) return;
+    const matches = str.match(/\d+$/);
+    if (matches) {
+        return parseInt(matches[0], 10);
+    }
+    return null; // Return null or handle the case when no number is found.
+}
+
 function applyOutfitData(entity, data){
     const OutfitData = JSON.parse(data);
     for(let i = 0 ; i < OutfitData.Components.length; i++){

@@ -557,6 +557,7 @@ const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max
 var APPEARANCE_IsMale = true;
 var CURRENT_APPEARANCE_DATA = undefined;
 
+
 mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appearanceData) => {
     if(appearanceData.length !== 0) CURRENT_APPEARANCE_DATA = JSON.parse(appearanceData);
     else CURRENT_APPEARANCE_DATA = undefined;
@@ -568,7 +569,7 @@ mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appeara
 });
 
 function updateCategoryOptionValues(category, options){
-    if(!CURRENT_APPEARANCE_DATA.length) return;
+    if(!CURRENT_APPEARANCE_DATA) return;
     var OptionsOBJ = options;
     if(category === "c_heritage"){
         const HeadBlendData = CURRENT_APPEARANCE_DATA.HeadBlend;
@@ -626,10 +627,17 @@ function updateCategoryOptionValues(category, options){
             const Color1 = Overlay.FirstColor;
             const Color2 = Overlay.SecondColor;
 
-            OptionsOBJ.find(h => h.id == `head_overlay_${i}`).value = Index;
-            OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`).value = Opacity;
-            OptionsOBJ.find(h => h.id == `color1_head_overlay_${i}`).value = Color1;
-            OptionsOBJ.find(h => h.id == `color2_head_overlay_${i}`).value = Color2;
+            if(OptionsOBJ.find(h => h.id == `head_overlay_${i}`))
+                OptionsOBJ.find(h => h.id == `head_overlay_${i}`).value = Index;
+
+            if(OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`))
+                OptionsOBJ.find(h => h.id == `opacity_head_overlay_${i}`).value = Opacity;
+   
+            if(OptionsOBJ.find(h => h.id == `color1_head_overlay_${i}`))
+                OptionsOBJ.find(h => h.id == `color1_head_overlay_${i}`).value = Color1;
+
+            if(OptionsOBJ.find(h => h.id == `color2_head_overlay_${i}`))
+                OptionsOBJ.find(h => h.id == `color2_head_overlay_${i}`).value = Color2;
         }
 
         if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
@@ -1429,7 +1437,7 @@ const OptionsPerCategory = [
             },
             {
                 type: "toggle",
-                id: "body_blemishes_toggle",
+                id: "head_overlay_12",
                 name: "Body Blemishes",
                 value: false,
                 labels: ["Disabled", "Enabled"]
@@ -1480,6 +1488,11 @@ const OptionsPerCategory = [
 ];
 
 function getHairOverlaysForGender(isMale){
+    if(!global.hairDecalsList){
+        mp.events.callRemote('ServerConsoleOutput', `Can't find hair decals list?!?!?!?!?!`);
+        return;
+    }
+
     var overlays = [];
     if(isMale) overlays = global.hairDecalsList[0];
     else overlays = global.hairDecalsList[1];

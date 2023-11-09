@@ -382,6 +382,14 @@ namespace RNC
             EPlayer.GetAccount(player).Lockpicks--;
         }
 
+        [Command("charedit")]
+        public static void cmd_charedit(Player player)
+        {
+            Character character = Character.GetCharacter(player);
+            string appData = NAPI.Util.ToJson(character.CurrentAppearance);
+            player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", true, character.CurrentAppearance.IsMale, appData);
+        }
+
         [Command("lock")]
         public static void cmd_lock(Player player)
         {

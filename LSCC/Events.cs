@@ -4023,10 +4023,15 @@ namespace RNC
             Task.Run(async () =>
             {
                 List<SavedAppearance> appearances = await Character.GetAppearances(acc);
+                SavedAppearance activeAppearance = null;
                 if(appearances == null)
                 {
                     NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc);  });
                     await NAPI.Task.WaitForMainThread();
+                }
+                else
+                {
+                    activeAppearance = appearances.FirstOrDefault(a => a.IsActive == true);
                 }
                 await Character.UpdateActiveOutfitVariables(player, acc);
 
@@ -4046,6 +4051,8 @@ namespace RNC
                     List<Teleport> teleports = await context.Teleports.AsQueryable().ToListAsync();
                     NAPI.Task.Run(() =>
                     {
+                        Character.SetCharacter(player, activeAppearance, Character.GetActiveOutfit(player, acc.LobbyClothing));
+
                         EPlayer.UpdateTeleports(player, teleports);
                     });
                     await NAPI.Task.WaitForMainThread();
@@ -5466,11 +5473,13 @@ namespace RNC
                 await AccountManager.BanEvadeCheck(player, acc);
 
                 List<SavedAppearance> appearances = await Character.GetAppearances(acc);
+                SavedAppearance activeAppearance = null;
                 if (appearances == null)
                 {
                     NAPI.Task.Run(() => { Character.InitializeCharacter(player, acc); });
                     await NAPI.Task.WaitForMainThread();
                 }
+                else activeAppearance = appearances.FirstOrDefault(a => a.IsActive == true);
                 await Character.UpdateActiveOutfitVariables(player, acc);
                 
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -5479,6 +5488,7 @@ namespace RNC
                     NAPI.Task.Run(() =>
                     {
                         EPlayer.UpdateTeleports(player, teleports);
+                        Character.SetCharacter(player, activeAppearance, Character.GetActiveOutfit(player, acc.LobbyClothing));
                     });
                     await NAPI.Task.WaitForMainThread();
                 }

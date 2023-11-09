@@ -478,6 +478,13 @@ namespace RNC
             }
             ApplyOutfit(player, outfit.IsMale, teamID, outfit);
         }
+
+        public static SavedOutfit GetActiveOutfit(Player player, int team)
+        {
+            if (team == 0 && player.HasSharedData("CHARACTER:FugitiveOutfit")) return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:FugitiveOutfit"));
+            if (team == 1 && player.HasSharedData("CHARACTER:PoliceOutfit")) return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:PoliceOutfit"));
+            return null;
+        }
         public async static Task UpdateActiveOutfitVariables(Player player, Account account)
         {
             List<SavedOutfit> outfits = await GetOutfits(account);
@@ -530,6 +537,13 @@ namespace RNC
                 await NAPI.Task.WaitForMainThread();
                 return _new;
             }
+        }
+
+        public static void SetCharacter(Player player, SavedAppearance appearance, SavedOutfit outfit)
+        {
+            if (player == null) return;
+
+            Character character = new Character(player, appearance, outfit);
         }
 
         public static Character GetCharacter(Player player)
