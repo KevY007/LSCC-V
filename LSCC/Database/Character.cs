@@ -432,6 +432,8 @@ namespace RNC
 
         public static void OpenOutfitEditor(Player player, SavedOutfit outfit)
         {
+            ApplyOutfitData(player, NAPI.Util.FromJson<Outfit>(outfit.Data));
+
             player.SetData("CHARACTER:EditorOpen", true);
 
             Outfit _o = NAPI.Util.FromJson<Outfit>(outfit.Data);

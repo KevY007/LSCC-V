@@ -6613,7 +6613,9 @@ namespace RNC
                         if (isNew_changeOutfitGender)
                         {
                             Character.ApplyOutfit(player, false, 0, savedFugi);
+                            Character.UpdateActiveOutfitVariable(player, savedFugi, 0);
                             Character.ApplyOutfit(player, false, 1, savedCop);
+                            Character.UpdateActiveOutfitVariable(player, savedCop, 1);
                         }
 
                         Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 1));
