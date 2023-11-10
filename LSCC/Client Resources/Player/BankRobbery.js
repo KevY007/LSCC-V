@@ -73,11 +73,11 @@ mp.events.add("EVENTS:SetBankRobberyObjective", (toggle, message_code, ...args) 
 mp.events.add('render', () => {
    if(!ObjectiveData.show) return;
 
-   mp.game.graphics.drawText(ObjectiveData.message, [0.5, 0.9], {
+   mp.game.graphics.drawText(ObjectiveData.message, [0.5, 0.95], {
     font:0,
     color:[255, 255, 255, 255],
     outline:true,
-    scale:[0.3, 0.3],
+    scale:[0.35, 0.35],
     centre:true
    });
 });
