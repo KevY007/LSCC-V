@@ -4868,6 +4868,7 @@ namespace RNC
                         {
                             player.SetSharedData("HeistLeader", true);
                             player.SetSharedData("BR_IsHeistLeader", true);
+                            player.TriggerEvent("SetActorInvulnerable", false);
                             player.Armor = 100;
 
                             player.GiveWeaponAC(WeaponHash.Pistol_mk2, 75);
@@ -4881,6 +4882,7 @@ namespace RNC
                         {
                             player.SetSharedData("HeistLeader", true);
                             player.SetSharedData("BR_IsHeistLeader", true);
+                            player.TriggerEvent("SetActorInvulnerable", false);
                             player.Armor = 100;
 
                             player.GiveWeaponAC(WeaponHash.Pistol_mk2, 75);
@@ -4893,6 +4895,7 @@ namespace RNC
                         else
                         {
                             player.SetSharedData("IsHeistLeader", false);
+                            player.TriggerEvent("SetActorInvulnerable", false);
                             player.Armor = 75;
 
                             player.GiveWeaponAC(WeaponHash.Pistol, 75);
@@ -4908,6 +4911,7 @@ namespace RNC
 
                         if (isBearcatUnit)
                         {
+                            player.TriggerEvent("SetActorInvulnerable", false);
                             player.Armor = 150;
 
                             player.GiveWeaponAC(WeaponHash.Nightstick, 1);
@@ -4918,6 +4922,7 @@ namespace RNC
                         }
                         else
                         {
+                            player.TriggerEvent("SetActorInvulnerable", false);
                             player.Armor = 100;
 
                             player.GiveWeaponAC(WeaponHash.Nightstick, 1);
@@ -4953,6 +4958,7 @@ namespace RNC
                         player.TriggerEvent("stopLoadingScreen");
                         player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY",
                                             lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name);
+                        player.TriggerEvent("SetActorInvulnerable", false);
                         continue;
                     }
                     if (lobby.Cops.Contains(player))
@@ -4973,6 +4979,7 @@ namespace RNC
                                 player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
 
                                 player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
+                                player.TriggerEvent("SetActorInvulnerable", false);
 
                                 player.TriggerEvent("EVENT:SetBankRobberyWaypoint", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
                                 player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);

@@ -5,6 +5,100 @@ var ObjectiveData = {
 };
   const {TranslateMessage: Translate} = require('./Translator');
 
+  const BankRobHostageData = [
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_a",
+        "position": new mp.Vector3(243.79079, 227.17055, 106.28744),
+        "heading": 76.1064,
+        "skin":"ig_bankman"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_c",
+        "position": new mp.Vector3(248.61475, 226.6744, 106.28748),
+        "heading": 166.46756,
+        "skin":"u_m_m_bankman"
+    },
+    {
+        "animDictionary": "random@arrests",
+        "animClip": "kneeling_arrest_idle",
+        "position": new mp.Vector3(255.31871, 228.69337, 106.28613),
+        "heading": -13.687548,
+        "skin":"a_f_y_business_04"
+    },
+    {
+        "animDictionary": "amb@code_human_cower@female",
+        "animClip": "idle_a",
+        "position": new mp.Vector3(243.7874, 224.19652, 106.28689),
+        "heading": 148.99236,
+        "skin":"a_f_o_genstreet_01"
+    },
+    {
+        "animDictionary": "amb@code_human_cower@male",
+        "animClip": "idle_a",
+        "position": new mp.Vector3(241.53307, 224.9041, 106.28689),
+        "heading": -137.23442,
+        "skin":"a_m_o_genstreet_01"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_d",
+        "position": new mp.Vector3(254.29602, 220.53346, 106.28684),
+        "heading": 151.43887,
+        "skin":"a_f_m_ktown_01"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_e",
+        "position": new mp.Vector3(252.74269, 221.3664, 106.286575),
+        "heading": 178.74031,
+        "skin":"a_m_m_socenlat_01"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_f",
+        "position": new mp.Vector3(250.64748, 221.58116, 106.286575),
+        "heading": 178.74031,
+        "skin":"a_f_m_soucentmc_01"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_g",
+        "position": new mp.Vector3(250.47556, 216.60675, 106.286804),
+        "heading": -99.13274,
+        "skin":"cs_tom"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_h",
+        "position": new mp.Vector3(253.66742, 215.48692, 106.286896),
+        "heading": 106.908615,
+        "skin":"mp_f_cardesign_01"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_a",
+        "position": new mp.Vector3(249.0875, 212.70743, 106.286896),
+        "heading": -21.926682,
+        "skin":"s_m_m_bouncer_02"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_g",
+        "position": new mp.Vector3(241.64333, 214.93053, 106.286896),
+        "heading": -102.78821,
+        "skin":"mp_f_helistaff_01"
+    },
+    {
+        "animDictionary": "anim@heists@ornate_bank@hostages@hit",
+        "animClip": "hit_loop_ped_h",
+        "position": new mp.Vector3(241.45969, 214.12125, 106.286896),
+        "heading": -45.291897,
+        "skin":"s_m_m_highsec_04"
+    }
+];
+
 
 var BR_BLIPS = [];
 var FinishMarker = null;
@@ -58,8 +152,50 @@ mp.events.add("playerEnterVehicle", (vehicle, seat) => {
     mp.events.callRemote("EVENT:BankRobbery_LeaderEnterVehicle", vehicle, team);
 });
 
+var BR_PEDS = [];
+function destroyBankRobberyPeds(){
+    for(let i = 0 ; i < BR_PEDS.length ; i++){
+        if(BR_PEDS[i] && BR_PEDS[i].ped)
+            BR_PEDS[i].ped.destroy();
+    }
+    BR_PEDS = [];
+}
+function loadBankRobberyPeds(){
+    for(let i = 0 ; i < BankRobHostageData.length ; i++){
+        const pedData = BankRobHostageData[i];
+
+        let ped = mp.peds.new(mp.game.joaat(pedData.skin),
+                              pedData.position,
+                              pedData.heading,
+                              mp.players.local.dimension);
+
+        BR_PEDS.push({
+            ped:ped,
+            data:pedData
+        });
+    }
+}
+mp.events.add("entityStreamIn", (entity) => {
+    if(entity.type !== 'ped') return;
+    const brPed = BR_PEDS.find(p => p.ped.handle === entity.handle);
+    if(!brPed) return;
+
+    mp.events.callRemote(`ServerConsoleOutput`, `[PedStream - ${mp.players.local.name}] Streaming in Bank Robbery ped.`);
+
+    brPed.ped.setInvincible(true);
+    brPed.ped.taskPlayAnim(brPed.data.animDictionary, brPed.data.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+});
+
 mp.events.add("EVENTS:SetBankRobberyActive", (value) => {
     global.BankRobberyOn = value;
+    if(value == true){
+        mp.game.gameplay.setFakeWantedLevel(4);
+        loadBankRobberyPeds();
+    }
+    else{
+        mp.game.gameplay.setFakeWantedLevel(0);
+        destroyBankRobberyPeds();
+    }
 });
 mp.events.add("EVENTS:SetBankRobberyObjective", (toggle, message_code, ...args) => {
 

@@ -2530,6 +2530,7 @@ mp.events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapo
     damage = 0;
     mp.game.weapon.setCurrentDamageEventAmount(0);
     mp.game.weapon.cancelCurrentDamageEvent();
+    mp.events.callRemote(`ServerConsoleOutput`, `${mp.players.local.name} INCOMING DAMAGE - set to 0!`);
     return;
 
     if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player' && targetEntity == player)
@@ -3182,6 +3183,7 @@ const WeaponDamageData = [
 mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
     if(sourceEntity === undefined || sourceEntity === null || sourceEntity.type !== 'player' || sourceEntity !== player) return;
 
+    const KEY = Date.now();
     // In case of the target being another player
     if(targetEntity !== undefined && targetEntity.type === 'player' && targetPlayer !== player){
         if(sourceEntity.getVariable("ClimbProtection") == true || targetEntity.getVariable("ClimbProtection") == true) return;
@@ -3226,6 +3228,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
             }
         }
 
+        /*
         if(boneIndex === 20 && distance > 10.0){ // no instant headshots if more than 10m away from target
             DamageToDeal = 50;
 
@@ -3244,8 +3247,10 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
             DamageToDeal *= 0.5; // lower damage by 50% if anti-peek is active
 
         }
+        */
 
         if(DamageToDeal > 0){
+            mp.events.callRemote(`[K:${KEY}]Dealing ${DamageToDeal} to ${targetPlayer.name} from ${mp.players.local.name}`);
             if(Date.now() - lastRegisteredShotTime > 20 && damageInfo.categoryId !== 4){
                 mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DamageToDeal, targetPlayer.getArmour(), weapon.toString(), boneIndex);            
                 lastRegisteredShotTime = Date.now();
@@ -3260,6 +3265,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         
         if(targetEntity.getVariable("IsBeingCuffed") === true || targetEntity.getVariable("IsCuffed") === true)
         {
+            mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] Target was cuffed, cancelling damage`);
             damage = 0;
             mp.game.weapon.setCurrentDamageEventAmount(0);
             mp.game.weapon.cancelCurrentDamageEvent();
@@ -3269,6 +3275,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
             {
                 if(sourceEntity.getVariable("Team") == targetEntity.getVariable("Team"))
                 {
+                    mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] Same team, cancelling damage`);
                     damage = 0;
                     mp.game.weapon.setCurrentDamageEventAmount(0);
                     mp.game.weapon.cancelCurrentDamageEvent();
@@ -3279,15 +3286,18 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                 {
                     if(targetEntity.getVariable("HasShot") == false) // Shot a fugitive that hasn't shot.
                     {
+                        mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] Fugi hasnt shot, shot by cop`);
                         if(weapon != 911657153){
                            
+                            mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] Weapon wasnt taser, cancelling`);
                             damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
                             return true; // cant damage dem at alll if thy havent shot unless taser
                         }
 
-                        if(global.chaseTimeCur < 60){                           
+                        if(global.chaseTimeCur < 60){  
+                            mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] Chase time current was less than 60 cancelling and tase protect`);                         
                             damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
@@ -3295,7 +3305,8 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                         }
 
                         if(targetEntity.getVariable("TaseProtection") == true && targetEntity.getVariable("Team") == 0)
-                        {                   
+                        {        
+                            mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] Tase protection active`);           
                             damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
@@ -3307,6 +3318,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                             damage = 0;
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
+                            mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] target entity was 0 and their shot was true, wtf, taser`);
                             return true;
                         }
 
@@ -3325,6 +3337,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                             mp.game.weapon.setCurrentDamageEventAmount(0);
                             mp.game.weapon.cancelCurrentDamageEvent();
                             mp.events.callLocal("HUDError", "You can't tase players who have the Shot Tag!");
+                            mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] tased with shot tag`);
                             return true;
                         }
                     }
@@ -3342,6 +3355,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                         damage = 0;
                         mp.game.weapon.setCurrentDamageEventAmount(0);
                         mp.game.weapon.cancelCurrentDamageEvent();
+                        mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] wounded is 1`);
                         return true;
                     }
                     if(targetEntity.getVariable("Wounded") == 2)
@@ -3350,6 +3364,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                         mp.game.weapon.setCurrentDamageEventAmount(0);
                         mp.game.weapon.cancelCurrentDamageEvent();
                         mp.events.callRemote("opsp", targetPlayer, boneIndex, mp.players.local.weapon);
+                        mp.events.callRemote(`ServerConsoleOutput`, `[K:${KEY}] wounded is 2`);
                         return true;
                     }
                 }

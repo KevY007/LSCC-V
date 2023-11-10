@@ -7896,10 +7896,12 @@ namespace RNC
             }
 
 
+            
             if (target.GetSharedDataSafe<int>("Team") >= 0 && target.GetSharedDataSafe<int>("Wounded") == 1)
             {
                 target.Health = 100;
             }
+            
             if (target.GetSharedDataSafe<int>("Team") >= 0 && target.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team"))
             {
 
