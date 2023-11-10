@@ -74,10 +74,10 @@ mp.events.add('render', () => {
    if(!ObjectiveData.show) return;
 
    mp.game.graphics.drawText(ObjectiveData.message, [0.5, 0.9], {
-    font:2,
+    font:0,
     color:[255, 255, 255, 255],
     outline:true,
-    scale:[0.25, 0.25],
+    scale:[0.3, 0.3],
     centre:true
    });
 });
