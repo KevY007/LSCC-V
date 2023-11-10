@@ -30,7 +30,6 @@ mp.events.add('entityStreamIn', (entity) => {
 
 mp.events.addDataHandler("Walkstyle", (entity, value, oldValue) => {
     if(entity.type !== 'player') return;
-    mp.events.callRemote('ServerConsoleOutput', `[${mp.players.local.name}] ${entity.name} walkstyle changed to: ${value}`);
 
     setWalkstyle(entity, value);
 });
