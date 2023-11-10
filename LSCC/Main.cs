@@ -3539,7 +3539,7 @@ namespace RNC
                 EPlayer.ResetCopchaseVariables(player);
                 
                 // Replace with custom loading screen for the Bank Robbery event
-                player.TriggerEvent("startLoadingScreen", -1, "Loading bank robbery...");
+                player.TriggerEvent("startLoadingScreen", 13000, "Loading bank robbery...");
 
                 player.RemoveAllWeaponsAC();
                 player.Health = 100;
@@ -4856,13 +4856,14 @@ namespace RNC
             // Setting up the basics -> team outfits, weapons, health, armor, etc
             if(secondsElapsed == 0)
             {
+                lobby.CollisionCounter = 0;
                 foreach(Player player in CopchasePlayers)
                 {
                     player.Health = 100;
-
+                    player.SetSharedData("Collisions", true);
+                    player.TriggerEvent("SetActorInvulnerable", false);
                     if (lobby.Fugitives.Contains(player))
                     {
-
                         if(player == lobby.BankRobbery.HeistLeader)
                         {
                             player.SetSharedData("HeistLeader", true);
@@ -4935,8 +4936,8 @@ namespace RNC
                 lobby.BankRobbery.GameState = BankRobberyData.State.StealingMoney;
                 foreach (Player player in CopchasePlayers)
                 {
+                    player.SetSharedData("Collisions", true);
                     player.TriggerEvent("SetActorInvulnerable", false);
-                    player.TriggerEvent("stopLoadingScreen");
                     player.TriggerEvent("EVENTS:SetBankRobberyActive", true);
                     // Stop the custom loading screen
                     if (lobby.Fugitives.Contains(player))
@@ -4948,6 +4949,7 @@ namespace RNC
 
                         EPlayer.Notify(player, Translate(player, "STEALING_MONEY"), "green", "fa-cash", false, 40000, "bottom-center");
 
+                        player.TriggerEvent("stopLoadingScreen");
                         player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY",
                                             lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name);
                         continue;
@@ -4964,6 +4966,7 @@ namespace RNC
                                 int seat = player.GetData<int>("ChaseVehicleSeat");
                                 NAPI.Util.ConsoleOutput($"Running after 1s: putting {player.Name} into handle {toPutIn.Handle} | seat: {seat}");
                                 player.SetIntoVehicle(toPutIn, seat);
+                                player.TriggerEvent("stopLoadingScreen");
 
                                 EPlayer.Freeze(player, false);
 
