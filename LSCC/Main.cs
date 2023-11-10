@@ -4936,6 +4936,7 @@ namespace RNC
                 lobby.BankRobbery.GameState = BankRobberyData.State.StealingMoney;
                 foreach (Player player in CopchasePlayers)
                 {
+                    player.SetSharedData("ClimbProtection", false);
                     player.SetSharedData("Collisions", true);
                     player.TriggerEvent("SetActorInvulnerable", false);
                     player.TriggerEvent("EVENTS:SetBankRobberyActive", true);
@@ -4964,7 +4965,6 @@ namespace RNC
                             if(player != null)
                             {
                                 int seat = player.GetData<int>("ChaseVehicleSeat");
-                                NAPI.Util.ConsoleOutput($"Running after 1s: putting {player.Name} into handle {toPutIn.Handle} | seat: {seat}");
                                 player.SetIntoVehicle(toPutIn, seat);
                                 player.TriggerEvent("stopLoadingScreen");
 
