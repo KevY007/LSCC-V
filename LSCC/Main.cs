@@ -3423,7 +3423,7 @@ namespace RNC
         public static void StartEvent_BankRobbery(LobbyData lobby, List<Player> participants)
         {
             if (lobby == null || participants.Count == 0) return;
-            if(participants.Count < 4)
+            if(participants.Count < 3)
             {
                 NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - at least 4 players are required!");
                 return;
@@ -3676,7 +3676,7 @@ namespace RNC
             if (lobby.gameMode != GameModes.BANKROBBERY) perc = (decimal)playerCount * ((decimal)lobby.FugitivePercent / (decimal)100);
             else
             {
-                if (lobby.gameMode == GameModes.BANKROBBERY) perc = (decimal)playerCount * ((decimal)49.0 / (decimal)100);
+                if (lobby.gameMode == GameModes.BANKROBBERY) perc = (decimal)playerCount * ((decimal)51.0 / (decimal)100);
             }
 
             int fugitives = (int)Decimal.Round(perc);
