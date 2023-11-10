@@ -3461,7 +3461,6 @@ namespace RNC
             // Setting cops to all players who aren't in fugitives, aka the rest
             lobby.Cops = participants.Where(p => !lobby.Fugitives.Contains(p)).ToList();
 
-            NAPI.Util.ConsoleOutput($"LOBBY COPS: {lobby.Cops.Count} | FUGITIVES: ${lobby.Fugitives.Count}");
 
             // Setting up custom BANK ROBBERY vehicles
             lobby.BankRobbery.FugitiveVehicles.Clear();
@@ -3488,6 +3487,7 @@ namespace RNC
                 lobby.BankRobbery.PoliceVehicles.Add(bearcatVehicle);
             }
 
+
             int currentCopVehicle = 0;
             while(totalSeats < lobby.Cops.Count)
             {
@@ -3495,10 +3495,11 @@ namespace RNC
                 currentCopVehicle++;
                 if (currentCopVehicle >= BankRobberyData.PoliceVehicleData.Length-1) currentCopVehicle = 0; // check all patrols except BCAT
 
-                Vehicle policeVehicle = CreateGameVehicle(vehData.Name, vehData.Position.Around(3.0f), vehData.Heading, lobby, true, false, "Fast+", 1, true, 10.0f, 0, 111);
+                Vehicle policeVehicle = CreateGameVehicle(vehData.Name, vehData.Position.Around(3.0f), vehData.Heading, lobby, true, false, "Fast+", 1, true, 10.0f, 111, 0);
                 lobby.BankRobbery.PoliceVehicles.Add(policeVehicle);
 
                 totalSeats += 2;
+
             }
 
             // Selecting a heist leader & co-leader
@@ -4932,6 +4933,7 @@ namespace RNC
                 lobby.BankRobbery.GameState = BankRobberyData.State.StealingMoney;
                 foreach (Player player in CopchasePlayers)
                 {
+                    player.TriggerEvent("SetActorInvulnerable", false);
                     player.TriggerEvent("stopLoadingScreen");
                     player.TriggerEvent("EVENTS:SetBankRobberyActive", true);
                     // Stop the custom loading screen
@@ -4950,6 +4952,10 @@ namespace RNC
                     }
                     if (lobby.Cops.Contains(player))
                     {
+                        Vehicle toPutIn = player.GetData<Vehicle>("ChaseVehicle");
+                        int seat = player.GetData<int>("ChaseVehicleSeat");
+                        player.SetIntoVehicle(toPutIn, seat);
+
                         EPlayer.Freeze(player, false);
 
                         player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));

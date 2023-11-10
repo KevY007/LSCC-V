@@ -2475,6 +2475,7 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterColshape)]
         public void OnPlayerEnterColshape(ColShape shape, Player player)
         {
+            NAPI.Util.ConsoleOutput($"{player.Name} entered shape!");
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if(lobby != null)
             {
@@ -4698,7 +4699,7 @@ namespace RNC
             // If none of the leaders have entered the vehicle yet, this is the first time one did
             if (lobby.BankRobbery.GameState == BankRobberyData.State.GettingToVehicle)
             {
-                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateCylinderColShape(hideoutPosition, 10.0f, 10.0f, Convert.ToUInt32(lobby.lobbyId));
+                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateSphereColShape(hideoutPosition, 40.0f, Convert.ToUInt32(lobby.lobbyId));
 
                 lobby.BankRobbery.GameState = BankRobberyData.State.DeliveringMoney;
                 foreach(Player cPlayer in CopchasePlayers)
@@ -7673,6 +7674,8 @@ namespace RNC
         [RemoteEvent("PlayerShot_SyncHealth")]
         public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, string weapon, int boneIndex)
         {
+            NAPI.Util.ConsoleOutput($"{player.Name} shot {target.Name} damage {damageToDeal}");
+
             if (target.Dead) return;
             if (targetHealth <= 0) return;
             if (player.CurrentWeapon == WeaponHash.Stungun) return;

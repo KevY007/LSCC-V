@@ -451,6 +451,7 @@ namespace RNC
 
         public static void ResetCopchaseVariables(Player player)
         {
+            player.TriggerEvent("EVENTS:SetBankRobberyObjective", "");
             player.TriggerEvent("EVENTS:SetBankRobberyActive", false);
             player.SetSharedData("HeistLeader", false);
 
@@ -2292,6 +2293,7 @@ namespace RNC
                     return;
                 }
 
+                player.TriggerEvent("EVENTS:SetBankRobberyObjective", "");
                 player.TriggerEvent("EVENTS:SetBankRobberyActive", false);
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
