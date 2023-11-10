@@ -4865,6 +4865,7 @@ namespace RNC
 
                         if(player == lobby.BankRobbery.HeistLeader)
                         {
+                            player.SetSharedData("HeistLeader", true);
                             player.SetSharedData("BR_IsHeistLeader", true);
                             player.Armor = 100;
 
@@ -4877,6 +4878,7 @@ namespace RNC
                         }
                         else if(player == lobby.BankRobbery.CoLeader)
                         {
+                            player.SetSharedData("HeistLeader", true);
                             player.SetSharedData("BR_IsHeistLeader", true);
                             player.Armor = 100;
 
@@ -4953,17 +4955,28 @@ namespace RNC
                     if (lobby.Cops.Contains(player))
                     {
                         Vehicle toPutIn = player.GetData<Vehicle>("ChaseVehicle");
-                        int seat = player.GetData<int>("ChaseVehicleSeat");
-                        player.SetIntoVehicle(toPutIn, seat);
+                        player.Position = toPutIn.Position.Around(10.0f);
 
-                        EPlayer.Freeze(player, false);
+                        NAPI.Task.Run(() =>
+                        {
+                            if(player != null)
+                            {
+                                int seat = player.GetData<int>("ChaseVehicleSeat");
+                                NAPI.Util.ConsoleOutput($"Running after 1s: putting {player.Name} into handle {toPutIn.Handle} | seat: {seat}");
+                                player.SetIntoVehicle(toPutIn, seat);
 
-                        player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
+                                EPlayer.Freeze(player, false);
 
-                        player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
+                                player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
 
-                        player.TriggerEvent("EVENT:SetBankRobberyWaypoint", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
-                        player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
+                                player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
+
+                                player.TriggerEvent("EVENT:SetBankRobberyWaypoint", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
+                                player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
+                            }
+
+                        }, 500);
+
                         continue;
                     }
                 }

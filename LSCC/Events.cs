@@ -2482,6 +2482,7 @@ namespace RNC
                 if(lobby.gameMode == GameModes.BANKROBBERY && shape == lobby.BankRobbery.BankRobberyFinishMarker
                     && player.GetSharedDataSafe<bool>("HeistLeader") == true && player.GetSharedDataSafe<int>("Team") == 0)
                 {
+                    NAPI.Util.ConsoleOutput("GG BANK ROB");
                     EPlayer.RemovePlayerFromCopchase(player, lobby, 0, 6);
                     EPlayer.GrantXP(player, 4);
                     EPlayer.GivePoints(player, 4);
@@ -2539,7 +2540,14 @@ namespace RNC
                             Main.StopGame(lobby.lobbyId, 6);
                         }
                     }
-                } 
+                }
+                else
+                {
+                    NAPI.Util.ConsoleOutput($"Lobby gamemode is bank: {(lobby.gameMode == GameModes.BANKROBBERY).ToString()}");
+                    NAPI.Util.ConsoleOutput($"Shape is good: {(shape == lobby.BankRobbery.BankRobberyFinishMarker).ToString()}");
+                    NAPI.Util.ConsoleOutput($"Heist leader: {(player.GetSharedDataSafe<bool>("HeistLeader") == true).ToString()}");
+                    NAPI.Util.ConsoleOutput($"Team: {(player.GetSharedDataSafe<int>("Team") == 0).ToString()}");
+                }
             }
 
             // Stingers
@@ -4699,7 +4707,7 @@ namespace RNC
             // If none of the leaders have entered the vehicle yet, this is the first time one did
             if (lobby.BankRobbery.GameState == BankRobberyData.State.GettingToVehicle)
             {
-                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateSphereColShape(hideoutPosition, 40.0f, Convert.ToUInt32(lobby.lobbyId));
+                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateSphereColShape(hideoutPosition, 20.0f, Convert.ToUInt32(lobby.lobbyId));
 
                 lobby.BankRobbery.GameState = BankRobberyData.State.DeliveringMoney;
                 foreach(Player cPlayer in CopchasePlayers)
@@ -7674,7 +7682,6 @@ namespace RNC
         [RemoteEvent("PlayerShot_SyncHealth")]
         public void SyncHealthOnShot(Player player, Player target, int targetHealth, int damageToDeal, int targetArmour, string weapon, int boneIndex)
         {
-            NAPI.Util.ConsoleOutput($"{player.Name} shot {target.Name} damage {damageToDeal}");
 
             if (target.Dead) return;
             if (targetHealth <= 0) return;
@@ -7735,6 +7742,7 @@ namespace RNC
                 if (targetTeam != -1 && target.GetSharedDataSafe<int>("Wounded") == 0)
                 {
                     //OnPlayerWounded(target, 1, player.Id);
+                    NAPI.Util.ConsoleOutput("GG 1");
                     target.TriggerEvent("setWounded", 1, player.Id);
                     target.Armor = 0;
                     target.Health = 100;
@@ -7744,6 +7752,7 @@ namespace RNC
                 }
                 else
                 {
+                    NAPI.Util.ConsoleOutput("GG 2");
                     target.Health = 1;
                     target.Armor = 0;
 
@@ -7758,10 +7767,12 @@ namespace RNC
 
             target.Armor = ARtoset;
             target.Health = HPtoset;
+            NAPI.Util.ConsoleOutput("GG 3");
             Logs.LogDamage(targetSQLID, dealerSQLID, weapon, damageToDeal, HPtoset, boneIndex, "", ARtoset);
 
             if (damageToDeal > 0)
             {
+                NAPI.Util.ConsoleOutput("GG 4");
                 //player.SendChatMessage($"!{{white}}You hit !{{red}}{target.Name} !{{white}}for !{{red}}{damageToDeal} DMG!{{white}}!");
                 //target.SendChatMessage($"!{{white}}You've been hit by !{{red}}{player.Name} !{{white}}for !{{red}}{damageToDeal} DMG!{{white}}!");
                 SetIsPlayerDamaged(target);
