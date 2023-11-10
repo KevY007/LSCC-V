@@ -5944,6 +5944,7 @@ namespace RNC
                             }
                             */
 
+                            /*
                             if (lobby.GameProgress >= (Convert.ToInt32(0.7 * Settings.GameRunTime) - 60) && lobby.gameMode != GameModes.BUSTED && lobby.gameMode != GameModes.BANKROBBERY)
                             {
                                 foreach (Player fugitive in lobby.Fugitives)
@@ -5997,6 +5998,7 @@ namespace RNC
                                     }
                                 }
                             }
+                            */
                         }
 
                         foreach (Lobby_StingerData stinger in lobby.Stingers)

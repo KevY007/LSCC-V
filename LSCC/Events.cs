@@ -2997,6 +2997,8 @@ namespace RNC
 
                 string reasonStr;
                 bool wasInGame = false;
+                bool killedByPlayer = (killer != null && !killer.IsNull && killer != player);
+
                 jWeaponData wepDat = new jWeaponData();
 
                 if (Settings.WeaponData.TryGetValue((long)reason, out wepDat))
