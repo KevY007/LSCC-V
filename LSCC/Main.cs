@@ -2626,7 +2626,7 @@ namespace RNC
             else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
             //Start websocket server
-            Websocket.Start();
+            //Websocket.Start();
 
             NAPI.TextLabel.CreateTextLabel("not today, friend", new Vector3(104.954094f, -744.55927f, 45.754745f), 2.0f, 1.0f, 0, new Color(255, 255, 255), false);
             NAPI.TextLabel.CreateTextLabel("Bored of waiting? Play some DM", new Vector3(107.493866f, -744.79114f, 242.15219f), 13.0f, 2.2f, 0, new Color(255, 0, 0, 156), false);
@@ -4941,6 +4941,10 @@ namespace RNC
                 lobby.BankRobbery.GameState = BankRobberyData.State.StealingMoney;
                 foreach (Player player in CopchasePlayers)
                 {
+
+                    player.TriggerEvent("StartChaseTimer", 10, 900, 0, (short)lobby.gameMode);
+
+
                     player.SetSharedData("ClimbProtection", false);
                     player.SetSharedData("Collisions", true);
                     player.TriggerEvent("SetActorInvulnerable", false);

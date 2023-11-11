@@ -2958,6 +2958,7 @@ namespace RNC
         [ServerEvent(Event.PlayerDeath)]
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
+            NAPI.Util.ConsoleOutput($"[ONPLAYERDEATH] {player.Name} just died!! {reason}");
             try
             {
                 if (player == null) return;

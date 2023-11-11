@@ -479,6 +479,7 @@ mp.events.add("render", () => {
 });
 
 mp.events.add("OneSecondEvent", () => {
+
     ShotStats.UpdateInterval++;
 
     if(player.getVariable("Team") >= 0){
@@ -2530,7 +2531,6 @@ mp.events.add('incomingDamage', (sourceEntity, sourcePlayer, targetEntity, weapo
     damage = 0;
     mp.game.weapon.setCurrentDamageEventAmount(0);
     mp.game.weapon.cancelCurrentDamageEvent();
-    mp.events.callRemote(`ServerConsoleOutput`, `${mp.players.local.name} INCOMING DAMAGE - set to 0!`);
     return;
 
     if(targetEntity !== null && targetEntity !== undefined && targetEntity.type === 'player' && targetEntity == player)
@@ -2817,13 +2817,23 @@ mp.events.add("ResetWounded", () => {
 mp.events.add('setWounded', (state, idToPass) => 
 {
     // if its trying to set the same state but the state isnt 0 [revive or clearing vars]
-    if (state == mp.players.local.getVariable("Wounded") && state != 0) return;
-    if (!global.chaseRunning && state != 0) return;
+    if (state == mp.players.local.getVariable("Wounded") && state != 0){
+        return;
+    }
+    if (!global.chaseRunning && state != 0){
+        return;
+    }
     // if the player is no longer in a team and it tries to set them wounded [but not 0]
-    if ((mp.players.local.getVariable("Team") != 1 && mp.players.local.getVariable("Team") != 0) && state != 0) return;
+    if ((mp.players.local.getVariable("Team") != 1 && mp.players.local.getVariable("Team") != 0) && state != 0){
+        return;
+    }
     // if the player is already in crawl mode and it tries to set them to state 1 [ragdoll] return
-    if(mp.players.local.getVariable("Wounded") == 2 && state == 1) return;
-    if(mp.players.local.isDead()) return;
+    if(mp.players.local.getVariable("Wounded") == 2 && state == 1){
+        return;
+    }
+    if(mp.players.local.isDead()){
+        return;
+    }
 
     if(state == 1) // Pre-wounded (beginning of wounded mode) --ragdolling the player and waiting 3 secs before giving ability to crawl
     {
