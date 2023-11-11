@@ -4101,7 +4101,7 @@ namespace RNC
                 if (lobby.Cops.Contains(player))
                 {
                     Character.SetTeamOutfit(player, 1);
-                    EPlayer.SetColor(player, new Color(100, 100, 255), 0);
+                    EPlayer.SetColor(player, new Color(0, 151, 255), 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name}");
                     player.SetSharedData("Team", 1);
 
