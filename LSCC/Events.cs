@@ -4710,7 +4710,7 @@ namespace RNC
             // If none of the leaders have entered the vehicle yet, this is the first time one did
             if (lobby.BankRobbery.GameState == BankRobberyData.State.GettingToVehicle)
             {
-                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateSphereColShape(hideoutPosition, 20.0f, Convert.ToUInt32(lobby.lobbyId));
+                lobby.BankRobbery.BankRobberyFinishMarker = NAPI.ColShape.CreateSphereColShape(hideoutPosition, 10.0f, Convert.ToUInt32(lobby.lobbyId));
 
                 lobby.BankRobbery.GameState = BankRobberyData.State.DeliveringMoney;
                 foreach(Player cPlayer in CopchasePlayers)

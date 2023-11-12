@@ -3538,8 +3538,6 @@ namespace RNC
                 if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) continue;
                 EPlayer.ResetCopchaseVariables(player);
                 
-                // Replace with custom loading screen for the Bank Robbery event
-                player.TriggerEvent("startLoadingScreen", 13000, "Loading bank robbery...");
 
                 player.RemoveAllWeaponsAC();
                 player.Health = 100;
@@ -3565,6 +3563,7 @@ namespace RNC
 
                 if (lobby.Fugitives.Contains(player))
                 {
+                    player.TriggerEvent("EVENT:ToggleBankRobberyBeginningScreen", true, 0, lobby.Fugitives.Count);
                     Character.SetTeamOutfit(player, 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Robbing bank as {player.Name}");
                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
@@ -3587,6 +3586,7 @@ namespace RNC
                 }
                 if (lobby.Cops.Contains(player))
                 {
+                    player.TriggerEvent("EVENT:ToggleBankRobberyBeginningScreen", true, 1, lobby.Fugitives.Count);
                     Character.SetTeamOutfit(player, 1);
                     EPlayer.SetColor(player, new Color(100, 100, 255), 0);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name} in Bank Robbery");
@@ -4959,7 +4959,7 @@ namespace RNC
 
                         EPlayer.Notify(player, Translate(player, "STEALING_MONEY"), "green", "fa-cash", false, 40000, "bottom-center");
 
-                        player.TriggerEvent("stopLoadingScreen");
+                        player.TriggerEvent("EVENT:ToggleBankRobberyBeginningScreen", false);
                         player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_FUGI_OBJECTIVE_STEALING_MONEY",
                                             lobby.BankRobbery.HeistLeader.Name, lobby.BankRobbery.CoLeader.Name);
                         player.TriggerEvent("SetActorInvulnerable", false);
@@ -4976,12 +4976,12 @@ namespace RNC
                             {
                                 int seat = player.GetData<int>("ChaseVehicleSeat");
                                 player.SetIntoVehicle(toPutIn, seat);
-                                player.TriggerEvent("stopLoadingScreen");
 
                                 EPlayer.Freeze(player, false);
 
                                 player.SendChatMessage(Translate(player, "START_BROB_RADIO_COP"));
 
+                                player.TriggerEvent("EVENT:ToggleBankRobberyBeginningScreen", false);
                                 player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
                                 player.TriggerEvent("SetActorInvulnerable", false);
 

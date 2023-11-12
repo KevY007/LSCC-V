@@ -145,6 +145,10 @@ mp.events.add("EVENT:ToggleBankRobberyBeginningScreen", (toggle, team, fugitiveC
                 }, 1000);
             }, 1001);
         }
+        else{
+            mp.game.cam.doScreenFadeIn(0);
+            mp.events.callLocal('ToggleHud', true);
+        }
         return;
     }
     BeginningScreenCEF = mp.browsers.new("package://GameEvents/BankRobbery/CEF/index.html");
@@ -182,7 +186,7 @@ var FinishMarker = null;
 mp.events.add("EVENT:AddBankRobberyFinishMarker", (posX, posY, posZ) => {
     if(FinishMarker != null) return;
 
-    FinishMarker = mp.markers.new(1, new mp.Vector3(posX, posY, posZ), 2.0, {
+    FinishMarker = mp.markers.new(1, new mp.Vector3(posX, posY, posZ), 10.0, {
         color:[255, 255, 0, 128],
         visible:true,
         dimension:mp.players.local.dimension
@@ -246,6 +250,11 @@ function loadBankRobberyPeds(){
                               pedData.heading,
                               mp.players.local.dimension);
 
+        const brPed = ped;
+        if(!brPed) return;
+        brPed.ped.setInvincible(true);
+        brPed.ped.taskPlayAnim(pedData.animDictionary, pedData.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+
         BR_PEDS.push({
             ped:ped,
             data:pedData
@@ -255,18 +264,36 @@ function loadBankRobberyPeds(){
 mp.events.add("entityStreamIn", (entity) => {
     if(entity.type !== 'ped') return;
     const brPed = BR_PEDS.find(p => p.ped.handle === entity.handle);
-    if(!brPed) return;
+    if(!brPed){
+        mp.events.callRemote(`ServerConsoleOutput`, `[PedStream - ${mp.players.local.name}] Failed to find pedestrian for bank robbery in array.`);
+        return;
+    }
 
-    mp.events.callRemote(`ServerConsoleOutput`, `[PedStream - ${mp.players.local.name}] Streaming in Bank Robbery ped.`);
-
+    mp.game.streaming.requestAnimDict(brPed.data.animDictionary);
     brPed.ped.setInvincible(true);
     brPed.ped.taskPlayAnim(brPed.data.animDictionary, brPed.data.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+
+    setTimeout(() => {
+        if(brPed != null && brPed.handle !== 0)
+        brPed.ped.taskPlayAnim(brPed.data.animDictionary, brPed.data.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+    }, 500);
+    setTimeout(() => {
+        if(brPed != null && brPed.handle !== 0)
+        brPed.ped.taskPlayAnim(brPed.data.animDictionary, brPed.data.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+    }, 1000);
+    setTimeout(() => {
+        if(brPed != null && brPed.handle !== 0)
+        brPed.ped.taskPlayAnim(brPed.data.animDictionary, brPed.data.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+    }, 2000);
 });
 
 mp.events.add("EVENTS:SetBankRobberyActive", (value) => {
     global.BankRobberyOn = value;
     if(value == true){
-        mp.game.gameplay.setFakeWantedLevel(4);
+
+        if(mp.players.local.getVariable("Team") == 0)
+            mp.game.gameplay.setFakeWantedLevel(4);
+
         loadBankRobberyPeds();
     }
     else{
