@@ -250,9 +250,10 @@ namespace RNC
             lobby.Enabled = false;
 
             // If they are still in the lobby when it's disabled, fuck them niggas. Spawn them in some other lobby.
-            // Since this one is disabled, it'll pick a new one for them automatically.
+            // Since this one is disabled and their lobby ID is set to -1, it'll pick a new one for them automatically.
             foreach(Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == (int)eventData.EventID))
             {
+                player.SetSharedData("InLobby", -1);
                 NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
             }
             foreach(EventData.EventPlayerData ePlayer in eventData.EventPlayers)
