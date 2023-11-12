@@ -64,6 +64,16 @@ const Language = {
     "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER":"~w~Deliver the ~g~money ~w~to the ~y~hideout~w~ at {STREET NAME}.",
     "BANKROB_COP_OBJECTIVE_GET_TO_BANK":"~w~Go to the ~y~Pacific Standard Bank~w~ and neutralize the ~r~fugitives~w~.",
     "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR":"~w~Stop the ~r~fugitives~w~ from reaching the getaway vehicles~w~!",
-    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT":"~w~Stop the ~r~fugitives~w~ before they get to their hideout!"
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT":"~w~Stop the ~r~fugitives~w~ before they get to their hideout!",
+    "F_BANKROB_SCREEN_OBJECTIVE_1":"Two ~b~heist leaders ~w~are in the process of stealing the ~g~money~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_2":"Your task is to escort the ~b~heist leaders ~w~to the ~y~getaway vehicles~w~ first.",
+    "F_BANKROB_SCREEN_OBJECTIVE_3":"Once in the vehicles, you must escort the ~b~heist leaders ~w~to the ~y~hideout location~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_4":"Protect the ~b~heist leaders ~w~by all means necessary - if they die, you lose!",
+    "F_BANKROB_SCREEN_OBJECTIVE_5":"The ~r~police ~w~are on their way.",
+    "C_BANKROB_SCREEN_OBJECTIVE_1":"You're responding to a call regarding an ongoing robbery at the ~y~Pacific Standard Bank~w~.",
+    "C_BANKROB_SCREEN_OBJECTIVE_2":"Excercise caution - it's reported that {FUGITIVE COUNT} ~r~armed robbers ~w~are inside the bank.",
+    "C_BANKROB_SCREEN_OBJECTIVE_3":"Deadly force is authorized - neutralize the ~r~armed robbers ~w~using any means necessary.",
+    "C_BANKROB_SCREEN_OBJECTIVE_4":"It is said that two ~r~heist leaders ~w~are taking the ~g~money ~w~- prioritize eliminating them to win.",
+    "C_BANKROB_SCREEN_OBJECTIVE_5":"Do not let the ~r~heist leaders ~w~take the ~g~money ~w~to their hideout!"
 }
 exports.Language = Language;

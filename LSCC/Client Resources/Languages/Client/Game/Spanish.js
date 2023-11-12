@@ -64,7 +64,17 @@ const Language = {
     "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER": "~w~Entrega el ~g~dinero ~w~al ~y~escondite~w~ en {STREET NAME}.",
     "BANKROB_COP_OBJECTIVE_GET_TO_BANK": "~w~Ve al ~y~Banco Pacific Standard~w~ y neutraliza a los ~r~fugitivos~w~.",
     "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR": "~w~¡Detén a los ~r~fugitivos~w~ antes de que lleguen a los vehículos de escape~w~ !",
-    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~¡Detén a los ~r~fugitivos~w~ antes de que lleguen a su escondite~w~ !"
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~¡Detén a los ~r~fugitivos~w~ antes de que lleguen a su escondite~w~ !",
+    "F_BANKROB_SCREEN_OBJECTIVE_1": "Dos ~b~jefes de atraco ~w~están en proceso de robar el ~g~dinero~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_2": "Tu tarea es escoltar a los ~b~jefes de atraco ~w~hasta los ~y~vehículos de escape~w~ primero.",
+    "F_BANKROB_SCREEN_OBJECTIVE_3": "Una vez en los vehículos, debes escoltar a los ~b~jefes de atraco ~w~hasta la ubicación del ~y~escondite~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_4": "Protege a los ~b~jefes de atraco ~w~por todos los medios necesarios: ¡si mueren, pierdes!",
+    "F_BANKROB_SCREEN_OBJECTIVE_5": "La ~r~policía ~w~está en camino.",
+    "C_BANKROB_SCREEN_OBJECTIVE_1": "Estás respondiendo a una llamada sobre un robo en curso en el ~y~Banco Pacific Standard~w~.",
+    "C_BANKROB_SCREEN_OBJECTIVE_2": "Ejerce precaución: se informa que {FUGITIVE COUNT} ~r~asaltantes armados ~w~están dentro del banco.",
+    "C_BANKROB_SCREEN_OBJECTIVE_3": "La fuerza letal está autorizada: neutraliza a los ~r~asaltantes armados ~w~usando cualquier medio necesario.",
+    "C_BANKROB_SCREEN_OBJECTIVE_4": "Se dice que dos ~r~jefes de atraco ~w~están llevando el ~g~dinero ~w~- prioriza eliminarlos para ganar.",
+    "C_BANKROB_SCREEN_OBJECTIVE_5": "¡No permitas que los ~r~jefes de atraco ~w~lleven el ~g~dinero ~w~a su escondite!"
 
 
 }

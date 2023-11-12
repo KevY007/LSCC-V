@@ -3,9 +3,9 @@ var ObjectiveData = {
     show:false,
     message:""
 };
-  const {TranslateMessage: Translate} = require('./Translator');
+const {TranslateMessage: Translate} = require('./Translator');
 
-  const BankRobHostageData = [
+const BankRobHostageData = [
     {
         "animDictionary": "anim@heists@ornate_bank@hostages@hit",
         "animClip": "hit_loop_ped_a",
@@ -98,6 +98,83 @@ var ObjectiveData = {
         "skin":"s_m_m_highsec_04"
     }
 ];
+var BeginningScreenCEF = null;
+const FUGITIVE_OBJECTIVES = [
+    "F_BANKROB_SCREEN_OBJECTIVE_1",
+    "F_BANKROB_SCREEN_OBJECTIVE_2",
+    "F_BANKROB_SCREEN_OBJECTIVE_3",
+    "F_BANKROB_SCREEN_OBJECTIVE_4",
+    "F_BANKROB_SCREEN_OBJECTIVE_5",
+]
+const POLICE_OBJECTIVES = [
+    "C_BANKROB_SCREEN_OBJECTIVE_1",
+    "C_BANKROB_SCREEN_OBJECTIVE_2",
+    "C_BANKROB_SCREEN_OBJECTIVE_3",
+    "C_BANKROB_SCREEN_OBJECTIVE_4",
+    "C_BANKROB_SCREEN_OBJECTIVE_5",
+]
+/**
+ * Need translating:
+ * C_BANKROB_SCREEN_OBJECTIVE_2 -> fugitiveCount
+ */
+
+mp.events.add("screenSimulation", (team, fugitiveCount) => {
+    mp.events.callLocal("EVENT:ToggleBankRobberyBeginningScreen", true, team, fugitiveCount);
+    setTimeout(() => {
+        mp.events.callLocal("EVENT:ToggleBankRobberyBeginningScreen", false);
+    }, 13000);
+});
+
+mp.events.add("EVENT:ToggleBankRobberyBeginningScreen", (toggle, team, fugitiveCount) => {
+    if(!toggle){
+        if(BeginningScreenCEF){
+            BeginningScreenCEF.call("toggle_objectives", false);
+            setTimeout(() => {
+                mp.game.cam.doScreenFadeOut(0);
+                //BeginningScreenCEF.call("fadeoutGameScreen", false);
+                mp.game.cam.doScreenFadeIn(1000);
+                setTimeout(() => {
+                    if(BeginningScreenCEF) BeginningScreenCEF.destroy();
+                    BeginningScreenCEF = null;
+                }, 251);
+            
+                mp.game.audio.playSoundFrontend(-1, "Long_Transition_Out", "PLAYER_SWITCH_CUSTOM_SOUNDSET", true);
+
+                setTimeout(() => {
+                    mp.events.callLocal('ToggleHud', true);
+                }, 1000);
+            }, 1001);
+        }
+        return;
+    }
+    BeginningScreenCEF = mp.browsers.new("package://GameEvents/BankRobbery/CEF/index.html");
+    BeginningScreenCEF.active = true;
+
+    var objectiveArray = [];
+    if(team == 0){
+        objectiveArray = FUGITIVE_OBJECTIVES.map((o) => {
+            return Translate(o);
+        });
+    }
+    if(team == 1){
+        objectiveArray = POLICE_OBJECTIVES.map((o) => {
+            if(o != "C_BANKROB_SCREEN_OBJECTIVE_2")
+                return Translate(o);
+            else return Translate(o, [fugitiveCount]);
+        });
+    }
+
+    mp.events.callLocal('ToggleHud', false);
+    BeginningScreenCEF.call("fadeoutGameScreen", true);
+    mp.game.audio.playSoundFrontend(-1, "1st_Person_Transition", "PLAYER_SWITCH_CUSTOM_SOUNDSET", true);
+    setTimeout(() => {
+        mp.game.audio.playSoundFrontend(-1, "Long_Transition_In", "PLAYER_SWITCH_CUSTOM_SOUNDSET", true);
+        BeginningScreenCEF.call("set_objectives", objectiveArray);
+        BeginningScreenCEF.call("set_team", team);
+        BeginningScreenCEF.call("toggle_objectives", true);
+    }, 1000);
+
+});
 
 
 var BR_BLIPS = [];

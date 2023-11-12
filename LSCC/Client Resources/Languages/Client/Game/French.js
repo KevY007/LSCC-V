@@ -64,7 +64,17 @@ const Language = {
     "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER": "~w~Livrez l'~g~argent ~w~au ~y~repaire~w~ à {STREET NAME}.",
     "BANKROB_COP_OBJECTIVE_GET_TO_BANK": "~w~Allez à la ~y~Banque Pacific Standard~w~ et neutralisez les ~r~fugitifs~w~.",
     "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR": "~w~Empêchez les ~r~fugitifs~w~ d'atteindre les véhicules de fuite~w~ !",
-    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~Arrêtez les ~r~fugitifs~w~ avant qu'ils n'atteignent leur repaire~w~ !"
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~Arrêtez les ~r~fugitifs~w~ avant qu'ils n'atteignent leur repaire~w~ !",
+    "F_BANKROB_SCREEN_OBJECTIVE_1": "Deux ~b~chefs de braquage ~w~sont en train de voler l'~g~argent~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_2": "Votre tâche est d'escorter les ~b~chefs de braquage ~w~vers les ~y~véhicules de fuite~w~ en premier.",
+    "F_BANKROB_SCREEN_OBJECTIVE_3": "Une fois dans les véhicules, vous devez escorter les ~b~chefs de braquage ~w~vers l'emplacement du ~y~repaire~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_4": "Protégez les ~b~chefs de braquage ~w~par tous les moyens nécessaires - s'ils meurent, vous perdez !",
+    "F_BANKROB_SCREEN_OBJECTIVE_5": "La ~r~police ~w~est en chemin.",
+    "C_BANKROB_SCREEN_OBJECTIVE_1": "Vous répondez à un appel concernant un vol en cours à la ~y~Banque Pacific Standard~w~.",
+    "C_BANKROB_SCREEN_OBJECTIVE_2": "Faites preuve de prudence - on signale que {FUGITIVE COUNT} ~r~braqueurs armés ~w~sont à l'intérieur de la banque.",
+    "C_BANKROB_SCREEN_OBJECTIVE_3": "La force létale est autorisée - neutralisez les ~r~braqueurs armés ~w~en utilisant tous les moyens nécessaires.",
+    "C_BANKROB_SCREEN_OBJECTIVE_4": "On dit que deux ~r~chefs de braquage ~w~prennent l'~g~argent ~w~- donnez la priorité à leur élimination pour gagner.",
+    "C_BANKROB_SCREEN_OBJECTIVE_5": "Ne laissez pas les ~r~chefs de braquage ~w~emmener l'~g~argent ~w~vers leur repaire !"
 
 
 }

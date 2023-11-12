@@ -1,18 +1,5 @@
-const DUMMY_OBJECTIVES = [
-    "Two ~b~heist leaders ~w~are in the process of stealing the ~g~money~w~.",
-    "Your task is to escort the ~b~heist leaders ~w~to the ~y~getaway vehicles~w~ first.",
-    "Once in the vehicles, you must escort the ~b~heist leaders ~w~to the ~y~hideout location~w~.",
-    "Protect the ~b~heist leaders ~w~by all means necessary - if they die, you lose!",
-    "The ~r~police ~w~are on their way.",
-]
-const POLICE_DUMMY_OBJECTIVES = [
-    "You're responding to a call regarding an ongoing robbery at the ~y~Pacific Standard Bank~w~.",
-    "Excercise caution - it's reported that XX ~r~armed robbers ~w~are inside the bank.",
-    "Deadly force is authorized - neutralize the ~r~armed robbers ~w~using any means necessary.",
-    "It is said that two ~r~heist leaders ~w~are taking the ~g~money ~w~- prioritize eliminating them to win.",
-    "Do not let the ~r~heist leaders ~w~take the ~g~money ~w~to their hideout!",
-]
-const DUMMY_TEAM = 0;
+
+const DUMMY_TEAM = 1;
 var OBJECTIVES = [];
 
 function setObjectives(objective_array){
@@ -49,10 +36,65 @@ function setTeam(team){
     else document.getElementById("team_display").innerHTML = `<span class="police">POLICE TEAM</span>`
 }
 
-setObjectives(DUMMY_OBJECTIVES);
-setTeam(DUMMY_TEAM);
+function showObjectives(){
+    const teamDisplay = document.getElementById("team_display");
+    const objectiveDisplay = document.getElementById("objective_list");
 
-// mp.events.add("set_objectives", (array) => {
-//     const realArray = JSON.parse(array);
-//     setObjectives(realArray);
-// });
+    teamDisplay.classList.add("fadeIn");
+    objectiveDisplay.classList.add("fadeIn");
+    teamDisplay.classList.remove("invisible");
+    objectiveDisplay.classList.remove("invisible");
+}
+function hideObjectives(){
+    const teamDisplay = document.getElementById("team_display");
+    const objectiveDisplay = document.getElementById("objective_list");
+
+    teamDisplay.classList.remove("fadeIn");
+    objectiveDisplay.classList.remove("fadeIn");    
+
+    teamDisplay.classList.add("fadeOut");
+    objectiveDisplay.classList.add("fadeOut");
+    setTimeout(() => {
+        teamDisplay.classList.add("invisible");
+        objectiveDisplay.classList.add("invisible");    
+        teamDisplay.classList.remove("fadeOut");
+        objectiveDisplay.classList.remove("fadeOut"); 
+    }, 1001);
+    teamDisplay.classList.remove("invisible");
+    objectiveDisplay.classList.remove("invisible");    
+}
+
+function toggleBlackBG(toggle){
+    var wrapper = document.getElementById("wrapper");
+    if(toggle == true){
+        wrapper.classList.remove("fadeOut");
+        wrapper.classList.add("fadeIn");
+        setTimeout(() => {
+            wrapper.style.opacity = 1.0;
+        }, 1001);
+    }
+    else{
+        wrapper.classList.remove("fadeIn");
+        wrapper.classList.add("fadeOut");
+        setTimeout(() => {
+            wrapper.style.opacity = 0.0;
+        }, 1001);
+    }
+}
+
+mp.events.add("set_objectives", (array) => {
+    const realArray = JSON.parse(array);
+    setObjectives(realArray);
+});
+mp.events.add("set_team", (team) => {
+    setTeam(team);
+});
+mp.events.add("fadeoutGameScreen", (toggle) => {
+    toggleBlackBG(true);
+})
+mp.events.add("toggle_objectives", (toggle) => {
+    if(toggle == true) showObjectives();
+    else hideObjectives();
+
+    console.log("Toggle objectives set to " + toggle.toString());
+});

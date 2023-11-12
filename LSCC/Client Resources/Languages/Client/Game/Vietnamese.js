@@ -64,7 +64,17 @@ const Language = {
     "BANKROB_FUGI_OBJECTIVE_GET_TO_HIDEOUT_LEADER": "~w~Giao ~g~tiền ~w~tới ~y~nơi ẩn náu~w~ tại {STREET NAME}.",
     "BANKROB_COP_OBJECTIVE_GET_TO_BANK": "~w~Đi đến ~y~Ngân hàng Pacific Standard~w~ và loại bỏ ~r~tội phạm~w~.",
     "BANKROB_COP_OBJECTIVE_STOP_REACHING_CAR": "~w~Ngăn chặn ~r~tội phạm~w~ trước khi đến được các phương tiện thoát khỏi~w~ !",
-    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~Ngăn chặn ~r~tội phạm~w~ trước khi đến nơi ẩn náu của họ~w~ !"
+    "BANKROB_COP_OBJECTIVE_STOP_REACHING_HIDEOUT": "~w~Ngăn chặn ~r~tội phạm~w~ trước khi đến nơi ẩn náu của họ~w~ !",
+    "F_BANKROB_SCREEN_OBJECTIVE_1": "Hai ~b~lãnh đạo vụ cướp ~w~đang trong quá trình đánh cắp ~g~tiền~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_2": "Nhiệm vụ của bạn là hộ tống ~b~lãnh đạo vụ cướp ~w~đến ~y~phương tiện thoát khỏi~w~ trước tiên.",
+    "F_BANKROB_SCREEN_OBJECTIVE_3": "Sau khi lên phương tiện, bạn phải hộ tống ~b~lãnh đạo vụ cướp ~w~đến ~y~địa điểm ẩn náu~w~.",
+    "F_BANKROB_SCREEN_OBJECTIVE_4": "Bảo vệ ~b~lãnh đạo vụ cướp ~w~bằng mọi cách cần thiết - nếu họ chết, bạn thua!",
+    "F_BANKROB_SCREEN_OBJECTIVE_5": "~r~Cảnh sát ~w~đang trên đường đến.",
+    "C_BANKROB_SCREEN_OBJECTIVE_1": "Bạn đang phản ứng với một cuộc gọi về một vụ cướp đang diễn ra tại ~y~Ngân hàng Pacific Standard~w~.",
+    "C_BANKROB_SCREEN_OBJECTIVE_2": "Hãy cẩn trọng - báo cáo cho biết có {FUGITIVE COUNT} ~r~tên cướp trang bị ~w~ở trong ngân hàng.",
+    "C_BANKROB_SCREEN_OBJECTIVE_3": "Sử dụng bất cứ biện pháp nào cần thiết - tiêu diệt ~r~tên cướp trang bị ~w~bằng mọi cách cần thiết.",
+    "C_BANKROB_SCREEN_OBJECTIVE_4": "Người ta nói rằng hai ~r~lãnh đạo vụ cướp ~w~đang mang ~g~tiền ~w~- ưu tiên loại bỏ họ để chiến thắng.",
+    "C_BANKROB_SCREEN_OBJECTIVE_5": "Đừng để ~r~lãnh đạo vụ cướp ~w~mang ~g~tiền ~w~đến ẩn náu của họ!"
 
 
 }
