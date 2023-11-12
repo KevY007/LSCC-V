@@ -4565,6 +4565,47 @@ namespace RNC
         }
         */
 
+        [Command("startevent")]
+        public static void cmd_startevent(Player player, int eventID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have permission to use this command!");
+                return;
+            }
+
+            EventManager.EventData toStart = EventManager.Events.FirstOrDefault(e => (int)e.EventID == eventID);
+            if(toStart == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}retard!");
+                return;
+            }
+
+            EventManager.ToggleEvent((LobbyData.EventLobbyID)eventID, true);
+        }
+        [Command("stopevent")]
+        public static void cmd_stopevent(Player player, int eventID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have permission to use this command!");
+                return;
+            }
+
+            EventManager.EventData toStart = EventManager.Events.FirstOrDefault(e => (int)e.EventID == eventID);
+            if (toStart == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}retard!");
+                return;
+            }
+
+            EventManager.ToggleEvent((LobbyData.EventLobbyID)eventID, false);
+        }
+
         [Command("switchlobby", "!{#AFAFAF}[USAGE] switchlobby (lobbyid) (optional: password)", Alias = "swl", GreedyArg = true)]
         public static void cmd_switchlobby(Player player, string args)
         {
@@ -4677,6 +4718,14 @@ namespace RNC
             {
                 //targ.SendChatMessage($"[Lobby {lobbyid}] {player.Name} has joined this lobby.");
                 EPlayer.Notify(targ, Translate(targ, "PLAYER_JOINED_LOBBY", EPlayer.Name(player)), "blue", "fas fa-user-plus", false, 1000);
+            }
+
+            EventManager.EventData eventLobbyCheck = EventManager.Events.FirstOrDefault(e => (int)e.EventID == lobbyid);
+            if(eventLobbyCheck != null)
+            {
+                // If the player switches to a lobby thats an event, put them in that lobby properly instead of this.
+                Events.OnPlayerRequestJoinEvent(player, eventLobbyCheck.Name);
+                return;
             }
 
             player.SetSharedData("InLobby", lobbyid);

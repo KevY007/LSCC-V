@@ -1535,8 +1535,9 @@ mp.events.add("EVENT:SendJoinNotification", (eName, description) => {
         ])
     }
 });
-mp.events.add("EVENT:OnClickJoinButton", (eventName) => {
-    mp.events.callRemote("EVENT:RequestJoinEvent", eventName);
+mp.events.add("EVENT:OnClickJoinButton", (data) => {
+    const eData = JSON.parse(data);
+    mp.events.callRemote("EVENT:RequestJoinEvent", eData.name);
 });
 
 mp.events.add('toggle_cursor', (toggle) => { mp.gui.cursor.show(toggle, toggle) });

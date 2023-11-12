@@ -229,6 +229,7 @@ namespace RNC
 
             _d.Enabled = value;
             if (value == false) OnEventDisabled(_d);
+            if (value == true) OnEventEnabled(_d);
         }
 
         private static void OnEventEnabled(EventData eventData)
@@ -247,6 +248,17 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == (int)eventData.EventID);
             if (lobby == null) return;
             lobby.Enabled = false;
+
+            // If they are still in the lobby when it's disabled, fuck them niggas. Spawn them in some other lobby.
+            // Since this one is disabled, it'll pick a new one for them automatically.
+            foreach(Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == (int)eventData.EventID))
+            {
+                NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
+            }
+            foreach(EventData.EventPlayerData ePlayer in eventData.EventPlayers)
+            {
+                ePlayer.Player.SendChatMessage("Thanks for participating in the event. You get score and shit now bla bla");
+            }
 
             eventData.EventPlayers.Clear();
         }
