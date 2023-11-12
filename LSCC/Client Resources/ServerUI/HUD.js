@@ -1517,6 +1517,28 @@ mp.events.add("menu_scoreboard_closed", () => {
     mp.events.call("TogglePlayerChat", true);
 
 });
+
+mp.events.add("EVENT:SendJoinNotification", (eName, description) => {
+    if(global.ServerUI){
+        global.ServerUI.call("hud_chat_message_embed_send", "https://i.imgur.com/PtKCeOI.png",
+        eName, description, [
+            {
+                label:"Join",
+                event:{
+                    name:"EVENT:OnClickJoinButton",
+                    data:{
+                        name:eName
+                    }
+                },
+                disableOnAction:true
+            }
+        ])
+    }
+});
+mp.events.add("EVENT:OnClickJoinButton", (eventName) => {
+    mp.events.callRemote("EVENT:RequestJoinEvent", eventName);
+});
+
 mp.events.add('toggle_cursor', (toggle) => { mp.gui.cursor.show(toggle, toggle) });
 function ToggleScoreboard()
 {

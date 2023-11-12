@@ -4689,6 +4689,27 @@ namespace RNC
             // "ReportFugitiveEnterBuilding"
         }
 
+        [RemoteEvent("EVENT:RequestJoinEvent")]
+        public static void OnPlayerRequestJoinEvent(Player player, string eventName)
+        {
+            EventManager.EventData eventData = EventManager.GetEvent(eventName);
+            if (eventData == null) return;
+            if(eventData.Enabled == false || eventData.InProgress == true)
+            {
+                EPlayer.Error(player, "This event is now disabled or in progress & can't be joined anymore!");
+                return;
+            }
+
+            eventData.EventPlayers.Add(new EventManager.EventData.EventPlayerData() 
+            { 
+                Player = player, 
+                Team = -1, 
+                IsParticipating = true 
+            });
+
+            player.SetSharedData("InLobby", eventData.EventID);
+            NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
+        }
 
         [RemoteEvent("EVENT:BankRobbery_LeaderEnterVehicle")]
         public static void BankRobbery_OnLeaderEnterVehicle(Player player, Vehicle vehicle, int vehicleTeam)

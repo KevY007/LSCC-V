@@ -2277,6 +2277,11 @@ namespace RNC
             player.SetSharedData("TELEPORT:Data", tpData);
         }
 
+        public static void SendEventNotification(Player player, string eventName, string description)
+        {
+            player.TriggerEvent("EVENT:SendJoinNotification", eventName, description);
+        }
+
         public static void Spawn(Player player, bool forceAutojoin = true, Vector3 spawn = default(Vector3))
         {
             try

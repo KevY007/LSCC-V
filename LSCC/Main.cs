@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 using RNC.Data;
+using Microsoft.Extensions.Logging;
 
 namespace RNC
 {
@@ -160,8 +161,104 @@ namespace RNC
         public Lobby_StingerData() { }
     }
 
+    public class EventManager
+    {
+        public class EventData
+        {
+            public class EventPlayerData
+            {
+                public Player Player { get; set; }
+                public int Team { get; set; }
+                public bool IsParticipating { get; set; }
+            }
+            
+            public string Name { get; set; }
+            public string Description { get; set; }
+            public LobbyData.EventLobbyID EventID { get; set; }
+            public bool Enabled { get; set; }
+            public bool InProgress { get; set; }
+            public List<EventPlayerData> EventPlayers { get; set; }
+
+            public EventData()
+            {
+
+            }
+            public EventData(string name, LobbyData.EventLobbyID eventLobbyID, bool enabled, GameModes lobbyMode, string description = "")
+            {
+                this.InProgress = false;
+                this.Name = name;
+                this.EventID = eventLobbyID;
+                this.Enabled = enabled;
+                EventPlayers = new List<EventPlayerData>();
+                this.Description = description;
+
+                new LobbyData()
+                {
+                    lobbyId = (int)eventLobbyID,
+                    gameMode = lobbyMode,
+                    Name = $"[EVENT] {name}",
+                    MaxPlayers = 1000,
+                    Enabled = enabled
+                };
+            }
+        }
+
+        public static List<EventData> Events = new List<EventData>();
+        public EventManager()
+        {
+
+        }
+        public static void Initialize()
+        {
+            Events.Add(new EventData("Bank Robbery", LobbyData.EventLobbyID.BankRobbery, false, GameModes.BANKROBBERY,
+                "An action & objective-focused event in which you have to rob a bank & deliver the money as fugitive, " +
+                "or stop the robbery as a police officer!"));
+        }
+        public static EventData GetEvent(LobbyData.EventLobbyID EventID)
+        {
+            return Events.FirstOrDefault(e => e.EventID == EventID);
+        }
+        public static EventData GetEvent(string eventName)
+        {
+            return Events.FirstOrDefault(e => e.Name.Equals(eventName));
+        }
+        public static void ToggleEvent(LobbyData.EventLobbyID EventID, bool value)
+        {
+            EventData _d = GetEvent(EventID);
+            if (_d == null) return;
+
+            _d.Enabled = value;
+            if (value == false) OnEventDisabled(_d);
+        }
+
+        private static void OnEventEnabled(EventData eventData)
+        {
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == (int)eventData.EventID);
+            if (lobby == null) return;
+            lobby.Enabled = true;
+
+            foreach(Player player in Settings.LoggedInPlayers)
+            {
+                EPlayer.SendEventNotification(player, eventData.Name, eventData.Description);
+            }
+        }
+        private static void OnEventDisabled(EventData eventData)
+        {
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == (int)eventData.EventID);
+            if (lobby == null) return;
+            lobby.Enabled = false;
+
+            eventData.EventPlayers.Clear();
+        }
+    }
+
     public class LobbyData
     {
+        public enum EventLobbyID
+        {
+            BankRobbery = 50000
+        };
+
         public enum GameStatus 
         { 
             None = 0,
@@ -2132,6 +2229,9 @@ namespace RNC
                 if (i >= Settings.MaxLobbies - 1) new LobbyData().gameMode = GameModes.BUSTED; // Some busted lobby too.
                 else new LobbyData();
             }
+
+            // This will initialize all the event lobbies and such.
+            EventManager.Initialize();
 
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring & loading settings.json...");
