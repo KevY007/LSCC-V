@@ -4718,6 +4718,8 @@ namespace RNC
                     cPlayer.TriggerEvent("EVENT:ClearObjectiveBlips");
                     cPlayer.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
                     cPlayer.TriggerEvent("EVENT:AddBankRobberyFinishMarker", hideoutPosition.X, hideoutPosition.Y, hideoutPosition.Z);
+                    cPlayer.TriggerEvent("EVENT:SetBankRobberyWaypoint", hideoutPosition.X, hideoutPosition.Y);
+
                     if (lobby.Fugitives.Contains(cPlayer))
                     {
                         if(cPlayer != lobby.BankRobbery.HeistLeader && cPlayer != lobby.BankRobbery.CoLeader)

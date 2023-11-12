@@ -218,6 +218,7 @@ mp.events.add("EVENT:AddBankRobberyObjectiveBlip", (posX, posY, posZ) => {
     BR_BLIPS.push(blip);
 });
 mp.events.add("EVENT:SetBankRobberyWaypoint", (posX, posY) => {
+    mp.game.invoke('0xA7E4E2D361C2627F'); // CLEAR WAYPOINT
     mp.game.ui.setNewWaypoint(posX, posY);
 });
 mp.events.add("EVENT:ClearBankRobberyWaypoint", () => {

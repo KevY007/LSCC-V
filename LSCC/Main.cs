@@ -4985,8 +4985,8 @@ namespace RNC
                                 player.TriggerEvent("EVENTS:SetBankRobberyObjective", true, "BANKROB_COP_OBJECTIVE_GET_TO_BANK");
                                 player.TriggerEvent("SetActorInvulnerable", false);
 
-                                player.TriggerEvent("EVENT:SetBankRobberyWaypoint", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
                                 player.TriggerEvent("EVENT:AddBankRobberyObjectiveBlip", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
+                                player.TriggerEvent("EVENT:SetBankRobberyWaypoint", BankRobberyData.BankCheckpointPos.X, BankRobberyData.BankCheckpointPos.Y);
                             }
 
                         }, 500);
