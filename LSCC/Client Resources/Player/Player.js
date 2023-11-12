@@ -1994,70 +1994,11 @@ mp.events.add('render', () => {
         playerBlips = [];
 
         global.traceLastFunc(`[Players] Blips Stage2`);
-        if(!global.isInInterior){
-            mp.players.forEach(target => {
-
-                if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && (!target.isDead() || target.handle == 0))
-                {
-                    if ((target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true) || 
-                        (target.getVariable("Team") == 0 && mp.players.local.getVariable("Team") == 0 && target.remoteId != mp.players.local.remoteId))
-                    {
-                        var blipColor = 45;
-                        var blipId = 1;
-                        if(target.getVariable("InLobby") == -6 && target.getVariable("InDM") != -1)
-                        {
-                            blipColor = Number(target.getVariable("DMBlipColor"));
-                        }
-                        else 
-                        {
-                            if(target.getVariable("Team") == 0) 
-                            {
-                                blipColor = 70;
-                                if(target.getVariable("HasShot") == true){
-                                    blipColor = 70;
-                                    blipId = 458;
-                                }
-                            }
-                            else if(target.getVariable("Team") == 1) blipColor = 3;
-                            if(target.getVariable("InLobby") == -3) blipColor = 15;
-                            if(target.getVariable("InLobby") == -4) blipColor = 69;
-                            if(target.getVariable("InDM") != -1) blipColor = 39;
-                        }
-                        
-    
-                        if(target.isInAnyVehicle(false)){ 
-                            blipId = 724; 
-                            if(target.isInAnyHeli()){
-                                blipId = 43;
-                            }
-                            if(target.isOnAnyBike()){
-                                blipId = 226;
-                            }
-                        }
-    
-                        var position = target.position;
-    
-                        if(global.calcDist(position, mp.players.local.position) >= 1000.0 
-                        || (target.handle !== 0) == false || target.handle === null || 
-                            target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
-                        {
-                            position.x = target.getVariable("UnstreamedX");
-                            position.y = target.getVariable("UnstreamedY");
-                            position.z = target.getVariable("UnstreamedZ");
-                            if(target.getVariable("UnstreamedState") == 1) blipId = 724;
-                        }
-    
-                        var targetBlip = mp.blips.new(blipId, position,
-                        {
-                            name: target.name,
-                            color: blipColor,
-                            shortRange: false,
-                            dimension: mp.players.local.dimension
-                        });
-                        playerBlips.push(targetBlip.id);
-                    }
-                }
-            });
+        if(global.chaseMode == 0 || global.chaseMode == 1){ // COPCHSE & BUSTED MODES
+            handleCopchaseBlips();
+        }
+        if(global.chaseMode == 2){ // BANK ROBBERY
+            handleBankRobberyBlips();
         }
         
 
@@ -2169,6 +2110,194 @@ mp.events.add('render', () => {
         }
     }
 });
+function handleBankRobberyBlips(){
+    if(!global.isInInterior){
+        mp.players.forEach(target => {
+
+            if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && (!target.isDead() || target.handle == 0))
+            {
+                // For cops, fugitives show up RED on the map in Bank Robbery. Other cops are always visible on the map no matter the GPS status.
+                if(mp.players.local.getVariable("Team") == 1){ // if cop
+                    var blipColor = 45;
+                    var blipId = 1;
+
+                    if(target.getVariable("Team") == 0){
+                        blipColor = 1;
+                    }
+                    if(target.getVariable("Team") == 1){
+                        blipColor = 3;
+                    }
+                    if(target.isInAnyVehicle(false)){ 
+                        blipId = 724; 
+                        if(target.isInAnyHeli()){
+                            blipId = 43;
+                        }
+                        if(target.isOnAnyBike()){
+                            blipId = 226;
+                        }
+                    }
+                    var position = target.position;
+
+                    if(global.calcDist(position, mp.players.local.position) >= 1000.0 
+                    || (target.handle !== 0) == false || target.handle === null || 
+                        target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
+                    {
+                        position.x = target.getVariable("UnstreamedX");
+                        position.y = target.getVariable("UnstreamedY");
+                        position.z = target.getVariable("UnstreamedZ");
+                        if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                    }
+
+                    var targetBlip = mp.blips.new(blipId, position,
+                        {
+                            name: target.name,
+                            color: blipColor,
+                            shortRange: false,
+                            dimension: mp.players.local.dimension
+                        });
+                        playerBlips.push(targetBlip.id);
+                }
+                else if(mp.players.local.getVariable("Team") == 0){ // if fugitive
+                    var blipColor = 45;
+                    var blipId = 1;
+
+                    // Only HEIST LEADERS are visible, marked BLUE on the map.
+                    // Cops will be marked RED if their GPS status is active.
+                    // Fellow fugitives are invisible to prevent confusion
+                    let displayThisPlayer = false;
+                    let isHeistLeader = false;
+                    let isPlayerCop = false;
+
+                    if(target.getVariable("Team") == 0){
+                        displayThisPlayer = true;
+                        if(target.getVariable("HeistLeader") === true){
+                            blipColor = 3;
+                            isHeistLeader = true;
+                        }
+                        else{
+                            blipColor = 43;
+                        }
+                    }
+                    if(target.getVariable("Team") == 1 && target.getVariable("VisibleBlip") == true){
+                        blipColor = 1;
+                        displayThisPlayer = true;
+                        isPlayerCop = true;
+                    }
+                    if(target.isInAnyVehicle(false)){ 
+                        blipId = 724; 
+                        if(target.isInAnyHeli()){
+                            blipId = 43;
+                        }
+                        if(target.isOnAnyBike()){
+                            blipId = 226;
+                        }
+                    }
+                    var position = target.position;
+
+                    if(global.calcDist(position, mp.players.local.position) >= 1000.0 
+                    || (target.handle !== 0) == false || target.handle === null || 
+                        target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
+                    {
+                        position.x = target.getVariable("UnstreamedX");
+                        position.y = target.getVariable("UnstreamedY");
+                        position.z = target.getVariable("UnstreamedZ");
+                        if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                    }
+
+                    if(displayThisPlayer == true){
+                        var targetBlip = mp.blips.new(blipId, position,
+                            {
+                                name: target.name,
+                                color: blipColor,
+                                shortRange: false,
+                                dimension: mp.players.local.dimension,
+                                scale:((isHeistLeader == true || isPlayerCop == true) ? 1.0 : 0.5) // if cop or heist leader, normal scale,
+                                                                                                   // otherwise make blip smaller
+                            });
+                            playerBlips.push(targetBlip.id);
+                    }
+             
+                }
+
+                
+            }
+        });
+    }
+    else{
+        
+    }
+}
+function handleCopchaseBlips(){
+    if(!global.isInInterior){
+        mp.players.forEach(target => {
+
+            if(target.dimension == mp.players.local.dimension/* && target != mp.players.local*/ && (!target.isDead() || target.handle == 0))
+            {
+                if ((target.getVariable("VisibleBlip") !== undefined && target.getVariable("VisibleBlip") == true) || 
+                    (target.getVariable("Team") == 0 && mp.players.local.getVariable("Team") == 0 && target.remoteId != mp.players.local.remoteId))
+                {
+                    var blipColor = 45;
+                    var blipId = 1;
+                    if(target.getVariable("InLobby") == -6 && target.getVariable("InDM") != -1)
+                    {
+                        blipColor = Number(target.getVariable("DMBlipColor"));
+                    }
+                    else 
+                    {
+                        if(target.getVariable("Team") == 0) 
+                        {
+                            blipColor = 70;
+                            if(target.getVariable("HasShot") == true){
+                                blipColor = 70;
+                                blipId = 458;
+                            }
+                        }
+                        else if(target.getVariable("Team") == 1) blipColor = 3;
+                        if(target.getVariable("InLobby") == -3) blipColor = 15;
+                        if(target.getVariable("InLobby") == -4) blipColor = 69;
+                        if(target.getVariable("InDM") != -1) blipColor = 39;
+                    }
+                    
+
+                    if(target.isInAnyVehicle(false)){ 
+                        blipId = 724; 
+                        if(target.isInAnyHeli()){
+                            blipId = 43;
+                        }
+                        if(target.isOnAnyBike()){
+                            blipId = 226;
+                        }
+                    }
+
+                    var position = target.position;
+
+                    if(global.calcDist(position, mp.players.local.position) >= 1000.0 
+                    || (target.handle !== 0) == false || target.handle === null || 
+                        target.handle === undefined || target.position == null || (target.position.x == 0.0 && target.position.z == 0.0))
+                    {
+                        position.x = target.getVariable("UnstreamedX");
+                        position.y = target.getVariable("UnstreamedY");
+                        position.z = target.getVariable("UnstreamedZ");
+                        if(target.getVariable("UnstreamedState") == 1) blipId = 724;
+                    }
+
+                    var targetBlip = mp.blips.new(blipId, position,
+                    {
+                        name: target.name,
+                        color: blipColor,
+                        shortRange: false,
+                        dimension: mp.players.local.dimension
+                    });
+                    playerBlips.push(targetBlip.id);
+                }
+            }
+        });
+    }
+    else{
+        
+    }
+}
+
 
 // ADDING SHORT COOLDOWN TO SHOOTING AFTER THEY DO THE ROLL THING
 var rollShootCooldownActive = false;
