@@ -765,34 +765,34 @@ namespace RNC
         public static int MaxTeleports = 400; // Used for dimension calculations
 
         // Connection Settings
-        public const string MySQL_Host = "panel.gm.miami";
-        public const string MySQL_User = "rncMainUser";
-        public const string MySQL_Password = "4irnKD3cDCJ74cfnbdK2W9dM";
+        public const string MySQL_Host = "161.97.73.126";
+        public const string MySQL_User = "QrE2bvDp3C";
+        public const string MySQL_Password = "FXF47ZKJLVHGrLSRAwFTmQEThPkQTU8W";
         public const string MySQL_Database = "racenchase";
-        public const string MySQL_Port = "50733";
+        public const string MySQL_Port = "65517";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
         public static bool SpawnParkedVehicles { get; set; } = false; // for debug purposes whether to spawn random cars
         public static int ParkedVehiclesToSpawn { get; set; } = 200;
-        public static List<LobbyData> Lobbies { get; set; }
-        public static List<Player> LoggedInPlayers { get; set; }
-        public static List<Vehicle> AdminVehicles { get; set; }
+        public static List<LobbyData> Lobbies { get; set; } = new List<LobbyData>();
+        public static List<Player> LoggedInPlayers { get; set; } = new List<Player>();
+        public static List<Vehicle> AdminVehicles { get; set; } = new List<Vehicle>();
         public static List<Achievement> Achievements = new List<Achievement>();
         public static int NextLobbyID { get; set; }
         public static int DerbyTimeLeft { get; set; }
         public static long LastDerbyTick { get; set; }
         public static long LastMessageTick { get; set; }
         public static long AutoSaveTick { get; set; }
-        public static List<RequestData> Requests { get; set; }
+        public static List<RequestData> Requests { get; set; } = new List<RequestData>();
         public static int NextRequestID { get; set; }
         public static long LastCountUpdate { get; set; }
         public static bool OOC { get; set; }
-        public static List<LoadoutData> Loadouts { get; set; }
+        public static List<LoadoutData> Loadouts { get; set; } = new List<LoadoutData>();
         public static List<CarData> Cars { get; set; }
-        public static Dictionary<long, jWeaponData> WeaponData { get; set; }
-        public static List<jCarGenData> CarGenData { get; set; }
-        public static List<SpawnSet> FreeroamSpawns { get; set; }
+        public static Dictionary<long, jWeaponData> WeaponData { get; set; } = new Dictionary<long, jWeaponData>();
+        public static List<jCarGenData> CarGenData { get; set; } = new List<jCarGenData>();
+        public static List<SpawnSet> FreeroamSpawns { get; set; } = new List<SpawnSet>();
 
         public static bool OOCSlowMode { get; set; } = false;
 
@@ -5173,7 +5173,7 @@ namespace RNC
         {
             try
             {
-                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedDataSafe<int>("InLobby") == -4).Count() >= 2)
+                if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers != null && Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedDataSafe<int>("InLobby") == -4).Count() >= 2)
                 {
                     //Settings.DerbyTimeLeft--;
                     Settings.LastDerbyTick = Environment.TickCount64;
@@ -5183,6 +5183,7 @@ namespace RNC
                         Main.CheckDerbyWinner();
                     }
                 }
+
 
                 lock (Settings.Lobbies)
                 {
