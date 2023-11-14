@@ -10,8 +10,7 @@ mp.events.add('character_import_open', (appearanceData) => {
 
     CHARACTER_APPEARANCE_DATA = JSON.parse(appearanceData);
 
-    global.CharacterImportCEF = mp.browsers.new('package://charcreator/char_import/CEF/index.html');
-    global.CharacterImportCEF.active = true;
+    // script to open it if needed maybe idk
     mp.gui.cursor.show(true, true);
 
     if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
@@ -21,20 +20,25 @@ mp.events.add('character_import_close', () => {
         global.CharacterImportCEF.destroy();
         global.CharacterImportCEF = null;
     }
+
+    if(global.ServerUI) global.ServerUI.call("character_editor_import_toggle", false);
+
     mp.gui.cursor.show(false, false);
     if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
 });
-mp.events.add('character_import_data', (gender, data) => {
+mp.events.add('character_editor_import', (genderValue, data) => {
+    let gender = (genderValue == 0 ? 'M' : 'F');
+
     if(data.startsWith("There was")){
         mp.events.callLocal("HUDError", data);
         return;
     }
     if(gender == "M" && !CHARACTER_APPEARANCE_DATA.IsMale){
-        mp.events.callLocal("HUDError", "Your current character's gender is set to FEMALE! Please pick a different option or use <strong>/char reset</strong> and set it to MALE.");
+        if(global.ServerUI) global.ServerUI.call("character_editor_import_error_set", "Your current character's gender is set to FEMALE! Please pick a different option or use <strong>/char reset</strong> and set it to MALE.");
         return;
     }
     if(gender == "F" && CHARACTER_APPEARANCE_DATA.IsMale){
-        mp.events.callLocal("HUDError", "Your current character's gender is set to MALE! Please pick a different option or use <strong>/char reset</strong> and set it to FEMALE.");
+        if(global.ServerUI) global.ServerUI.call("character_editor_import_error_set", "Your current character's gender is set to MALE! Please pick a different option or use <strong>/char reset</strong> and set it to FEMALE.");
         return;
     }
     

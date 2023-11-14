@@ -34,7 +34,7 @@ function getPropUIID(realID){
     return -1;
 }
 
-mp.events.add("dialog_clothing_editor_change_id", (value) => {
+mp.events.add("clothing_editor_change_id", (value) => {
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, drawable:value};
 
     if(CURRENT_EDIT_ITEM.isProp){
@@ -46,7 +46,7 @@ mp.events.add("dialog_clothing_editor_change_id", (value) => {
             CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Drawable = value;
             CURRENT_OUTFIT_DATA.Props.find(p => p.Index === CURRENT_EDIT_ITEM.index).Texture = 0;
 
-            mp.events.callLocal("dialog_clothing_editor_change_type", getPropUIID(CURRENT_EDIT_ITEM.index));
+            mp.events.callLocal("clothing_editor_change_type", getPropUIID(CURRENT_EDIT_ITEM.index));
         }
     }
     else{
@@ -55,11 +55,11 @@ mp.events.add("dialog_clothing_editor_change_id", (value) => {
             CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index].Drawable = value;
             CURRENT_OUTFIT_DATA.Components[CURRENT_EDIT_ITEM.index].Texture = 0;
 
-            mp.events.callLocal("dialog_clothing_editor_change_type", CURRENT_EDIT_ITEM.index);
+            mp.events.callLocal("clothing_editor_change_type", CURRENT_EDIT_ITEM.index);
         }
     }
 });
-mp.events.add("dialog_clothing_editor_change_texture", (value) => {
+mp.events.add("clothing_editor_change_texture", (value) => {
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, texture:value};
 
     if(CURRENT_EDIT_ITEM.isProp){
@@ -76,7 +76,7 @@ mp.events.add("dialog_clothing_editor_change_texture", (value) => {
         }
     }
 });
-mp.events.add("dialog_clothing_editor_change_type", (value) => {
+mp.events.add("clothing_editor_change_type", (value) => {
     if(value < 0){
         const realID = getRealPropID(value);
 
@@ -101,12 +101,17 @@ mp.events.add("dialog_clothing_editor_change_type", (value) => {
     onOutfitCreatorChangeType(CURRENT_EDIT_ITEM.index, CURRENT_EDIT_ITEM.drawable, CURRENT_EDIT_ITEM.texture, CURRENT_EDIT_ITEM.isProp);
 
 });
-mp.events.add("dialog_clothing_editor_close", (value) => {
+mp.events.add("clothing_editor_close", (value) => {
+    mp.gui.cursor.show(false, false);
+
+
+    mp.events.callRemote("CharacterEditor:CloseEvent");
+});
+mp.events.add("clothing_editor_save", (value) => {
     mp.gui.cursor.show(false, false);
 
     // For debugging purposes: save outfit edits
     mp.events.callRemote("OutfitCreator:SaveOutfitChanges", JSON.stringify(CURRENT_OUTFIT_DATA));
-
     mp.events.callRemote("CharacterEditor:CloseEvent");
 });
 
@@ -1512,8 +1517,11 @@ mp.events.add("character_editor_set_active_category_id", (id) => {
 mp.events.add("character_editor_change_category", (id) => {
     setAppearanceEditorOptions(id);
 });
-mp.events.add("character_editor_close", () => {
+mp.events.add("character_editor_save", () => {
     mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CURRENT_APPEARANCE_DATA))
+    mp.events.callRemote('CharacterEditor:CloseAppearanceEditor');
+});
+mp.events.add("character_editor_close", () => {
     mp.events.callRemote('CharacterEditor:CloseAppearanceEditor');
 });
 mp.events.add("character_editor_change_option", (id, value) => {
