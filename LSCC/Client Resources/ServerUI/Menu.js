@@ -550,6 +550,10 @@ function updateMenuSettingsTab() {
                 value: "2",
               },
               {
+                label: "Croatian/Hrvatski",
+                value: "3",
+              },
+              {
                 label: "Vietnamese/Tiếng Việt",
                 value: "4",
               },
