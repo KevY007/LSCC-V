@@ -237,6 +237,7 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == (int)eventData.EventID);
             if (lobby == null) return;
             lobby.Enabled = true;
+            lobby.GameAutoStart = false; // don't let it start for a while, maybe 60-90 seconds?
 
             foreach(Player player in Settings.LoggedInPlayers)
             {
@@ -248,10 +249,11 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == (int)eventData.EventID);
             if (lobby == null) return;
             lobby.Enabled = false;
+            lobby.GameAutoStart = false;
 
             // If they are still in the lobby when it's disabled, fuck them niggas. Spawn them in some other lobby.
             // Since this one is disabled and their lobby ID is set to -1, it'll pick a new one for them automatically.
-            foreach(Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == (int)eventData.EventID))
+            foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == (int)eventData.EventID))
             {
                 player.SetSharedData("InLobby", -1);
                 NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
