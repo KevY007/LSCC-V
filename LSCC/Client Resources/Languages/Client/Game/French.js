@@ -74,7 +74,9 @@ const Language = {
     "C_BANKROB_SCREEN_OBJECTIVE_2": "Faites preuve de prudence - on signale que {FUGITIVE COUNT} ~r~braqueurs armés ~w~sont à l'intérieur de la banque.",
     "C_BANKROB_SCREEN_OBJECTIVE_3": "La force létale est autorisée - neutralisez les ~r~braqueurs armés ~w~en utilisant tous les moyens nécessaires.",
     "C_BANKROB_SCREEN_OBJECTIVE_4": "On dit que deux ~r~chefs de braquage ~w~prennent l'~g~argent ~w~- donnez la priorité à leur élimination pour gagner.",
-    "C_BANKROB_SCREEN_OBJECTIVE_5": "Ne laissez pas les ~r~chefs de braquage ~w~emmener l'~g~argent ~w~vers leur repaire !"
+    "C_BANKROB_SCREEN_OBJECTIVE_5": "Ne laissez pas les ~r~chefs de braquage ~w~emmener l'~g~argent ~w~vers leur repaire !",
+    "CURSOR_CHAT_TIP":"!{#00ff00}[>] !{#FFFFFF}Vous pouvez appuyer sur !{#FFFF00}F2 !{#FFFFFF}pour afficher le curseur de la souris et interagir avec l'interface utilisateur !"
+
 
 
 }

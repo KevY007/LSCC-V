@@ -74,7 +74,9 @@ const Language = {
     "C_BANKROB_SCREEN_OBJECTIVE_2": "Hãy cẩn trọng - báo cáo cho biết có {FUGITIVE COUNT} ~r~tên cướp trang bị ~w~ở trong ngân hàng.",
     "C_BANKROB_SCREEN_OBJECTIVE_3": "Sử dụng bất cứ biện pháp nào cần thiết - tiêu diệt ~r~tên cướp trang bị ~w~bằng mọi cách cần thiết.",
     "C_BANKROB_SCREEN_OBJECTIVE_4": "Người ta nói rằng hai ~r~lãnh đạo vụ cướp ~w~đang mang ~g~tiền ~w~- ưu tiên loại bỏ họ để chiến thắng.",
-    "C_BANKROB_SCREEN_OBJECTIVE_5": "Đừng để ~r~lãnh đạo vụ cướp ~w~mang ~g~tiền ~w~đến ẩn náu của họ!"
+    "C_BANKROB_SCREEN_OBJECTIVE_5": "Đừng để ~r~lãnh đạo vụ cướp ~w~mang ~g~tiền ~w~đến ẩn náu của họ!",
+    "CURSOR_CHAT_TIP":"!{#00ff00}[>] !{#FFFFFF}Bạn có thể nhấn !{#FFFF00}F2 !{#FFFFFF}để hiển thị con trỏ chuột và tương tác với giao diện người dùng!"
+
 
 
 }

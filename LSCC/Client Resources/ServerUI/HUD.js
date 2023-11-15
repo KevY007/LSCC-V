@@ -1518,8 +1518,13 @@ mp.events.add("menu_scoreboard_closed", () => {
 
 });
 
+let joinNotificationHintSent = false;
 mp.events.add("EVENT:SendJoinNotification", (eName, description) => {
     if(global.ServerUI){
+        if(joinNotificationHintSent == false){
+            joinNotificationHintSent = true;
+            mp.gui.chat.push(Translate("CURSOR_CHAT_TIP"));
+        }
         global.ServerUI.call("hud_chat_message_embed_send", "https://i.imgur.com/PtKCeOI.png",
         eName, description, [
             {
@@ -1532,7 +1537,8 @@ mp.events.add("EVENT:SendJoinNotification", (eName, description) => {
                 },
                 disableOnAction:true
             }
-        ])
+        ]);
+
     }
 });
 mp.events.add("EVENT:OnClickJoinButton", (data) => {

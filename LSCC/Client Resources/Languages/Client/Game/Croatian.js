@@ -74,6 +74,8 @@ const Language = {
     "C_BANKROB_SCREEN_OBJECTIVE_2": "Budite oprezni - prijavljeno je da je {FUGITIVE COUNT} ~r~naoružanih razbojnika ~w~unutar banke.",
     "C_BANKROB_SCREEN_OBJECTIVE_3": "Smrtonosna sila je ovlaštena - neutralizirajte ~r~naoružane razbojnike ~w~koristeći sve potrebne mjere.",
     "C_BANKROB_SCREEN_OBJECTIVE_4": "Kaže se da dva ~r~vođe pljačke ~w~uzimaju ~g~novac ~w~- prioritet je eliminirati ih kako biste pobijedili.",
-    "C_BANKROB_SCREEN_OBJECTIVE_5": "Nemojte dopustiti ~r~vođama pljačke ~w~da ponesu ~g~novac ~w~do svog skrovišta!"
+    "C_BANKROB_SCREEN_OBJECTIVE_5": "Nemojte dopustiti ~r~vođama pljačke ~w~da ponesu ~g~novac ~w~do svog skrovišta!",
+    "CURSOR_CHAT_TIP":"!{#00ff00}[>] !{#FFFFFF}Možete pritisnuti !{#FFFF00}F2 !{#FFFFFF}za prikaz miša i interakciju s korisničkim sučeljem!"
+
 }  
 exports.Language = Language;

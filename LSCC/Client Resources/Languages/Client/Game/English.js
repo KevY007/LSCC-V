@@ -74,6 +74,7 @@ const Language = {
     "C_BANKROB_SCREEN_OBJECTIVE_2":"Excercise caution - it's reported that {FUGITIVE COUNT} ~r~armed robbers ~w~are inside the bank.",
     "C_BANKROB_SCREEN_OBJECTIVE_3":"Deadly force is authorized - neutralize the ~r~armed robbers ~w~using any means necessary.",
     "C_BANKROB_SCREEN_OBJECTIVE_4":"It is said that two ~r~heist leaders ~w~are taking the ~g~money ~w~- prioritize eliminating them to win.",
-    "C_BANKROB_SCREEN_OBJECTIVE_5":"Do not let the ~r~heist leaders ~w~take the ~g~money ~w~to their hideout!"
+    "C_BANKROB_SCREEN_OBJECTIVE_5":"Do not let the ~r~heist leaders ~w~take the ~g~money ~w~to their hideout!",
+    "CURSOR_CHAT_TIP":"!{#00ff00}[>] !{#FFFFFF}You can press !{#FFFF00}F2 !{#FFFFFF}to show the mouse cursor & interact with the UI!"
 }
 exports.Language = Language;
