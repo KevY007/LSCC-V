@@ -178,6 +178,8 @@ namespace RNC
             public bool Enabled { get; set; }
             public bool InProgress { get; set; }
             public List<EventPlayerData> EventPlayers { get; set; }
+            public int TimeUntilStart = 90;
+            public LobbyData EventLobby { get; set; }
 
             public EventData()
             {
@@ -191,8 +193,9 @@ namespace RNC
                 this.Enabled = enabled;
                 EventPlayers = new List<EventPlayerData>();
                 this.Description = description;
+                this.TimeUntilStart = 90;
 
-                new LobbyData()
+                this.EventLobby = new LobbyData()
                 {
                     lobbyId = (int)eventLobbyID,
                     gameMode = lobbyMode,
@@ -231,6 +234,16 @@ namespace RNC
             if (value == false) OnEventDisabled(_d);
             if (value == true) OnEventEnabled(_d);
         }
+        public static void StartEvent(EventData gameEvent)
+        {
+            gameEvent.InProgress = true;
+            gameEvent.EventLobby.GameAutoStart = true;
+            foreach(EventData.EventPlayerData eventPlayer in gameEvent.EventPlayers)
+            {
+                eventPlayer.Player.SendChatMessage("!{#ffff00}[EVENT] !{#ffffff}Event room is now closed & the event will begin shortly!");
+            }
+        }
+
 
         private static void OnEventEnabled(EventData eventData)
         {
@@ -811,6 +824,7 @@ namespace RNC
         {
             public static long GameUpdate_Tick { get; set; }
             public static long TimeUpdate_Tick { get; set; }
+            public static long EventUpdate_Tick { get; set; }
         }
 
 
@@ -2803,6 +2817,7 @@ namespace RNC
 
                             Settings.Timers.GameUpdate_Tick = Environment.TickCount64 + 1000;
                             Settings.Timers.TimeUpdate_Tick = Environment.TickCount64 + 1000;
+                            Settings.Timers.EventUpdate_Tick = Environment.TickCount64 + 1000;
 
                         });
                     }
@@ -2828,6 +2843,28 @@ namespace RNC
                 TimeUpdate();
                 Settings.Timers.TimeUpdate_Tick = Environment.TickCount64;
             }
+            if (Environment.TickCount64 - Settings.Timers.EventUpdate_Tick >= 1000)
+            {
+                EventUpdate();
+                Settings.Timers.EventUpdate_Tick = Environment.TickCount64;
+            }
+        }
+
+        private void EventUpdate()
+        {
+            foreach(EventManager.EventData gameEvent in EventManager.Events)
+            {
+                if(gameEvent.TimeUntilStart > 0)
+                {
+                    gameEvent.TimeUntilStart--;
+                    continue;
+                }
+                if(gameEvent.TimeUntilStart == 0 && !gameEvent.InProgress)
+                {
+                    EventManager.StartEvent(gameEvent);
+                    continue;
+                }
+            }            
         }
 
         public void GameStartCountdown(int time, int lobbyid)

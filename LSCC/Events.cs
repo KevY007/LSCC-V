@@ -4692,6 +4692,13 @@ namespace RNC
         [RemoteEvent("EVENT:RequestJoinEvent")]
         public static void OnPlayerRequestJoinEvent(Player player, string eventName)
         {
+            if(player.GetSharedDataSafe<int>("Team") == 0 || player.GetSharedDataSafe<int>("Team") == 1 
+                || player.GetSharedDataSafe<int>("InLobby") == -3 || player.GetSharedDataSafe<int>("InDM") > -1)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_NOT_IN_LOBBY"));
+                return;
+            }
+
             EventManager.EventData eventData = EventManager.GetEvent(eventName);
             if (eventData == null) return;
             if(eventData.Enabled == false || eventData.InProgress == true)
@@ -4706,6 +4713,7 @@ namespace RNC
                 Team = -1, 
                 IsParticipating = true 
             });
+            player.SendChatMessage($"!{{#ffff00}}[EVENT] !{{#ffffff}}You joined the event room. The event will begin in {eventData.TimeUntilStart} seconds!");
 
             player.SetSharedData("InLobby", eventData.EventID);
             NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
