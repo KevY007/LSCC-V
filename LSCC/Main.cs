@@ -3316,6 +3316,126 @@ namespace RNC
             }
             return;
         }
+
+        public static bool StopGameInEvent(LobbyData lobby, int reason)
+        {
+            EventManager.EventData eData = EventManager.GetEvent((LobbyData.EventLobbyID)lobby.lobbyId);
+            if (eData == null)
+            {
+                NAPI.Util.ConsoleOutput($"[EVENT-MANAGER] Event for {lobby.lobbyId} was not found!");
+                return false;
+            }
+
+            int lobbyid = lobby.lobbyId;
+            int winnerTeam = -1;
+            switch (reason)
+            {
+                case 0: 
+                    break;
+                case 1:
+
+                    if (lobby.gameMode == GameModes.BANKROBBERY)
+                    {
+                        winnerTeam = 1;
+                        EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_BANKROB_FAIL", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives failed to rob the bank in time.", $"Lobby {lobbyid}");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
+
+                        foreach(EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
+                        {
+                            Player i = ePlayer.Player;
+                            if (lobby.GameProgress <= 40) continue;
+
+                            // Reward
+                            EPlayer.GrantXP(i, 8);
+                            EPlayer.GivePoints(i, 7);
+                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
+                            EPlayer.UnlockAchievement(i, "first_bankrob_cop");
+                        }
+                    }
+                    break;
+                case 2:
+                    if (lobby.gameMode == GameModes.BANKROBBERY)
+                    {
+                        winnerTeam = 0;
+                        foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 0).ToList())
+                        {
+                            Player i = ePlayer.Player;
+                            // Reward
+                            EPlayer.GrantXP(i, 8);
+                            EPlayer.GivePoints(i, 7);
+                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.1);
+
+                            EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
+
+                            if (i.GetData<bool>("ShotsFired") == false)
+                                EPlayer.UnlockAchievement(i, "no_shooting_win");
+                        }
+                        EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
+                    }
+                    break;
+                case 3:
+                    if (lobby.gameMode == GameModes.BANKROBBERY)
+                    {
+                        winnerTeam = 1;
+                        foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
+                        {
+                            Player i = ePlayer.Player;
+                            // Reward
+                            EPlayer.GrantXP(i, 8);
+                            EPlayer.GivePoints(i, 7);
+                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
+                            EPlayer.UnlockAchievement(i, "first_bankrob_cop");
+                        }
+                    }
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    if(lobby.gameMode == GameModes.BANKROBBERY)
+                    {
+                        EPlayer.SendMessageToAll("GAME_STOP_BANKROB_NO_LEADER", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | No one was left to replace the heist leader.", $"Lobby {lobbyid}");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
+                        winnerTeam = 1;
+                        foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
+                        {
+                            Player i = ePlayer.Player;
+                            // Reward
+                            EPlayer.GrantXP(i, 8);
+                            EPlayer.GivePoints(i, 6);
+                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
+                            EPlayer.UnlockAchievement(i, "first_bankrob_cop");
+                        }
+                    }
+                    break;
+                case 6:
+                    if (lobby.gameMode == GameModes.BANKROBBERY)
+                    {
+                        winnerTeam = 0;
+                        EPlayer.SendMessageToAll("GAME_STOP_BANKROB_FUGI_WIN", lobbyid);
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives successfully delivered the money to their hideout.", $"Lobby {lobbyid}");
+                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
+                        foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 0).ToList())
+                        {
+                            Player i = ePlayer.Player;
+                            // Reward
+                            EPlayer.GrantXP(i, 10);
+                            EPlayer.GivePoints(i, 13);
+                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.2);
+                            EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
+
+                            if (i.GetData<bool>("ShotsFired") == false)
+                                EPlayer.UnlockAchievement(i, "no_shooting_win");
+                        }
+                        EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
+                    }
+                    break;
+            }
+
+            return true;
+        }
+
         public static bool StopGame(int lobbyid, int reason)
         {
             LobbyData lobby = Settings.Lobbies.Find(l => l.lobbyId == lobbyid);
@@ -3342,9 +3462,11 @@ namespace RNC
                         EPlayer.SendMessageToAll("GAME_STOP_ADMIN", lobbyid);
                         DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Stopped by an admin.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Stopped by an admin.**");
+
+                        StopGameInEvent(lobby, 0);
                         break;
                     case 1: // time run out | fugi escape shit
-                        if (lobby.gameMode != GameModes.BANKROBBERY)
+                        if (lobby.gameMode == GameModes.STANDARD || lobby.gameMode == GameModes.BUSTED)
                         {
                             EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_ESCAPE", lobbyid);
                             DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives have escaped.", $"Lobby {lobbyid}");
@@ -3362,27 +3484,11 @@ namespace RNC
                                     i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.3);
                             }
                             EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
-
                         }
                         else
                         {
-                            if (lobby.gameMode == GameModes.BANKROBBERY)
-                            {
-                                winnerTeam = 1;
-                                EPlayer.SendMessageToAll("GAME_STOP_FUGITIVE_BANKROB_FAIL", lobbyid);
-                                DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives failed to rob the bank in time.", $"Lobby {lobbyid}");
-                                //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives didn't manage to rob the bank in time.**");
+                            StopGameInEvent(lobby, 1);
 
-                                foreach (Player i in lobby.Cops)
-                                {
-                                    if (lobby.GameProgress <= 40) continue;
-                                    // Reward
-                                    EPlayer.GrantXP(i, 8);
-                                    EPlayer.GivePoints(i, 7);
-                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
-                                    EPlayer.UnlockAchievement(i, "first_bankrob_cop");
-                                }
-                            }
                         }
                         break;
                     case 2:
@@ -3390,7 +3496,7 @@ namespace RNC
                         DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | All cops have been eliminated.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | All cops have been eliminated.**");
 
-                        if (lobby.gameMode != GameModes.BANKROBBERY)
+                        if (lobby.gameMode == GameModes.STANDARD || lobby.gameMode == GameModes.BUSTED)
                         {
                             winnerTeam = 0;
                             foreach (Player i in lobby.Fugitives)
@@ -3404,23 +3510,7 @@ namespace RNC
                         }
                         else
                         {
-                            if (lobby.gameMode == GameModes.BANKROBBERY)
-                            {
-                                winnerTeam = 0;
-                                foreach (Player i in lobby.Fugitives)
-                                {
-                                    // Reward
-                                    EPlayer.GrantXP(i, 8);
-                                    EPlayer.GivePoints(i, 7);
-                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.1);
-
-                                    EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
-
-                                    if (i.GetData<bool>("ShotsFired") == false)
-                                        EPlayer.UnlockAchievement(i, "no_shooting_win");
-                                }
-                                EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
-                            }
+                            StopGameInEvent(lobby, 2);
                         }
                         break;
                     case 3:
@@ -3428,7 +3518,7 @@ namespace RNC
                         DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Police has neutralized all fugitives.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Police has neutralized all fugitives.**");
 
-                        if (lobby.gameMode != GameModes.BANKROBBERY)
+                        if (lobby.gameMode == GameModes.STANDARD || lobby.gameMode == GameModes.BUSTED)
                         {
                             winnerTeam = 1;
                             foreach (Player i in lobby.Cops)
@@ -3442,59 +3532,20 @@ namespace RNC
                         }
                         else
                         {
-                            if (lobby.gameMode == GameModes.BANKROBBERY)
-                            {
-                                winnerTeam = 1;
-                                foreach (Player i in lobby.Cops)
-                                {
-                                    // Reward
-                                    EPlayer.GrantXP(i, 8);
-                                    EPlayer.GivePoints(i, 7);
-                                    i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
-                                    EPlayer.UnlockAchievement(i, "first_bankrob_cop");
-                                }
-                            }
+                            StopGameInEvent(lobby, 3);
                         }
                         break;
                     case 4:
                         EPlayer.SendMessageToAll("GAME_STOP_NO_PLAYERS", lobbyid);
                         DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Lack of players.", $"Lobby {lobbyid}");
                         //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Game was ended due to lack of players.**");
+                        StopGameInEvent(lobby, 4);
                         break;
                     case 5: // event cop win
-                        EPlayer.SendMessageToAll("GAME_STOP_BANKROB_NO_LEADER", lobbyid);
-                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | No one was left to replace the heist leader.", $"Lobby {lobbyid}");
-                        //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | No one was left to replace the heist leader.**");
-                        winnerTeam = 1;
-                        foreach (Player i in lobby.Cops)
-                        {
-                            // Reward
-                            EPlayer.GrantXP(i, 8);
-                            EPlayer.GivePoints(i, 6);
-                            i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
-                            EPlayer.UnlockAchievement(i, "first_bankrob_cop");
-                        }
+                        StopGameInEvent(lobby, 5);
                         break;
                     case 6: // event fugi win
-                        if (lobby.gameMode == GameModes.BANKROBBERY)
-                        {
-                            winnerTeam = 0;
-                            EPlayer.SendMessageToAll("GAME_STOP_BANKROB_FUGI_WIN", lobbyid);
-                            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, "Copchase has ended! | Fugitives successfully delivered the money to their hideout.", $"Lobby {lobbyid}");
-                            //Discord.SendTextChannel("staff-bot", $"**(Lobby {lobbyid}) Copchase has ended! | Fugitives successfully delivered the money to their hideout.**");
-                            foreach (Player i in lobby.Fugitives)
-                            {
-                                // Reward
-                                EPlayer.GrantXP(i, 10);
-                                EPlayer.GivePoints(i, 13);
-                                i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.2);
-                                EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
-
-                                if (i.GetData<bool>("ShotsFired") == false)
-                                    EPlayer.UnlockAchievement(i, "no_shooting_win");
-                            }
-                            EPlayer.UnlockAchievement(lobby.BankRobbery.HeistLeader, "heist_leader_win");
-                        }
+                        StopGameInEvent(lobby, 6);
                         break;
                 }
 
