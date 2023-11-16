@@ -4206,6 +4206,7 @@ namespace RNC
                 {
                     EventManager.EventData.EventPlayerData ePlayer = eventCheck.EventPlayers.FirstOrDefault(f => f.Player.Id == player.Id);
                     if (ePlayer != null) eventCheck.EventPlayers.Remove(ePlayer);
+                    player.SetSharedData("InLobby", -1);
                 }
             }        
 
@@ -4323,7 +4324,8 @@ namespace RNC
             if(eventCheck != null)
             {
                 EventManager.EventData.EventPlayerData ePlayer = eventCheck.EventPlayers.FirstOrDefault(f => f.Player.Id == player.Id);
-                if (ePlayer != null) eventCheck.EventPlayers.Remove(ePlayer);
+                if (ePlayer != null) eventCheck.EventPlayers.Remove(ePlayer); 
+                player.SetSharedData("InLobby", -1);
             }
 
             if (player.GetSharedDataSafe<int>("InDM") != -1)
