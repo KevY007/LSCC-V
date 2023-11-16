@@ -251,7 +251,7 @@ namespace RNC
                 if(toReturn == false)
                 {
                     EventData.EventPlayerData pCheck = e.EventPlayers.FirstOrDefault(p => p.Player.Id == player.Id);
-                    if (pCheck != null)
+                    if (pCheck != null && pCheck.Player.GetSharedDataSafe<int>("InLobby") == (int)e.EventID)
                     {
                         toReturn = true;
                     }
@@ -3449,7 +3449,7 @@ namespace RNC
                     }
                     break;
             }
-
+            EventManager.ToggleEvent((LobbyData.EventLobbyID)lobby.lobbyId, false);
             return true;
         }
 
