@@ -6694,6 +6694,7 @@ namespace RNC
         public void OutfitEditor_OnCreateNew(Player player, int outfitTeam)
         {
             if (!EPlayer.LoggedIn(player)) return;
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
 
             Account acc = EPlayer.GetAccount(player);
             bool isMale = Character.GetCharacter(player).CurrentAppearance.IsMale;
@@ -6742,6 +6743,7 @@ namespace RNC
         [RemoteEvent("OutfitCreator:Edit")]
         public void OutfitEditor_OnEdit(Player player, int outfitID, int team)
         {
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
             Account acc = EPlayer.GetAccount(player);
             Task.Run(async () =>
             {

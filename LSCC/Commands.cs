@@ -3128,7 +3128,8 @@ namespace RNC
         [Command("weaponeditor")]
         public static void cmd_weaponeditor(Player player)
         {
-            if(player.GetSharedDataSafe<int>("Team") > -1 || player.GetSharedDataSafe<int>("InDM") > -1 || player.GetSharedDataSafe<int>("InLobby") < 0)
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
+            if (player.GetSharedDataSafe<int>("Team") > -1 || player.GetSharedDataSafe<int>("InDM") > -1 || player.GetSharedDataSafe<int>("InLobby") < 0)
             {
                 EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_LOBBY_NOCOLOR"));
                 return;
@@ -4841,6 +4842,7 @@ namespace RNC
         {
             if (arenaid == 666) return;
             if (!EPlayer.LoggedIn(player)) return;
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
             if (EPlayer.GetAccount(player).DeathmatchBanTime > 0)
             {
@@ -5058,6 +5060,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
             if(EPlayer.GetAccount(player).FreeroamBanTime > 0)
             {
                 long secs = EPlayer.GetAccount(player).FreeroamBanTime - DateTimeOffset.Now.ToUnixTimeSeconds();
@@ -5142,6 +5145,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
             if (EPlayer.GetAccount(player).JailTime > 0) return;
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
 
             if (player.GetSharedDataSafe<int>("Team") != -1)
             {
@@ -11700,6 +11704,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player))
                 return;
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
 
             if (player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") != -4)
             {
