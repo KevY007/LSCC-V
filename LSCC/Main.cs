@@ -243,6 +243,23 @@ namespace RNC
                 eventPlayer.Player.SendChatMessage("!{#ffff00}[EVENT] !{#ffffff}Event room is now closed & the event will begin shortly!");
             }
         }
+        public static bool IsPlayerInAnyEvent(Player player)
+        {
+            bool toReturn = false;
+            EventManager.Events.ForEach(e =>
+            {
+                if(toReturn == false)
+                {
+                    EventData.EventPlayerData pCheck = e.EventPlayers.FirstOrDefault(p => p.Player.Id == player.Id);
+                    if (pCheck != null)
+                    {
+                        toReturn = true;
+                    }
+                }
+             
+            });
+            return toReturn;
+        }
 
 
         private static void OnEventEnabled(EventData eventData)
