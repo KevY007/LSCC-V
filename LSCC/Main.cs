@@ -243,6 +243,29 @@ namespace RNC
                 eventPlayer.Player.SendChatMessage("!{#ffff00}[EVENT] !{#ffffff}Event room is now closed & the event will begin shortly!");
             }
         }
+        public static void SetEventPlayerTeam(Player player, int team)
+        {
+            if (!IsPlayerInAnyEvent(player)) return;
+
+            EventData.EventPlayerData eData = GetEventPlayerData(player);
+            eData.Team = team;            
+        }
+        public static EventData.EventPlayerData GetEventPlayerData(Player player)
+        {
+            EventData.EventPlayerData toReturn = null;
+            EventManager.Events.ForEach(e =>
+            {
+                if (toReturn == null)
+                {
+                    EventData.EventPlayerData pCheck = e.EventPlayers.FirstOrDefault(p => p.Player.Id == player.Id);
+                    if (pCheck != null && pCheck.Player.GetSharedDataSafe<int>("InLobby") == (int)e.EventID)
+                    {
+                        toReturn = pCheck;
+                    }
+                }
+            });
+            return toReturn;
+        }
         public static bool IsPlayerInAnyEvent(Player player)
         {
             bool toReturn = false;
@@ -267,6 +290,9 @@ namespace RNC
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == (int)eventData.EventID);
             if (lobby == null) return;
             lobby.Enabled = true;
+            eventData.InProgress = false;
+            eventData.Enabled = true;
+            eventData.TimeUntilStart = 90;
             lobby.GameAutoStart = false; // don't let it start for a while, maybe 60-90 seconds?
 
             foreach(Player player in Settings.LoggedInPlayers)
@@ -280,13 +306,16 @@ namespace RNC
             if (lobby == null) return;
             lobby.Enabled = false;
             lobby.GameAutoStart = false;
+            eventData.InProgress = false;
+            eventData.TimeUntilStart = 90;
+            eventData.Enabled = false;
 
             // If they are still in the lobby when it's disabled, fuck them niggas. Spawn them in some other lobby.
             // Since this one is disabled and their lobby ID is set to -1, it'll pick a new one for them automatically.
             foreach (Player player in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("InLobby") == (int)eventData.EventID))
             {
                 player.SetSharedData("InLobby", -1);
-                NAPI.Player.SpawnPlayer(player, Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First());
+                EPlayer.Spawn(player);
             }
             foreach(EventData.EventPlayerData ePlayer in eventData.EventPlayers)
             {
@@ -3362,6 +3391,7 @@ namespace RNC
                         {
                             Player i = ePlayer.Player;
                             if (lobby.GameProgress <= 40) continue;
+                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
 
                             // Reward
                             EPlayer.GrantXP(i, 8);
@@ -3378,6 +3408,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 0).ToList())
                         {
                             Player i = ePlayer.Player;
+                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 8);
                             EPlayer.GivePoints(i, 7);
@@ -3398,6 +3429,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
                         {
                             Player i = ePlayer.Player;
+                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 8);
                             EPlayer.GivePoints(i, 7);
@@ -3418,6 +3450,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
                         {
                             Player i = ePlayer.Player;
+                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 8);
                             EPlayer.GivePoints(i, 6);
@@ -3436,6 +3469,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 0).ToList())
                         {
                             Player i = ePlayer.Player;
+                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 10);
                             EPlayer.GivePoints(i, 13);
@@ -3788,6 +3822,7 @@ namespace RNC
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Robbing bank as {player.Name}");
                     EPlayer.SetColor(player, new Color(255, 174, 0), 0);
                     player.SetSharedData("Team", 0);
+                    EventManager.SetEventPlayerTeam(player, 0);
                     player.SetSharedData("VisibleBlip", true);
 
                     player.SetSharedData("FugitiveChance", 10.0);
@@ -3809,6 +3844,7 @@ namespace RNC
                     player.TriggerEvent("EVENT:ToggleBankRobberyBeginningScreen", true, 1, lobby.Fugitives.Count);
                     Character.SetTeamOutfit(player, 1);
                     EPlayer.SetColor(player, new Color(100, 100, 255), 0);
+                    EventManager.SetEventPlayerTeam(player, 1);
                     EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Cop as {player.Name} in Bank Robbery");
                     player.SetSharedData("Team", 1);
 

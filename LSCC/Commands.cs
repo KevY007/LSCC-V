@@ -4585,6 +4585,26 @@ namespace RNC
         }
         */
 
+        [Command("forceevent")]
+        public static void cmd_foreceevent(Player player, int eventID)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+            if (EPlayer.GetAccount(player).Admin < 1)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You do not have permission to use this command!");
+                return;
+            }
+
+            EventManager.EventData toStart = EventManager.Events.FirstOrDefault(e => (int)e.EventID == eventID);
+            if (toStart == null)
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}retard!");
+                return;
+            }
+            toStart.TimeUntilStart = 1;
+        }
+
         [Command("startevent")]
         public static void cmd_startevent(Player player, int eventID)
         {
