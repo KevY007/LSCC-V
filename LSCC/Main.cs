@@ -3680,6 +3680,7 @@ namespace RNC
             if(participants.Count < 3)
             {
                 NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - at least 4 players are required!");
+                EventManager.ToggleEvent(LobbyData.EventLobbyID.BankRobbery, false);
                 return;
             }
 
@@ -3687,6 +3688,7 @@ namespace RNC
             if(fugitives < 2) // At least 2 fugitives are required for the Bank Robbery mode!
             {
                 NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - min. 2 fugitives are required!");
+                EventManager.ToggleEvent(LobbyData.EventLobbyID.BankRobbery, false);
                 return;
             }
 
