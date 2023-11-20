@@ -243,6 +243,13 @@ namespace RNC
                 eventPlayer.Player.SendChatMessage("!{#ffff00}[EVENT] !{#ffffff}Event room is now closed & the event will begin shortly!");
             }
         }
+        public static void SetEventPlayerParticipating(Player player, bool isParticipating)
+        {
+            if (!IsPlayerInAnyEvent(player)) return;
+
+            EventData.EventPlayerData eData = GetEventPlayerData(player);
+            eData.IsParticipating = isParticipating;
+        }
         public static void SetEventPlayerTeam(Player player, int team)
         {
             if (!IsPlayerInAnyEvent(player)) return;

@@ -2958,7 +2958,6 @@ namespace RNC
         [ServerEvent(Event.PlayerDeath)]
         public static void OnPlayerDeath(Player player, Player killer, uint reason)
         {
-            NAPI.Util.ConsoleOutput($"[ONPLAYERDEATH] {player.Name} just died!! {reason}");
             try
             {
                 if (player == null) return;
@@ -3319,6 +3318,8 @@ namespace RNC
 
                                 if (lobby.gameMode == GameModes.BANKROBBERY)
                                 {
+                                    EventManager.SetEventPlayerParticipating(player, false);
+
                                     if ((lobby.Fugitives.Count - 1) <= 0) // in case all fugis die 
                                     {
                                         Main.StopGame(lobby.lobbyId, 3);
@@ -7773,6 +7774,7 @@ namespace RNC
             if (HPtoset < 0)
             {
                 HPtoset = 0;
+                EventManager.SetEventPlayerParticipating(target, false);
                 target.TriggerEvent("showKillTrace", player.Position.X, player.Position.Y, player.Position.Z);
 
                 if (targetTeam != -1 && target.GetSharedDataSafe<int>("Wounded") == 0)
@@ -8814,6 +8816,12 @@ namespace RNC
             if (lobby != null && lobby.gameStatus != 0 && (lobby.Cops.Contains(player) || lobby.Fugitives.Contains(player)))
             {
                 return; // WHITE COLOR BUG FYX..
+            }
+
+            if(EventManager.IsPlayerInAnyEvent(player) && EventManager.GetEventPlayerData(player).IsParticipating == false)
+            {
+                player.SetSharedData("InLobby", -1);
+                EPlayer.Spawn(player);
             }
 
             if (player.HasSharedData("TattooList"))
