@@ -4652,6 +4652,8 @@ namespace RNC
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
+
             if (player.GetSharedDataSafe<int>("InLobby") == -5) return;
 
             if (player.GetData<int>("JailTime") > 0)
