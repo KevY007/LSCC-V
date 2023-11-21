@@ -48,6 +48,16 @@ namespace RNC
         public string Notes { get; set; }
         public int Armor { get; set; } // Armor after getting damaged
     }
+    public class Logs_Transaction
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public string Type { get; set; }
+        public int Amount { get; set; }
+        public string Reason { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
     public class Logs_AdminRecord
     {
         [Key]
@@ -358,6 +368,27 @@ namespace RNC
         {
             LogAdmin(EPlayer.GetAccount(player).SQL_ID, description);
         }
+
+        public static void LogTransaction(int aSQLID, string type, int amount, string reason)
+        {
+            Logs_Transaction _l = new Logs_Transaction()
+            {
+                Type = type,
+                AccountID = aSQLID,
+                Amount = amount,
+                Reason = reason,
+                Timestamp = DateTime.Now
+            };
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Logs_Transactions.AddAsync(_l);
+                    await context.SaveChangesAsync();
+                }
+            });
+        }
+
         [RemoteEvent("logPlayerCommand")]
         public static void LogCommand(Player player, string command)
         {

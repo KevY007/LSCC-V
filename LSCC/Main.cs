@@ -3355,7 +3355,8 @@ namespace RNC
                 if (winner != null)
                 {
                     EPlayer.GetAccount(winner).DerbyWins++;
-                    EPlayer.GrantXP(winner, winXP); DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{winner.Name}** has won the Derby round! | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4).Count()}", $"Derby");
+                    EPlayer.GrantXP(winner, winXP, "Derby Win"); 
+                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**{winner.Name}** has won the Derby round! | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4).Count()}", $"Derby");
                     ////Discord.SendTextChannel("staff-bot", $"**(Derby) | Winner: {winner.Name} | XP Gained: {winXP} | Participants: {Settings.LoggedInPlayers.Where(a => a.GetSharedDataSafe<int>("InLobby") == -4).Count()}**");
 
                     winner.SetSharedData("FugitiveChance", winner.GetSharedDataSafe<float>("FugitiveChance") + 5 + (double)((double)EPlayer.GetAccount(winner).DonatorLevel / 2.0));
@@ -3398,11 +3399,10 @@ namespace RNC
                         {
                             Player i = ePlayer.Player;
                             if (lobby.GameProgress <= 40) continue;
-                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
 
                             // Reward
-                            EPlayer.GrantXP(i, 8);
-                            EPlayer.GivePoints(i, 7);
+                            EPlayer.GrantXP(i, 8, "[EVENT WIN] Bank Robbery | Police | Fugitives failed to rob the bank in time");
+                            EPlayer.GivePoints(i, 7, "[EVENT WIN] Bank Robbery | Police | Fugitives failed to rob the bank in time");
                             i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
                             EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                         }
@@ -3415,10 +3415,9 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 0).ToList())
                         {
                             Player i = ePlayer.Player;
-                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
-                            EPlayer.GrantXP(i, 8);
-                            EPlayer.GivePoints(i, 7);
+                            EPlayer.GrantXP(i, 8, "[EVENT WIN] Bank Robbery | Fugitive | All cops were dead");
+                            EPlayer.GivePoints(i, 7, "[EVENT WIN] Bank Robbery | Fugitive | All cops were dead");
                             i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.1);
 
                             EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
@@ -3438,8 +3437,8 @@ namespace RNC
                             Player i = ePlayer.Player;
                             NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
-                            EPlayer.GrantXP(i, 8);
-                            EPlayer.GivePoints(i, 7);
+                            EPlayer.GrantXP(i, 8, "[EVENT WIN] Bank Robbery | Police | All fugitives were dead");
+                            EPlayer.GivePoints(i, 7, "[EVENT WIN] Bank Robbery | Police | All fugitives were dead");
                             i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
                             EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                         }
@@ -3459,8 +3458,8 @@ namespace RNC
                             Player i = ePlayer.Player;
                             NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
-                            EPlayer.GrantXP(i, 8);
-                            EPlayer.GivePoints(i, 6);
+                            EPlayer.GrantXP(i, 8, "[EVENT WIN] Bank Robbery | Police | Heist leaders died");
+                            EPlayer.GivePoints(i, 6, "[EVENT WIN] Bank Robbery | Police | Heist leaders died");
                             i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.5);
                             EPlayer.UnlockAchievement(i, "first_bankrob_cop");
                         }
@@ -3478,8 +3477,8 @@ namespace RNC
                             Player i = ePlayer.Player;
                             NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
                             // Reward
-                            EPlayer.GrantXP(i, 10);
-                            EPlayer.GivePoints(i, 13);
+                            EPlayer.GrantXP(i, 10, "[EVENT WIN] Bank Robbery | Fugitive | Fugitives delivered the money");
+                            EPlayer.GivePoints(i, 13, "[EVENT WIN] Bank Robbery | Fugitive | Fugitives delivered the money");
                             i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.2);
                             EPlayer.UnlockAchievement(i, "first_bankrob_fugitive");
 
@@ -3535,8 +3534,8 @@ namespace RNC
                                 if (lobby.GameProgress <= 40) continue;
                                 // Reward
                                 EPlayer.GetAccount(i).Escapes++;
-                                EPlayer.GrantXP(i, 5);
-                                EPlayer.GivePoints(i, 5);
+                                EPlayer.GrantXP(i, 5, "[COPCHASE WIN] Fugitive | Escaped");
+                                EPlayer.GivePoints(i, 5, "[COPCHASE WIN] Fugitive | Escaped");
 
                                 if(i.HasSharedData("FugitiveChance"))
                                     i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.3);
@@ -3561,8 +3560,8 @@ namespace RNC
                             {
                                 if (lobby.GameProgress <= 40) continue;
                                 // Reward
-                                EPlayer.GrantXP(i, 3);
-                                EPlayer.GivePoints(i, 2);
+                                EPlayer.GrantXP(i, 3, "[COPCHASE WIN] Fugitive | All cops were dead");
+                                EPlayer.GivePoints(i, 2, "[COPCHASE WIN] Fugitive | All cops were dead");
                                 i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.2);
                             }
                         }
@@ -3583,8 +3582,8 @@ namespace RNC
                             {
                                 if (lobby.GameProgress <= 40) continue;
                                 // Reward
-                                EPlayer.GrantXP(i, 4);
-                                EPlayer.GivePoints(i, 2);
+                                EPlayer.GrantXP(i, 4, "[COPCHASE WIN] Police | All fugitives were dead");
+                                EPlayer.GivePoints(i, 2, "[COPCHASE WIN] Police | All fugitives were dead");
                                 i.SetSharedData("FugitiveChance", i.GetSharedDataSafe<float>("FugitiveChance") + 0.3);
                             }
                         }

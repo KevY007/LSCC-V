@@ -2337,7 +2337,7 @@ namespace RNC
                                 return;
                             }
 
-                            EPlayer.GrantXP(player, 2);
+                            EPlayer.GrantXP(player, 2, "[COPCHASE] Police | Successful dragout");
                             target.TriggerEvent("ToggleSeatbelt", false);
                             target.ResetData("Seatbelt");
                             player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
@@ -7692,6 +7692,7 @@ namespace RNC
                 return;
 
             if (!EPlayer.LoggedIn(target)) { player.SendChatMessage(Translate(player, "ERROR_TARGET_NOT_LOGIN")); return; }
+            if (target == player) return;
 
             if(points < 1 || points > 10000)
             {
@@ -7706,8 +7707,8 @@ namespace RNC
                 return;
             }
 
-            EPlayer.GivePoints(player, -points);
-            EPlayer.GivePoints(target, points);
+            EPlayer.GivePoints(player, -points, $"Sent to {target.Name}");
+            EPlayer.GivePoints(target, points, $"Given by {player.Name}");
 
             player.SendChatMessage(Translate(player, "SENT_POINTS", points, EPlayer.Name(target), DateTime.Now.ToString("G")));
             target.SendChatMessage(Translate(target, "RECEIVED_POINTS", points, EPlayer.Name(player), DateTime.Now.ToString("G")));
@@ -7727,7 +7728,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(target)) { player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not logged in."); return; }
 
             Logs.LogAdmin(player, $"Gave {target.Name} {points} points. They now have {EPlayer.GetAccount(target).Points}.");
-            EPlayer.GivePoints(target, points);
+            EPlayer.GivePoints(target, points, $"Received from admin - {player.Name}");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {points} points.");
             target.SendChatMessage(Translate(target, "ADMIN_GAVE_POINTS", EPlayer.Name(player), points));
             return;
@@ -7749,7 +7750,7 @@ namespace RNC
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:grantxp:{target.Name}:{xp}"); } catch { }
             Logs.LogAdmin(player, $"Gave {target.Name} {xp} XP.");
-            EPlayer.GrantXP(target, xp);
+            EPlayer.GrantXP(target, xp, $"Received from {player.Name}");
             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has given {target.Name} {xp} xp.");
             target.SendChatMessage(Translate(target, "ADMIN_GAVE_XP", EPlayer.Name(player), xp));
             return;
@@ -9818,27 +9819,6 @@ namespace RNC
             Task.Run(async () => {
                 Challenge.SetNewDailyChallenges();
             });
-        }
-
-        [Command("dbgdiscordverify")]
-        public void cmd_dbgdiscordverify(Player player, Player _p)
-        {
-            if (EPlayer.GetAccount(player).Admin < 6) return;
-            Account a = EPlayer.GetAccount(player);
-
-            player.SendChatMessage(">> GIVEN " + _p.Name + " THEIR DISCORD REWARDS");
-
-            _p.SendChatMessage("!{#83ff75}Congratulations! You successfully linked your Discord account to your Race 'N' Chase account.");
-            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You now have access to the !{#ffff00}Negotiator !{#ffffff}loadout for !{#0097ff}cops !{#ffffff}& !{#ffae00}fugitives!{#ffffff}.");
-            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You unlocked a new !{#ffae00}fugitive !{#ffffff}vehicle: !{#ffff00}Super Diamond!{#ffffff}.");
-            _p.SendChatMessage("!{#ffff00}[>] !{#ffffff}You also received !{#ffff00}13 points & 10XP !{#ffffff}as a bonus.");
-
-            EPlayer.GrantXP(_p, 10);
-            EPlayer.GivePoints(_p, 13);
-            EPlayer.UnlockLoadout(a, _p, "Negotiator", 0);
-            EPlayer.UnlockLoadout(a, _p, "Negotiator", 1);
-            EPlayer.UnlockVehicle(a, _p, "superd", 0);
-            EPlayer.UnlockAchievement(_p, "discord_verify");
         }
 
         [Command("unlockitem")]

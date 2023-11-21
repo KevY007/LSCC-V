@@ -409,8 +409,8 @@ namespace RNC
                         {
                             player.SendChatMessage(Translator.Translate(player, "VERIFIED_MSG_1"));
 
-                            EPlayer.GrantXP(player, 10);
-                            EPlayer.GivePoints(player, 13);
+                            EPlayer.GrantXP(player, 10, "Account Verification Bonus");
+                            EPlayer.GivePoints(player, 13, "Account Verification Bonus");
                             EPlayer.UnlockAchievement(player, "discord_verify");
 
                             Task.Run(async () =>

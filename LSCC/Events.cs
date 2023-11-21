@@ -19,6 +19,7 @@ using RNC.Data;
 using System.Collections;
 using GTANetworkAPI;
 using System.Net.Mime;
+using System.Xml.Linq;
 
 namespace RNC
 {
@@ -500,7 +501,7 @@ namespace RNC
                                     }
 
                                     killer.SetSharedData("FugitiveChance", killer.GetSharedDataSafe<float>("FugitiveChance") + 0.3 + (double)((double)EPlayer.GetAccount(killer).DonatorLevel / 10.0));
-                                    EPlayer.GrantXP(killer, 2);
+                                    EPlayer.GrantXP(killer, 2, $"Killed {player.Name} in copchase");
 
                                     if (lobby.Fugitives.Contains(player) && killer.GetSharedDataSafe<int>("Team") == 0)
                                     {
@@ -519,11 +520,11 @@ namespace RNC
 
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
-                                        EPlayer.GrantXP(killer, 5);
+                                        EPlayer.GrantXP(killer, 5, $"Killstreak bonus");
                                         EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", EPlayer.Name(killer), killStreak);
 
                                         killer.SendChatMessage(Translate(killer, "KILLSTREAK_5XP"));
-                                        EPlayer.GivePoints(killer, 5);
+                                        EPlayer.GivePoints(killer, 5, $"Killstreak bonus");
                                         killer.SetSharedData("FugitiveChance", killer.GetSharedDataSafe<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                                     }
 
@@ -1273,7 +1274,7 @@ namespace RNC
             }
 
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
-            EPlayer.GivePoints(player, price);
+            EPlayer.GivePoints(player, price, $"Sold/removed weapon component");
             EPlayer.Notify(player, Translate(player, "SELL_WEAPON_ATTACHMENT", price), "green", "", false, 3000);
 
             // try { Main.Log("currency.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:removecomp:{itemData.Name}:{comp.Name}"); } catch { }
@@ -1346,7 +1347,7 @@ namespace RNC
 
                 newWepData.Add(wephash, newDataTwo);
             }
-            EPlayer.GivePoints(player, -price);
+            EPlayer.GivePoints(player, -price, $"Purchased weapon component");
             EPlayer.GetAccount(player).WeaponComponents = NAPI.Util.ToJson(newWepData);
             EPlayer.Save(player);
             EPlayer.Notify(player, Translate(player, "BUY_WEAPON_ATTACHMENT", price), "green", "", false, 3000);
@@ -2366,7 +2367,7 @@ namespace RNC
 
                     acc.ClanTier = 0;
                     acc.ClanID = thaClan.SQL_ID;
-                    EPlayer.GivePoints(player, -300);
+                    EPlayer.GivePoints(player, -300, $"Created a clan: {clanname}");
                     EPlayer.Save(player, false);
                     int cID = thaClan.SQL_ID;
                     string cTag = thaClan.Tag;
@@ -2482,10 +2483,9 @@ namespace RNC
                 if(lobby.gameMode == GameModes.BANKROBBERY && shape == lobby.BankRobbery.BankRobberyFinishMarker
                     && player.GetSharedDataSafe<bool>("HeistLeader") == true && player.GetSharedDataSafe<int>("Team") == 0)
                 {
-                    NAPI.Util.ConsoleOutput("GG BANK ROB");
                     EPlayer.RemovePlayerFromCopchase(player, lobby, 0, 6);
-                    EPlayer.GrantXP(player, 4);
-                    EPlayer.GivePoints(player, 4);
+                    EPlayer.GrantXP(player, 4, $"[EVENT] Bank Robbery | Fugitive | Delivered money to hideout");
+                    EPlayer.GivePoints(player, 4, $"[EVENT] Bank Robbery | Fugitive | Delivered money to hideout");
 
                     /*
                      If no bag was delivered yet, and after removing the first leader from CC, the other leader is still alive..
@@ -2534,8 +2534,8 @@ namespace RNC
                                 // Bonus for delivering both money bags
                                 if (ePlayer.Team == 0)
                                 {
-                                    EPlayer.GrantXP(cPlayer, 4);
-                                    EPlayer.GivePoints(cPlayer, 4);
+                                    EPlayer.GrantXP(cPlayer, 4, $"[EVENT] Bank Robbery | Fugitive | Bonus for delivering both money bags");
+                                    EPlayer.GivePoints(cPlayer, 4, $"[EVENT] Bank Robbery | Fugitive | Bonus for delivering both money bags");
                                 }
                             }
                             Main.StopGame(lobby.lobbyId, 6);
@@ -3089,12 +3089,12 @@ namespace RNC
                                 }
                             }
 
-                            EPlayer.GrantXP(killer, 1);
+                            EPlayer.GrantXP(killer, 1, $"Killed {player.Name} in deathmatch");
                         }
 
                         if (killer.GetSharedDataSafe<int>("Team") != player.GetSharedDataSafe<int>("Team") && player.GetSharedDataSafe<int>("Team") != -1 && player.GetSharedDataSafe<int>("InLobby") >= 0)
                         {
-                            EPlayer.GrantXP(killer, 1);
+                            EPlayer.GrantXP(killer, 1, $"Killed {player.Name} in copchase");
 
                             if (reason != 696988 && reason != 696989 && player.GetSharedDataSafe<int>("Team") == 0 && killer.GetSharedDataSafe<int>("Team") == 1 && player.GetSharedDataSafe<bool>("HasShot") == false)
                             {
@@ -3119,7 +3119,7 @@ namespace RNC
                                     {
                                         int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
 
-                                        EPlayer.GrantXP(killer, xpReduce);
+                                        EPlayer.GrantXP(killer, xpReduce, $"Punishment for killing innocent ({player.Name}) in copchase");
                                         RAGE.Entities.Players.All.ForEach((Player ey) =>
                                         {
                                             ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_FUGI", EPlayer.Name(killer), xpReduce));
@@ -3181,7 +3181,7 @@ namespace RNC
 
                                     int xpReduce = EPlayer.GetAccount(killer).XP >= 8 ? -(EPlayer.GetAccount(killer).XP / 4) : -3;
 
-                                    EPlayer.GrantXP(killer, xpReduce);
+                                    EPlayer.GrantXP(killer, xpReduce, $"Punishment for killing teammate ({player.Name}) in copchase");
                                     RAGE.Entities.Players.All.ForEach((Player ey) =>
                                     {
                                         ey.SendChatMessage(Translate(ey, "REDUCE_XP_KILL_TEAM", EPlayer.Name(killer), xpReduce));
@@ -3251,11 +3251,11 @@ namespace RNC
 
                                     if (killStreak % 4 == 0 && killStreak >= 4 && (lobby.Cops.Contains(killer) || lobby.Fugitives.Contains(killer)))
                                     {
-                                        EPlayer.GrantXP(killer, 3);
+                                        EPlayer.GrantXP(killer, 3, $"Killstreak in copchase");
                                         EPlayer.SendMessageInLobby(lobby.lobbyId, "KILLSTREAK_LOBBY_MSG", EPlayer.Name(killer), killStreak);
 
                                         killer.SendChatMessage(Translate(killer, "KILLSTREAK_3XP"));
-                                        EPlayer.GivePoints(killer, 3);
+                                        EPlayer.GivePoints(killer, 3, $"Killstreak in copchase");
                                         killer.SetSharedData("FugitiveChance", killer.GetSharedDataSafe<float>("FugitiveChance") + (0.1 * (double)((double)EPlayer.GetAccount(killer).DonatorLevel + 1.0)));
                                     }
                                 }
@@ -3277,7 +3277,7 @@ namespace RNC
                             {
                                 wasInGame = true;
 
-                                if (killer != null && killer.GetSharedDataSafe<int>("Team") == 1) EPlayer.GrantXP(killer, 2);
+                                if (killer != null && killer.GetSharedDataSafe<int>("Team") == 1) EPlayer.GrantXP(killer, 2, $"Killed fugitive ({player.Name}) in copchase");
 
                                 lock (Settings.LoggedInPlayers)
                                 {
@@ -3336,7 +3336,7 @@ namespace RNC
                                             {
                                                 c.SendChatMessage(Translate(c, "KILLED_HEIST_LEADER", EPlayer.Name(killer)));
                                             }
-                                            EPlayer.GrantXP(killer, 2);
+                                            EPlayer.GrantXP(killer, 2, $"[EVENT] Bank Robbery | Killed heist leader ({player.Name})");
                                         }
                                         if (!Main.BankRobbery_AnyLeadersAlive(lobby))
                                         {
@@ -3353,8 +3353,8 @@ namespace RNC
                                                     // Bonus for eliminating the second leader before they deliver the money
                                                     if (ePlayer.Team == 1)
                                                     {
-                                                        EPlayer.GrantXP(cPlayer, 4);
-                                                        EPlayer.GivePoints(cPlayer, 4);
+                                                        EPlayer.GrantXP(cPlayer, 4, $"[EVENT] Bank Robbery | Bonus for stopping second heist leader ({player.Name}) from delivering the money");
+                                                        EPlayer.GivePoints(cPlayer, 4, $"[EVENT] Bank Robbery | Bonus for stopping second heist leader ({player.Name}) from delivering the money");
                                                     }
                                                 }
                                                 Main.StopGame(lobby.lobbyId, 6);
@@ -6257,7 +6257,7 @@ namespace RNC
                             return;
                         }
 
-                        EPlayer.GivePoints(player, -car.PointsRequired);
+                        EPlayer.GivePoints(player, -car.PointsRequired, $"Purchased a vehicle: {car.Name}");
                         acc.DonatorPoints -= car.DonatorPointsRequired;
                         EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
                         EPlayer.Notify(player, Translate(player, "CAR_PURCHASED", car.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
@@ -6433,7 +6433,7 @@ namespace RNC
                             return;
                         }
 
-                        EPlayer.GivePoints(player, -loadout.PointsRequired);
+                        EPlayer.GivePoints(player, -loadout.PointsRequired, $"Purchased a loadout: {loadout.Name}");
                         acc.DonatorPoints -= loadout.DonatorPointsRequired;
                         EPlayer.UnlockLoadout(acc, player, loadout.Name, loadout.Team);
                         EPlayer.Notify(player, Translate(player, "LOADOUT_PURCHASED", loadout.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
@@ -7061,7 +7061,7 @@ namespace RNC
                     if (warnings >= 7)
                     {
                         player.Health = 0;
-                        EPlayer.GrantXP(player, -1);
+                        EPlayer.GrantXP(player, -1, $"Punishment for shooting teammate ({player.Name}) in copchase");
                         player.SendChatMessage(Translate(player, "SHOT_TEAMMATE_PUNISHMENT"));
                         warnings = 0;
                     }
@@ -7117,7 +7117,7 @@ namespace RNC
                     if (warnings >= 7)
                     {
                         player.Health = 0;
-                        EPlayer.GrantXP(player, -1);
+                        EPlayer.GrantXP(player, -1, $"Punishment for shooting innocent ({player.Name}) in copchase");
                         player.SendChatMessage(Translate(player, "SHOT_FUGITIVE_PUNISHMENT"));
                         warnings = 0;
                     }
@@ -7199,7 +7199,7 @@ namespace RNC
                                             if (check != null)
                                             {
                                                 isPlayerOnline = true;
-                                                EPlayer.GivePoints(check, prize);
+                                                EPlayer.GivePoints(check, prize, $"'Clan Of The Week' reward");
                                                 check.SendChatMessage(Translate(check, "COTW_ONLINE_MESSAGE", prize));
                                             }
                                         });
@@ -8046,12 +8046,12 @@ namespace RNC
                 {
                     if (!bustSupporters.Contains(assist.Id) || assist.Id == cop.Id) continue;
 
-                    EPlayer.GrantXP(assist, 5);
+                    EPlayer.GrantXP(assist, 5, $"[COPCHASE - BUSTED!] Assisted with busting {fugitive.Name}");
                     EPlayer.GetAccount(assist).Arrests++;
                     assist.SendNotification("~g~+5 XP for helping bust " + EPlayer.Name(fugitive));
                 }
 
-                EPlayer.GrantXP(cop, 7);
+                EPlayer.GrantXP(cop, 7, $"[COPCHASE - BUSTED!] Busted {fugitive.Name}");
                 EPlayer.GetAccount(cop).Arrests++;
                 cop.SendNotification("~g~+7 XP for busting " + EPlayer.Name(fugitive));
 
@@ -8093,8 +8093,8 @@ namespace RNC
             player.SendChatMessage(Translate(player, "REVIVED_PLAYER_REWARD", EPlayer.Name(target)));
             target.SendChatMessage(Translate(target, "REVIVED_BY_PLAYER", EPlayer.Name(player)));
 
-            EPlayer.GrantXP(player, 2);
-            EPlayer.GivePoints(player, 1);
+            EPlayer.GrantXP(player, 2, $"Revived teammate ({target.Name}) in copchase");
+            EPlayer.GivePoints(player, 1, $"Revived teammate ({target.Name}) in copchase");
             EPlayer.UnlockAchievement(player, "first_revive");
             EPlayer.UnlockAchievement(target, "get_revived");
 
@@ -8179,7 +8179,7 @@ namespace RNC
                 EPlayer.Error(player, Translate(player, "ERROR_ITEM_NOT_ENOUGH_POINTS", price));
                 return;
             }
-            EPlayer.GivePoints(player, -price);
+            EPlayer.GivePoints(player, -price, $"Purchased an item: {item.Name}");
             switch (item.Name)
             {
                 case "Medkit":
@@ -8428,7 +8428,7 @@ namespace RNC
             target.SetSharedData("IsCuffed", true);
 
             Events.RequestClearAnimation(player);
-            EPlayer.GrantXP(player, 5);
+            EPlayer.GrantXP(player, 5, $"[COPCHASE] Police | Arrested {target.Name}");
             player.SetSharedData("FugitiveChance", player.GetSharedDataSafe<float>("FugitiveChance") + (0.2 * (double)((double)EPlayer.GetAccount(player).DonatorLevel + 1.0)));
             EPlayer.ActionEx(player, $"has grabbed ahold of {EPlayer.Name(target)} and slapped the handcuffs on their wrists.");
 
@@ -8443,7 +8443,7 @@ namespace RNC
             EPlayer.Handcuff(target, true);
 
             EPlayer.GetAccount(player).Arrests++;
-            EPlayer.GivePoints(player, 5);
+            EPlayer.GivePoints(player, 5, $"[COPCHASE] Police | Arrested {target.Name}");
 
             if (EPlayer.GetAccount(player).Arrests >= 100)
             {
@@ -8722,7 +8722,7 @@ namespace RNC
                                 }
                                 NAPI.Task.Run(() =>
                                 {
-                                    EPlayer.GivePoints(player, -(vMods.Keys.Count * 50));
+                                    EPlayer.GivePoints(player, -(vMods.Keys.Count * 50), $"Purchased vehicle modifications");
                                 });
                             }
                             NAPI.Task.Run(() =>
@@ -8778,7 +8778,7 @@ namespace RNC
                                         EPlayer.Notify(player, Translate(player, "TUNING_POINTS_REQUIRED", ((vMods.Keys.Count * 50) - acc.Points)), "red", "fas fa-lock", false, 2500, "topCenter", "replace");
                                         return;
                                     }
-                                    EPlayer.GivePoints(player, -(changes * 50));
+                                    EPlayer.GivePoints(player, -(changes * 50), "Purchased vehicle modifications");
                                 });
                             }
 

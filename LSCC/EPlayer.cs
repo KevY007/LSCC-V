@@ -897,7 +897,7 @@ namespace RNC
                 }
             }
 
-            EPlayer.GrantXP(target, 0);
+            EPlayer.GrantXP(target, 0, "");
             return;
         }
 
@@ -1083,9 +1083,9 @@ namespace RNC
             NAPI.Task.Run(() =>
             {
                 if (challenge.RewardXP > 0)
-                    EPlayer.GrantXP(player, challenge.RewardXP);
+                    EPlayer.GrantXP(player, challenge.RewardXP, $"Completed a challenge of type {challenge.Type}");
                 if (challenge.RewardPoints > 0)
-                    EPlayer.GivePoints(player, challenge.RewardPoints);
+                    EPlayer.GivePoints(player, challenge.RewardPoints, $"Completed a challenge of type {challenge.Type}");
 
                 Account acc = EPlayer.GetAccount(player);
                 if (!acc.CompletedDailyChallenge)
@@ -1101,8 +1101,8 @@ namespace RNC
                     }
                     else if (acc.ChallengeStreak == 7)
                     {
-                        EPlayer.GrantXP(player, 70);
-                        EPlayer.GivePoints(player, 50);
+                        EPlayer.GrantXP(player, 70, "Completed 7-day challenge streak");
+                        EPlayer.GivePoints(player, 50, "Completed 7-day challenge streak");
 
                         player.SendChatMessage("!{#c387ff}[DAILY CHALLENGES] ~w~You successfully completed the weekly challenge! Received ~y~70 XP and 50 points~w~.");
                         player.TriggerEvent("sendAchievementNotify", "Weekly Challenge", $"Complete at least one daily challenge for 7 days in a row.",
@@ -1170,12 +1170,12 @@ namespace RNC
                         });
 
                         if (achdata.RewardXP > 0)
-                            NAPI.Task.Run(() => { EPlayer.GrantXP(player, achdata.RewardXP); });
+                            NAPI.Task.Run(() => { EPlayer.GrantXP(player, achdata.RewardXP, $"Unlocked achievement: {achdata.Name}"); });
 
                         if (achdata.RewardPoints > 0)
                             NAPI.Task.Run(() =>
                             {
-                                EPlayer.GivePoints(player, achdata.RewardPoints);
+                                EPlayer.GivePoints(player, achdata.RewardPoints, $"Unlocked achievement: {achdata.Name}");
                             });
 
                         await context.SaveChangesAsync();
@@ -1829,7 +1829,7 @@ namespace RNC
             SetDiscordStatus(player, "On login screen");
             ResetPlayerData(player);
         }
-        public static void GivePoints(Player player, int points)
+        public static void GivePoints(Player player, int points, string reason)
         {
             NAPI.Task.Run(() =>
             {
@@ -1841,6 +1841,10 @@ namespace RNC
                 EPlayer.GetAccount(player).Points += points;
                 player.SetSharedData("Points", EPlayer.GetAccount(player).Points);
                 EPlayer.Save(player);
+
+
+                if (points != 0)
+                    Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Points", points, reason);
             });
 
         }
@@ -2042,7 +2046,7 @@ namespace RNC
             }
 
         }
-        public static void GrantXP(Player player, int xp)
+        public static void GrantXP(Player player, int xp, string reason)
         {
             NAPI.Task.Run(() =>
             {
@@ -2110,6 +2114,9 @@ namespace RNC
                 player.SetSharedData("CurrentXP", acc.XP);
                 player.SetSharedData("NextLevelXP", EPlayer.GetMaxLevelXP(acc.Level));
                 player.TriggerEvent("Menu_UpdateLevelXP");
+
+                if(xp != 0)
+                    Logs.LogTransaction(acc.SQL_ID, "XP", xp, reason);
 
                 try
                 {
