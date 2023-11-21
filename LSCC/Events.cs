@@ -2526,12 +2526,13 @@ namespace RNC
                             List<Player> CopchasePlayers = new List<Player>();
                             CopchasePlayers.AddRange(lobby.Fugitives);
                             CopchasePlayers.AddRange(lobby.Cops);
-                            foreach (Player cPlayer in CopchasePlayers)
+                            foreach (EventManager.EventData.EventPlayerData ePlayer in EventManager.GetEvent(LobbyData.EventLobbyID.BankRobbery).EventPlayers)
                             {
+                                Player cPlayer = ePlayer.Player;
                                 cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_FULL_WIN"));
 
                                 // Bonus for delivering both money bags
-                                if (lobby.Fugitives.Contains(cPlayer))
+                                if (ePlayer.Team == 0)
                                 {
                                     EPlayer.GrantXP(cPlayer, 4);
                                     EPlayer.GivePoints(cPlayer, 4);
@@ -3344,12 +3345,13 @@ namespace RNC
                                                 List<Player> CopchasePlayers = new List<Player>();
                                                 CopchasePlayers.AddRange(lobby.Fugitives);
                                                 CopchasePlayers.AddRange(lobby.Cops);
-                                                foreach (Player cPlayer in CopchasePlayers)
+                                                foreach (EventManager.EventData.EventPlayerData ePlayer in EventManager.GetEvent(LobbyData.EventLobbyID.BankRobbery).EventPlayers)
                                                 {
+                                                    Player cPlayer = ePlayer.Player;
                                                     cPlayer.SendChatMessage(Translate(cPlayer, "BANKROB_ONE_LEADER_NEUTRALIZED"));
 
                                                     // Bonus for eliminating the second leader before they deliver the money
-                                                    if (lobby.Cops.Contains(cPlayer))
+                                                    if (ePlayer.Team == 1)
                                                     {
                                                         EPlayer.GrantXP(cPlayer, 4);
                                                         EPlayer.GivePoints(cPlayer, 4);
