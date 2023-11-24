@@ -20,29 +20,29 @@ function streamIn_OutfitCheck(entity){
 }
 
 // Hair Overlays applying
-let fuckRendering = false;
-mp.events.add("hell", () => {
-    fuckRendering = true;
-})
-mp.events.add('render', () => {
-    if(!fuckRendering) return;
-    if(mp.players.local.hasVariable("CHARACTER:Appearance")){
-        const LocalAppearance = JSON.parse(mp.players.local.getVariable("CHARACTER:Appearance"));
-        applyHairOverlays(mp.players.local, LocalAppearance);
-    }
-});
-mp.events.add("OneSecondEvent", () => {
-    if(mp.players.local.hasVariable("CHARACTER:Appearance")){
-        const LocalAppearance = JSON.parse(mp.players.local.getVariable("CHARACTER:Appearance"));
-        applyHairOverlays(mp.players.local, LocalAppearance);
-    }
-    mp.players.forEachInStreamRange(p => {
-        if(p.dimension === mp.players.local.dimension && p.hasVariable("CHARACTER:Appearance")){
-            const Appearance = JSON.parse(p.getVariable("CHARACTER:Appearance"));
-            applyHairOverlays(p, Appearance);
-        }
-    })
-});
+// let fuckRendering = false;
+// mp.events.add("hell", () => {
+//     fuckRendering = true;
+// })
+// mp.events.add('render', () => {
+//     if(!fuckRendering) return;
+//     if(mp.players.local.hasVariable("CHARACTER:Appearance")){
+//         const LocalAppearance = JSON.parse(mp.players.local.getVariable("CHARACTER:Appearance"));
+//         applyHairOverlays(mp.players.local, LocalAppearance);
+//     }
+// });
+// mp.events.add("OneSecondEvent", () => {
+//     if(mp.players.local.hasVariable("CHARACTER:Appearance")){
+//         const LocalAppearance = JSON.parse(mp.players.local.getVariable("CHARACTER:Appearance"));
+//         applyHairOverlays(mp.players.local, LocalAppearance);
+//     }
+//     mp.players.forEachInStreamRange(p => {
+//         if(p.dimension === mp.players.local.dimension && p.hasVariable("CHARACTER:Appearance")){
+//             const Appearance = JSON.parse(p.getVariable("CHARACTER:Appearance"));
+//             applyHairOverlays(p, Appearance);
+//         }
+//     })
+// });
 
 function applyAppearanceData(entity, data){
 
