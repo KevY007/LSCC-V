@@ -653,17 +653,17 @@ namespace RNC
     public static class Settings
     {
         // Static Settings / Const
-        public const string Version = "1.2";
+        public const string Version = "1.5";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
         public const int MaxLobbies = 5; // Default/starting lobby num.
         public const int DefaultMaxInLobby = 30;
 
         // Connection Settings
-        public const string MySQL_Host = "panel.gm.miami";
-        public const string MySQL_User = "rncMainUser";
-        public const string MySQL_Password = "4irnKD3cDCJ74cfnbdK2W9dM";
-        public const string MySQL_Database = "racenchase";
-        public const string MySQL_Port = "50733";
+        public const string MySQL_Host = "de.nu.n1.gm.miami";
+        public const string MySQL_User = "u2_GrxxbSepvA";
+        public const string MySQL_Password = "b@ic!1bWG=ALDct.nTE4MdRy";
+        public const string MySQL_Database = "s2_production";
+        public const string MySQL_Port = "57540";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -2099,7 +2099,7 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
             ContextFactory.Instance.Database.EnsureCreated();
-            BackupContextFactory.Instance.Database.EnsureCreated();
+            //BackupContextFactory.Instance.Database.EnsureCreated();
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
 
             Settings.Lobbies = new List<LobbyData>();

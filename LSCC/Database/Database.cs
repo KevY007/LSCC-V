@@ -389,6 +389,17 @@ namespace RNC
                 _connectionString = "Server=localhost;Database=racenchase_test;Uid=racenchase;Pwd=12345678";
             else
                 _connectionString = "Server=" + Settings.MySQL_Host + ";Database=" + Settings.MySQL_Database + ";Uid=" + Settings.MySQL_User + ";Pwd=" + Settings.MySQL_Password + ";Port=" + Settings.MySQL_Port;
+
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput("[STRING:]" + _connectionString);
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
+            GTANetworkAPI.NAPI.Util.ConsoleOutput(" ");
         }
     }
 
@@ -483,6 +494,8 @@ namespace RNC
         public static BackupDatabase CreateContext() { return new BackupContextFactory().CreateDbContext(new string[] { }); }
         public BackupDatabase CreateDbContext(string[] args)
         {
+            
+
             var builder = new DbContextOptionsBuilder<BackupDatabase>();
 
             // Load the connection string for the first time
