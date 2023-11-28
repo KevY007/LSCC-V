@@ -5319,9 +5319,27 @@ namespace RNC
             }
         }
 
+        private static void CheckIfFiveMinutesBeforeMidnight()
+        {
+            DateTime currentUtcTime = DateTime.UtcNow;
 
+            // Set the target time as 5 minutes before midnight
+            DateTime targetTime = new DateTime(currentUtcTime.Year, currentUtcTime.Month, currentUtcTime.Day, 23, 55, 0, DateTimeKind.Utc);
+
+            // Calculate the time difference
+            TimeSpan timeDifference = targetTime - currentUtcTime;
+
+            // Check if the current time is 5 minutes before midnight
+            if (timeDifference.TotalSeconds <= 0 && timeDifference.TotalSeconds >= -60)
+            {
+                Console.WriteLine("It is 5 minutes before 00:00 in UTC time. Server auto-restarting soon.");
+                NAPI.Chat.SendChatMessageToAll("!{#FF6347}[SERVER] !{#FFFFFF}The daily server restart will occur in !{#FFFF00}5 minutes{#FFFFFF}!");
+            }
+        }
         public static void GameUpdate()
         {
+            CheckIfFiveMinutesBeforeMidnight();
+
             try
             {
                 if (Environment.TickCount64 - Settings.LastDerbyTick >= 1000 && Settings.LoggedInPlayers != null && Settings.LoggedInPlayers.Where(a => a.HasSharedData("InLobby") && a.GetSharedDataSafe<int>("InLobby") == -4).Count() >= 2)
