@@ -142,6 +142,18 @@ namespace RNC
         public int WheelColor { get; set; }
         public string Mods { get; set; }
     }
+    public class EmailVerificationRequest
+    {
+        [Column("id")]
+        [Key]
+        public int SQL_ID { get; set; }
+        [Column("accountId")]
+        public int AccountID { get; set; }
+        [Column("code")]
+        public string Code { get; set; }
+        [Column("createdAt")]
+        public DateTime CreatedAt { get; set; }
+    }
     public class PasswordResetRequest
     {
         [Column("id")]
@@ -335,6 +347,7 @@ namespace RNC
         public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
+        public DbSet<EmailVerificationRequest> EmailVerificationRequests { get; set; }
 
         public DbSet<SavedOutfit> SavedOutfits { get; set; }
         public DbSet<SavedAppearance> SavedAppearances { get; set; }
