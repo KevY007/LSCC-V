@@ -14,7 +14,7 @@ namespace RNC
         public static readonly string SMTP_USER = "uB4QVa3fk5DeHNC";
         public static readonly string SMTP_PASS = "KavTUNuDbxgF4wmHRmpGVn8MNmftpuE4";
 
-        public static readonly string EMAIL_FROM = "noreply@racenchase.com";
+        public static readonly string EMAIL_FROM = "no-reply@racenchase.com";
 
         public static void SendEmail(string recipient, string subject, string body)
         {

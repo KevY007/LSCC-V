@@ -833,17 +833,22 @@ namespace RNC
         public static int MaxTeleports = 400; // Used for dimension calculations
 
         // Connection Settings
-        public const string MySQL_Host = "161.97.73.126";
-        public const string MySQL_User = "QrE2bvDp3C";
-        public const string MySQL_Password = "FXF47ZKJLVHGrLSRAwFTmQEThPkQTU8W";
-        public const string MySQL_Database = "racenchase";
-        public const string MySQL_Port = "65517";
+        //public const string MySQL_Host = "de.nu.n1.gm.miami";
+        //public const string MySQL_User = "u2_GrxxbSepvA";
+        //public const string MySQL_Password = "b@ic!1bWG=ALDct.nTE4MdRy";
+        //public const string MySQL_Database = "s2_production";
+        //public const string MySQL_Port = "57540";
+        public const string MySQL_Host = "de.nu.n1.gm.miami";
+        public const string MySQL_User = "u7_TUJvktwTiO";
+        public const string MySQL_Password = "du0+e@ek^Yy4MlC^uIJydvwo";
+        public const string MySQL_Database = "s7_development";
+        public const string MySQL_Port = "57540";
 
-        public const string Test_MySQL_Host = "161.97.73.126";
-        public const string Test_MySQL_User = "QrE2bvDp3C";
-        public const string Test_MySQL_Password = "FXF47ZKJLVHGrLSRAwFTmQEThPkQTU8W";
-        public const string Test_MySQL_Database = "racenchase";
-        public const string Test_MySQL_Port = "65517";
+        public const string Test_MySQL_Host = "de.nu.n1.gm.miami";
+        public const string Test_MySQL_User = "u7_TUJvktwTiO";
+        public const string Test_MySQL_Password = "du0+e@ek^Yy4MlC^uIJydvwo";
+        public const string Test_MySQL_Database = "s7_development";
+        public const string Test_MySQL_Port = "57540";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -2283,7 +2288,7 @@ namespace RNC
 
             NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
             ContextFactory.Instance.Database.EnsureCreated();
-            BackupContextFactory.Instance.Database.EnsureCreated();
+            //BackupContextFactory.Instance.Database.EnsureCreated();
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
 
             Settings.Lobbies = new List<LobbyData>();
