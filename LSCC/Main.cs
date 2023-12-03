@@ -838,6 +838,12 @@ namespace RNC
         public const string MySQL_Password = "FXF47ZKJLVHGrLSRAwFTmQEThPkQTU8W";
         public const string MySQL_Database = "racenchase";
         public const string MySQL_Port = "65517";
+
+        public const string Test_MySQL_Host = "161.97.73.126";
+        public const string Test_MySQL_User = "QrE2bvDp3C";
+        public const string Test_MySQL_Password = "FXF47ZKJLVHGrLSRAwFTmQEThPkQTU8W";
+        public const string Test_MySQL_Database = "racenchase";
+        public const string Test_MySQL_Port = "65517";
         public const string DCBotToken = "NjAyNTQ1Mzc0MDY1OTgzNTgw.XtaCEQ.clpqVL5c0X_38xkT-mYTr4_N9a4";
 
         // Global Variables (changing accordingly)
@@ -2862,6 +2868,8 @@ namespace RNC
                             NAPI.Util.ConsoleOutput($"[Accounts]: {accountsCnt}");
                             NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
                             NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
+
+                            EmailController.SendEmail("codename420yt@gmail.com", "Race 'N' Chase - Test Email", "This is a test e-mail from RnC.");
 
                             // After all the stuff is set.
                             SaveDynamicSettings();
