@@ -397,6 +397,7 @@ namespace RNC
 
         public async static Task<bool> VerifyEmail(int accountSQLID, string code)
         {
+            NAPI.Util.ConsoleOutput($"[VERIFY] Verifying email for account {accountSQLID} code is {code}");
             using(MainDatabase context = ContextFactory.CreateContext())
             {
                 EmailVerificationRequest _e = await context.EmailVerificationRequests.AsQueryable().FirstOrDefaultAsync(e => e.AccountID == accountSQLID);
@@ -409,6 +410,7 @@ namespace RNC
                     context.EmailVerificationRequests.Remove(_e);
                     Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == accountSQLID);
                     _a.EmailVerified = true;
+                    NAPI.Util.ConsoleOutput($"[VERIFY] {_a.Username} set verified to TRUE!");
                     await context.SaveChangesAsync();
                     return true;
                 }
@@ -417,7 +419,7 @@ namespace RNC
         }
         public async static Task SendVerificationEmail(Account _a)
         {
-            string code = Main.GenerateRandomCode(5);
+            string code = Main.GenerateRandomCode(5, false);
             using(MainDatabase context = ContextFactory.CreateContext())
             {
                 EmailVerificationRequest _e = new EmailVerificationRequest()
@@ -430,7 +432,6 @@ namespace RNC
                 await context.SaveChangesAsync();
 
                 EmailController.SendEmail(_a.Email, "Race 'N' Chase - Email Verification", $"Your code is: {code}");
-                await Task.Delay(1);
             }
         }
         public async static Task Add(Account _a)

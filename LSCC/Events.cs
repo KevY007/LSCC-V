@@ -5072,6 +5072,7 @@ namespace RNC
         [RemoteEvent("EmailVerification_SendToEmail")]
         public static void OnEmailVerificationRequestEmail(Player player, string email)
         {
+            NAPI.Util.ConsoleOutput($"SENDING VERIFY EMAIL TO {email}");
             if (!player.HasData("ACCOUNT:Verification"))
             {
                 EPlayer.Error(player, "Fatal error - no account verification handle found. Reconnect or contact the devs.");
@@ -5098,6 +5099,7 @@ namespace RNC
                     _a.Email = email;
                     await context.SaveChangesAsync();
 
+                    NAPI.Util.ConsoleOutput($"Sending verification email to {_a.Username}!!");
                     await AccountManager.SendVerificationEmail(_a);
                     NAPI.Task.Run(() =>
                     {

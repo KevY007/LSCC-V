@@ -1882,10 +1882,11 @@ namespace RNC
             }
         }
 
-        public static string GenerateRandomCode(int length)
+        public static string GenerateRandomCode(int length, bool includeNumbers = true)
         {
             Random random = new Random();
-            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            if (includeNumbers) chars += "0123456789";
             string generatedCode = new string(Enumerable.Repeat(chars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
 
