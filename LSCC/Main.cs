@@ -2884,8 +2884,6 @@ namespace RNC
                             NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
                             NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
 
-                            EmailController.SendEmail("codename420yt@gmail.com", "Race 'N' Chase - Test Email", "This is a test e-mail from RnC.");
-
                             // After all the stuff is set.
                             SaveDynamicSettings();
 
