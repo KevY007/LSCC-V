@@ -395,6 +395,26 @@ namespace RNC
 
         public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }
 
+        public async static Task<bool> VerifyEmail(int accountSQLID, string code)
+        {
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                EmailVerificationRequest _e = await context.EmailVerificationRequests.AsQueryable().FirstOrDefaultAsync(e => e.AccountID == accountSQLID);
+                if (_e == null) return false;
+
+                if(_e.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+                {
+                    // If code is correct, remove the verification request entity from DB
+                    // And change their EmailVerified variable to true
+                    context.EmailVerificationRequests.Remove(_e);
+                    Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == accountSQLID);
+                    _a.EmailVerified = true;
+                    await context.SaveChangesAsync();
+                    return true;
+                }
+                return false;
+            }
+        }
         public async static Task SendVerificationEmail(Account _a)
         {
             string code = Main.GenerateRandomCode(5);

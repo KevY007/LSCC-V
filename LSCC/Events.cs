@@ -7350,6 +7350,43 @@ namespace RNC
                 return false;
             }
         }
+        [RemoteEvent("RegisterAttempt_StepTwo")]
+        public static void OnRegisterAttempt_StepTwo(Player player, string code)
+        {
+            if (EPlayer.LoggedIn(player)) return;
+            if (player.HasData("Kicked")) return;
+
+            if(code == null || code.Length != 5)
+            {
+                player.TriggerEvent("auth_register_step_two_result", false, "Code must be 5 characters in length!");
+                return;
+            }
+            if (!player.HasData("ACCOUNT:Verification"))
+            {
+                EPlayer.Error(player, "A fatal error has occurred: no account found to verify! Please reconnect.");
+                return;
+            }
+
+            Account _new = player.GetData<Account>("ACCOUNT:Verification");
+            int accountSQLID = _new.SQL_ID;
+            Task.Run(async () =>
+            {
+                bool verified = await AccountManager.VerifyEmail(accountSQLID, code);
+                if (!verified)
+                {
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("auth_register_step_two_result", false, "The verification code is invalid!");
+                        return;
+                    });
+                    return;
+                }
+                NAPI.Task.Run(() =>
+                {
+                    OnPlayerRegister(player, _new);
+                });
+            });
+        }
 
         [RemoteEvent("RegisterAttempt_StepOne")]
         public static void OnRegisterAttempt_StepOne(Player player, string email, string username, string password)
@@ -7427,6 +7464,7 @@ namespace RNC
                             await AccountManager.SendVerificationEmail(_new);
                             NAPI.Task.Run(() =>
                             {
+                                player.SetData<Account>("ACCOUNT:Verification", _new);
                                 player.TriggerEvent("auth_register_step_one_result", true, "", "");
                             });
                         });

@@ -398,7 +398,7 @@ mp.events.add("showPasswordChangeDisclaimer", () => {
 mp.events.add("auth_register_step_one_submit", (username, email, password, confirmPassword) => {
   if(global.ServerUI) global.ServerUI.call("auth_register_step_one_loading_toggle", true);
   if(password === confirmPassword){
-    mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
+    mp.events.callRemote('RegisterAttempt_StepOne', email, username, password);
   }
   else{
     if(global.ServerUI) global.ServerUI.call("auth_register_step_one_error_set", "password", "Passwords do not match!");
@@ -421,4 +421,19 @@ mp.events.add("auth_register_step_one_result", (isSuccess, resultMessage, field)
 
   // Awaiting email verification
   if(global.ServerUI) global.ServerUI.call("auth_register_step_set", 1);
+});
+
+mp.events.add("auth_register_step_two_submit", (code) => {
+  if(global.ServerUI) global.ServerUI.call("auth_register_step_two_loading_toggle", true);
+  mp.events.callRemote('RegisterAttempt_StepTwo', code);
+});
+mp.events.add("auth_register_step_two_result", (isSuccess, resultMessage) => {
+  if(global.ServerUI) global.ServerUI.call("auth_register_step_two_loading_toggle", false);
+
+  if(!isSuccess){
+    if(global.ServerUI) global.ServerUI.call("auth_register_step_two_error_set", resultMessage);
+    return;
+  }
+
+  
 });
