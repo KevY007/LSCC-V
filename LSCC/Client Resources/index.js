@@ -467,3 +467,7 @@ mp.events.add("email_verification_step_two_result", (isSuccess, resultMessage) =
     return;
   }
 });
+
+mp.events.add("auth_register_reset_password_submit", (email) => {
+  mp.events.callRemote("ForgotPasswordRequest", email);
+});

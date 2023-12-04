@@ -16,11 +16,12 @@ namespace RNC
 
         public static readonly string EMAIL_FROM = "no-reply@racenchase.com";
 
-        public static void SendEmail(string recipient, string subject, string body)
+        public static void SendEmail(string recipient, string subject, string body, bool isHTML = false)
         {
             MailMessage message = new MailMessage(EMAIL_FROM, recipient);
             message.Subject = subject;
             message.Body = body;
+            message.IsBodyHtml = isHTML;
 
             SmtpClient smtpClient = new SmtpClient(SMTP_HOST, SMTP_PORT);
             smtpClient.Credentials = new NetworkCredential(SMTP_USER, SMTP_PASS);

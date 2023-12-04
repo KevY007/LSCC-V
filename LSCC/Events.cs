@@ -7400,6 +7400,37 @@ namespace RNC
                 return false;
             }
         }
+
+        [RemoteEvent("ForgotPasswordRequest")]
+        public static void OnRequestForgotPassword(Player player, string email)
+        {
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account check = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                    if (check != null)
+                    {
+                        Guid requestToken = Guid.NewGuid();
+                        string requestTokenString = requestToken.ToString();
+
+                        PasswordResetRequest request = new PasswordResetRequest()
+                        {
+                            AccountID = check.SQL_ID,
+                            Code = requestTokenString,
+                            CreatedAt = DateTime.Now
+                        };
+                        await context.PasswordResetRequests.AddAsync(request);
+                        await context.SaveChangesAsync();
+
+                        EmailController.SendEmail(email, "Race 'N' Chase - Password Change Request",
+                            $"Hello {check.Username}, you have requested to reset your password.<br><br>" +
+                            $"Your password reset link is: https://racenchase.com/reset-password/{requestTokenString}", true);
+                    }
+                }
+            });
+        }
+
         [RemoteEvent("RegisterAttempt_StepTwo")]
         public static void OnRegisterAttempt_StepTwo(Player player, string code)
         {
