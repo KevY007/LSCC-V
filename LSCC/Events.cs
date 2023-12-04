@@ -5085,7 +5085,7 @@ namespace RNC
                 using(MainDatabase context = ContextFactory.CreateContext())
                 {
                     Account _emailCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-                    if (_emailCheck != null)
+                    if (_emailCheck != null && _emailCheck.SQL_ID != accSQLID)
                     {
                         NAPI.Task.Run(() =>
                         {
