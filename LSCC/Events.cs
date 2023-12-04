@@ -7351,6 +7351,90 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("RegisterAttempt_StepOne")]
+        public static void OnRegisterAttempt_StepOne(Player player, string email, string username, string password)
+        {
+            if (EPlayer.LoggedIn(player)) return;
+            if (player.HasData("Kicked")) return;
+
+            if ((email == null || email.Length < 2) || !IsEmailValid(email))
+            {
+                player.TriggerEvent("auth_register_step_one_result", false, "A valid e-mail address is required!", "email");
+                return;
+            }
+            if ((username == null || username.Length < 2))
+            {
+                player.TriggerEvent("auth_register_step_one_result", false, "Username must be at least 2 characters in length!", "username");
+                return;
+            }
+            if ((password == null || password.Length < 6))
+            {
+                player.TriggerEvent("auth_register_step_one_result", false, "Password does not match requirements!", "password");
+                return;
+            }
+            Regex exp = new Regex(@"^[a-zA-Z0-9]*$");
+            Match match = exp.Match(username);
+            if (!match.Success)
+            {
+                player.TriggerEvent("auth_register_step_one_result", false, "Username contains illegal characters!", "username");
+                return;
+            }
+
+            ulong pSCID = player.SocialClubId;
+            string pSerial = player.Serial;
+            bool reachedAccountLimit = false;
+
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account _usernameCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
+                    if (_usernameCheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("auth_register_step_one_result", false, "An account with that username already exists!", "username");
+                        });
+                        return;
+                    }
+                    Account _emailCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                    if (_emailCheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("auth_register_step_one_result", false, "An account with that e-mail already exists!", "email");
+                        });
+                        return;
+                    }
+
+                    int numberLinkedAccounts = await context.Accounts.AsQueryable().CountAsync(a => a.RegisterHWID.Equals(pSerial) || a.RegisterRID == pSCID);
+                    if (numberLinkedAccounts >= 2) 
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("auth_register_step_one_result", false, "You've reached the maximum limit of <strong>2 accounts</strong>!", "");
+                        });
+                        return;
+                    }
+
+                    // If all checks are successful, create the account and set them to the email verification step
+                    NAPI.Task.Run(() =>
+                    {
+                        Account _new = AccountManager.CreateNewAccount(player, password, email, username);
+                        Task.Run(async () =>
+                        {
+                            await AccountManager.Add(_new);
+                            await AccountManager.SendVerificationEmail(_new);
+                            NAPI.Task.Run(() =>
+                            {
+                                player.TriggerEvent("auth_register_step_one_result", true, "", "");
+                            });
+                        });
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password)
         {
@@ -7448,97 +7532,7 @@ namespace RNC
                         {
                             NAPI.Task.Run(() =>
                             {
-                                player.SetData("LastCryptAttempt", Environment.TickCount64);
-                                string salt = AccountManager.GenSalt();
-                                string newPass = AccountManager.Crypt(password, salt);
-
-                                Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
-
-                                wComponentData test = new wComponentData();
-                                test.Components.Add(123456789);
-                                wepItems.Add(123456789, test);
-
-                                DiscordData _discordData = new DiscordData();
-                                string jsonDiscordData = NAPI.Util.ToJson(_discordData);
-
-                                List<ChallengeData> challengeData = new List<ChallengeData>();
-                                string jsonChallengeData = NAPI.Util.ToJson(challengeData);
-
-                                var _new = new Account
-                                {
-                                    Email = email,
-                                    Password = newPass,
-                                    OldPassword = "",
-                                    OldSalt = "",
-                                    ForcePasswordChange = false,
-                                    Salt = salt,
-                                    Username = username,
-                                    DiscordCode = _discordData.DiscordCode,
-                                    DiscordID = null,
-                                    UsedDiscordPerks = false,
-                                    ChallengeInfo = jsonChallengeData,
-                                    AutoLogin = true,
-                                    Admin = 0,
-                                    WalkstyleClipset = "null",
-                                    RegisterHWID = player.Serial,
-                                    RegisterIP = player.Address,
-                                    RegisterRID = player.SocialClubId,
-                                    RegisterSC = player.SocialClubName,
-                                    LastHWID = player.Serial,
-                                    LastIP = player.Address,
-                                    LastRID = player.SocialClubId,
-                                    LastSC = player.SocialClubName,
-                                    MuteTime = 0,
-                                    MuteReason = "N/A",
-                                    JailTime = 0,
-                                    JailReason = "N/A",
-                                    CopchaseBanReason = "N/A",
-                                    CopchaseBanTime = 0,
-                                    DeathmatchBanReason = "N/A",
-                                    DeathmatchBanTime = 0,
-                                    FreeroamBanReason = "N/A",
-                                    FreeroamBanTime = 0,
-                                    DerbyWins = 0,
-                                    FinishedTutorial = false,
-                                    Level = 1,
-                                    Medkits = 0,
-                                    Painkillers = 0,
-                                    Language = -1,
-                                    DonatorStatus = true,
-                                    XP = 1,
-                                    Escapes = 0,
-                                    Arrests = 0,
-                                    Kills = 1,
-                                    Lockpicks = 0,
-                                    Deaths = 1,
-                                    MinutesPlayed = 1.0,
-                                    LastSessionMins = 0.0,
-                                    DonatorPoints = 0,
-                                    Points = 10,
-                                    Warns = 0,
-                                    Suspended = 0,
-                                    DonatorLevel = 0,
-                                    LobbyClothing = 1,
-                                    LoadoutCop = "?",
-                                    LoadoutFugitive = "?",
-                                    CarCop = "?",
-                                    CarFugitive = "?",
-                                    WeaponComponents = NAPI.Util.ToJson(wepItems),
-                                    MOTD = "none",
-                                    RegisterDate = DateTime.Now,
-                                    LastLogin = DateTime.Now,
-                                    Character = "{}",
-                                    PurchasedAmmo = "{}",
-                                    ChallengeStreak = 0,
-                                    CompletedDailyChallenge = false,
-                                    Namechanges = 0,
-                                    ClanTier = -1,
-                                    ClanID = -1,
-                                    CrosshairProfiles = "[]",
-                                    ActiveCrosshairProfile = "{}",
-                                    TattooList = "[]",
-                                    SelectedBadgeData = "{id:0, name:\"\"}",
-                                };
+                                Account _new = AccountManager.CreateNewAccount(player, password, email, username);
                                 Task.Run(async () =>
                                 {
                                     await AccountManager.Add(_new);

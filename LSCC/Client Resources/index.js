@@ -392,3 +392,33 @@ mp.events.add("showPasswordChangeDisclaimer", () => {
     });
   });
 });
+
+
+// NEW LOGIN/REGISTER
+mp.events.add("auth_register_step_one_submit", (username, email, password, confirmPassword) => {
+  if(global.ServerUI) global.ServerUI.call("auth_register_step_one_loading_toggle", true);
+  if(password === confirmPassword){
+    mp.events.callRemote('OnPlayerRegisterAttempt', email, username, password);
+  }
+  else{
+    if(global.ServerUI) global.ServerUI.call("auth_register_step_one_error_set", "password", "Passwords do not match!");
+    mp.events.callLocal("HUDError", "The passwords do not match!");
+    if(global.ServerUI) global.ServerUI.call("auth_register_step_one_loading_toggle", false);
+  }
+});
+
+mp.events.add("auth_register_step_one_result", (isSuccess, resultMessage, field) => {
+  if(global.ServerUI) global.ServerUI.call("auth_register_step_one_loading_toggle", false);
+
+  if(!isSuccess){
+    if(field !== ""){
+      if(global.ServerUI) global.ServerUI.call("auth_register_step_one_error_set", field, resultMessage);
+      return;
+    }
+    mp.events.callLocal("HUDError", resultMessage);
+    return;
+  }
+
+  // Awaiting email verification
+  if(global.ServerUI) global.ServerUI.call("auth_register_step_set", 1);
+});

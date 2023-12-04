@@ -1882,6 +1882,16 @@ namespace RNC
             }
         }
 
+        public static string GenerateRandomCode(int length)
+        {
+            Random random = new Random();
+            string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            string generatedCode = new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
+
+            return generatedCode;
+        }
+
         public static IDictionary<long, string> WeaponReasons = new Dictionary<long, string>()
         {
             {2460120199, "Antique Cavalry Dagger"},

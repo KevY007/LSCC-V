@@ -103,6 +103,8 @@ namespace RNC
 
         public string ActiveCrosshairProfile { get; set; }
         public string CrosshairProfiles { get; set; }
+
+        public bool EmailVerified { get; set; }
     }
 
     public class ChallengeData
@@ -294,8 +296,123 @@ namespace RNC
             return true;
         }
 
+        public static Account CreateNewAccount(Player player, string password, string email, string username)
+        {
+            player.SetData("LastCryptAttempt", Environment.TickCount64);
+            string salt = AccountManager.GenSalt();
+            string newPass = AccountManager.Crypt(password, salt);
+
+            Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
+
+            wComponentData test = new wComponentData();
+            test.Components.Add(123456789);
+            wepItems.Add(123456789, test);
+
+            DiscordData _discordData = new DiscordData();
+            string jsonDiscordData = NAPI.Util.ToJson(_discordData);
+
+            List<ChallengeData> challengeData = new List<ChallengeData>();
+            string jsonChallengeData = NAPI.Util.ToJson(challengeData);
+
+            var _new = new Account
+            {
+                Email = email,
+                Password = newPass,
+                OldPassword = "",
+                OldSalt = "",
+                ForcePasswordChange = false,
+                Salt = salt,
+                Username = username,
+                DiscordCode = _discordData.DiscordCode,
+                DiscordID = null,
+                UsedDiscordPerks = false,
+                ChallengeInfo = jsonChallengeData,
+                AutoLogin = true,
+                Admin = 0,
+                WalkstyleClipset = "null",
+                RegisterHWID = player.Serial,
+                RegisterIP = player.Address,
+                RegisterRID = player.SocialClubId,
+                RegisterSC = player.SocialClubName,
+                LastHWID = player.Serial,
+                LastIP = player.Address,
+                LastRID = player.SocialClubId,
+                LastSC = player.SocialClubName,
+                MuteTime = 0,
+                MuteReason = "N/A",
+                JailTime = 0,
+                JailReason = "N/A",
+                CopchaseBanReason = "N/A",
+                CopchaseBanTime = 0,
+                DeathmatchBanReason = "N/A",
+                DeathmatchBanTime = 0,
+                FreeroamBanReason = "N/A",
+                FreeroamBanTime = 0,
+                DerbyWins = 0,
+                FinishedTutorial = false,
+                Level = 1,
+                Medkits = 0,
+                Painkillers = 0,
+                Language = -1,
+                DonatorStatus = true,
+                XP = 1,
+                Escapes = 0,
+                Arrests = 0,
+                Kills = 1,
+                Lockpicks = 0,
+                Deaths = 1,
+                MinutesPlayed = 1.0,
+                LastSessionMins = 0.0,
+                DonatorPoints = 0,
+                Points = 10,
+                Warns = 0,
+                Suspended = 0,
+                DonatorLevel = 0,
+                LobbyClothing = 1,
+                LoadoutCop = "?",
+                LoadoutFugitive = "?",
+                CarCop = "?",
+                CarFugitive = "?",
+                WeaponComponents = NAPI.Util.ToJson(wepItems),
+                MOTD = "none",
+                RegisterDate = DateTime.Now,
+                LastLogin = DateTime.Now,
+                Character = "{}",
+                PurchasedAmmo = "{}",
+                ChallengeStreak = 0,
+                CompletedDailyChallenge = false,
+                Namechanges = 0,
+                ClanTier = -1,
+                ClanID = -1,
+                CrosshairProfiles = "[]",
+                ActiveCrosshairProfile = "{}",
+                TattooList = "[]",
+                SelectedBadgeData = "{id:0, name:\"\"}",
+                EmailVerified = false
+            };
+            return _new;
+        }
+
         public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }
 
+        public async static Task SendVerificationEmail(Account _a)
+        {
+            string code = Main.GenerateRandomCode(5);
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                EmailVerificationRequest _e = new EmailVerificationRequest()
+                {
+                    AccountID = _a.SQL_ID,
+                    Code = code,
+                    CreatedAt = DateTime.Now
+                };
+                await context.EmailVerificationRequests.AddAsync(_e);
+                await context.SaveChangesAsync();
+
+                EmailController.SendEmail(_a.Email, "Race 'N' Chase - Email Verification", $"Your code is: {code}");
+                await Task.Delay(1);
+            }
+        }
         public async static Task Add(Account _a)
         {
                 using (MainDatabase context = ContextFactory.CreateContext())
