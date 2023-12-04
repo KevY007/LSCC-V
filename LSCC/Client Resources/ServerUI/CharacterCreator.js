@@ -568,6 +568,11 @@ var CURRENT_APPEARANCE_DATA = undefined;
 
 
 mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appearanceData) => {
+    if(toggle == false){
+        if(global.ServerUI) global.ServerUI.call('character_editor_toggle', toggle);
+        return;
+    }
+
     if(appearanceData.length !== 0) CURRENT_APPEARANCE_DATA = JSON.parse(appearanceData);
     else CURRENT_APPEARANCE_DATA = undefined;
 

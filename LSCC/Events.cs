@@ -20,6 +20,7 @@ using System.Collections;
 using GTANetworkAPI;
 using System.Net.Mime;
 using System.Xml.Linq;
+using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
 
 namespace RNC
 {
@@ -3639,6 +3640,7 @@ namespace RNC
             if (!EPlayer.LoggedIn(player)) return;
 
             EPlayer.GetAccount(player).FinishedTutorial = true;
+            EPlayer.GetAccount(player).EmailVerified = true;
             EPlayer.Save(player, false);
 
             int voiceMode = (useVoice ? 0 : 4);
@@ -4938,6 +4940,7 @@ namespace RNC
 
             Task.Run(async () =>
             {
+
                 await AccountManager.BanEvadeCheck(player, acc);
 
                 NAPI.Task.Run(() =>
@@ -4952,7 +4955,15 @@ namespace RNC
                 
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    List<Teleport> teleports = await context.Teleports.AsQueryable().ToListAsync();
+                    Account _email = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                    if(_email != null)
+                    {
+                        _email.EmailVerified = true;
+                        await context.SaveChangesAsync();
+                    }
+
+
+                    List <Teleport> teleports = await context.Teleports.AsQueryable().ToListAsync();
                     NAPI.Task.Run(() =>
                     {
                         EPlayer.UpdateTeleports(player, teleports);
@@ -6660,7 +6671,10 @@ namespace RNC
             if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true) return;
             player.ResetData("CHARACTER:EditorOpen");
             player.TriggerEvent("CharacterEditor:DestroyScene");
-            Commands.cmd_lobby(player);
+            //Commands.cmd_lobby(player);
+
+            player.SetSharedData("InLobby", -1);
+            EPlayer.Spawn(player);
         }
 
         [RemoteEvent("CharacterEditor:SaveAppearance")]
@@ -6736,13 +6750,17 @@ namespace RNC
             // If the outfit editor is closed & the char is still new, it means they haven't edited fugitive yet! hehe
             if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true)
             {
+                player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", false, false, "[]");
                 Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 0));
                 EPlayer.Notify(player, "Editing <strong>Fugitive Outfit</strong>", "yellow", "", false, 5000);
                 player.ResetData("CHARACTER:IsNew");
                 Character.ApplyOutfit(player, Character.GetOutfitByTeam(player, 0).IsMale, 0, Character.GetOutfitByTeam(player, 0));
                 return;
             }
-            Commands.cmd_lobby(player);
+            //Commands.cmd_lobby(player);
+            player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", false, false, "[]");
+            player.SetSharedData("InLobby", -1);
+            EPlayer.Spawn(player);
         }
 
         [RemoteEvent("OutfitCreator:Create")]
