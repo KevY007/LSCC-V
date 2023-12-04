@@ -5028,6 +5028,85 @@ namespace RNC
             EPlayer.SendForgotUsernameData(player);
         }
 
+        [RemoteEvent("EmailVerification_VerifyCode")]
+        public static void OnEmailVerificationVerifyCode(Player player, string code)
+        {
+            if(code.Length != 5)
+            {
+                player.TriggerEvent("email_verification_step_two_result", false, "The verification code must be 5 characters in length!");
+                return;
+            }
+            if (!player.HasData("ACCOUNT:Verification"))
+            {
+                EPlayer.Error(player, "Fatal error - no account verification handle found. Reconnect or contact the devs.");
+                return;
+            }
+            Account acc = player.GetData<Account>("ACCOUNT:Verification");
+            int accSQLID = acc.SQL_ID;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    bool verified = await AccountManager.VerifyEmail(accSQLID, code);
+                    if (!verified)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("email_verification_step_two_result", false, "The verification code is invalid!");
+                        });
+                        return;
+                    }
+
+                    Account toLogin = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == accSQLID);
+                    if (toLogin == null) return;
+
+                    NAPI.Task.Run(() =>
+                    {
+                        OnPlayerLogin(player, toLogin);
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("EmailVerification_SendToEmail")]
+        public static void OnEmailVerificationRequestEmail(Player player, string email)
+        {
+            if (!player.HasData("ACCOUNT:Verification"))
+            {
+                EPlayer.Error(player, "Fatal error - no account verification handle found. Reconnect or contact the devs.");
+                return;
+            }
+            Account acc = player.GetData<Account>("ACCOUNT:Verification");
+            int accSQLID = acc.SQL_ID;
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account _emailCheck = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                    if (_emailCheck != null)
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("email_verification_step_one_result", false, "That e-mail is already in use by another account!");
+                        });
+                        return;
+                    }
+
+                    Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == accSQLID);
+                    if (_a == null) return;
+                    _a.Email = email;
+                    await context.SaveChangesAsync();
+
+                    await AccountManager.SendVerificationEmail(_a);
+                    NAPI.Task.Run(() =>
+                    {
+                        player.TriggerEvent("email_verification_step_one_result", true, "");
+                    });
+                }
+            });
+        }
+
         [RemoteEvent("OnPlayerLoginAttempt")]
         public static void OnPlayerLoginAttempt(Player player, string username, string password)
         {
@@ -5072,6 +5151,13 @@ namespace RNC
                                 {
                                     if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
+                                        if (acc.EmailVerified == false)
+                                        {
+                                            player.SetData<Account>("ACCOUNT:Verification", acc);
+                                            player.TriggerEvent("email_verification_open_dialog", acc.Email);
+                                            return;
+                                        }
+
                                         OnPlayerLogin(player, acc);
                                         return;
                                     }
@@ -5091,27 +5177,6 @@ namespace RNC
                             }
                         }
                     });
-
-                    /*
-                    else
-                    {
-                        Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                        if (archiveCheck != null)
-                        {
-                            AccountManager.RecoverAccount(archiveCheck);
-
-                            acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Email != null && a.Email.Length > 5 && a.Email.Equals(username, StringComparison.OrdinalIgnoreCase));
-                            if (acc != null)
-                            {
-                                if (AccountManager.Login(acc, password))
-                                {
-                                    OnPlayerLogin(player, acc);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    */
                 }
                 else
                 {
@@ -5128,6 +5193,13 @@ namespace RNC
                                 {
                                     if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
+                                        if (acc.EmailVerified == false)
+                                        {
+                                            player.SetData<Account>("ACCOUNT:Verification", acc);
+                                            player.TriggerEvent("email_verification_open_dialog", acc.Email);
+                                            return;
+                                        }
+
                                         OnPlayerLogin(player, acc);
                                         return;
                                     }
@@ -5148,29 +5220,7 @@ namespace RNC
                             }
                         }
                     });
-
-                    /*
-                    else
-                    {
-                        Account archiveCheck = BackupContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                        if (archiveCheck != null)
-                        {
-                            AccountManager.RecoverAccount(archiveCheck);
-
-                            acc = ContextFactory.Instance.Accounts.ToList().Find(a => a.Username.Equals(username, StringComparison.OrdinalIgnoreCase));
-                            if (acc != null)
-                            {
-                                if (AccountManager.Login(acc, password))
-                                {
-                                    OnPlayerLogin(player, acc);
-                                    return;
-                                }
-                            }
-                        }
-                    }
-                    */
                 }
-                //EPlayer.Notify(player, "Invalid credentials or unable to log-in!", "red", "fas fa-lock", false, 4000, "bottomCenter");
 
             }
             catch (Exception ex)

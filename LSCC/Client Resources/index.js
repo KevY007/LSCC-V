@@ -434,6 +434,36 @@ mp.events.add("auth_register_step_two_result", (isSuccess, resultMessage) => {
     if(global.ServerUI) global.ServerUI.call("auth_register_step_two_error_set", resultMessage);
     return;
   }
+});
 
-  
+
+mp.events.add("email_verification_open_dialog", (initialEmail) => {
+  if(global.ServerUI) global.ServerUI.call("dialog_email_verification_open", initialEmail);
+});
+mp.events.add("email_verification_step_one_submit", (email) => {
+  if(global.ServerUI) global.ServerUI.call("email_verification_step_one_loading_toggle", true);
+
+  mp.events.callRemote("EmailVerification_SendToEmail", email);
+});
+mp.events.add("email_verification_step_one_result", (isSuccess, resultMessage) => {
+  if(global.ServerUI) global.ServerUI.call("email_verification_step_one_loading_toggle", false);
+  if(!isSuccess){
+    if(global.ServerUI) global.ServerUI.call("email_verification_step_one_error_set", resultMessage);
+    return;
+  }
+
+  if(global.ServerUI) global.ServerUI.call("email_verification_step_set", 1);
+});
+
+mp.events.add("email_verification_step_two_submit", (code) => {
+  if(global.ServerUI) global.ServerUI.call("email_verification_step_two_loading_toggle", true);
+
+  mp.events.callRemote("EmailVerification_VerifyCode", code);
+});
+mp.events.add("email_verification_step_two_result", (isSuccess, resultMessage) => {
+  if(global.ServerUI) global.ServerUI.call("email_verification_step_two_loading_toggle", false);
+  if(!isSuccess){
+    if(global.ServerUI) global.ServerUI.call("email_verification_step_two_error_set", resultMessage);
+    return;
+  }
 });
