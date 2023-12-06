@@ -163,6 +163,11 @@ mp.events.add('finishAccountHwidCheck', (status) => {
   }
 });
 
+mp.events.add("RememberMe_Toggle", (value) => {
+  mp.storage.data.menu.rememberMe = value;
+  mp.storage.flush();
+});
+
 mp.events.add('showLoginBrowser', (state) => {
     setTimeout(() => {
         if(global.ServerUI != null)

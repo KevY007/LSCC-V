@@ -127,12 +127,19 @@ namespace RNC
             player.SetData("Kicked", true);
             NAPI.Task.Run(() =>
             {
+                if (player == null) return;
                 try
                 {
                     if (reason == "AFK")
                     {
-                        EPlayer.SendMessageToAll("MSGALL_AFK_KICKED", EPlayer.Name(player));
-                        player.KickSilent(reason);
+                        player.TriggerEvent("RememberMe_Toggle", false);
+                        NAPI.Task.Run(() =>
+                        {
+                            if (player == null) return;
+                            EPlayer.SendMessageToAll("MSGALL_AFK_KICKED", EPlayer.Name(player));
+                            player.KickSilent(reason);
+                            return;
+                        }, 100);
                         return;
                     }
                     if (silent)
