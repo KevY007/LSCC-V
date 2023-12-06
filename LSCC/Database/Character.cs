@@ -714,10 +714,6 @@ namespace RNC
         }
         private static void ApplyOutfitData(Player player, Outfit outfit)
         {
-            NAPI.Util.ConsoleOutput($"|||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            NAPI.Util.ConsoleOutput($"|||||| [EDITOR] Applying outfit: {outfit.Team} ||||||");
-            NAPI.Util.ConsoleOutput($"|||||||||||||||||||||||||||||||||||||||||||||||||||||");
-            NAPI.Util.ConsoleOutput($"|||||||||||||||||||||||||||||||||||||||||||||||||||||");
             NAPI.Util.ConsoleOutput(NAPI.Util.ToJson(outfit));
             player.SetSharedData("CHARACTER:Outfit", NAPI.Util.ToJson(outfit));
         }
