@@ -4205,7 +4205,7 @@ namespace RNC
                     }
                     else
                     {
-                        Character.InitializeCharacter(player, acc);
+                        //Character.InitializeCharacter(player, acc);
                         player.TriggerEvent("TogglePlayerChat", false);
                         player.TriggerEvent("StartTutorial");
                         EPlayer.Error(player, Translate(player, "SHOWING_TUTORIAL_LATE"));
@@ -6734,6 +6734,7 @@ namespace RNC
                             Character.UpdateActiveOutfitVariable(player, savedCop, 1);
                         }
 
+                        player.SetData<SavedOutfit>("CHARACTER:OutfitOverride", Character.GetOutfitByTeam(player, 1));
                         Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 1));
                         EPlayer.Notify(player, "Editing <strong>Police Outfit</strong>", "blue", "", false, 5000);
                     }
@@ -6744,20 +6745,25 @@ namespace RNC
         [RemoteEvent("CharacterEditor:CloseEvent")]
         public void CharacterEditor_OnClose(Player player)
         {
-            player.ResetData("CHARACTER:EditorOpen");
-            player.TriggerEvent("CharacterEditor:DestroyScene");
-
             // If the outfit editor is closed & the char is still new, it means they haven't edited fugitive yet! hehe
             if (player.HasData("CHARACTER:IsNew") && player.GetData<bool>("CHARACTER:IsNew") == true)
             {
                 player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", false, false, "[]");
-                Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 0));
                 EPlayer.Notify(player, "Editing <strong>Fugitive Outfit</strong>", "yellow", "", false, 5000);
                 player.ResetData("CHARACTER:IsNew");
                 Character.ApplyOutfit(player, Character.GetOutfitByTeam(player, 0).IsMale, 0, Character.GetOutfitByTeam(player, 0));
+                NAPI.Task.Run(() =>
+                {
+                    player.SetData<SavedOutfit>("CHARACTER:OutfitOverride", Character.GetOutfitByTeam(player, 0));
+                    Character.ApplyOutfit(player, Character.GetOutfitByTeam(player, 0).IsMale, 0, Character.GetOutfitByTeam(player, 0));
+                    Character.OpenOutfitEditor(player, Character.GetOutfitByTeam(player, 0));
+                }, 100);     
                 return;
             }
             //Commands.cmd_lobby(player);
+            player.ResetData("CHARACTER:OutfitOverride");
+            player.ResetData("CHARACTER:EditorOpen");
+            player.TriggerEvent("CharacterEditor:DestroyScene");
             player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", false, false, "[]");
             player.SetSharedData("InLobby", -1);
             EPlayer.Spawn(player);

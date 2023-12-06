@@ -669,6 +669,14 @@ namespace RNC
         }
         public static Outfit ApplyOutfit(Player player, bool isMale, int team, SavedOutfit outfit = null, bool update_char = true)
         {
+            if (player.HasData("CHARACTER:OutfitOverride"))
+            {
+                SavedOutfit fit = player.GetData<SavedOutfit>("CHARACTER:OutfitOverride");
+                Outfit overrideOutfit = NAPI.Util.FromJson<Outfit>(fit.Data);
+                ApplyOutfitData(player, overrideOutfit);
+                return overrideOutfit;
+            }
+
             if (outfit == null)
             {
                 Outfit _newOutfit = new Outfit("Default", "null", isMale, team);
@@ -706,6 +714,11 @@ namespace RNC
         }
         private static void ApplyOutfitData(Player player, Outfit outfit)
         {
+            NAPI.Util.ConsoleOutput($"|||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            NAPI.Util.ConsoleOutput($"|||||| [EDITOR] Applying outfit: {outfit.Team} ||||||");
+            NAPI.Util.ConsoleOutput($"|||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            NAPI.Util.ConsoleOutput($"|||||||||||||||||||||||||||||||||||||||||||||||||||||");
+            NAPI.Util.ConsoleOutput(NAPI.Util.ToJson(outfit));
             player.SetSharedData("CHARACTER:Outfit", NAPI.Util.ToJson(outfit));
         }
 

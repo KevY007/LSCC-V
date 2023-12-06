@@ -374,6 +374,12 @@ mp.events.add('render', () => {
 });
 
 /* Character Editor Scene Setup */
+
+mp.events.add("OneSecondEvent", () => {
+    if(CanRotateInEditor === true) // WE'RE ALL GOING TO HELL WITH THIS ONE 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        mp.events.callLocal('ToggleHud', false);
+});
+
 mp.events.add("CharacterEditor:SceneSetup", (camX, camY, camZ, camRX, camRY, camRZ) => {
     if(EditorCamera){
         EditorCamera.destroy();
