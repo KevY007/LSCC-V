@@ -431,7 +431,11 @@ namespace RNC
                 await context.EmailVerificationRequests.AddAsync(_e);
                 await context.SaveChangesAsync();
 
-                EmailController.SendEmail(_a.Email, "Race 'N' Chase - Email Verification", $"Your code is: {code}");
+                EmailController.SendEmail(_a.Email, "Race 'N' Chase - Email Verification", 
+                    RNC.EmailTemplates.EmailVerification.HTML
+                    .Replace("{{name}}", _a.Username)
+                    .Replace("{{code}}", code), 
+                    true);
             }
         }
         public async static Task Add(Account _a)

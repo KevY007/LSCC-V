@@ -7456,9 +7456,12 @@ namespace RNC
                         await context.PasswordResetRequests.AddAsync(request);
                         await context.SaveChangesAsync();
 
-                        EmailController.SendEmail(email, "Race 'N' Chase - Password Change Request",
-                            $"Hello {check.Username}, you have requested to reset your password.<br><br>" +
-                            $"Your password reset link is: https://racenchase.com/reset-password/{requestTokenString}", true);
+                        EmailController.SendEmail(email, "Race 'N' Chase - Password Change Request", 
+                            RNC.EmailTemplates.PasswordReset.HTML
+                            .Replace("{{name}}", check.Username)
+                            .Replace("{{link}}", $" https://racenchase.com/reset-password/{requestTokenString}"), 
+                            true);
+
                     }
                 }
             });
