@@ -48,6 +48,14 @@ namespace RNC
         public string Notes { get; set; }
         public int Armor { get; set; } // Armor after getting damaged
     }
+    public class Logs_Redeem
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public DateTime Timestamp { get; set; }
+        public string Text { get; set; }
+    }
     public class Logs_Transaction
     {
         [Key]
@@ -369,6 +377,24 @@ namespace RNC
             LogAdmin(EPlayer.GetAccount(player).SQL_ID, description);
         }
 
+
+        public static void LogRedeem(int aSQLID, string text)
+        {
+            Logs_Redeem _l = new Logs_Redeem()
+            {
+                AccountID = aSQLID,
+                Text = text,
+                Timestamp = DateTime.Now
+            };
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.Logs_Redeems.AddAsync(_l);
+                    await context.SaveChangesAsync();
+                }
+            });
+        }
         public static void LogTransaction(int aSQLID, string type, int amount, string reason)
         {
             Logs_Transaction _l = new Logs_Transaction()

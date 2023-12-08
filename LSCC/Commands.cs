@@ -9998,9 +9998,10 @@ namespace RNC
                     }
 
                     Logs.LogAdmin(player, $"Gave offline player {tpAcc.Username} {points} donator points.");
-                    tpAcc.DonatorPoints += points;
+                    tpAcc.DonatorPoints += points; 
                     NAPI.Task.Run(() =>
                     {
+                        Logs.LogTransaction(tpAcc.SQL_ID, "Diamond Points", points, $"Received from admin ({EPlayer.GetAccount(player).SQL_ID}) {player.Name}");
                         player.SendChatMessage($"!{{#00FF33}}You have given {tpAcc.Username} {points} donator points. (Their total now: {tpAcc.DonatorPoints})");
                     });
 
@@ -10030,6 +10031,7 @@ namespace RNC
 
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:givedonorpoints:{target.Name}:{points}"); } catch { }
             Logs.LogAdmin(player, $"Gave {points} donator points to {target.Name}");
+            Logs.LogTransaction(t_acc.SQL_ID, "Diamond Points", points, $"Received from admin ({EPlayer.GetAccount(player).SQL_ID}) {player.Name}");
             t_acc.DonatorPoints += points;
             player.SendChatMessage($"!{{#00FF33}}You gave {points} donator points to {target.Name}.");
             target.SendChatMessage(Translate(target, "ADMIN_GAVE_DP", EPlayer.Name(player), points));

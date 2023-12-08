@@ -343,6 +343,7 @@ namespace RNC
         public DbSet<Logs_Damage> Logs_Damages { get; set; }
         public DbSet<Logs_Command> Logs_Commands{ get; set; }
         public DbSet<Logs_Transaction> Logs_Transactions { get; set; }
+        public DbSet<Logs_Redeem> Logs_Redeems { get; set; }
         public DbSet<CustomDMArenas> CustomArenas { get; set; }
         public DbSet<CustomDMArenaTeams> CustomArenas_Teams { get; set; }
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }

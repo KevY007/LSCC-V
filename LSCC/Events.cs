@@ -6003,6 +6003,8 @@ namespace RNC
                         EPlayer.UpdateMaxMenuItems(player);
 
                         EPlayer.UpdatePlayerBadges(player);
+
+                        Logs.LogTransaction(acc.SQL_ID, "Diamond Points", -packagePrice, "Purchased BRONZE DONATOR BUNDLE (bonus: +1 namechange)");
                         break;
                     case 2:
                         //acc.DonatorPoints += 350;
@@ -6018,6 +6020,8 @@ namespace RNC
                         EPlayer.UpdateMaxMenuItems(player);
 
                         EPlayer.UpdatePlayerBadges(player);
+
+                        Logs.LogTransaction(acc.SQL_ID, "Diamond Points", -packagePrice, "Purchased SILVER DONATOR BUNDLE (bonus: +3 namechanges)");
                         break;
                     case 3:
                         //acc.DonatorPoints += 500;
@@ -6033,6 +6037,8 @@ namespace RNC
                         EPlayer.UpdateMaxMenuItems(player);
 
                         EPlayer.UpdatePlayerBadges(player);
+
+                        Logs.LogTransaction(acc.SQL_ID, "Diamond Points", -packagePrice, "Purchased GOLD DONATOR BUNDLE (bonus: +5 namechanges)");
                         break;
                 }
                 EPlayer.Save(player, false);
@@ -6075,6 +6081,8 @@ namespace RNC
                 return;
             }
 
+
+            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", packagePrice, $"Purchased {namechangeNumber} NAMECHANGE{(namechangeNumber > 1 ? "S" : "")}");
             EPlayer.GetAccount(player).Namechanges += namechangeNumber;
             EPlayer.GetAccount(player).DonatorPoints -= packagePrice;
             EPlayer.Save(player, false);
@@ -6151,6 +6159,8 @@ namespace RNC
                                         EPlayer.UpdateMaxMenuItems(player);
 
                                         EPlayer.UpdatePlayerBadges(player);
+
+                                        Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed BRONZE DONATOR BUNDLE with code {code} (BONUS: +1 namechange)");
                                         break;
                                     case 1:
                                         //acc.DonatorPoints += 350;
@@ -6166,6 +6176,8 @@ namespace RNC
                                         EPlayer.UpdateMaxMenuItems(player);
 
                                         EPlayer.UpdatePlayerBadges(player);
+
+                                        Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed SILVER DONATOR BUNDLE with code {code} (BONUS: +3 namechanges)");
                                         break;
                                     case 2:
                                         //acc.DonatorPoints += 500;
@@ -6181,6 +6193,8 @@ namespace RNC
                                         EPlayer.UpdateMaxMenuItems(player);
 
                                         EPlayer.UpdatePlayerBadges(player);
+
+                                        Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed GOLD DONATOR BUNDLE with code {code} (BONUS: +5 namechanges)");
                                         break;
                                 }
                                 break;
@@ -6199,6 +6213,8 @@ namespace RNC
                                         EPlayer.UpdateMaxMenuItems(player);
 
                                         EPlayer.UpdatePlayerBadges(player);
+
+                                        Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed BRONZE DONATOR (Rank-Only) with code {code}");
                                         break;
                                     case 1:
                                         acc.DonatorLevel = 2;
@@ -6212,6 +6228,8 @@ namespace RNC
                                         EPlayer.UpdateMaxMenuItems(player);
 
                                         EPlayer.UpdatePlayerBadges(player);
+
+                                        Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed SILVER DONATOR (Rank-Only) with code {code}");
                                         break;
                                     case 2:
                                         acc.DonatorLevel = 3;
@@ -6225,6 +6243,8 @@ namespace RNC
                                         EPlayer.UpdateMaxMenuItems(player);
 
                                         EPlayer.UpdatePlayerBadges(player);
+
+                                        Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed GOLD DONATOR (Rank-Only) with code {code}");
                                         break;
                                 }
                                 break;
@@ -6233,6 +6253,9 @@ namespace RNC
                                     acc.DonatorPoints += redeem.Value;
                                     player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value}DP"));
                                     player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+
+                                    Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", redeem.Value, $"Redeemed a code ({code})");
+                                    Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed {redeem.Value} DIAMOND POINTS with code {code}");
                                 }
                                 break;
                             case 3:
@@ -6240,6 +6263,8 @@ namespace RNC
                                     acc.Namechanges += redeem.Value;
                                     player.SendChatMessage(Translate(player, "REDEEM_SUCCESS", $"~y~{redeem.Value} Namechange{(redeem.Value > 1 ? "s" : "")}"));
                                     player.TriggerEvent("menu_store_redeem_result", true, "Successfully redeemed item!");
+
+                                    Logs.LogRedeem(EPlayer.GetAccount(player).SQL_ID, $"Redeemed {redeem.Value} NAMECHANGES with code {code}");
                                 }
                                 break;
                         }
@@ -6328,7 +6353,11 @@ namespace RNC
                         }
 
                         EPlayer.GivePoints(player, -car.PointsRequired, $"Purchased a vehicle: {car.Name}");
-                        acc.DonatorPoints -= car.DonatorPointsRequired;
+                        acc.DonatorPoints -= car.DonatorPointsRequired; 
+
+                        if(car.DonatorPointsRequired > 0)
+                            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -car.DonatorPointsRequired, $"Purchased a car ({car.Name})");
+
                         EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
                         EPlayer.Notify(player, Translate(player, "CAR_PURCHASED", car.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
@@ -6505,6 +6534,10 @@ namespace RNC
 
                         EPlayer.GivePoints(player, -loadout.PointsRequired, $"Purchased a loadout: {loadout.Name}");
                         acc.DonatorPoints -= loadout.DonatorPointsRequired;
+
+                        if (loadout.DonatorPointsRequired > 0)
+                            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -loadout.DonatorPointsRequired, $"Purchased a car ({loadout.Name})");
+
                         EPlayer.UnlockLoadout(acc, player, loadout.Name, loadout.Team);
                         EPlayer.Notify(player, Translate(player, "LOADOUT_PURCHASED", loadout.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
@@ -8857,7 +8890,8 @@ namespace RNC
                                     });
                                     return;
                                 }
-                                acc.DonatorPoints -= (vMods.Keys.Count * 10);
+                                acc.DonatorPoints -= (vMods.Keys.Count * 10); 
+                                Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -(vMods.Keys.Count * 10), $"Purchased {vMods.Keys.Count} vehicle modifications.");
                             }
                             else
                             {
@@ -8917,6 +8951,7 @@ namespace RNC
                                     return;
                                 }
                                 acc.DonatorPoints -= (changes * 10);
+                                Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -(changes * 10), $"Changed {changes} vehicle modifications.");
                             }
                             else
                             {
