@@ -1,77 +1,36 @@
 const player = mp.players.local;
-var currentVehicleFuel = 0.0;
-var wasInVehicle = false;
-var vehicleRemoteID = -1;
-var fuelFrameCount = 0;
-var global = require('./globals');
-  const {TranslateMessage: Translate} = require('./Translator');
-mp.events.add('render', () => {
-    fuelFrameCount++;
-    if(!wasInVehicle) {
-        if(mp.players.local.getVariable("Team") == 0){
-           if(mp.players.local.vehicle && player.seat == -1){ // if the player was not in any vehicle, set his current vehicle fuel to a new value
-                wasInVehicle = true; // this is done so the fuel calculations are done clientside
-                const vehicle = mp.players.local.vehicle; // the only serverside call is to set the fuel
-                currentVehicleFuel = vehicle.getVariable("Fuel");  // fuel is set e.g. when it reaches 0, or the player exits vehicle
-                vehicleRemoteID = vehicle.remoteId;
-           }
+var lastFuelTickPosition = new mp.Vector3(0,0,0);
+var isPlayerDriving = false;
 
-        }
-    }
-    else{
-        if(fuelFrameCount >= 30){ // fuel handler is called every 30 frames
-            HandleFuel();
-            fuelFrameCount = 0;
-        }
-   }
-});
-
-function HandleFuel(){
-    if(!mp.players.exists(mp.players.local) || !mp.players.local.vehicle || player.seat != -1 || player.getVariable("Team") != 0){
-        wasInVehicle = false;
-        fuelFrameCount = 0;
-        mp.events.callRemote("UpdateVehicleFuel", currentVehicleFuel, vehicleRemoteID);
-        return;
-    }
-
-    var currentVehicleSpeed = (player.vehicle.getSpeed() * 3.6);
-
-    var minimum = 69420;
-    const vec1 = player.position;
-    mp.players.forEach(cop => {
-        if(cop.dimension == player.dimension && cop.getVariable("Team") == 1 && cop.getVariable("Wounded") == 0){ 
-            const vec2 = cop.position;
-            const dist = vec1.subtract(vec2).length();
-
-            if(dist < minimum) minimum = dist;
-        }
-    });
-
-
-    var distance = minimum;
-    var distanceEffect = 1; // PLACEHOLDER!!!
-    if(distance < 100) distanceEffect = 0.2;
-    else if(distance >= 100 && distance <= 200) distanceEffect = 1;
-    else distanceEffect = 2;
-
-	var fuelToSubstract = (Math.pow(currentVehicleSpeed, 2)/100000)*distanceEffect;
-    currentVehicleFuel -= fuelToSubstract;
-
-    if(global.ServerUI) global.ServerUI.call('hud_vehicle_fuel_set', currentVehicleFuel);
-
-    if(currentVehicleFuel <= 0.0){
-        currentVehicleFuel = 0.0;
-        wasInVehicle = false;
-        
-        mp.events.callRemote("UpdateVehicleFuel", 0, 65535); // 65535 = it takes the vehicle player is currently in
-        return;
-    }
-}
 
 mp.events.add("render", () => {
-    if(mp.players.local.isInAnyVehicle(false) && mp.players.local.vehicle != undefined && mp.players.local.vehicle.getVariable("Team") == 0){
-        if(mp.players.local.vehicle.getVariable("Engine") == false || currentVehicleFuel <= 0.0){
-            mp.players.local.vehicle.setEngineOn(false, true, true);
-        }
+    // Handle the 'isPlayerDriving' variable based on whether the player is in the vehicle AND their seat is the driver's seat
+    if(isPlayerDriving && (!mp.players.local.isInAnyVehicle() || mp.players.local.seat !== -1)){
+        isPlayerDriving = false;
+        return;
     }
+    if(!isPlayerDriving && mp.players.local.isInAnyVehicle() && mp.players.local.seat == -1){
+        isPlayerDriving = true;
+        return;
+    }
+});
+
+// Every two seconds, perform a check to see how far the vehicle went from last check
+mp.events.add("TwoSecondsEvent", () => {
+    if(!isPlayerDriving) return;
+
+    const vehicle = mp.players.local.vehicle;
+    if(!vehicle || !vehicle.hasVariable("Fuel")) return;
+
+    const vehiclePosition = vehicle.position;
+
+    const distance = mp.game.system.vdist2(vehiclePosition.x, vehiclePosition.y, vehiclePosition.z, lastFuelTickPosition.x, lastFuelTickPosition.y, lastFuelTickPosition.z);
+    if(distance < 10) return;
+
+    // If distance is more than 10 units, decrease the fuel
+    const fuel = vehicle.getVariable("Fuel");
+    const fuelToSet = (fuel ? (fuel-1) : 0);
+    mp.gui.chat.push(`!{#ff6347}[FUEL] !{#ffffff}Fuel depleted, currently at: !{#ffff00}${fuelToSet}%!{#ffffff}.`);
+    mp.events.callRemote("UpdateVehicleFuel", fuelToSet, vehicle.remoteId);
+    lastFuelTickPosition = vehiclePosition;
 });

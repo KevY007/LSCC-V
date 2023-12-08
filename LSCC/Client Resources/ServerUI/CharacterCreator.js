@@ -104,7 +104,6 @@ mp.events.add("clothing_editor_change_type", (value) => {
 mp.events.add("clothing_editor_close", (value) => {
     mp.gui.cursor.show(false, false);
 
-
     mp.events.callRemote("CharacterEditor:CloseEvent");
 });
 mp.events.add("clothing_editor_save", (value) => {

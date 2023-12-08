@@ -10038,6 +10038,15 @@ namespace RNC
             EPlayer.Save(target);
         }
 
+        [Command("testfuelcar")]
+        public void cmd_testfuelcar(Player player, float fuel) 
+        {
+            if (EPlayer.GetAccount(player).Admin < 6) return;
+
+            Vehicle vehicle = NAPI.Vehicle.CreateVehicle(VehicleHash.Buffalo2, player.Position.Around(5.0f), player.Heading, -1, -1, "8===D", 255, false, true, player.Dimension);
+            vehicle.SetSharedData("Fuel", fuel);
+        }
+
         [Command("laser")]
         public void cmd_laser(Player player)
         {
