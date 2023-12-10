@@ -5278,6 +5278,16 @@ namespace RNC
         {
             try
             {
+                long currentTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+                long lastLoginTimestamp = player.GetSharedDataSafe<long>("LastLoginAttemptStamp");
+                if(currentTimestamp - lastLoginTimestamp < 5)
+                {
+                    EPlayer.Error(player, "You must wait 5 seconds between each login attempt!");
+                    NAPI.Util.ConsoleOutput($"[LOGIN] {username} attempted login too fast, 5 seconds hasn't elapsed. ({(currentTimestamp - lastLoginTimestamp)})");
+                    return;
+                }
+                player.SetSharedData("LastLoginAttemptStamp", currentTimestamp);
+
                 if (EPlayer.LoggedIn(player)) return;
                 if (player.HasData("Kicked")) return;
 
@@ -7364,6 +7374,16 @@ namespace RNC
         [RemoteEvent("OnPlayerRegisterAttempt")]
         public static void OnPlayerRegisterAttempt(Player player, string email, string username, string password)
         {
+            long currentTimestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
+            long lastLoginTimestamp = player.GetSharedDataSafe<long>("LastLoginAttemptStamp");
+            if (currentTimestamp - lastLoginTimestamp < 5)
+            {
+                EPlayer.Error(player, "You must wait 5 seconds between each register attempt!");
+                NAPI.Util.ConsoleOutput($"[REGISTRATION] {username} attempted register too fast, 5 seconds hasn't elapsed. ({(currentTimestamp - lastLoginTimestamp)})");
+                return;
+            }
+            player.SetSharedData("LastLoginAttemptStamp", currentTimestamp);
+
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
 
