@@ -86,10 +86,6 @@ function applyAppearanceData(entity, data){
 }
 
 function applyHairOverlays(entity, AppearanceData){
-    if(!AppearanceData.HairOverlays){
-        mp.events.callRemote('ServerConsoleOutput', JSON.stringify(AppearanceData));
-        return;
-    }
 
     const hairDecalIndex = (AppearanceData.IsMale ? 0 : 1);
     const HeadOverlayData = global.hairDecalsList[hairDecalIndex];
