@@ -278,6 +278,11 @@ namespace RNC
                 .AddOption("username", ApplicationCommandOptionType.String, "Target player username", isRequired: true)
                 .Build(), UnlinkCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("reloadsettings")
+                .WithDescription("Load dynamic settings from the server config file; only to be used by developers.")
+                .Build(), ReloadSettingsCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
@@ -298,6 +303,33 @@ namespace RNC
             }
 
             await command.RespondAsync(null, new Embed[] { embed.Build() }, false, false);
+        }
+        private static async Task ReloadSettingsCommandHandler(SocketSlashCommand command)
+        {
+            int aLevel = GetIngameAdminLevel(command.User);
+            int aSQL = await GetIngameSQLID(command.User);
+            if (aSQL == -1)
+            {
+                await command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                return;
+            }
+            if (aLevel < 6)
+            {
+                await command.RespondAsync("**[!]** You must be a Manager to use this!");
+                return;
+            }
+
+            try
+            {
+                Main.LoadDynamicSettings();
+                await command.RespondAsync(":gear: **Dynamic settings have been loaded from the config file!**");
+            }
+            catch (Exception ex)
+            {
+                await command.RespondAsync($":bangbang: **There was an issue loading the dynamic settings! Exception details:**\n" +
+                    $"```{ex.ToString()}```", null, false, true);
+            }
+         
         }
         private static async Task UnlinkCommandHandler(SocketSlashCommand command)
         {

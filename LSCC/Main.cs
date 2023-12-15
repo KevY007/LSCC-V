@@ -655,6 +655,18 @@ namespace RNC
         [JsonProperty("NextMonthUnix")]
         public long NextMonthUnix { get; set; }
 
+        [JsonProperty("SMTP_Host")]
+        public string SMTP_HOST = "mail.smtp2go.com";
+        [JsonProperty("SMTP_Port")]
+        public int SMTP_PORT = 8025;
+        [JsonProperty("SMTP_User")]
+        public string SMTP_USER = "uB4QVa3fk5DeHNC";
+        [JsonProperty("SMTP_Pass")]
+        public string SMTP_PASS = "KavTUNuDbxgF4wmHRmpGVn8MNmftpuE4";
+        [JsonProperty("SMTP_EmailFrom")]
+        public string SMTP_EMAIL_FROM = "no-reply@racenchase.com";
+
+
         public DynSet()
         {
             this.WeaponDataURL = "https://gist.githubusercontent.com/root-cause/3f29d38179b12245a003fb4fff615335/raw/5713349a648f7fde716fea1b089635ab39a56019/v2944%2520Weapon%2520Data.json";

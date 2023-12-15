@@ -9,22 +9,16 @@ namespace RNC
 {
     public class EmailController
     {
-        public static readonly string SMTP_HOST = "mail.smtp2go.com";
-        public static readonly int SMTP_PORT = 8025;
-        public static readonly string SMTP_USER = "uB4QVa3fk5DeHNC";
-        public static readonly string SMTP_PASS = "KavTUNuDbxgF4wmHRmpGVn8MNmftpuE4";
-
-        public static readonly string EMAIL_FROM = "no-reply@racenchase.com";
 
         public static void SendEmail(string recipient, string subject, string body, bool isHTML = false)
         {
-            MailMessage message = new MailMessage(EMAIL_FROM, recipient);
+            MailMessage message = new MailMessage(Settings.Dynamics.SMTP_EMAIL_FROM, recipient);
             message.Subject = subject;
             message.Body = body;
             message.IsBodyHtml = isHTML;
 
-            SmtpClient smtpClient = new SmtpClient(SMTP_HOST, SMTP_PORT);
-            smtpClient.Credentials = new NetworkCredential(SMTP_USER, SMTP_PASS);
+            SmtpClient smtpClient = new SmtpClient(Settings.Dynamics.SMTP_HOST, Settings.Dynamics.SMTP_PORT);
+            smtpClient.Credentials = new NetworkCredential(Settings.Dynamics.SMTP_USER, Settings.Dynamics.SMTP_PASS);
             smtpClient.EnableSsl = true;
             try
             {
