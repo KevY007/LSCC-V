@@ -4303,6 +4303,8 @@ mp.events.add(
 
     "playerReady": (player) => {
         setTimeout(() => {
+            mp.gui.chat.show(false);
+            mp.gui.chat.activate(false);
             /*
             loginBrowser = mp.browsers.new("package://LoginRegister/index.html"); // Right on connect so it doesn't overlay the notifications.
             loginBrowser.active = false;
