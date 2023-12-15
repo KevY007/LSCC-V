@@ -6332,8 +6332,9 @@ namespace RNC
                         return;
                     }
 
-                    string password = AccountManager.Crypt(newpass);
-                    tpAcc.Salt = "UNUSED";
+                    string salt = AccountManager.GenSalt();
+                    string password = AccountManager.Crypt(newpass, salt);
+                    tpAcc.Salt = salt;
                     tpAcc.Password = password;
                     tpAcc.ForcePasswordChange = true;
                     await context.SaveChangesAsync();
@@ -6383,8 +6384,9 @@ namespace RNC
             player.SendChatMessage(Translate(player, "PASSWORD_CHANGED", newpass));
             //EPlayer.Notify(player, $"Your password has been changed to <p><strong>{newpass}</strong></p>", "green", "fas fa-check", false, 3000, "center", "replace");
 
-            string password = AccountManager.Crypt(newpass);
-            EPlayer.GetAccount(player).Salt = "UNUSED";
+            string salt = AccountManager.GenSalt();
+            string password = AccountManager.Crypt(newpass, salt);
+            EPlayer.GetAccount(player).Salt = salt;
             EPlayer.GetAccount(player).Password = password;
             ContextFactory.SaveDB();
             player.SetData("LastCryptAttempt", Environment.TickCount64);

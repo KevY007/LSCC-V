@@ -161,9 +161,9 @@ namespace RNC
         {
             return BCrypt.Net.BCrypt.GenerateSalt();
         }
-        public static string Crypt(string pass)
+        public static string Crypt(string pass, string salt)
         {
-            return BCrypt.Net.BCrypt.HashPassword(pass);
+            return BCrypt.Net.BCrypt.HashPassword(pass, salt);
         }
 
         public async static Task<bool> RecoverAccount(Account acc)
@@ -299,7 +299,8 @@ namespace RNC
         public static Account CreateNewAccount(Player player, string password, string email, string username)
         {
             player.SetData("LastCryptAttempt", Environment.TickCount64);
-            string newPass = AccountManager.Crypt(password);
+            string salt = AccountManager.GenSalt();
+            string newPass = AccountManager.Crypt(password, salt);
 
             Dictionary<long, wComponentData> wepItems = new Dictionary<long, wComponentData>();
 
@@ -320,7 +321,7 @@ namespace RNC
                 OldPassword = "",
                 OldSalt = "",
                 ForcePasswordChange = false,
-                Salt = "UNUSED",
+                Salt = salt,
                 Username = username,
                 DiscordCode = _discordData.DiscordCode,
                 DiscordID = null,
@@ -474,7 +475,7 @@ namespace RNC
                 if (_target.Suspended == 1 && _target.Admin < 4) return false;
 
                 string crypted = password;
-                if (!_crypted) crypted = Crypt(password);
+                if (!_crypted) crypted = Crypt(password, _target.Salt);
                 if (MatchPass(crypted, _target.Password))
                 {
                     return true;

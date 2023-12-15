@@ -590,8 +590,9 @@ namespace RNC
                     await command.RespondAsync("**[!]** Target's admin level is higher than yours!");
                     return;
                 }
-                string password = AccountManager.Crypt(newpass);
-                tpAcc.Salt = "UNUSED";
+                string salt = AccountManager.GenSalt();
+                string password = AccountManager.Crypt(newpass, salt);
+                tpAcc.Salt = salt;
                 tpAcc.Password = password;
                 tpAcc.ForcePasswordChange = true;
                 await dbcontext.SaveChangesAsync();
