@@ -7492,7 +7492,7 @@ namespace RNC
                         EmailController.SendEmail(email, "Race 'N' Chase - Password Change Request", 
                             RNC.EmailTemplates.PasswordReset.HTML
                             .Replace("{{name}}", check.Username)
-                            .Replace("{{link}}", $" https://racenchase.com/reset-password/{requestTokenString}"), 
+                            .Replace("{{link}}", $" https://racenchase.com/password/{requestTokenString}"), 
                             true);
 
                     }
