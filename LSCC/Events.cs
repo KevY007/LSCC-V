@@ -3802,8 +3802,7 @@ namespace RNC
                 return;
             }
             Account acc = player.GetData<Account>("ForceChangePassword_Account");
-            string salt = AccountManager.GenSalt();
-            string password = AccountManager.Crypt(newPassword, salt);
+            string password = AccountManager.Crypt(newPassword);
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -3812,7 +3811,7 @@ namespace RNC
                     if (_target != null)
                     {
                         _target.Password = password;
-                        _target.Salt = salt;
+                        _target.Salt = "UNUSED";
                         _target.ForcePasswordChange = false;
                     }
 
@@ -4533,9 +4532,8 @@ namespace RNC
                         Account account = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == request.AccountID);
                         if(account != null)
                         {
-                            string salt = AccountManager.GenSalt();
-                            string password = AccountManager.Crypt(newPassword, salt);
-                            account.Salt = salt;
+                            string password = AccountManager.Crypt(newPassword);
+                            account.Salt = "UNUSED";
                             account.Password = password;
                             await context.SaveChangesAsync();
 
