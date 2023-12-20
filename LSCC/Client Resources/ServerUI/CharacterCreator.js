@@ -586,10 +586,16 @@ mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appeara
 
     setAppearanceEditorCategories();
     mp.gui.cursor.show(toggle, toggle);
+    updateCategoryOptionValues("none", []);
 });
 
 function updateCategoryOptionValues(category, options){
     if(!CURRENT_APPEARANCE_DATA) return;
+    if(category === "none"){
+        if(global.ServerUI) global.ServerUI.call('character_editor_set_options', []);
+        return;
+    }
+
     var OptionsOBJ = options;
     if(category === "c_heritage"){
         const HeadBlendData = CURRENT_APPEARANCE_DATA.HeadBlend;
@@ -635,6 +641,11 @@ function updateCategoryOptionValues(category, options){
         }
 
         if(global.ServerUI) global.ServerUI.call('character_editor_set_options', OptionsOBJ);
+        return;
+    }
+    if(category === "c_tattoos"){
+        const TattooList = CURRENT_APPEARANCE_DATA.Tattoos;
+        
         return;
     }
 
@@ -701,10 +712,10 @@ function setAppearanceEditorCategories(){
             id:"c_hair",
             name:"Hair"
         },  
-        {
+        /*{
             id:"c_tattoos",
             name:"Tattoos"
-        },
+        },*/
     ];
     if(global.ServerUI) global.ServerUI.call('character_editor_set_categories', options);
 }
@@ -723,6 +734,14 @@ function setAppearanceEditorOptions(category){
         
         var optionToSet = options.find(o => o.id === "hair_overlay");
         if(optionToSet !== undefined && optionToSet.values) optionToSet.values = overlaysToSet;
+    }
+    if(category === "c_tattoos"){
+        const tattooList = getTattoosForGender(APPEARANCE_IsMale);
+        const tattoosToSet = tattooList.map((t) => {
+            return {id:`tattooID_${t.Name}`, name:t.LocalizedName};
+        });
+        var optionToSet = options.find(o => o.id === "tattoos");
+        if(optionToSet !== undefined && optionToSet.values) optionToSet.values = tattoosToSet;
     }
 
     if(global.ServerUI) global.ServerUI.call('character_editor_set_options', options);
@@ -1506,9 +1525,32 @@ const OptionsPerCategory = [
                 ]
             }   
         ]
-    }
+    },
+    {
+        category:"c_tattoos",
+        options:[
+            {
+                type:"checkbox",
+                id:"tattoos",
+                name:"Tattoos",
+                value:[],
+                values:[
+                    // Filled out on runtime depending on gender
+                ]
+            }   
+        ]
+    },
 ];
 
+
+function getTattoosForGender(isMale){
+    if(!global.tattoosList) return;
+
+    var tattoos = [];
+    if(isMale) tattoos = global.tattoosList.map((t) => {if(t.HashNameMale) return t;});
+    else tattoos = global.tattoosList.map((t) => {if(t.HashNameFemale) return t;});
+    return tattoos;
+}
 function getHairOverlaysForGender(isMale){
     if(!global.hairDecalsList){
         return;
@@ -1615,6 +1657,7 @@ mp.events.add("character_editor_change_option", (id, value) => {
             mp.players.local.setFacialDecoration(collection, overlay);
         }
     }
+    // TATTOOS TBA.
 
     if(id == "shape_parent_1"){
         CURRENT_APPEARANCE_DATA.HeadBlend.FirstParentID = value;

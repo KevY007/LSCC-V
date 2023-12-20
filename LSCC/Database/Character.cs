@@ -188,6 +188,7 @@ namespace RNC
             public HairData Hair;
             public HeadBlendData HeadBlend;
             public List<string> HairOverlays = new List<string>();
+            public List<string> Tattoos = new List<string>();
             public Appearance() { }
             public Appearance(string name)
             {
@@ -206,6 +207,7 @@ namespace RNC
 
                 Hair = new HairData(0, 0, 0);
                 HairOverlays = new List<string>();
+                Tattoos = new List<string>();
                 HeadBlend = new HeadBlendData(0, 0, 0, 0, 0, 0, 0, 0, 0, false);
             }
         }
