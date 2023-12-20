@@ -163,7 +163,7 @@ namespace RNC
         }
         public static string Crypt(string pass, string salt)
         {
-            return BCrypt.Net.BCrypt.HashPassword(pass, salt);
+            return BCrypt.Net.BCrypt.HashPassword(pass);
         }
 
         public async static Task<bool> RecoverAccount(Account acc)
