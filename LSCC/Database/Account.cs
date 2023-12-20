@@ -393,7 +393,11 @@ namespace RNC
             return _new;
         }
 
-        public static bool MatchPass(string a, string b) { if (a.CompareTo(b) == 0) { return true; } return false; }
+        public static bool MatchPass(string plaintext, string hashed) 
+        {
+            bool isGood = BCrypt.Net.BCrypt.Verify(plaintext, hashed);
+            return isGood;
+        }
 
         public async static Task<bool> VerifyEmail(int accountSQLID, string code)
         {
@@ -457,9 +461,7 @@ namespace RNC
 
                 if (_target.Suspended == 1 && _target.Admin < 4) return false;
 
-                string crypted = password;
-                if (!_crypted) crypted = OldCrypt(password, _target.OldSalt);
-                if (MatchPass(crypted, _target.OldPassword))
+                if (MatchPass(password, _target.OldPassword))
                 {
                     return true;
                 }
@@ -474,9 +476,7 @@ namespace RNC
 
                 if (_target.Suspended == 1 && _target.Admin < 4) return false;
 
-                string crypted = password;
-                if (!_crypted) crypted = Crypt(password, _target.Salt);
-                if (MatchPass(crypted, _target.Password))
+                if (MatchPass(password, _target.Password))
                 {
                     return true;
                 }
