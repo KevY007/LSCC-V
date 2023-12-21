@@ -80,6 +80,7 @@ require("./Player/VehicleTuner.js");
 
 
 var ReactDOM = null;
+
 mp.events.add("testNativeEventSend", (text) => {
   mp.gui.chat.push(text);
 });
@@ -217,6 +218,16 @@ mp.events.add('showLoginBrowser', (state) => {
         }
 
     }, 500);
+});
+
+// Preventing mouse hiding in the login screen
+mp.events.add("OneSecondEvent", () => {
+  if(global.isLoginScreenActive === true) mp.gui.cursor.show(true, true);
+});
+// Preventing TAB turning on weapon wheel
+mp.events.add("render", () => {
+  if(global.isLoginScreenActive === true)
+    mp.game.controls.disableControlAction(32, 37, true);
 });
 
 mp.events.add("login_ShowInvalidInfo", (toggle) => {

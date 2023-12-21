@@ -236,12 +236,14 @@ mp.events.add("actionMenu:removeAllItems", () => {
 });
 
 mp.events.add('actionMenu:close', () => {
+    if(global.isLoginScreenActive === true) return;
     if(!global.ServerUI) return;
     global.ActionMenuActive = false;
     if(global.ServerUI) global.ServerUI.call("menu_actionwheel_toggle", false);
     mp.gui.cursor.show(false, false);
 });
 mp.events.add('actionMenu:open', () => {
+    if(global.isLoginScreenActive === true) return;
     if(global.isInPunishmentDialog) return;
     if(global.chatStatus == true || global.TeleportEditorOpen == true || global.isHeliCamActive() || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
         || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.StationPickerToggled == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
