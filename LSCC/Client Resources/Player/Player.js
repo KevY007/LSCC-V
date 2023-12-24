@@ -3389,7 +3389,6 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         
 
         if(DamageToDeal > 0){
-            mp.events.callRemote(`[K:${KEY}]Dealing ${DamageToDeal} to ${targetPlayer.name} from ${mp.players.local.name}`);
             if(Date.now() - lastRegisteredShotTime > 20 && damageInfo.categoryId !== 4){
                 mp.events.callRemoteUnreliable("PlayerShot_SyncHealth", targetPlayer, targetPlayer.getHealth(), DamageToDeal, targetPlayer.getArmour(), weapon.toString(), boneIndex);            
                 lastRegisteredShotTime = Date.now();
