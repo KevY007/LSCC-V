@@ -470,6 +470,7 @@ namespace RNC
         public static void SendPlayerToEditorScene(Player player, int team, bool isOutfitEditor)
         {
             player.Dimension = Convert.ToUInt32(player.Id);
+            player.SetSharedData("AutoJoin", false);
             if (!isOutfitEditor)
             {
                 player.Position = new Vector3(402.76282f, -996.4929f, -99.00027f);

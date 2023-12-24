@@ -4516,6 +4516,7 @@ namespace RNC
             foreach (Player player in CopchasePlayers)
             {
                 player.TriggerEvent("StartChaseTimer", -5, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
+                player.TriggerEvent("ReloadInteriors");
             }
 
             NAPI.Util.ConsoleOutput($"[Lobby ${lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");

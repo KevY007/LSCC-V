@@ -72,6 +72,9 @@ function clearTeleportIndicators(){
     }
     global.TeleportIndicators = [];
 }
+mp.events.add("ReloadInteriors", () => {
+    refreshTeleportIndicators();
+});
 function refreshTeleportIndicators(){
     clearTeleportIndicators();
     for(let i = 0 ; i < global.TeleportData.length ; i++){
@@ -117,14 +120,6 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
     if(mp.players.local.isInAnyVehicle(true)) return;
     if(mp.players.local.getVariable("Wounded") > 0) return;
     if(IsEnteringExiting === true) return;
-    if(mp.players.local.getVariable("Team") == 1 && COP_ABLE_TO_ENTER == false){
-        if(TimeUntilCopCanEnter == -1){
-            mp.gui.chat.push(Translate("COP_CANT_ENTER_INTERIORS"));
-            return;
-        }
-        mp.gui.chat.push(Translate("COP_CANT_ENTER_INTERIORS_TIMED", [TimeUntilCopCanEnter]));
-        return;
-    }
 
     const teleportsWithDistance = global.TeleportData.map((tp) => {
         const enterDistance = mp.game.system.vdist2(mp.players.local.position.x, mp.players.local.position.y, mp.players.local.position.z,
@@ -148,6 +143,14 @@ mp.events.add("CS_OnPlayerTeleportCheck", () => {
                     mp.game.streaming.requestIpl(iplList[i]);
                 }
             }
+        }
+        if(mp.players.local.getVariable("Team") == 1 && COP_ABLE_TO_ENTER == false){
+            if(TimeUntilCopCanEnter == -1){
+                mp.gui.chat.push(Translate("COP_CANT_ENTER_INTERIORS"));
+                return;
+            }
+            mp.gui.chat.push(Translate("COP_CANT_ENTER_INTERIORS_TIMED", [TimeUntilCopCanEnter]));
+            return;
         }
 
         IsEnteringExiting = true;
