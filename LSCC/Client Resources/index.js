@@ -483,6 +483,9 @@ mp.events.add("email_verification_step_two_result", (isSuccess, resultMessage) =
     if(global.ServerUI) global.ServerUI.call("email_verification_step_two_error_set", resultMessage);
     return;
   }
+  
+  
+  if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
 });
 
 mp.events.add("auth_register_reset_password_submit", (email) => {
