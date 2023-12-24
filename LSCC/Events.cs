@@ -3944,45 +3944,6 @@ namespace RNC
             }
         }
 
-        [RemoteEvent("Auth_ConfirmAccountBySerial")]
-        public static void Auth_ConfirmAccountBySerial(Player player)
-        {
-            if (EPlayer.LoggedIn(player)) return;
-            if (player.HasData("Kicked")) return;
-
-            string serial = player.Serial;
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    List<Account> accounts = await context.Accounts.AsQueryable().Where(a => a.LastHWID.Equals(serial)).ToListAsync();
-                    if (accounts.Count > 0)
-                    {
-                        accounts.OrderByDescending(a => a.Level);
-                        Account account = accounts[0];
-                        if(account.Password.Length < 1)
-                        {
-                            NAPI.Task.Run(() =>
-                            {
-                                OnPlayerLogin(player, account);
-                                player.TriggerEvent("finishAccountHwidCheck", 1);
-                            });
-                        }
-                   
-                    }
-                    else
-                    {
-                        NAPI.Task.Run(() =>
-                        {
-                            player.TriggerEvent("finishAccountHwidCheck", 0);
-                        });
-                        return;
-                    }
-                }
-            });
-
-        }
-
         public static void OnPlayerLogin(Player player, Account acc)
         {
             if (EPlayer.LoggedIn(player)) return;
@@ -4624,6 +4585,16 @@ namespace RNC
             Commands.cmd_spec(player, target);
         }
 
+        [RemoteEvent("RequestCharImportData")]
+        public static void OnRequestCharImportData(Player player)
+        {
+            NAPI.Util.ConsoleOutput("Requested char import data");
+            Character character = Character.GetCharacter(player);
+            Character.Appearance appearance = character.CurrentAppearance;
+
+            player.TriggerEvent("character_import_set_data", NAPI.Util.ToJson(appearance));
+        }
+
         [RemoteEvent("StopAnimPositioner")]
         public static void OnStopAnimPositioner(Player player)
         {
@@ -5094,6 +5065,7 @@ namespace RNC
             if (!player.HasData("ACCOUNT:Verification"))
             {
                 EPlayer.Error(player, "Fatal error - no account verification handle found. Reconnect or contact the devs.");
+                NAPI.Util.ConsoleOutput($"{player.Name} had no account verification handle when sending verification email ({email})!");
                 return;
             }
             Account acc = player.GetData<Account>("ACCOUNT:Verification");
@@ -5169,6 +5141,7 @@ namespace RNC
                                 if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
+                                    NAPI.Util.ConsoleOutput($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
                                     if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
                                         if (acc.EmailVerified == false)
@@ -5177,8 +5150,10 @@ namespace RNC
                                             player.TriggerEvent("email_verification_open_dialog", acc.Email);
                                             return;
                                         }
-
-                                        OnPlayerLogin(player, acc);
+                                        else
+                                        {
+                                            OnPlayerLogin(player, acc);
+                                        }
                                         return;
                                     }
                                     else
@@ -5211,6 +5186,7 @@ namespace RNC
                                 if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
+                                    NAPI.Util.ConsoleOutput($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
                                     if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
                                         if (acc.EmailVerified == false)
@@ -5219,8 +5195,10 @@ namespace RNC
                                             player.TriggerEvent("email_verification_open_dialog", acc.Email);
                                             return;
                                         }
-
-                                        OnPlayerLogin(player, acc);
+                                        else
+                                        { 
+                                            OnPlayerLogin(player, acc);
+                                        }
                                         return;
                                     }
                                     else

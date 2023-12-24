@@ -4319,13 +4319,13 @@ namespace RNC
                     player.Health = 0;
                     return;
                 }
-            }
-            EventManager.EventData eventCheck = EventManager.GetEvent((LobbyData.EventLobbyID)elobby.lobbyId);
-            if(eventCheck != null)
-            {
-                EventManager.EventData.EventPlayerData ePlayer = eventCheck.EventPlayers.FirstOrDefault(f => f.Player.Id == player.Id);
-                if (ePlayer != null) eventCheck.EventPlayers.Remove(ePlayer); 
-                player.SetSharedData("InLobby", -1);
+                EventManager.EventData eventCheck = EventManager.GetEvent((LobbyData.EventLobbyID)elobby.lobbyId);
+                if (eventCheck != null)
+                {
+                    EventManager.EventData.EventPlayerData ePlayer = eventCheck.EventPlayers.FirstOrDefault(f => f.Player.Id == player.Id);
+                    if (ePlayer != null) eventCheck.EventPlayers.Remove(ePlayer);
+                    player.SetSharedData("InLobby", -1);
+                }
             }
 
             if (player.GetSharedDataSafe<int>("InDM") != -1)

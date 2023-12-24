@@ -165,7 +165,7 @@ mp.events.add('finishAccountHwidCheck', (status) => {
 });
 
 mp.events.add("RememberMe_Toggle", (value) => {
-  mp.storage.data.menu.rememberMe = value;
+  mp.storage.data.menu.rememberMe17 = value;
   mp.storage.flush();
 });
 
@@ -186,7 +186,7 @@ mp.events.add('showLoginBrowser', (state) => {
                 global.ServerUI.call('auth_quick_login_toggle', false);
                 toggleLoginScene(true);
 
-                if(mp.storage.data.menu.rememberMe !== undefined && mp.storage.data.menu.rememberMe === true){
+                if(mp.storage.data.menu.rememberMe17 !== undefined && mp.storage.data.menu.rememberMe17 === true){
                   mp.events.callRemote("requestQuickLoginForgotUsernameData"); // If 'Remember Me' is checked, auto-login the user.
                 }
 
@@ -268,7 +268,7 @@ mp.events.add("PasswordResetResult", (result) => {
 mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerConsoleOutput", msg));
 
 mp.events.add("auth_reset_rememberMe", () => {
-  mp.storage.data.menu.rememberMe = false;
+  mp.storage.data.menu.rememberMe17 = false;
   mp.storage.flush();
 });
 
@@ -314,7 +314,7 @@ mp.events.add("auth_reset_password", (code, newPassword) => {
 mp.events.add('auth_login', (username, password, rememberMe) => {
     mp.events.callRemote('OnPlayerLoginAttempt', username, password);
 
-    mp.storage.data.menu.rememberMe = rememberMe;
+    mp.storage.data.menu.rememberMe17 = rememberMe;
     mp.storage.flush();
 });
 
@@ -334,10 +334,10 @@ mp.events.add('requestAutoLoginData', () => {
 
 var quickLoginUsername = "";
 mp.events.add('sendAutoLoginDataToBrowser', (data) => {
-    if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
+    if(mp.storage.data.menu.rememberMe17 == undefined || mp.storage.data.menu.rememberMe17 === false) return;
 
     setTimeout(() => {
-        if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
+        if(mp.storage.data.menu.rememberMe17 == undefined || mp.storage.data.menu.rememberMe17 === false) return;
 
         if(data.length > 2){
             //if(global.ServerUI) global.ServerUI.call(`auth_quick_login_set`, data);
@@ -348,7 +348,7 @@ mp.events.add('sendAutoLoginDataToBrowser', (data) => {
 });
 
 mp.events.add('auth_quick_login', () => {
-    if(mp.storage.data.menu.rememberMe == undefined || mp.storage.data.menu.rememberMe === false) return;
+    if(mp.storage.data.menu.rememberMe17 == undefined || mp.storage.data.menu.rememberMe17 === false) return;
     
     mp.events.callRemote("OnAutoLoginAttempt", quickLoginUsername);
 });
@@ -459,7 +459,7 @@ mp.events.add("email_verification_open_dialog", (initialEmail) => {
 });
 mp.events.add("email_verification_step_one_submit", (email) => {
   if(global.ServerUI) global.ServerUI.call("email_verification_step_one_loading_toggle", true);
-
+  mp.events.callRemote(`ServerConsoleOutput`, `Sending verification from login to ${email}`);
   mp.events.callRemote("EmailVerification_SendToEmail", email);
 });
 mp.events.add("email_verification_step_one_result", (isSuccess, resultMessage) => {

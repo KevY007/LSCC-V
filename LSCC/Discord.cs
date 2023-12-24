@@ -23,10 +23,10 @@ namespace RNC
         private static DiscordSocketClient client;
 
         public enum Channel : long{
-            Global = 717768143140814928,
-            Local = 717768143140814928,
+            Global = 1180465236482985994,
+            Local = 1180465236482985994,
             Restricted = 856968180462518332,
-            General = 717768143140814928
+            General = 1180465236482985994
         }
 
         private static ulong guildId = 713731146072064040;

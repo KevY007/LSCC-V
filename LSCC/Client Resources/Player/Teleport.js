@@ -77,7 +77,7 @@ function refreshTeleportIndicators(){
     for(let i = 0 ; i < global.TeleportData.length ; i++){
         const tp = global.TeleportData[i];
 
-        const label = mp.labels.new(`~w~${tp.Name}\n~y~Press ~g~(Y) ~y~to enter.`, new mp.Vector3(tp.FromX, tp.FromY, tp.FromZ), {
+        const label = mp.labels.new(`~w~${tp.Name}\n~y~Press ~g~(X) ~y~to enter.`, new mp.Vector3(tp.FromX, tp.FromY, tp.FromZ), {
             font:4,
             los:true,
             drawDistance:6,

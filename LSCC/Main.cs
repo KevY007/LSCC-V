@@ -845,16 +845,16 @@ namespace RNC
         public static int MaxTeleports = 400; // Used for dimension calculations
 
         // Connection Settings
-        //public const string MySQL_Host = "de.nu.n1.gm.miami";
-        //public const string MySQL_User = "u2_GrxxbSepvA";
-        //public const string MySQL_Password = "b@ic!1bWG=ALDct.nTE4MdRy";
-        //public const string MySQL_Database = "s2_production";
-        //public const string MySQL_Port = "57540";
         public const string MySQL_Host = "de.nu.n1.gm.miami";
-        public const string MySQL_User = "u7_TUJvktwTiO";
-        public const string MySQL_Password = "du0+e@ek^Yy4MlC^uIJydvwo";
-        public const string MySQL_Database = "s7_development";
+        public const string MySQL_User = "u2_GrxxbSepvA";
+        public const string MySQL_Password = "b@ic!1bWG=ALDct.nTE4MdRy";
+        public const string MySQL_Database = "s2_production";
         public const string MySQL_Port = "57540";
+        //public const string MySQL_Host = "de.nu.n1.gm.miami";
+        //public const string MySQL_User = "u7_TUJvktwTiO";
+        //public const string MySQL_Password = "du0+e@ek^Yy4MlC^uIJydvwo";
+        //public const string MySQL_Database = "s7_development";
+        //public const string MySQL_Port = "57540";
 
         public const string Test_MySQL_Host = "de.nu.n1.gm.miami";
         public const string Test_MySQL_User = "u7_TUJvktwTiO";
@@ -2841,6 +2841,8 @@ namespace RNC
             }
             else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
+            NAPI.Util.ConsoleOutput($"(RnC | EMAIL) E-mail server data: [HOST:] {Settings.Dynamics.SMTP_HOST} | [FROM:] {Settings.Dynamics.SMTP_EMAIL_FROM}");
+
             //Start websocket server
             //Websocket.Start();
 
@@ -4620,7 +4622,6 @@ namespace RNC
         // Handles when and when not to show fugitive blips on the map - run every second
         private static void HandleFugitiveShowCounters(LobbyData lobby)
         {
-            NAPI.Util.ConsoleOutput($"Fugitive Show Counter: {lobby.FugitiveShowCounter} | Last seen: {lobby.LastSeenCounter}");
 
             lobby.FugitiveShowCounter++;
             lobby.LastSeenCounter++;
@@ -4865,7 +4866,6 @@ namespace RNC
 
         private static void CopchaseSecondTick(LobbyData lobby, int secondsElapsed)
         {
-            NAPI.Util.ConsoleOutput($"Copchase second tick: {lobby.lobbyId} [secs: {secondsElapsed}] | {lobby.Cops.Count} fugs: {lobby.Fugitives.Count}");
             HandleFugitiveShowCounters(lobby);
             HandleCollisionCounters(lobby);
 
