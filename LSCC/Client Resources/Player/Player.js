@@ -3367,7 +3367,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
             }
         }
 
-        /*
+        
         if(boneIndex === 20 && distance > 10.0){ // no instant headshots if more than 10m away from target
             DamageToDeal = 50;
 
@@ -3386,7 +3386,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
             DamageToDeal *= 0.5; // lower damage by 50% if anti-peek is active
 
         }
-        */
+        
 
         if(DamageToDeal > 0){
             mp.events.callRemote(`[K:${KEY}]Dealing ${DamageToDeal} to ${targetPlayer.name} from ${mp.players.local.name}`);
