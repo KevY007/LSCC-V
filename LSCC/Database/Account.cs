@@ -404,14 +404,16 @@ namespace RNC
             NAPI.Util.ConsoleOutput($"[VERIFY] Verifying email for account {accountSQLID} code is {code}");
             using(MainDatabase context = ContextFactory.CreateContext())
             {
-                EmailVerificationRequest _e = await context.EmailVerificationRequests.AsQueryable().FirstOrDefaultAsync(e => e.AccountID == accountSQLID);
+                EmailVerificationRequest _e = await context.EmailVerificationRequests.AsQueryable().FirstOrDefaultAsync(e => e.AccountID == accountSQLID && e.Code == code);
                 if (_e == null) return false;
 
                 if(_e.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
                 {
+                    List<EmailVerificationRequest> allRequests = await context.EmailVerificationRequests.AsQueryable().Where(e => e.AccountID == accountSQLID).ToListAsync();
+
                     // If code is correct, remove the verification request entity from DB
                     // And change their EmailVerified variable to true
-                    context.EmailVerificationRequests.Remove(_e);
+                    context.EmailVerificationRequests.RemoveRange(allRequests);
                     Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == accountSQLID);
                     _a.EmailVerified = true;
                     NAPI.Util.ConsoleOutput($"[VERIFY] {_a.Username} set verified to TRUE!");
@@ -454,18 +456,19 @@ namespace RNC
         {
             if (_useOldPassword)
             {
-                foreach (Player player in Settings.LoggedInPlayers)
-                {
-                    if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
-                }
-
-                if (_target.Suspended == 1 && _target.Admin < 4) return false;
-
-                if (MatchPass(password, _target.OldPassword))
-                {
-                    return true;
-                }
                 return false;
+                //foreach (Player player in Settings.LoggedInPlayers)
+                //{
+                //    if (EPlayer.GetAccount(player) != null && EPlayer.GetAccount(player).SQL_ID == _target.SQL_ID) return false; // Return FALSE if another PLAYER is online from SAME ACC.
+                //}
+                //
+                //if (_target.Suspended == 1 && _target.Admin < 4) return false;
+                //
+                //if (MatchPass(password, _target.OldPassword))
+                //{
+                //    return true;
+                //}
+                //return false;
             }
             else
             {

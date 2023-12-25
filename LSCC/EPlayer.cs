@@ -2306,6 +2306,7 @@ namespace RNC
                     return;
                 }
 
+                player.TriggerEvent("Bleeding:SetActive", false);
                 player.TriggerEvent("EVENT:ClearObjectiveBlips");
                 player.TriggerEvent("EVENTS:SetBankRobberyObjective", false, "");
                 player.TriggerEvent("EVENTS:SetBankRobberyActive", false);

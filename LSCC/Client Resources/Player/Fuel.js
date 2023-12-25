@@ -20,7 +20,7 @@ mp.events.add("TwoSecondsEvent", () => {
     if(!isPlayerDriving) return;
 
     const vehicle = mp.players.local.vehicle;
-    if(!vehicle || !vehicle.hasVariable("Fuel")) return;
+    if(!vehicle || !vehicle.hasVariable("Fuel") || vehicle.getVariable("Team") == 1) return;
 
     const vehiclePosition = vehicle.position;
 
