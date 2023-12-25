@@ -454,7 +454,8 @@ mp.events.add("auth_register_step_two_result", (isSuccess, resultMessage) => {
 
 
 mp.events.add("email_verification_open_dialog", (initialEmail) => {
-  if(global.ServerUI) global.ServerUI.call("dialog_email_verification_open", initialEmail);
+  //if(global.ServerUI) global.ServerUI.call("dialog_email_verification_open", initialEmail);
+  if(global.ServerUI) global.ServerUI.call("dialog_email_verification_open", "");
   if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
 });
 mp.events.add("email_verification_step_one_submit", (email) => {
