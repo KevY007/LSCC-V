@@ -6832,7 +6832,7 @@ namespace RNC
                 {
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Outfit not found!");
+                        EPlayer.Error(player, $"<strong>FATAL ERROR:</strong> Outfit not found! (Send this to devs: <strong>ID: {outfitID} | Team: {team} | Acc ID: {acc.SQL_ID}</strong>)");
                     });
                 }
             });
