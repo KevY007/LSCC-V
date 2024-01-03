@@ -3462,7 +3462,7 @@ namespace RNC
                         }
                     }
 
-                    player.RemoveAllWeapons();
+                    player.RemoveAllWeaponsAC();
 
                     NAPI.Task.Run(() =>
                     {
@@ -9146,7 +9146,7 @@ namespace RNC
 
                     player.TriggerEvent("SetTimeWeather", player.GetData<int>("FreeroamTime"), 0, 0, player.GetData<int>("FreeroamWeather"));
 
-                    player.RemoveAllWeapons();
+                    player.RemoveAllWeaponsAC();
 
                     player.Dimension = (uint)256 + player.GetData<uint>("FreeroamWorld");
                 }
@@ -9181,7 +9181,7 @@ namespace RNC
 
                     player.SetSharedData("VisibleBlip", true);
 
-                    player.RemoveAllWeapons();
+                    player.RemoveAllWeaponsAC();
 
                     player.TriggerEvent("SetDerbyCounting", false, Settings.DerbyTimeLeft);
 
@@ -9244,7 +9244,7 @@ namespace RNC
 
                     EPlayer.SetDiscordStatus(player, $"[Lobby {player.GetSharedDataSafe<int>("InLobby")}] Waiting as {player.Name}");
 
-                    player.RemoveAllWeapons();
+                    player.RemoveAllWeaponsAC();
 
                     player.Dimension = 100 + Convert.ToUInt32(player.GetSharedDataSafe<int>("InLobby"));
 
@@ -9397,7 +9397,7 @@ namespace RNC
                 }
                 else if (player.GetSharedDataSafe<int>("InLobby") == -6)
                 {
-                    player.RemoveAllWeapons();
+                    player.RemoveAllWeaponsAC();
 
                     player.TriggerEvent("SetActorInvulnerable", false);
 

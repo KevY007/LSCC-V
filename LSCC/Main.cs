@@ -4948,7 +4948,6 @@ namespace RNC
                         player.TriggerEvent("ToggleCollisionsForEnt", playerVehicle, false);
 
                         player.RemoveAllWeaponsAC();
-
                         player.Health = 100;
                         player.Armor = 0;
 

@@ -1621,7 +1621,7 @@ namespace RNC
 
                 player.SetData("FreezeWeapons", wepData);
 
-                player.RemoveAllWeapons();
+                player.RemoveAllWeaponsAC();
             }
             else
             {
