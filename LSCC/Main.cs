@@ -5016,7 +5016,12 @@ namespace RNC
                         if (!player.IsInVehicle)
                         {
                             player.SendChatMessage("~r~[SERVER] ~w~You're not in a vehicle! This may be a bug, so one will be spawned for you.");
-                            CreateFugitiveVehicle(player, player.Position, player.Heading, lobby);
+                            Vehicle veh = CreateFugitiveVehicle(player, player.Position, player.Heading, lobby);
+                            NAPI.Task.Run(() =>
+                            {
+                                if(player != null && veh != null)
+                                    player.SetIntoVehicle(veh, 0);
+                            }, 1000);
                         }
                         continue;
                     }
@@ -5025,7 +5030,12 @@ namespace RNC
                         if (!player.IsInVehicle)
                         {
                             player.SendChatMessage("~r~[SERVER] ~w~You're not in a vehicle! This may be a bug, so one will be spawned for you.");
-                            CreateFugitiveVehicle(player, player.Position, player.Heading, lobby);
+                            Vehicle veh = CreateGameVehicle("police2", player.Position, player.Heading, lobby, true, true, "Average", 1, true, 10f, 0, 110);
+                            NAPI.Task.Run(() =>
+                            {
+                                if (player != null && veh != null)
+                                    player.SetIntoVehicle(veh, 0);
+                            }, 1000);
                         }
                         player.SendNotification("~b~You may begin the chase now.");
                         continue;
