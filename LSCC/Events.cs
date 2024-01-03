@@ -7356,6 +7356,36 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("DebugLog_CharAppearanceImport")]
+        public static void DebugLog_SendCharAppearanceImport(Player player, string char_data, string json_data)
+        {
+            if (player == null || player.GetSharedDataSafe<int>("Team") == -1) return;
+            LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
+            if (lobby == null) return;
+
+            var writer = new System.IO.StreamWriter($"racenchase/debug_logs/character_import.txt", true);
+
+            writer.WriteLine($"[ {DateTime.Now.ToString()} ]");
+            writer.WriteLine($"PLAYER: {player.Name} (ServerID: {player.Id}) (AccountID: {EPlayer.GetAccount(player).SQL_ID})");
+            writer.WriteLine($" ");
+            writer.WriteLine($" ");
+            writer.WriteLine($"IMPORT JSON DATA: {json_data}");
+            writer.WriteLine($" ");
+            writer.WriteLine($" ");
+            writer.WriteLine($"FULL CHARACTER DATA THAT SHOULD BE SAVED: {char_data}");
+            writer.WriteLine($" ");
+            writer.WriteLine($" ");
+            writer.WriteLine($"CURRENT CHARACTER DATA: {Character.GetCharacter(player).SavedAppearance.Data}");
+            writer.WriteLine($"[==========> END <==========]");
+            writer.WriteLine($" ");
+            writer.WriteLine($" ");
+            writer.Flush();
+            writer.Close();
+
+            EPlayer.Notify(player, "If your character import failed, open a bug report and ping codename.", "yellow", "", false, 10000);
+            return;
+        }
+
         [RemoteEvent("DebugLog_SendCameraStuckLog")]
         public static void DebugLog_SendCameraStuck(Player player, string camswitch_native_return)
         {

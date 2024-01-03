@@ -88,8 +88,14 @@ function setupOnImport(genderValue, data){
             }
         }
     }
-    mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CHARACTER_APPEARANCE_DATA));
-    mp.events.callLocal('character_import_close');
+    setTimeout(() => {
+        mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CHARACTER_APPEARANCE_DATA));
+        mp.events.callRemote("DebugLog_CharAppearanceImport", JSON.stringify(CHARACTER_APPEARANCE_DATA), data);
+        setTimeout(() => {
+            mp.events.callLocal('character_import_close');
+        }, 50);
+    }, 50);
+ 
 }
 
 mp.events.add('character_editor_import', (genderValue, data) => {
