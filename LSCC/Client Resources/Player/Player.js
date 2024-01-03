@@ -3380,10 +3380,15 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
                 DamageToDeal = 50;
                 if(damageInfo)
                     DamageToDeal = damageInfo.headDamage;
+
+                if(distance < 7.5){
+                    DamageToDeal = 1000;
+                }
+            }
+            else{
+                DamageToDeal *= 0.5; // lower damage by 50% if anti-peek is active
             }
 
-
-            DamageToDeal *= 0.5; // lower damage by 50% if anti-peek is active
 
         }
         
