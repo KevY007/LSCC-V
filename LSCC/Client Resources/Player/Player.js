@@ -3368,7 +3368,7 @@ mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapo
         }
 
         
-        if(boneIndex === 20 && distance > 10.0){ // no instant headshots if more than 10m away from target
+        if(boneIndex === 20 && distance > 50.0){ // no instant headshots if more than 50m away from target
             DamageToDeal = 50;
 
             if(damageInfo)
