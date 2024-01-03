@@ -2666,7 +2666,7 @@ namespace RNC
             // Discord-exclusive loadout
             new LoadoutData(0, "Negotiator")
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 50)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
+                //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
                 .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 50);
             // -------------------------
 
@@ -2705,13 +2705,13 @@ namespace RNC
             new LoadoutData(0, "Shot-Caller", 27, 40)
                 .Add(WeaponHash.Microsmg, "https://assets.gm.miami/gtav/weapons/Micro-smg-icon.png", "Micro SMG", 70)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 50)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
+                //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
                 .Add(WeaponHash.Snspistol, "https://assets.gm.miami/gtav/weapons/Sns-pistol-icon.png", "SNS Pistol", 60);
 
             new LoadoutData(0, "Kingpin", 35, 70)
                 .Add(WeaponHash.Heavyshotgun, "https://assets.gm.miami/gtav/weapons/Heavy-shotgun-icon.png", "Heavy Shotgun", 50)
                 .Add(WeaponHash.Carbinerifle, "https://assets.gm.miami/gtav/weapons/Carbine-rifle-icon.png", "Carbine Rifle", 80)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
+                //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 1)
                 .Add(WeaponHash.Heavypistol, "https://assets.gm.miami/gtav/weapons/Heavy-pistol-icon.png", "Heavy Pistol", 60);
 
             // 3347935668 - Heavy Rifle hash
@@ -2728,7 +2728,7 @@ namespace RNC
             new LoadoutData(0, "Godfather", 50, 70)
                 .Add(WeaponHash.Bullpupshotgun, "https://assets.gm.miami/gtav/weapons/Bullpup-shotgun-icon.png", "Bullpup Shotgun", 50)
                 .Add(WeaponHash.Specialcarbine, "https://assets.gm.miami/gtav/weapons/Special-carbine-icon.png", "Special Carbine", 80)
-                .Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3)
+                //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3)
                 .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
 
 
