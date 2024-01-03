@@ -1845,6 +1845,9 @@ namespace RNC
                 case "esperanto2d":
                     seats = 2;
                     break;
+                case "argento":
+                    seats = 4;
+                    break;
             }
             return seats;
         }
