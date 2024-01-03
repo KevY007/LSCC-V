@@ -4523,8 +4523,8 @@ namespace RNC
                 EPlayer.UpdateTeleports(player);
             }
 
-            NAPI.Util.ConsoleOutput($"[Lobby ${lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
-            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**[Lobby ${lobby.lobbyId}]** {ConvertGameMode(lobby.gameMode)} started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count} fugitives** on map *{(map == null ? "EVENT" : map.Name)}*!");
+            NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
+            DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**[Lobby {lobby.lobbyId}]** {ConvertGameMode(lobby.gameMode)} started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count} fugitives** on map *{(map == null ? "EVENT" : map.Name)}*!");
         }
 
         public static void StartGameNew(int lobbyID)
