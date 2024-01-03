@@ -90,9 +90,9 @@ function setupOnImport(genderValue, data){
     }
     setTimeout(() => {
         mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CHARACTER_APPEARANCE_DATA));
-        mp.events.callRemote("DebugLog_CharAppearanceImport", JSON.stringify(CHARACTER_APPEARANCE_DATA), data);
         setTimeout(() => {
             mp.events.callLocal('character_import_close');
+            mp.events.callRemote("DebugLog_CharAppearanceImport", JSON.stringify(CHARACTER_APPEARANCE_DATA), data);
         }, 50);
     }, 50);
  
