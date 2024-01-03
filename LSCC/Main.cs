@@ -4517,6 +4517,8 @@ namespace RNC
             {
                 player.TriggerEvent("StartChaseTimer", -5, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
                 player.TriggerEvent("ReloadInteriors");
+
+                EPlayer.UpdateTeleports(player);
             }
 
             NAPI.Util.ConsoleOutput($"[Lobby ${lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
@@ -5009,10 +5011,20 @@ namespace RNC
 
                     if (lobby.Fugitives.Contains(player))
                     {
+                        if (!player.IsInVehicle)
+                        {
+                            player.SendChatMessage("~r~[SERVER] ~w~You're not in a vehicle! This may be a bug, so one will be spawned for you.");
+                            CreateFugitiveVehicle(player, player.Position, player.Heading, lobby);
+                        }
                         continue;
                     }
                     if (lobby.Cops.Contains(player))
                     {
+                        if (!player.IsInVehicle)
+                        {
+                            player.SendChatMessage("~r~[SERVER] ~w~You're not in a vehicle! This may be a bug, so one will be spawned for you.");
+                            CreateFugitiveVehicle(player, player.Position, player.Heading, lobby);
+                        }
                         player.SendNotification("~b~You may begin the chase now.");
                         continue;
                     }
