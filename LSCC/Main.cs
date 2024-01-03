@@ -5369,6 +5369,7 @@ namespace RNC
             }
         }
 
+        private static bool RestartMessageSent = false;
         private static void CheckIfFiveMinutesBeforeMidnight()
         {
             DateTime currentUtcTime = DateTime.UtcNow;
@@ -5382,8 +5383,13 @@ namespace RNC
             // Check if the current time is 5 minutes before midnight
             if (timeDifference.TotalSeconds <= 0 && timeDifference.TotalSeconds >= -60)
             {
-                Console.WriteLine("It is 5 minutes before 00:00 in UTC time. Server auto-restarting soon.");
-                NAPI.Chat.SendChatMessageToAll("!{#FF6347}[SERVER] !{#FFFFFF}The daily server restart will occur in !{#FFFF00}5 minutes{#FFFFFF}!");
+                if (!RestartMessageSent)
+                {
+                    RestartMessageSent = true;
+                    Console.WriteLine("It is 5 minutes before 00:00 in UTC time. Server auto-restarting soon.");
+                    NAPI.Chat.SendChatMessageToAll("!{#FF6347}[SERVER] !{#FFFFFF}The daily server restart will occur in !{#FFFF00}5 minutes{#FFFFFF}!");
+                }
+               
             }
         }
         public static void GameUpdate()
