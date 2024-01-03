@@ -2282,6 +2282,7 @@ namespace RNC
 
             string tpData = NAPI.Util.ToJson(teleports);
             player.SetSharedData("TELEPORT:Data", tpData);
+            player.TriggerEvent("ReloadInteriors");
         }
 
         public static void SendEventNotification(Player player, string eventName, string description)

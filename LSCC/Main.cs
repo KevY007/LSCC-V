@@ -4519,7 +4519,6 @@ namespace RNC
             foreach (Player player in CopchasePlayers)
             {
                 player.TriggerEvent("StartChaseTimer", -5, gameRunTime, lobby.CollisionCounter, (short)lobby.gameMode);
-                player.TriggerEvent("ReloadInteriors");
 
                 EPlayer.UpdateTeleports(player);
             }
@@ -5006,6 +5005,7 @@ namespace RNC
                     player.TriggerEvent("ToggleCanExitVehicle", true);
                     EPlayer.TryAdvanceChallenge(player, Challenge.ChallengeType.CopchaseRounds, "N/A");
                     EPlayer.Freeze(player, false);
+                    EPlayer.UpdateTeleports(player);
 
                     if (player.IsInVehicle && player.Vehicle != null)
                     {
