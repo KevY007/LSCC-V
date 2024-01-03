@@ -89,10 +89,13 @@ function setupOnImport(genderValue, data){
         }
     }
     setTimeout(() => {
-        mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CHARACTER_APPEARANCE_DATA));
+        if(global.ServerUI) global.ServerUI.call('character_editor_toggle', false);
+        mp.events.callRemote(`ServerConsoleOutput`, `Character imported, closing editor fully! ${mp.players.local.name}`);
+        mp.events.callLocal('character_import_close');
+        mp.events.callRemote("DebugLog_CharAppearanceImport", JSON.stringify(CHARACTER_APPEARANCE_DATA), data);
         setTimeout(() => {
-            mp.events.callLocal('character_import_close');
-            mp.events.callRemote("DebugLog_CharAppearanceImport", JSON.stringify(CHARACTER_APPEARANCE_DATA), data);
+            mp.events.callRemote("CharacterEditor:SaveAppearance", JSON.stringify(CHARACTER_APPEARANCE_DATA));
+            mp.events.callRemote("CharacterEditor:CloseAppearanceEditor");
         }, 50);
     }, 50);
  

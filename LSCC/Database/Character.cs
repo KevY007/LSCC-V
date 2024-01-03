@@ -603,20 +603,23 @@ namespace RNC
             {
                 SavedOutfit _old = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == account.SQL_ID && o.Team == teamID && o.IsActive == true);
                 SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.Team == teamID && o.IsActive == false);
-                if (_new == null) return null;
+                //if (_new == null) return null;
 
                 if (_old != null)
                     _old.IsActive = false;
 
-                _new.IsActive = true;
+                if(_new != null)
+                    _new.IsActive = true;
 
 
                 await context.SaveChangesAsync();
-                NAPI.Task.Run(() =>
+                if(_new != null)
                 {
-                    UpdateActiveOutfitVariable(player, _new, teamID);
-                });
-                await NAPI.Task.WaitForMainThread();
+                    NAPI.Task.Run(() =>
+                    {
+                        UpdateActiveOutfitVariable(player, _new, teamID);
+                    });
+                }
                 return _new;
             }
         }
