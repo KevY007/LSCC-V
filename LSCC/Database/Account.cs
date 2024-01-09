@@ -39,10 +39,14 @@ namespace RNC
         public bool UsedDiscordPerks { get; set; }
         public string ChallengeInfo { get; set; }
         public DateTime RegisterDate { get; set; }
+        [Column(TypeName = "VARCHAR")]
+        [StringLength(255)]
         public string RegisterHWID { get; set; }
         public ulong RegisterRID { get; set; }
         public string RegisterIP { get; set; }
         public string RegisterSC { get; set; }
+        [Column(TypeName = "VARCHAR")]
+        [StringLength(255)]
         public string LastHWID { get; set; }
         public ulong LastRID { get; set; }
         public string LastIP { get; set; }
@@ -203,9 +207,14 @@ namespace RNC
         }
         
 
-        public async static Task BanEvadeCheck(Player player, Account acc)
+        public async static Task BanEvadeCheck(Player player, Account acc, List<Account> cachedLinkedAccs = null)
         {
-            List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+            List<Account> linkedAccs = new List<Account>();
+            if (cachedLinkedAccs == null)
+            {
+                linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+            }
+            else linkedAccs = cachedLinkedAccs;
             var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
             using (MainDatabase context = ContextFactory.CreateContext())
             {

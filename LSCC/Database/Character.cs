@@ -557,6 +557,7 @@ namespace RNC
             {
                 EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Could not find active outfit for team " + teamID);
                 // Will apply default outfit if outfit is null
+                return;
             }
             ApplyOutfit(player, outfit.IsMale, teamID, outfit);
         }

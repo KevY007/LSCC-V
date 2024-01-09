@@ -3944,8 +3944,16 @@ namespace RNC
             }
         }
 
+        private static void LogQueryTime(long start, long finish, string info)
+        {
+            NAPI.Util.ConsoleOutput($"[Query Performance] Query \"{info}\" took a total of {(finish-start).ToString()}ms to finish!");
+        }
+
         public static void OnPlayerLogin(Player player, Account acc)
         {
+            long queryStartTime = 0;
+            long queryFinishTime = 0;
+
             if (EPlayer.LoggedIn(player)) return;
             if (player.HasData("Kicked")) return;
 
@@ -3997,7 +4005,10 @@ namespace RNC
 
             Task.Run(async () =>
             {
+                queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 List<SavedAppearance> appearances = await Character.GetAppearances(acc);
+                queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                LogQueryTime(queryStartTime, queryFinishTime, $"Character.GetAppearances({acc.Username})");
                 SavedAppearance activeAppearance = null;
                 if(appearances == null)
                 {
@@ -4018,10 +4029,17 @@ namespace RNC
                 bool pClanPartnering = false;
                 string pClanTag = "";
                 bool isClanPublic = false;
+
+                queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 List<Account> linkedAccs = await EPlayer.GetLinkedAccounts(acc);
+                queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                LogQueryTime(queryStartTime, queryFinishTime, $"EPlayer.GetLinkedAccounts({acc.Username})");
                 var linkedSQLs = linkedAccs.Select(accs => accs.SQL_ID).ToList(); // BONKERS
 
-                await AccountManager.BanEvadeCheck(player, acc);
+                queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                await AccountManager.BanEvadeCheck(player, acc, linkedAccs);
+                queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                LogQueryTime(queryStartTime, queryFinishTime, $"AccountManager.BanEvadeCheck({acc.Username})");
 
                 Clan pClan = null;
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -4207,8 +4225,15 @@ namespace RNC
                     }
                 });
 
+                queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 List<string> cLoadouts = await EPlayer.GetOwnedLoadouts(acc, 1);
+                queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                LogQueryTime(queryStartTime, queryFinishTime, $"EPlayer.GetOwnedLoadouts({acc.Username}, 1)");
+
+                queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
                 List<string> fLoadouts = await EPlayer.GetOwnedLoadouts(acc, 0);
+                queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+                LogQueryTime(queryStartTime, queryFinishTime, $"EPlayer.GetOwnedLoadouts({acc.Username}, 0)");
                 int totalOwned = cLoadouts.Count + fLoadouts.Count + 2;
                 if (totalOwned >= Settings.Loadouts.Count)
                     EPlayer.UnlockAchievement(player, "all_loadouts");
@@ -6357,7 +6382,13 @@ namespace RNC
 
         public async Task<List<object[]>> Menu_OwnedVehicleData(Account _a)
         {
+            long queryStartTime = 0;
+            long queryFinishTime = 0;
+
+            queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             List<CarData> cars = await EPlayer.GetOwnedVehicles(_a);
+            queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            LogQueryTime(queryStartTime, queryFinishTime, $"EPlayer.GetOwnedVehicles({_a.Username})");
             List<object[]> vehItems = new List<object[]>();
             foreach (var car in cars)
             {

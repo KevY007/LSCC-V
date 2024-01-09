@@ -1697,12 +1697,8 @@ namespace RNC
         {
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                var accounts = await context.Accounts.AsAsyncEnumerable().Where(acc =>
-                    new ulong[] { pAcc.RegisterRID, pAcc.LastRID }.Intersect(new ulong[] { acc.LastRID, acc.RegisterRID }).Any() ||
-                    new string[] { pAcc.RegisterHWID, pAcc.LastHWID }.Intersect(new string[] { acc.RegisterHWID, acc.LastHWID }).Any() ||
-                    (acc.Email != null && acc.Email.Equals(pAcc.Email) && acc.Email.Length >= 5)).ToListAsync(); // BONKERS
-
-                return accounts;
+                List<Account> matches = await context.Accounts.FromSqlInterpolated($"SELECT * FROM Accounts WHERE LastHWID = {pAcc.LastHWID} OR RegisterHWID = {pAcc.LastHWID} OR LastRID = {pAcc.LastRID} OR RegisterRID = {pAcc.LastRID}").ToListAsync();
+                return matches;
             }
         }
 
