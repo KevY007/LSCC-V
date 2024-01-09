@@ -283,11 +283,64 @@ namespace RNC
                 .WithDescription("Load dynamic settings from the server config file; only to be used by developers.")
                 .Build(), ReloadSettingsCommandHandler));
 
+            commands.Add(new CommandDefinition(new SlashCommandBuilder()
+                .WithName("fix_character")
+                .WithDescription("Resets your character & outfit data to their defaults. May fix login issues.")
+                .Build(), FixCharacterCommandHandler));
+
             await guild.BulkOverwriteApplicationCommandAsync(commands.Select(cmd => cmd.Meta).ToArray());
         }
 
 
         // Commands
+        private static async Task FixCharacterCommandHandler(SocketSlashCommand command)
+        {
+            int aSQL = await GetIngameSQLID(command.User);
+            if (aSQL == -1)
+            {
+                await command.RespondAsync("**[!]** For security reasons, you must link your Discord account to your RnC account to use this!");
+                return;
+            }
+
+            try
+            {
+                NAPI.Task.Run(() =>
+                {
+                    Player pl = Settings.LoggedInPlayers.FirstOrDefault(p => EPlayer.GetAccount(p).SQL_ID == aSQL);
+                    if(pl != null)
+                    {
+                        Task.Run(async () =>
+                        {
+                            await command.RespondAsync($":bangbang: **You must be offline to use this! Use `/logout` in-game first.**", null, false, true);
+                        });
+                    }
+                    else
+                    {
+                        Task.Run(async () =>
+                        {
+                            using (MainDatabase context = ContextFactory.CreateContext())
+                            {
+                                List<SavedAppearance> apps = await context.SavedAppearances.AsQueryable().Where(s => s.AccountID == aSQL).ToListAsync();
+                                List<SavedOutfit> outs = await context.SavedOutfits.AsQueryable().Where(s => s.AccountID == aSQL).ToListAsync();
+                                List<CharacterSlot> slots = await context.CharacterSlots.AsQueryable().Where(s => s.AccountID == aSQL).ToListAsync();
+
+                                context.SavedAppearances.RemoveRange(apps);
+                                context.SavedOutfits.RemoveRange(outs);
+                                context.CharacterSlots.RemoveRange(slots);
+                                await context.SaveChangesAsync();
+
+                                await command.RespondAsync($":white_check_mark: **Your character & outfit data have been successfully reset!**", null, false, true);
+                            }
+                        });
+                    }
+                });
+               
+            }
+            catch
+            {
+                await command.RespondAsync($":bangbang: **There was an issue running this command, sorry!**", null, false, true);
+            }
+        }
 
         private static async Task PunishmentResponse(SocketSlashCommand command, string type, params (string, string)[] details)
         {
