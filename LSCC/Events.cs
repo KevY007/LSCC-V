@@ -3946,7 +3946,8 @@ namespace RNC
 
         private static void LogQueryTime(long start, long finish, string info)
         {
-            NAPI.Util.ConsoleOutput($"[Query Performance] Query \"{info}\" took a total of {(finish-start).ToString()}ms to finish!");
+            // Disabled for now
+            //NAPI.Util.ConsoleOutput($"[Query Performance] Query \"{info}\" took a total of {(finish-start).ToString()}ms to finish!");
         }
 
         public static void OnPlayerLogin(Player player, Account acc)
@@ -4075,7 +4076,11 @@ namespace RNC
 
                                     player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
 
-                                    EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+                                    //EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+
+                                    player.TriggerEvent("showLoginBrowser", false);
+                                    EPlayer.ShowPunishmentScreen(player, _banInfo.SQL_ID, "ban", _banInfo.Admin, $"{_banInfo.AccountSQLID} ({_banInfo.Reason}) | Linked to banned account", null, false);
+                                    EPlayer.SendToKickedScreen(player);
 
                                     player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
@@ -4083,9 +4088,14 @@ namespace RNC
                                     NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
                                     Logs.AddToAdminRecord(_accData.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade under username: {acc.Username}", "Permanent");
-
                                     player.SetData("Kicked", true);
-                                    NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                                    NAPI.Task.Run(() => { 
+                                    try
+                                    {
+                                        player.TriggerEvent("ToggleHud", false);
+                                    }
+                                    catch { } }, 5000);
+                                    NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 20000);
                                 });
                             }
                             else
@@ -4103,16 +4113,16 @@ namespace RNC
 
                                 player.SendChatMessage($"!{{#FF6347}}[BANNED] You are not allowed to play on this server.");
 
-                                EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
+                                //EPlayer.Notify(player, $"You are banned from the server.<p>Please appeal on our forums (www.racenchase.com) or consult on discord server at discord.gg/y3g2WuR</p><p>Use your account name as a reference.</p>", "red", "fas fa-ban", true, 30000);
 
                                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
-                                EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
-                                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+                                //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
+                                //NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
 
-                                player.SetData("Kicked", true);
-                                NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
+                                //player.SetData("Kicked", true);
+                                //NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
                             });
                         }
                         return;
