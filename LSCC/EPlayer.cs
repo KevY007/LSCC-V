@@ -2299,7 +2299,7 @@ namespace RNC
                     EPlayer.Error(player, "<strong>CHARACTER EDITOR</strong> - You need to edit your character's appearance!");
                     EPlayer.Notify(player, "You can also <strong>import your character</strong> from <strong>Menyoo</strong> with <strong>/char import</strong>!", "blue", "", false, 7500);
 
-                    Character.OpenAppearanceEditor(player, Character.GetCharacter(player).CurrentAppearance);
+                    Character.OpenAppearanceEditor(player, Character.GetCharacter(player).CurrentAppearance, false);
                     return;
                 }
 

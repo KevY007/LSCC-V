@@ -571,6 +571,9 @@ const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max
 var APPEARANCE_IsMale = true;
 var CURRENT_APPEARANCE_DATA = undefined;
 
+mp.events.add("CharacterEditor:SetClosable", (toggle) => {
+    if(global.ServerUI) global.ServerUI.call("character_editor_closable_toggle", toggle);
+});
 
 mp.events.add("CharacterEditor:ToggleAppearanceEditor", (toggle, gender, appearanceData) => {
     if(toggle == false){

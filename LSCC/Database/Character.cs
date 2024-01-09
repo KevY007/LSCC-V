@@ -436,13 +436,15 @@ namespace RNC
             }
         }
 
-        public static void OpenAppearanceEditor(Player player, Appearance appearance)
+        public static void OpenAppearanceEditor(Player player, Appearance appearance, bool canClose = true)
         {
             player.SetData("CHARACTER:EditorOpen", true);
             player.SetSharedData("APPEARANCE:Editing", NAPI.Util.ToJson(appearance));
-
+            
+            player.TriggerEvent("CharacterEditor:SetClosable", canClose);
             player.TriggerEvent("CharacterEditor:ToggleAppearanceEditor", true, appearance.IsMale, NAPI.Util.ToJson(appearance));
             SendPlayerToEditorScene(player, -1, false);
+            player.TriggerEvent("CharacterEditor:SetClosable", canClose);
         }
         public static void OpenAppearanceEditor(Player player, SavedAppearance appearance)
         {
@@ -555,7 +557,7 @@ namespace RNC
             SavedOutfit outfit = GetOutfitByTeam(player, teamID);
             if (outfit == null)
             {
-                EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Could not find active outfit for team " + teamID);
+                EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Could not find active outfit for team " + teamID + ". Using <strong>/char reset</strong> may fix this.");
                 // Will apply default outfit if outfit is null
                 return;
             }
