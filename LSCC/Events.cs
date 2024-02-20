@@ -6929,8 +6929,11 @@ namespace RNC
                     {
                         List<object[]> loadoutData = await Menu_LoadoutData(acc);
                         List<object[]> vehData = await Menu_VehicleData(acc);
-                        List<SavedOutfit> outfitData = await Character.GetOutfits(acc);
 
+
+                        bool fits_found = true;
+                        List<SavedOutfit> outfitData = await Character.GetOutfits(acc);
+                        if (outfitData == null) fits_found = false;
                         int activeFugiOutfitID = outfitData.FirstOrDefault(o => o.IsActive == true && o.Team == 0).SQL_ID;
                         int activeCopOutfitID = outfitData.FirstOrDefault(o => o.IsActive == true && o.Team == 1).SQL_ID;
 
@@ -6940,9 +6943,17 @@ namespace RNC
                             player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);                                                 
                             EPlayer.Menu_UpdateAllItems(player);
 
-                            player.TriggerEvent("OutfitCreator:SetOutfits", NAPI.Util.ToJson(outfitData));
-                            player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, 0);
-                            player.TriggerEvent("OutfitCreator:SetActive", activeCopOutfitID, 1);
+                            if(fits_found == true)
+                            {
+                                player.TriggerEvent("OutfitCreator:SetOutfits", NAPI.Util.ToJson(outfitData));
+                                player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, 0);
+                                player.TriggerEvent("OutfitCreator:SetActive", activeCopOutfitID, 1);
+                            }
+                            else
+                            {
+                                NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] Failed to fetch outfits for {acc.Username}!");
+                            }
+                     
                         });
                     });
                     break;

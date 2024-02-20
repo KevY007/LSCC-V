@@ -557,8 +557,37 @@ namespace RNC
             SavedOutfit outfit = GetOutfitByTeam(player, teamID);
             if (outfit == null)
             {
-                EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Could not find active outfit for team " + teamID + ". Using <strong>/char reset</strong> may fix this.");
-                // Will apply default outfit if outfit is null
+                Account acc = EPlayer.GetAccount(player);
+                if (acc == null) return;
+                Task.Run(async () =>
+                {
+                    using(MainDatabase context = ContextFactory.CreateContext())
+                    {
+                        SavedOutfit _check = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == teamID);
+                        if(_check == null)
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                EPlayer.Error(player, "<strong>OUTFIT ERROR:</strong> Can't find outfit for team " + teamID + " in the database. Please use <strong>/char reset</strong> to fix this.");
+                                return;
+                            });
+                            return;
+                        }
+                        else
+                        {
+                            _check.IsActive = true;
+                            await context.SaveChangesAsync();
+
+                            NAPI.Task.Run(() =>
+                            {
+                                UpdateActiveOutfitVariable(player, _check, teamID);
+                                NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] {acc.Username} had no active outfit for team {teamID}. It was now assigned to outfit {_check.SQL_ID}!");
+                                EPlayer.Error(player, "Your outfits appear to be bugged. The server has attempted to fix them. It will be fixed on next respawn.");
+                            });
+                        }
+
+                    }
+                });
                 return;
             }
             ApplyOutfit(player, outfit.IsMale, teamID, outfit);
@@ -608,8 +637,13 @@ namespace RNC
                 SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.Team == teamID && o.IsActive == false);
                 //if (_new == null) return null;
 
-                if (_old != null)
+                if (_old != null && _new != null)
                     _old.IsActive = false;
+                else
+                {
+                  
+                    NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] [ACCOUNT]:{account.Username} [Didn't set old active outfit to false] [OLD is NULL]:{(_old == null).ToString()} | [NEW is NULL]:{(_new == null).ToString()} | Looked for OutfitID: {outfitID} with Team {teamID}?");
+                }
 
                 if(_new != null)
                     _new.IsActive = true;
