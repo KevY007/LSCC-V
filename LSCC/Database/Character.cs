@@ -398,6 +398,11 @@ namespace RNC
 
                             await context.SaveChangesAsync();
 
+                            Account toUpdate = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == AccountSQLID);
+                            toUpdate.FugitiveOutfitID = savedFugitive.SQL_ID;
+                            toUpdate.CopOutfitID = savedCop.SQL_ID;
+                            await context.SaveChangesAsync();
+
                             CharacterSlot character = new CharacterSlot()
                             {
                                 AccountID = AccountSQLID,
@@ -413,6 +418,10 @@ namespace RNC
 
                             NAPI.Task.Run(() =>
                             {
+                                EPlayer.GetAccount(player).CopOutfitID = savedCop.SQL_ID;
+                                EPlayer.GetAccount(player).FugitiveOutfitID = savedFugitive.SQL_ID;
+                                EPlayer.Save(player, false);
+
                                 UpdateActiveOutfitVariable(player, savedFugitive, 0);
                                 UpdateActiveOutfitVariable(player, savedCop, 1);
 
@@ -604,8 +613,8 @@ namespace RNC
             List<SavedOutfit> outfits = await GetOutfits(account);
             if (outfits == null || outfits.Count == 0) return;
 
-            SavedOutfit activeCopOutfit = outfits.FirstOrDefault(o => o.Team == 1 && o.IsActive == true);
-            SavedOutfit activeFugitiveOutfit = outfits.FirstOrDefault(o => o.Team == 0 && o.IsActive == true);
+            SavedOutfit activeCopOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.CopOutfitID);
+            SavedOutfit activeFugitiveOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.FugitiveOutfitID);
 
             if (activeCopOutfit == null || activeFugitiveOutfit == null) return;
 
@@ -633,30 +642,22 @@ namespace RNC
         {
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                SavedOutfit _old = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == account.SQL_ID && o.Team == teamID && o.IsActive == true);
-                SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.Team == teamID && o.IsActive == false);
-                //if (_new == null) return null;
+                Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == account.SQL_ID);
+                SavedOutfit _new = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID);
 
-                if (_old != null && _new != null)
-                    _old.IsActive = false;
-                else
-                {
-                  
-                    NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] [ACCOUNT]:{account.Username} [Didn't set old active outfit to false] [OLD is NULL]:{(_old == null).ToString()} | [NEW is NULL]:{(_new == null).ToString()} | Looked for OutfitID: {outfitID} with Team {teamID}?");
-                }
-
-                if(_new != null)
-                    _new.IsActive = true;
-
+                if (teamID == 0)
+                    _a.FugitiveOutfitID = outfitID;
+                else _a.CopOutfitID = outfitID;
 
                 await context.SaveChangesAsync();
-                if(_new != null)
+                NAPI.Task.Run(() =>
                 {
-                    NAPI.Task.Run(() =>
-                    {
-                        UpdateActiveOutfitVariable(player, _new, teamID);
-                    });
-                }
+                    if (teamID == 0)
+                        EPlayer.GetAccount(player).FugitiveOutfitID = outfitID;
+                    else EPlayer.GetAccount(player).CopOutfitID = outfitID;
+                    EPlayer.Save(player, false);
+                    UpdateActiveOutfitVariable(player, _new, teamID);
+                });
                 return _new;
             }
         }
@@ -696,7 +697,13 @@ namespace RNC
                 };
 
                 await context.SavedOutfits.AddAsync(outfit);
+
                 await context.SaveChangesAsync();
+
+                Account toUpdate = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == account.SQL_ID);
+                if (outfitTeam == 0)
+                    toUpdate.FugitiveOutfitID = outfit.SQL_ID;
+                else toUpdate.CopOutfitID = outfit.SQL_ID;
 
                 CharacterSlot slot = await context.CharacterSlots.AsQueryable().FirstOrDefaultAsync(s => s.AccountID == account.SQL_ID);
                 if (slot != null)

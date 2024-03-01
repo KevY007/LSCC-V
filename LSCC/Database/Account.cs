@@ -86,6 +86,8 @@ namespace RNC
         public int Suspended { get; set; }
         public int LobbyClothing { get; set; }
         public string Character { get; set; }
+        public int CopOutfitID { get; set; }
+        public int FugitiveOutfitID { get; set; }
         public string LoadoutCop { get; set; }
         public string LoadoutFugitive { get; set; }
         public string CarFugitive { get; set; }
