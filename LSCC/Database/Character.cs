@@ -570,30 +570,31 @@ namespace RNC
                 if (acc == null) return;
                 Task.Run(async () =>
                 {
-                    using(MainDatabase context = ContextFactory.CreateContext())
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        SavedOutfit _check = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == teamID);
-                        if(_check == null)
+                        SavedOutfit _check = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == (teamID == 1 ? acc.CopOutfitID : acc.FugitiveOutfitID));
+                        if (_check == null)
                         {
-                            NAPI.Task.Run(() =>
-                            {
-                                EPlayer.Error(player, "<strong>OUTFIT ERROR:</strong> Can't find outfit for team " + teamID + " in the database. Please use <strong>/char reset</strong> to fix this.");
-                                return;
-                            });
+                            SavedOutfit _findNewToSet = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == teamID);
+                            _check = _findNewToSet;
+
+                            Account toUpdateAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
+                            if (teamID == 0)
+                                toUpdateAcc.CopOutfitID = _findNewToSet.SQL_ID;
+                            else toUpdateAcc.FugitiveOutfitID = _findNewToSet.SQL_ID;
                             return;
                         }
-                        else
-                        {
-                            _check.IsActive = true;
-                            await context.SaveChangesAsync();
 
-                            NAPI.Task.Run(() =>
-                            {
-                                UpdateActiveOutfitVariable(player, _check, teamID);
-                                NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] {acc.Username} had no active outfit for team {teamID}. It was now assigned to outfit {_check.SQL_ID}!");
-                                EPlayer.Error(player, "Your outfits appear to be bugged. The server has attempted to fix them. It will be fixed on next respawn.");
-                            });
-                        }
+                        _check.IsActive = true;
+                        await context.SaveChangesAsync();
+
+                        NAPI.Task.Run(() =>
+                        {
+                            UpdateActiveOutfitVariable(player, _check, teamID);
+                            NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] {acc.Username} had no active outfit for team {teamID}. It was now assigned to outfit {_check.SQL_ID}!");
+                            EPlayer.Error(player, $"Your {(teamID == 1 ? "<strong>Police</strong>" : "<strong>Fugitive</strong>")} outfit has been updated & fixed. It will be applied on next respawn.");
+                        });
+
 
                     }
                 });
@@ -616,7 +617,28 @@ namespace RNC
             SavedOutfit activeCopOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.CopOutfitID);
             SavedOutfit activeFugitiveOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.FugitiveOutfitID);
 
-            if (activeCopOutfit == null || activeFugitiveOutfit == null) return;
+            if (activeCopOutfit == null || activeFugitiveOutfit == null)
+            {
+                activeCopOutfit = outfits.FirstOrDefault(o => o.AccountID == account.SQL_ID && o.Team == 1);
+                activeFugitiveOutfit = outfits.FirstOrDefault(o => o.AccountID == account.SQL_ID && o.Team == 0);
+                if (activeCopOutfit == null || activeFugitiveOutfit == null) return; // if they're still null just fucking quit at this point
+
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Account _toUpdate = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == account.SQL_ID);
+                    if (_toUpdate == null) return;
+                    _toUpdate.CopOutfitID = activeCopOutfit.SQL_ID;
+                    _toUpdate.FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
+                    await context.SaveChangesAsync();
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.GetAccount(player).CopOutfitID = activeCopOutfit.SQL_ID;
+                        EPlayer.GetAccount(player).FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
+                        EPlayer.Save(player, false);
+                        EPlayer.Error(player, "Your outfits have been <strong>fixed & updated</strong>. You can change them in the Menu.");
+                    });
+                }
+            }
 
             NAPI.Task.Run(() =>
             {

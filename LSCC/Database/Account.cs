@@ -399,7 +399,9 @@ namespace RNC
                 ActiveCrosshairProfile = "{}",
                 TattooList = "[]",
                 SelectedBadgeData = "{id:0, name:\"\"}",
-                EmailVerified = false
+                EmailVerified = false,
+                CopOutfitID = -1,
+                FugitiveOutfitID = -1
             };
             return _new;
         }
