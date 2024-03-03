@@ -401,6 +401,8 @@ namespace RNC
                             Account toUpdate = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == AccountSQLID);
                             toUpdate.FugitiveOutfitID = savedFugitive.SQL_ID;
                             toUpdate.CopOutfitID = savedCop.SQL_ID;
+                            acc.FugitiveOutfitID = savedFugitive.SQL_ID;
+                            acc.CopOutfitID = savedCop.SQL_ID;
                             await context.SaveChangesAsync();
 
                             CharacterSlot character = new CharacterSlot()
@@ -580,9 +582,15 @@ namespace RNC
 
                             Account toUpdateAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
                             if (teamID == 0)
+                            {
                                 toUpdateAcc.CopOutfitID = _findNewToSet.SQL_ID;
-                            else toUpdateAcc.FugitiveOutfitID = _findNewToSet.SQL_ID;
-                            return;
+                                acc.CopOutfitID = _findNewToSet.SQL_ID;
+                            }
+                            else
+                            {
+                                toUpdateAcc.FugitiveOutfitID = _findNewToSet.SQL_ID;
+                                acc.CopOutfitID = _findNewToSet.SQL_ID;
+                            }
                         }
 
                         _check.IsActive = true;
@@ -629,12 +637,11 @@ namespace RNC
                     if (_toUpdate == null) return;
                     _toUpdate.CopOutfitID = activeCopOutfit.SQL_ID;
                     _toUpdate.FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
+                    account.CopOutfitID = activeCopOutfit.SQL_ID;
+                    account.FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.GetAccount(player).CopOutfitID = activeCopOutfit.SQL_ID;
-                        EPlayer.GetAccount(player).FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
-                        EPlayer.Save(player, false);
                         EPlayer.Error(player, "Your outfits have been <strong>fixed & updated</strong>. You can change them in the Menu.");
                     });
                 }
@@ -724,8 +731,15 @@ namespace RNC
 
                 Account toUpdate = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == account.SQL_ID);
                 if (outfitTeam == 0)
+                {
                     toUpdate.FugitiveOutfitID = outfit.SQL_ID;
-                else toUpdate.CopOutfitID = outfit.SQL_ID;
+                    account.FugitiveOutfitID = outfit.SQL_ID;
+                }
+                else
+                {
+                    toUpdate.CopOutfitID = outfit.SQL_ID;
+                    account.CopOutfitID = outfit.SQL_ID;
+                }
 
                 CharacterSlot slot = await context.CharacterSlots.AsQueryable().FirstOrDefaultAsync(s => s.AccountID == account.SQL_ID);
                 if (slot != null)
