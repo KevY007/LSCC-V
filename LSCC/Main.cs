@@ -1849,6 +1849,7 @@ namespace RNC
                     seats = 4;
                     break;
             }
+            if (seats <= 0) seats = 4; //quickfix
             return seats;
         }
 
