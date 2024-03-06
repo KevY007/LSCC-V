@@ -4321,6 +4321,7 @@ namespace RNC
             int spawnLocFugitive = 0;
             int spawnLocHeli = 0;
             int currentFugiSeats = 0;
+            string currentFugiCarName = "";
             Vehicle currentFugitiveCar = null;
 
             /*
@@ -4382,6 +4383,7 @@ namespace RNC
                         player.Position = spawnVector.Around(10.0f);
 
                         currentFugitiveCar = CreateFugitiveVehicle(player, spawnVector, spawn.spawnA, lobby);
+                        currentFugiCarName = EPlayer.GetAccount(player).CarFugitive;
 
                         // Setting leftover seats to Max-1 since one is already taken by the driver, pro maths
 
@@ -4389,15 +4391,21 @@ namespace RNC
 
                         //if (GetMaxSeats(EPlayer.GetAccount(player).CarFugitive) != 0) currentFugiSeats = GetMaxSeats(EPlayer.GetAccount(player).CarFugitive)-1;
                         //else currentFugiSeats = currentFugitiveCar.MaxOccupants-1;
+
+                        NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog] 0 fugitive seats left! Spawned new vehicle for {player.Name}: {currentFugiCarName} with {currentFugiSeats} seats left.");
                     }
                     else
                     {
+                        int seatToSetIn = (GetMaxSeats(currentFugiCarName)-currentFugiSeats);
+
                         player.Position = currentFugitiveCar.Position.Around(10.0f);
-                        player.TriggerEvent("SetChaseVehicle", currentFugitiveCar.Id, currentFugiSeats);
+                        player.TriggerEvent("SetChaseVehicle", currentFugitiveCar.Id, seatToSetIn);
                         player.SetData("ChaseVehicle", currentFugitiveCar);
-                        player.SetData("ChaseVehicleSeat", currentFugiSeats);
+                        player.SetData("ChaseVehicleSeat", seatToSetIn);
 
                         currentFugiSeats--;
+
+                        NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog] Setting {player.Name} into {currentFugiCarName} seat {seatToSetIn}. This car now has {currentFugiSeats} left!");
                     }
                     continue;
                 }
@@ -5015,13 +5023,7 @@ namespace RNC
                     {
                         if (!player.IsInVehicle)
                         {
-                            player.SendChatMessage("~r~[SERVER] ~w~You're not in a vehicle! This may be a bug, so one will be spawned for you.");
-                            Vehicle veh = CreateFugitiveVehicle(player, player.Position, player.Heading, lobby);
-                            NAPI.Task.Run(() =>
-                            {
-                                if(player != null && veh != null)
-                                    player.SetIntoVehicle(veh, 0);
-                            }, 1000);
+                            NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog | ERROR ({DateTime.Now.ToString("g")})] Fugitive {player.Name} wasn't set in a vehicle!");
                         }
                         continue;
                     }
@@ -5029,15 +5031,8 @@ namespace RNC
                     {
                         if (!player.IsInVehicle)
                         {
-                            player.SendChatMessage("~r~[SERVER] ~w~You're not in a vehicle! This may be a bug, so one will be spawned for you.");
-                            Vehicle veh = CreateGameVehicle("police2", player.Position, player.Heading, lobby, true, true, "Average", 1, true, 10f, 0, 110);
-                            NAPI.Task.Run(() =>
-                            {
-                                if (player != null && veh != null)
-                                    player.SetIntoVehicle(veh, 0);
-                            }, 1000);
+                            NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog | ERROR ({DateTime.Now.ToString("g")})] Cop {player.Name} wasn't set in a vehicle!");
                         }
-                        player.SendNotification("~b~You may begin the chase now.");
                         continue;
                     }
                 }

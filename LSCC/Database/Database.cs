@@ -93,7 +93,6 @@ namespace RNC
         public int PriceDiamondPoints { get; set; }
         public int DonatorLevelRequired { get; set; }
         public int Team { get; set; }
-
     }
 
     public class Clan
