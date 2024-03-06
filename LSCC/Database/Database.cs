@@ -80,6 +80,20 @@ namespace RNC
         public DateTime DateTime { get; set; }
     }
 
+    public class ShopVehicleData
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public string Name { get; set; }
+        public string Model { get; set; }
+        public string ImageURL { get; set; }
+        public int MaxSpeedKMH { get; set; }
+        public int LevelRequired { get; set; }
+        public int PricePoints { get; set; }
+        public int PriceDiamondPoints { get; set; }
+        public int DonatorLevelRequired { get; set; }
+    }
+
     public class Clan
     {
         [Key]
@@ -349,6 +363,7 @@ namespace RNC
         public DbSet<CustomDMArenaSpawns> CustomArenas_Spawns { get; set; }
         public DbSet<PasswordResetRequest> PasswordResetRequests { get; set; }
         public DbSet<EmailVerificationRequest> EmailVerificationRequests { get; set; }
+        public DbSet<ShopVehicleData> ShopVehicles { get; set; }
 
         public DbSet<SavedOutfit> SavedOutfits { get; set; }
         public DbSet<SavedAppearance> SavedAppearances { get; set; }
