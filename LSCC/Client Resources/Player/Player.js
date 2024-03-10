@@ -4518,6 +4518,9 @@ mp.events.add("OnPlayerLoginRegister", () => {
         mp.game.object.doorControl(4147641866, 2055.52, 2969.68, -67.3, true, 0, 0, 0.2);
     }, 800);
 
+    if(global.ServerUI){
+        global.ServerUI.call("hud_watermark_toggle", true);
+    }
 });
 
 
