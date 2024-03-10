@@ -5820,7 +5820,7 @@ namespace RNC
             player.SendChatMessage("!{#FFFFFF}[!{#ffae00}Race !{#FFFFFF}'n !{#0097ff}Chase !{#FFFFFF}Commands]:");
             player.SendChatMessage("[General]: /ooc /autojoin /b /pm /tog /keys /admins /rules /id /kill");
             player.SendChatMessage("[General]: /report /helpme /l(ow) /c(ar)w(hisper) /s(hout)");
-            player.SendChatMessage("[Squad/Partner]: /squad /squadleave /s(quad)c(hat) /squadaccept /squadmembers");
+            player.SendChatMessage("[Squad/Partner]: /squad [join (room number), leave, players | enter any text to chat]");
             player.SendChatMessage("[Lobby]: /lobby /(sw)itch(l)obby /mylobby /lobbies /time (/weather)");
             player.SendChatMessage("[Lobby]: /lobbychat (/lo,/lg) /spec /specoff /(fugitive)chances");
             player.SendChatMessage("!{#999999}[Account]: /char help (/character) /clothing /stats /changemypass /outfit");
@@ -7242,7 +7242,7 @@ namespace RNC
             {
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
                 {
-                    player.SendChatMessage("!{#FFAC38}> ~w~" + EPlayer.Name(mem));
+                    player.SendChatMessage("!{#38ebff}> ~w~" + EPlayer.Name(mem));
                 }
             }
             return;
@@ -7487,7 +7487,7 @@ namespace RNC
             {
                 foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
                 {
-                    mem.SendChatMessage("!{#FFAC38}[SQUAD] !{#FFFFFF}" + EPlayer.Name(player) + ": " + message);
+                    mem.SendChatMessage("!{#38ebff}[SQUAD] !{#FFFFFF}" + EPlayer.Name(player) + ": " + message);
                 }
             }
             else player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
@@ -7495,34 +7495,110 @@ namespace RNC
             return;
         }
 
-        [Command("squad", "!{#AFAFAF}[USAGE] squad (target)", Alias = "partner")]
-        public void cmd_squadjoin(Player player, Player target)
+        [Command("squad", "!{#AFAFAF}[USAGE] squad (option: join [room], leave, players | for chat, use /squad [text] or /sc [text])", Alias = "partner", GreedyArg = true)]
+        public void cmd_squad(Player player, string argstext)
         {
-            if (player.HasData("PlayerSquad"))
+            string[] args = argstext.Split(" ");
+            switch (args[0].ToLower())
             {
-                player.SendChatMessage(Translate(player, "ERROR_ALREADY_IN_SQUAD"));
-                return;
+                case "join":
+                    {
+                        if(args.Length < 2)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}[USAGE] squad join (room number [0-1000])");
+                            return;
+                        }
+                        if (player.GetSharedDataSafe<int>("SquadID") != -1)
+                        {
+                            player.SendChatMessage(Translate(player, "ERROR_ALREADY_IN_SQUAD"));
+                            return;
+                        }
+                        int squadToJoin = -1;
+                        bool goodId = int.TryParse(args[1], out squadToJoin);
+                        if (!goodId)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}[USAGE] squad join (room !{#ff6347}number [0-1000]!{#AFAFAF})");
+                            return;
+                        }
+                        if(squadToJoin < 0 || squadToJoin > 1000)
+                        {
+                            player.SendChatMessage("!{#AFAFAF}[USAGE] squad join (room number !{#ff6347}[0-1000]!{#AFAFAF})");
+                            return;
+                        }
+                        player.SetSharedData("SquadID", squadToJoin);
+                        foreach(Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("SquadID") == squadToJoin))
+                        {
+                            pl.SendChatMessage(Translate(pl, "PLAYER_PARTNERED_SQUAD", EPlayer.Name(player)));
+                        }
+                    }
+                    break;
+                case "leave":
+                    {
+                        if (player.GetSharedDataSafe<int>("SquadID") != -1)
+                        {
+                            int squadID = player.GetSharedDataSafe<int>("SquadID");
+                            foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("SquadID") == squadID))
+                            {
+                                pl.SendChatMessage(Translate(pl, "PLAYER_LEFT_SQUAD", EPlayer.Name(player)));
+                            }
+                            player.SetSharedData("SquadID", -1);
+                        }
+                        else
+                        {
+                            player.SendChatMessage(Translate(player, "ERROR_NO_SQUAD"));
+                        }
+                    }
+                    break;
+                case "players":
+                    {
+                        if (player.GetSharedDataSafe<int>("SquadID") == -1)
+                        {
+                            player.SendChatMessage(Translate(player, "ERROR_NO_SQUAD"));
+                            return;
+                        }
+                        int squadID = player.GetSharedDataSafe<int>("SquadID");
+                        player.SendChatMessage($"!{{#38ebff}}[SQUAD {squadID}]");
+                        List<string> squadPlayerMsgs = new List<string>();
+                        int currStringPlayers = 0;
+                        int totalPlayers = 0;
+                        string currString = "";
+
+                        List<Player> squadPlayers = Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("SquadID") == squadID).ToList();
+                        int squadPlayersNumber = squadPlayers.Count;
+                        foreach (Player pl in squadPlayers)
+                        {
+                            if(currStringPlayers == 10)
+                            {
+                                squadPlayerMsgs.Add(currString);
+                                currString = "";
+                                currStringPlayers = 0;
+                            }
+                            currStringPlayers++;
+                            totalPlayers++;
+                            currString += $"!{{#38ebff}}{EPlayer.Name(pl)}";
+                            if (totalPlayers != squadPlayersNumber) currString += "!{#ffffff}, ";
+                        }
+                        foreach(string str in squadPlayerMsgs)
+                        {
+                            player.SendChatMessage(str);
+                        }
+                    }
+                    break;
+                default:
+                    {
+                        if (player.GetSharedDataSafe<int>("SquadID") == -1)
+                        {
+                            player.SendChatMessage(Translate(player, "ERROR_NO_SQUAD"));
+                            return;
+                        }
+                        int squadID = player.GetSharedDataSafe<int>("SquadID");
+                        foreach (Player pl in Settings.LoggedInPlayers.Where(p => p.GetSharedDataSafe<int>("SquadID") == squadID))
+                        {
+                            pl.SendChatMessage("!{#38ebff}[SQUAD] !{#FFFFFF}" + EPlayer.Name(player) + ": " + argstext);
+                        }
+                    }
+                    break;
             }
-
-            if (target.HasData("PlayerSquad"))
-            {
-                target = target.GetData<Player>("PlayerSquad");
-            }
-            else
-            {
-                target.SetData("PlayerSquad", target);
-            }
-
-            target.SetData("AskedBySquad", player);
-
-            player.SendChatMessage(Translate(player, "SQUAD_REQUESTED", target.Name));
-            Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == target).ToList().ForEach((Player member) =>
-            {
-                member.SendChatMessage(Translate(member, "SQUAD_REQUESTED_MEMBERS", player.Name));
-            });
-
-            return;
-
         }
 
         [Command("fugitivelist", Alias = "fugilist")]

@@ -519,6 +519,7 @@ namespace RNC
                 player.SetSharedData("Invincible", false);
                 player.SetSharedData("ShowDamaged", false);
                 player.SetSharedData("IsChatOpen", false);
+                player.SetSharedData("SquadID", -1);
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");
                 player.ResetData("CHARACTER:EditorOpen");
