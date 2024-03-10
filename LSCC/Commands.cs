@@ -7488,16 +7488,16 @@ namespace RNC
                         int squadPlayersNumber = squadPlayers.Count;
                         foreach (Player pl in squadPlayers)
                         {
-                            if(currStringPlayers == 10)
-                            {
-                                squadPlayerMsgs.Add(currString);
-                                currString = "";
-                                currStringPlayers = 0;
-                            }
                             currStringPlayers++;
                             totalPlayers++;
                             currString += $"!{{#38ebff}}{EPlayer.Name(pl)}";
                             if (totalPlayers != squadPlayersNumber) currString += "!{#ffffff}, ";
+                            if (currStringPlayers == 10 || (totalPlayers < 10 && totalPlayers == currStringPlayers))
+                            {
+                                squadPlayerMsgs.Add(currString);
+                                currString = "";
+                                currStringPlayers = 0;
+                            }                         
                         }
                         foreach(string str in squadPlayerMsgs)
                         {
@@ -7517,6 +7517,7 @@ namespace RNC
                         {
                             pl.SendChatMessage("!{#38ebff}[SQUAD] !{#FFFFFF}" + EPlayer.Name(player) + ": " + argstext);
                         }
+                        DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.Restricted, $"**{player.Name}:** {argstext}", $"Squad ({squadID})");
                     }
                     break;
             }
