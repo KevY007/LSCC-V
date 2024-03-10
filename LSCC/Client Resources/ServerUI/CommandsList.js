@@ -2099,48 +2099,6 @@ var CommandsDataJSON = [
     "Parameters": []
   },
   {
-    "CommandText": "squadmembers",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
-    "CommandText": "partners",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
-    "CommandText": "squadaccept",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
-    "CommandText": "partneraccept",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
-    "CommandText": "squadleave",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
-    "CommandText": "partnerleave",
-    "Usage": "",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": []
-  },
-  {
     "CommandText": "removelanguage",
     "Usage": "[USAGE] removelanguage (language) | /languages for a list",
     "Admin": 4,
@@ -2229,41 +2187,21 @@ var CommandsDataJSON = [
     ]
   },
   {
-    "CommandText": "squadchat",
-    "Usage": "[USAGE] squadchat (sc) (text)",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": [
-      "sc",
-      "text"
-    ]
-  },
-  {
-    "CommandText": "sc",
-    "Usage": "[USAGE] squadchat (sc) (text)",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": [
-      "sc",
-      "text"
-    ]
-  },
-  {
     "CommandText": "squad",
-    "Usage": "[USAGE] squad (target)",
+    "Usage": "[USAGE] squad (option: join [room], leave, players | for chat, use /squad [text] or /sc [text])",
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "_player:target"
+      "option: join [room], leave, players | for chat, use /squad [text] or /sc [text]"
     ]
   },
   {
     "CommandText": "partner",
-    "Usage": "[USAGE] squad (target)",
+    "Usage": "[USAGE] squad (option: join [room], leave, players | for chat, use /squad [text] or /sc [text])",
     "Admin": 0,
     "Donator": 0,
     "Parameters": [
-      "_player:target"
+      "option: join [room], leave, players | for chat, use /squad [text] or /sc [text]"
     ]
   },
   {
@@ -3397,24 +3335,6 @@ var CommandsDataJSON = [
     "Donator": 0,
     "Parameters": [
       "_player:target"
-    ]
-  },
-  {
-    "CommandText": "outfit",
-    "Usage": "[USAGE] outfit (option: save, select)",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": [
-      "option: save, select"
-    ]
-  },
-  {
-    "CommandText": "clothing",
-    "Usage": "[USAGE] clothing (option: reset, cop, fugitive)",
-    "Admin": 0,
-    "Donator": 0,
-    "Parameters": [
-      "option: reset, cop, fugitive"
     ]
   },
   {
