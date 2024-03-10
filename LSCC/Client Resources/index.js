@@ -169,6 +169,10 @@ mp.events.add("RememberMe_Toggle", (value) => {
   mp.storage.flush();
 });
 
+mp.events.add("setAuthDonators", (donorList) => {
+  eval(`var authDonators = ${donorList}`);
+  if(global.ServerUI) global.ServerUI.call("auth_donators_set", authDonators);
+});
 mp.events.add('showLoginBrowser', (state) => {
     setTimeout(() => {
         if(global.ServerUI != null)

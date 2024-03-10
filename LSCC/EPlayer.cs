@@ -1812,19 +1812,39 @@ namespace RNC
 
         public static void LoginBrowserSetup(Player player, bool show_login = true)
         {
-            NAPI.Task.Run(() =>
+            Task.Run(async () =>
             {
-                if (show_login)
+                using(MainDatabase context = ContextFactory.CreateContext())
                 {
-                    player.TriggerEvent("showLoginBrowser", true);
+                    List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).Take(30).ToListAsync();
+                    string donorList = "[";
+                    foreach (Account donor in donors)
+                    {
+                        donorList += $"\"{donor.Username}\",";
+                    }
+                    donorList += "]";
+
+                    NAPI.Task.Run(() =>
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            if (show_login)
+                            {
+                                player.TriggerEvent("showLoginBrowser", true);
+                                player.TriggerEvent("setAuthDonators", donorList);
+                            }
+
+                            player.TriggerEvent("InitiateCustomChat");
+                            player.TriggerEvent("TogglePlayerChat", false);
+                        }, 500);
+
+                        SetDiscordStatus(player, "On login screen");
+                        ResetPlayerData(player);
+                    });          
                 }
+            });
 
-                player.TriggerEvent("InitiateCustomChat");
-                player.TriggerEvent("TogglePlayerChat", false);
-            }, 500);
 
-            SetDiscordStatus(player, "On login screen");
-            ResetPlayerData(player);
         }
         public static void GivePoints(Player player, int points, string reason)
         {
