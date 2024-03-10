@@ -379,7 +379,7 @@ namespace RNC
                 Warns = 0,
                 Suspended = 0,
                 DonatorLevel = 0,
-                LobbyClothing = 1,
+                LobbyClothing = -1,
                 LoadoutCop = "?",
                 LoadoutFugitive = "?",
                 CarCop = "?",

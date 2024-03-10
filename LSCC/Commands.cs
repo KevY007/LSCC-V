@@ -11688,25 +11688,6 @@ namespace RNC
                 player.SendChatMessage(Translate(player, "CHARACTER_RESET_WARNING_2"));
                 player.SendChatMessage(Translate(player, "CHARACTER_RESET_WARNING_3"));
             }
-            if (action.StartsWith("lobbyteam"))
-            {
-                if(action.StartsWith("lobbyteam cop"))
-                {
-                    EPlayer.GetAccount(player).LobbyClothing = 1;
-                    Character.SetTeamOutfit(player, 1);
-                    player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_COP"));
-                    return;
-                }
-                if (action.StartsWith("lobbyteam fugitive"))
-                {
-                    EPlayer.GetAccount(player).LobbyClothing = 0;
-                    Character.SetTeamOutfit(player, 0);
-                    player.SendChatMessage(Translate(player, "LOBBY_CLOTHING_FUGITIVE"));
-                    return;
-                }
-                player.SendChatMessage(Translate(player, "ERROR_INVALID_CLOTHING_TEAM_2"));
-            }
-
             return;
         }
 
