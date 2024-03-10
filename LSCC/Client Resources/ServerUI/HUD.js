@@ -1113,12 +1113,6 @@ mp.events.add('browserDomReady', (browser) => {
         miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
         miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
-        if(resolution.x > 3820){
-            miniHUDVars["left"] = miniHUDVars["left"]-296;
-        }
-        if(resolution.y > 2140){
-            miniHUDVars["bottom"] = miniHUDVars["bottom"]-15;
-        }
         if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
 
         
@@ -1997,13 +1991,7 @@ mp.events.add("render", () => {
                 
                 miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
                 miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
-                
-                if(resolution.x > 3820){
-                    miniHUDVars["left"] = miniHUDVars["left"]-296;
-                }
-                if(resolution.y > 2140){
-                    miniHUDVars["bottom"] = miniHUDVars["bottom"]-15;
-                }
+
 
                 if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
             }
