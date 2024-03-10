@@ -4335,8 +4335,9 @@ namespace RNC
              The "Squad Pairing" works in the same way, except it checks for the squad ID instead of clan ID.
              */
             List<KeyValuePair<int, Vehicle>> PairedClanVehicles = new List<KeyValuePair<int, Vehicle>>();
+            List<KeyValuePair<int, Vehicle>> PairedSquadVehicles = new List<KeyValuePair<int, Vehicle>>();
 
-            foreach(Player player in CopchasePlayers)
+            foreach (Player player in CopchasePlayers)
             {
                 if (!lobby.Fugitives.Contains(player) && !lobby.Cops.Contains(player)) continue;
                 EPlayer.ResetCopchaseVariables(player);
@@ -4423,9 +4424,12 @@ namespace RNC
                     bool isClanPartneringEnabled = EPlayer.GetAccount(player).ClanPartnering;
                     string carModel = EPlayer.GetAccount(player).CarCop;
 
+                    bool wasClanPaired = false;
+
                     // Clan Pairing
                     if(clanID != -1 && isClanPartneringEnabled)
                     {
+                        wasClanPaired = true;
                         KeyValuePair<int, Vehicle> clanVehicle = PairedClanVehicles.FirstOrDefault(p => p.Key == clanID);
                         if(clanVehicle.Equals(default(KeyValuePair<int, Vehicle>))) // if null
                         {
@@ -4492,8 +4496,75 @@ namespace RNC
                         }
                     }
 
-                    // To Add: Squad Pairing
+                    // Squad Pairing
+                    int squadID = player.GetSharedDataSafe<int>("SquadID");
+                    if(squadID != -1 && !wasClanPaired)
+                    {
+                        KeyValuePair<int, Vehicle> squadVehicle = PairedSquadVehicles.FirstOrDefault(p => p.Key == squadID);
+                        if (squadVehicle.Equals(default(KeyValuePair<int, Vehicle>))) // if null
+                        {
+                            carModel = EPlayer.GetAccount(player).CarCop;
+                            Vehicle policeSquadCar = null;
+                            if (IsHelicopter(carModel)) // If helicopter, use the helicopter spawn index
+                            {
+                                policeSquadCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocHeli);
+                                spawnLocHeli++;
+                                if (spawnLocHeli >= heliSpawns.Count) spawnLocHeli = 0;
+                            }
+                            else // Otherwise just use the normal car spawns
+                            {
+                                policeSquadCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocCop);
+                                spawnLocCop++;
+                                if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+                            }
+                            player.Position = policeSquadCar.Position.Around(10.0f);
 
+                            PairedSquadVehicles.Add(new KeyValuePair<int, Vehicle>(squadID, policeSquadCar));
+                            continue;
+                        }
+                        else
+                        {
+                            Vehicle squadCar = squadVehicle.Value;
+                            int leftoverSeats = 0;
+                            if (squadCar.HasData("LeftoverSeats"))
+                                leftoverSeats = squadCar.GetData<int>("LeftoverSeats");
+
+                            if (leftoverSeats == 0) // If no seats are found in the last squad car, create a new one
+                            {
+                                PairedSquadVehicles.Remove(squadVehicle);
+
+                                carModel = EPlayer.GetAccount(player).CarCop;
+                                Vehicle policeSquadCar = null;
+                                if (IsHelicopter(carModel))
+                                {
+                                    policeSquadCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocHeli);
+                                    spawnLocHeli++;
+                                    if (spawnLocHeli >= heliSpawns.Count) spawnLocHeli = 0;
+                                }
+                                else
+                                {
+                                    policeSquadCar = CreatePoliceVehicle(player, copSpawns, heliSpawns, lobby, spawnLocCop);
+                                    spawnLocCop++;
+                                    if (spawnLocCop >= copSpawns.Count) spawnLocCop = 0;
+                                }
+                                player.Position = policeSquadCar.Position.Around(10.0f);
+
+                                PairedSquadVehicles.Add(new KeyValuePair<int, Vehicle>(squadID, policeSquadCar));
+                                continue;
+                            }
+                            else // If there's more leftover seats, set player in the next free seat
+                            {
+                                player.Position = squadCar.Position.Around(10.0f);
+                                player.TriggerEvent("SetChaseVehicle", squadCar.Id, leftoverSeats);
+                                player.SetData("ChaseVehicle", squadCar);
+                                player.SetData("ChaseVehicleSeat", leftoverSeats);
+
+                                leftoverSeats--;
+                                squadCar.SetData<int>("LeftoverSeats", leftoverSeats);
+                                continue;
+                            }
+                        }
+                    }
 
                     // Normal car spawning, no partners
                     Vehicle noPartnerCar = null;
