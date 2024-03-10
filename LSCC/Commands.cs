@@ -10549,23 +10549,48 @@ namespace RNC
 
             player.SendChatMessage("!{#FF6347}Online Staff:");
             int count = 0;
-            foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0))
+            if(EPlayer.GetAccount(player).Admin < 4)
             {
-                if (EPlayer.GetAccount(player).Admin < 3)
+                foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0))
                 {
-                    if (adm.GetData<bool>("Anonymous") == false)
+                    if (EPlayer.GetAccount(player).Admin < 3)
                     {
-                        player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name} (FN:{EPlayer.Name(adm)})");
+                        if (adm.GetData<bool>("Anonymous") == false)
+                        {
+                            player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name}");
+                            count++;
+                        }
+                        else continue;
+                    }
+                    else
+                    {
+                        player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name} !{{#C9C9C9}}[Vanish: {adm.GetData<bool>("Anonymous").ToString()}]");
                         count++;
                     }
-                    else continue;
-                }
-                else
-                {
-                    player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name} (FN:{EPlayer.Name(adm)}) !{{#C9C9C9}}[Vanish: {adm.GetData<bool>("Anonymous").ToString()}]");
-                    count++;
                 }
             }
+            else
+            {
+                foreach (Player adm in Settings.LoggedInPlayers.Where(b => EPlayer.LoggedIn(b) == true && EPlayer.GetAccount(b).Admin > 0))
+                {
+                    if (EPlayer.GetAccount(player).Admin < 3)
+                    {
+                        if (adm.GetData<bool>("Anonymous") == false)
+                        {
+                            player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name} (FN:{EPlayer.Name(adm)})");
+                            count++;
+                        }
+                        else continue;
+                    }
+                    else
+                    {
+                        player.SendChatMessage($"{EPlayer.GetAdminLevelName(EPlayer.GetAccount(adm).Admin, true)}: !{{#FFFFFF}}{adm.Name} (FN:{EPlayer.Name(adm)}) !{{#C9C9C9}}[Vanish: {adm.GetData<bool>("Anonymous").ToString()}]");
+                        count++;
+                    }
+                }
+
+            }
+            
                 
             if(count == 0) {
                 player.SendChatMessage(Translate(player, "NO_ADMINS_ONLINE"));
