@@ -1830,6 +1830,8 @@ function isVehicleInLOS(target, startpos) {
     return false;
 }
 
+
+let wasWeaponShownInHud = false;
 mp.events.add("render", () => {
 
         mp.game.ui.hideHudComponentThisFrame(7); // area name
@@ -1839,6 +1841,13 @@ mp.events.add("render", () => {
         mp.game.ui.hideHudComponentThisFrame(3); // cash
         mp.game.ui.hideHudComponentThisFrame(4); // mp_cash
         mp.game.ui.displayAmmoThisFrame(false); // HIDE AMMO
+
+        if(mp.players.local.weapon == 2725352035){
+            if(wasWeaponShownInHud === true){
+                if(global.ServerUI) global.ServerUI.execute("hud_info_weapon_toggle", false);
+                wasWeaponShownInHud = false;
+            }
+        }
 
         if(mp.players.local.weapon != 2725352035){
             if(global.ServerUI != null){
@@ -1853,6 +1862,18 @@ mp.events.add("render", () => {
             let ammoClip = mp.players.local.getAmmoInClip(weapon_hash); // returns ur ammo in clip
             let ammoWeapon  = mp.players.local.getWeaponAmmo(weapon_hash); // returns ur wep ammo
             let clipSize = mp.game.weapon.getWeaponClipSize(weapon_hash);
+
+            if(wasWeaponShownInHud === false){
+                if(global.ServerUI) global.ServerUI.execute("hud_info_weapon_toggle", true);
+                wasWeaponShownInHud = true;
+            }   
+
+            if(global.ServerUI) global.ServerUI.execute("hud_info_current_weapon_set", {
+                name: wepData.Name,
+                ammoInClip: ammoClip,
+                ammo: (ammoWeapon + (clipSize-ammoClip)),
+                image: wepData.ImageSrc,
+            });
 
             // if(global.ServerUI) global.ServerUI.execute(`gm.$refs.hud.$refs.topRight.$refs.info.equippedWeapon = {
             //     name: "${wepData.Name}",
