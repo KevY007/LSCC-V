@@ -1816,7 +1816,7 @@ namespace RNC
             {
                 using(MainDatabase context = ContextFactory.CreateContext())
                 {
-                    List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).Take(30).ToListAsync();
+                    List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Take(30).ToListAsync();
                     string donorList = "[";
                     foreach (Account donor in donors)
                     {
