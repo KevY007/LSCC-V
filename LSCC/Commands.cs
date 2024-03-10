@@ -7235,70 +7235,6 @@ namespace RNC
             return;
         }
 
-        [Command("squadmembers", Alias = "partners")]
-        public void cmd_squadmembers(Player player)
-        {
-            if (player.HasData("PlayerSquad"))
-            {
-                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
-                {
-                    player.SendChatMessage("!{#38ebff}> ~w~" + EPlayer.Name(mem));
-                }
-            }
-            return;
-        }
-
-        [Command("squadaccept", Alias = "partneraccept")]
-        public void cmd_squadaccept(Player player)
-        {
-            if (player.HasData("AskedBySquad"))
-            {
-                player.SetData("PlayerSquad", player);
-                player.SetSharedData("PlayerSquadID", player.Id);
-
-                Player target = player.GetData<Player>("AskedBySquad");
-                player.ResetData("AskedBySquad");
-
-                target.SetData("PlayerSquad", player);
-                target.SetSharedData("PlayerSquadID", player.Id);
-
-                EPlayer.UnlockAchievement(player, "first_squad");
-                EPlayer.UnlockAchievement(target, "first_squad");
-
-
-                Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player).ToList().ForEach((Player member) =>
-                {
-                    member.SendChatMessage(Translate(member, "PLAYER_PARTNERED_SQUAD", target.Name));
-                });
-            }
-            else player.SendChatMessage(Translate(player, "ERROR_SQUAD_NOT_REQUESTED"));
-            return;
-        }
-
-        [Command("squadleave", Alias = "partnerleave")]
-        public void cmd_squadleave(Player player)
-        {
-            if (player.HasData("PlayerSquad"))
-            {
-                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
-                {
-                    mem.SendChatMessage(Translate(mem, "PLAYER_LEFT_SQUAD", player.Name));
-                }
-
-                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player))
-                {
-                    mem.SendChatMessage(Translate(mem, "SQUAD_DISBANDED"));
-                    mem.ResetData("PlayerSquad");
-                    mem.SetSharedData("PlayerSquadID", -1);
-                }
-            }
-
-            player.SetSharedData("PlayerSquadID", -1);
-            player.ResetData("PlayerSquad");
-            player.ResetData("AskedBySquad");
-            return;
-        }
-
         /*
         [Command("removelanguage", "!{#AFAFAF}[USAGE] removelanguage (language) | /languages for a list")]
         public void cmd_removelanguage(Player player, string language)
@@ -7476,21 +7412,6 @@ namespace RNC
                 }
             }
             else player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}You did not set any language! Please do so by using !{#FFFF00}/language!{#FFFFFF}.");
-
-            return;
-        }
-
-        [Command("squadchat", "!{#AFAFAF}[USAGE] squadchat (sc) (text)", Alias = "sc", GreedyArg = true)]
-        public void cmd_squadchat(Player player, string message)
-        {
-            if (player.HasData("PlayerSquad"))
-            {
-                foreach (Player mem in Settings.LoggedInPlayers.Where(p => p.HasData("PlayerSquad") && p.GetData<Player>("PlayerSquad") == player.GetData<Player>("PlayerSquad")))
-                {
-                    mem.SendChatMessage("!{#38ebff}[SQUAD] !{#FFFFFF}" + EPlayer.Name(player) + ": " + message);
-                }
-            }
-            else player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
 
             return;
         }
