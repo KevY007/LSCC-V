@@ -7755,7 +7755,7 @@ namespace RNC
         }
 
         // TO-DO: This command is pending rewrite
-        /*
+        
         [Command("setteam", "!{#AFAFAF}[USAGE] setteam (target) (team)", Alias = "steam")]
         public void cmd_setteam(Player player, Player target, string team)
         {
@@ -7775,9 +7775,19 @@ namespace RNC
             {
                 if (lobby.gameStatus != 1 || lobby.Fugitives.Contains(target) || lobby.Cops.Contains(target))
                 {
-                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not eligible to be set in a team!");
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Target is not eligible to be set in a team! (copchase not active or they're already in a team)");
                     return;
                 }
+                if(lobby.gameMode == GameModes.BANKROBBERY)
+                {
+                    player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}/setteam isn't supported for Bank Robbery yet. Sorry, bad luck bozo!");
+                    return;
+                }
+            }
+            else
+            {
+                player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}Player is not in any lobby.");
+                return;
             }
 
             int teamID = 1;
@@ -7798,6 +7808,9 @@ namespace RNC
 
             try
             {
+                if (teamID == 0) lobby.Fugitives.Add(target);
+                else if (teamID == 1) lobby.Cops.Add(target);
+
                 target.SetSharedData("BustedProgress", 0.0);
                 target.ResetData("BustSupporters");
                 target.SetSharedData("CuffedBy", "n/a");
@@ -7810,207 +7823,98 @@ namespace RNC
                 Task.Run(async () => {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        MapSpawn spawn = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(b => b.spawnTeam == teamID);
+                        MapSpawn spawn = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(b => b.mapID == bruh.SQL_ID && b.spawnTeam == teamID);
+                        MapSpawn heliSpawn = await context.MapSpawns.AsQueryable().FirstOrDefaultAsync(b => b.mapID == bruh.SQL_ID && b.spawnTeam == 2);
+                        List<MapSpawn> carSpawns = new List<MapSpawn>(); 
+                        carSpawns.Add(spawn);
+                        List<MapSpawn> heliSpawns = new List<MapSpawn>();
+                        heliSpawns.Add(heliSpawn);
+
                         NAPI.Task.Run(() =>
                         {
-                            if (teamID == 0)
+                            EPlayer.ResetCopchaseVariables(target);
+                            target.TriggerEvent("startLoadingScreen", -1, "Loading copchase match...");
+
+                            target.RemoveAllWeaponsAC();
+                            target.Health = 100;
+                            target.Armor = 0;
+                            target.Dimension = Convert.ToUInt32(lobby.lobbyId);
+
+                            target.TriggerEvent("ToggleNametags", false);
+                            target.SetSharedData("Collisions", false);
+                            target.ResetData("Seatbelt");
+                            target.TriggerEvent("ToggleSeatbelt", false);
+
+                            EPlayer.Freeze(target, true);
+
+                            target.SetData("GPS", false);
+                            target.TriggerEvent("SetActorInvulnerable", false);
+                            target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
+                            target.SetSharedData("CuffedBy", "n/a");
+                            target.ResetData("Handsup");
+                            target.ResetData("Cuffed");
+                            target.SetSharedData("HasShot", false);
+
+                            EPlayer.UpdateTeleports(target);
+
+                            if (lobby.Fugitives.Contains(target))
                             {
-                                lobby.Fugitives.Add(target);
-                                lobby.Cops.Remove(target);
-
-                                Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
-
-                                CharacterData ConvChar = new CharacterData();
-
-                                try
-                                {
-                                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-
-                                    EPlayer.ApplyCharacter(target, ConvChar, 0);
-                                }
-                                catch { }
-
-                                target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
-                                EPlayer.Freeze(target, false);
-
-                                target.Health = 100;
-                                target.Armor = 0;
-                                EPlayer.SetColor(target, new Color(255, 174, 0), target.Armor);
-
-                                EPlayer.SetDiscordStatus(player, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
-
-                                target.TriggerEvent("SetActorInvulnerable", false);
-                                target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
-
-                                target.SetSharedData("VisibleBlip", true);
-                                target.ResetData("Handsup");
-                                target.ResetData("Cuffed");
+                                Character.SetTeamOutfit(target, 0);
+                                EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Fugitive as {target.Name}");
+                                EPlayer.SetColor(target, new Color(255, 174, 0), 0);
                                 target.SetSharedData("Team", 0);
-                                target.SetSharedData("CuffedBy", "n/a");
-                                target.SetSharedData("HasShot", false);
+                                target.SetSharedData("VisibleBlip", true);
 
-                                string carName = "washington";
+                                target.SetSharedData("FugitiveChance", 10.0);
 
-                                if (EPlayer.GetAccount(target).CarFugitive.Length < 3)
-                                {
-                                    switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 6))
-                                    {
-                                        case 0:
-                                            carName = "washington";
-                                            break;
-                                        case 1:
-                                            carName = "washington";
-                                            break;
-                                        case 2:
-                                            carName = "oracle";
-                                            break;
-                                        case 3:
-                                            carName = "moonbeam";
-                                            break;
-                                        case 4:
-                                            carName = "rancherxl";
-                                            break;
-                                        case 5:
-                                            carName = "cavalcade2";
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    carName = EPlayer.GetAccount(target).CarFugitive;
-                                }
-
-                                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), new Random(DateTimeOffset.UtcNow.Millisecond).Next(122), $"SPAWN", 255, false, true, Convert.ToUInt32(lobby.lobbyId));
-                                pVehicle.EngineStatus = true;
-                                pVehicle.SetSharedData("Engine", true);
-                                pVehicle.SetSharedData("Locked", true);
-                                pVehicle.Locked = true;
-                                pVehicle.SetSharedData("Team", 0);
-                                lobby.Vehicles.Add(pVehicle);
-
+                                Vehicle fugiVehicle = Main.CreateFugitiveVehicle(target, 
+                                    new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ), spawn.spawnA, lobby);
+                                target.Position = fugiVehicle.Position.Around(10.0f);
                                 NAPI.Task.Run(() =>
                                 {
-                                    lock (pVehicle)
+                                    if (target != null && fugiVehicle != null)
                                     {
-                                        if (pVehicle != null && pVehicle.Exists) pVehicle.Position = vecSpawn;
+                                        target.SetIntoVehicle(fugiVehicle, 0);
+                                        EPlayer.GiveFugitiveWeapons(target);
+
+                                        player.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                        EPlayer.Freeze(player, false);
+                                        player.TriggerEvent("stopLoadingScreen");
                                     }
                                 }, 1000);
-
-                                target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
-                                EPlayer.Freeze(target, false);
-                                target.Dimension = Convert.ToUInt32(lobby.lobbyId);
-
-                                target.SetIntoVehicle(pVehicle, 0);
-
-                                EPlayer.GiveFugitiveWeapons(target);
-
-                                Logs.LogAdmin(player, $"Set {target.Name}'s team to fugitive.");
-
-                                NAPI.Task.Run(() =>
-                                {
-                                    try { target.SetIntoVehicle(pVehicle, 0); } catch { }
-                                });
                             }
-                            else
+                            if (lobby.Cops.Contains(target))
                             {
-                                lobby.Fugitives.Remove(target);
-                                lobby.Cops.Add(target);
-
-                                Vector3 vecSpawn = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ);
-
-                                CharacterData ConvChar = new CharacterData();
-
-                                try
-                                {
-                                    ConvChar = NAPI.Util.FromJson<CharacterData>(EPlayer.GetAccount(target).Character);
-
-                                    EPlayer.ApplyCharacter(target, ConvChar, 1);
-                                }
-                                catch { }
-
-                                target.Health = 100;
-                                target.Armor = 60;
-                                EPlayer.SetColor(target, new Color(0, 151, 255), target.Armor);
-
-                                string carName = "police";
-
-                                int col1 = 0; // Black?
-                                int col2 = 111; // Frost white
-
-                                if (EPlayer.GetAccount(target).CarCop.Length < 3)
-                                {
-                                    switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
-                                    {
-                                        case 0:
-                                            carName = "police";
-                                            col1 = 111;
-                                            break;
-                                        case 1:
-                                            carName = "police3";
-                                            col1 = 111;
-                                            break;
-                                        case 2:
-                                            carName = "police4";
-                                            col1 = 111;
-                                            break;
-                                    }
-                                }
-                                else
-                                {
-                                    carName = EPlayer.GetAccount(target).CarCop;
-
-                                    if (carName.StartsWith("police"))
-                                    {
-                                        col1 = 111;
-                                    }
-                                }
-
-                                if (carName.Equals("prevolter")) col2 = 0; // Full black undercover brr.
-                                if (carName.Equals("police4")) col1 = 8; // Stone Silver // Undercover Default Cruiser
-
-                                Vehicle pVehicle = NAPI.Vehicle.CreateVehicle(NAPI.Util.GetHashKey(carName), vecSpawn, spawn.spawnA, col1, col2, target.Name, 255, false, true, Convert.ToUInt32(lobby.lobbyId));
-                                pVehicle.EngineStatus = true;
-                                pVehicle.SetSharedData("Engine", true);
-                                pVehicle.SetSharedData("Locked", true);
-                                pVehicle.Locked = true;
-                                pVehicle.SetSharedData("Team", 1);
-
-                                lobby.Vehicles.Add(pVehicle);
-
-                                NAPI.Task.Run(() =>
-                                {
-                                    lock (pVehicle)
-                                    {
-                                        if (pVehicle.Exists && pVehicle != null) pVehicle.Position = vecSpawn;
-                                    }
-                                }, 1000);
-
-
-                                target.Position = new Vector3(spawn.spawnX, spawn.spawnY, spawn.spawnZ).Around(5f);
-                                target.Dimension = Convert.ToUInt32(lobby.lobbyId);
-                                EPlayer.Freeze(target, false);
-
-                                target.SetData("GPS", false);
-
+                                Character.SetTeamOutfit(target, 1);
+                                EPlayer.SetColor(target, new Color(0, 151, 255), 0);
                                 EPlayer.SetDiscordStatus(target, $"[Lobby {lobby.lobbyId}] Cop as {target.Name}");
-
-                                target.TriggerEvent("SetActorInvulnerable", false);
-                                target.TriggerEvent("ToggleAFOB", Settings.Dynamics.AntiFallOffBike, Settings.Dynamics.AntiFallOffBikeSpeedLimit);
-                                target.SetSharedData("CuffedBy", "n/a");
                                 target.SetSharedData("Team", 1);
 
-                                EPlayer.GiveCopWeapons(target);
+                                target.SetSharedData("FugitiveChance", target.GetSharedDataSafe<float>("FugitiveChance") + 1.0f);
+
+                                int clanID = EPlayer.GetAccount(target).ClanID;
+                                string carModel = EPlayer.GetAccount(target).CarCop;
+
+                                // Normal car spawning, no partners
+                                Vehicle noPartnerCar = null;
+                                noPartnerCar = Main.CreatePoliceVehicle(target, carSpawns, heliSpawns, lobby, 0);
+                                target.Position = noPartnerCar.Position.Around(10.0f);
                                 NAPI.Task.Run(() =>
                                 {
-                                    try { target.SetIntoVehicle(pVehicle, 0); } catch { }
-                                });
+                                    if (target != null && noPartnerCar != null)
+                                    {
+                                        target.SetIntoVehicle(noPartnerCar, 0);
+                                        EPlayer.GiveCopWeapons(target);
+
+                                        player.Dimension = Convert.ToUInt32(lobby.lobbyId);
+                                        EPlayer.Freeze(player, false);
+                                        player.TriggerEvent("stopLoadingScreen");
+                                    }
+                                }, 1000);
                             }
 
-
-                            // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:setteam:{target.Name}:{team}"); } catch { }
-
-                            Logs.LogAdmin(player, $"Set {target.Name}'s team to cop.");
-                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name} as a cop in copchase.");
+                            Logs.LogAdmin(player, $"Set {target.Name}'s team to {(teamID == 1 ? "cop" : "fugitive")}.");
+                            EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}[AdmCmd] {player.Name} has set {target.Name} as a {(teamID == 1 ? "cop" : "fugitive")} in copchase.");
                         });
                     }
                 });
@@ -8019,7 +7923,7 @@ namespace RNC
             catch { player.SendChatMessage("!{#FF6347}Very very internal error occured, please don't use this. -kEVy"); }
             return;
         }
-*/
+
         [Command("maps")]
         public void cmd_maps(Player player)
         {
