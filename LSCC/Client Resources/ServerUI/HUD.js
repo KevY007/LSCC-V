@@ -1838,7 +1838,7 @@ mp.events.add("render", () => {
 
         if(mp.players.local.weapon == 2725352035){
             if(wasWeaponShownInHud === true){
-                if(global.ServerUI) global.ServerUI.execute("hud_info_weapon_toggle", false);
+                if(global.ServerUI) global.ServerUI.call("hud_info_weapon_toggle", false);
                 wasWeaponShownInHud = false;
             }
         }
@@ -1858,11 +1858,11 @@ mp.events.add("render", () => {
             let clipSize = mp.game.weapon.getWeaponClipSize(weapon_hash);
 
             if(wasWeaponShownInHud === false){
-                if(global.ServerUI) global.ServerUI.execute("hud_info_weapon_toggle", true);
+                if(global.ServerUI) global.ServerUI.call("hud_info_weapon_toggle", true);
                 wasWeaponShownInHud = true;
             }   
 
-            if(global.ServerUI) global.ServerUI.execute("hud_info_current_weapon_set", {
+            if(global.ServerUI) global.ServerUI.call("hud_info_current_weapon_set", {
                 name: wepData.Name,
                 ammoInClip: ammoClip,
                 ammo: (ammoWeapon + (clipSize-ammoClip)),

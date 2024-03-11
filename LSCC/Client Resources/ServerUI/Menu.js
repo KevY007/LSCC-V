@@ -1547,17 +1547,17 @@ mp.events.add("mainmenu_play_custom_room_settings_update", (roomJSON) => {
     roomData.maxPing
   );
 });
-mp.events.add("privateRoom_delete", (id) => {
+mp.events.add("custom_room_delete", (id) => {
   mp.events.callRemote("Menu_OnLobbyDelete", id);
 });
-mp.events.add("privateRoom_kickPlayer", (id) => {
+mp.events.add("custom_room_kick_player", (id) => {
   mp.events.callRemote("Menu_OnLobbyKickPlayer", id);
 });
 
-mp.events.add("privateRoom_banPlayer", (id) => {
+mp.events.add("custom_room_ban_player", (id) => {
   mp.events.callRemote("Menu_OnLobbyBanPlayer", id);
 });
-mp.events.add("privateRoom_unbanPlayer", (id) => {
+mp.events.add("custom_room_unban_player", (id) => {
   mp.events.callRemote("Menu_OnLobbyUnbanPlayer", id);
 });
 mp.events.add("removePrivateLobby", () => {

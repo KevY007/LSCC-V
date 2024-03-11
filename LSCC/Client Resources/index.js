@@ -171,6 +171,7 @@ mp.events.add("RememberMe_Toggle", (value) => {
 
 mp.events.add("setAuthDonators", (donorList) => {
   eval(`var authDonators = ${donorList}`);
+  mp.events.callRemote("ServerConsoleOutput", donorList);
   if(global.ServerUI) global.ServerUI.call("auth_donators_set", authDonators);
 });
 mp.events.add('showLoginBrowser', (state) => {
