@@ -401,8 +401,10 @@ namespace RNC
                             Account toUpdate = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == AccountSQLID);
                             toUpdate.FugitiveOutfitID = savedFugitive.SQL_ID;
                             toUpdate.CopOutfitID = savedCop.SQL_ID;
+                            toUpdate.LobbyClothing = savedCop.SQL_ID;
                             acc.FugitiveOutfitID = savedFugitive.SQL_ID;
                             acc.CopOutfitID = savedCop.SQL_ID;
+                            acc.LobbyClothing = savedCop.SQL_ID;
                             await context.SaveChangesAsync();
 
                             CharacterSlot character = new CharacterSlot()
@@ -422,6 +424,7 @@ namespace RNC
                             {
                                 EPlayer.GetAccount(player).CopOutfitID = savedCop.SQL_ID;
                                 EPlayer.GetAccount(player).FugitiveOutfitID = savedFugitive.SQL_ID;
+                                EPlayer.GetAccount(player).LobbyClothing = savedCop.SQL_ID;
                                 EPlayer.Save(player, false);
 
                                 UpdateActiveOutfitVariable(player, savedFugitive, 0);
@@ -586,10 +589,15 @@ namespace RNC
                                 toUpdateAcc.CopOutfitID = _findNewToSet.SQL_ID;
                                 acc.CopOutfitID = _findNewToSet.SQL_ID;
                             }
-                            else
+                            else if(teamID == 1)
                             {
                                 toUpdateAcc.FugitiveOutfitID = _findNewToSet.SQL_ID;
                                 acc.CopOutfitID = _findNewToSet.SQL_ID;
+                            }
+                            else
+                            {
+                                toUpdateAcc.LobbyClothing = _findNewToSet.SQL_ID;
+                                acc.LobbyClothing = _findNewToSet.SQL_ID;
                             }
                         }
 
@@ -615,6 +623,7 @@ namespace RNC
         {
             if (team == 0 && player.HasSharedData("CHARACTER:FugitiveOutfit")) return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:FugitiveOutfit"));
             if (team == 1 && player.HasSharedData("CHARACTER:PoliceOutfit")) return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:PoliceOutfit"));
+            if (team == 2 && player.HasSharedData("CHARACTER:LobbyOutfit")) return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:LobbyOutfit"));
             return null;
         }
         public async static Task UpdateActiveOutfitVariables(Player player, Account account)
@@ -624,12 +633,17 @@ namespace RNC
 
             SavedOutfit activeCopOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.CopOutfitID);
             SavedOutfit activeFugitiveOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.FugitiveOutfitID);
+            SavedOutfit activeLobbyOutfit = outfits.FirstOrDefault(o => o.SQL_ID == account.LobbyClothing);
 
-            if (activeCopOutfit == null || activeFugitiveOutfit == null)
+            if (activeCopOutfit == null || activeFugitiveOutfit == null || activeLobbyOutfit == null)
             {
                 activeCopOutfit = outfits.FirstOrDefault(o => o.AccountID == account.SQL_ID && o.Team == 1);
                 activeFugitiveOutfit = outfits.FirstOrDefault(o => o.AccountID == account.SQL_ID && o.Team == 0);
-                if (activeCopOutfit == null || activeFugitiveOutfit == null) return; // if they're still null just fucking quit at this point
+
+                // The default lobby outfit is the active cop outfit
+                activeLobbyOutfit = outfits.FirstOrDefault(o => o.AccountID == account.SQL_ID && o.Team == 1);
+
+                if (activeCopOutfit == null || activeFugitiveOutfit == null || activeLobbyOutfit == null) return; // if they're still null just fucking quit at this point
 
                 using(MainDatabase context = ContextFactory.CreateContext())
                 {
@@ -637,8 +651,10 @@ namespace RNC
                     if (_toUpdate == null) return;
                     _toUpdate.CopOutfitID = activeCopOutfit.SQL_ID;
                     _toUpdate.FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
+                    _toUpdate.LobbyClothing = activeLobbyOutfit.SQL_ID;
                     account.CopOutfitID = activeCopOutfit.SQL_ID;
                     account.FugitiveOutfitID = activeFugitiveOutfit.SQL_ID;
+                    account.LobbyClothing = activeLobbyOutfit.SQL_ID;
                     await context.SaveChangesAsync();
                     NAPI.Task.Run(() =>
                     {
@@ -651,6 +667,7 @@ namespace RNC
             {
                 player.SetSharedData("CHARACTER:PoliceOutfit", NAPI.Util.ToJson(activeCopOutfit));
                 player.SetSharedData("CHARACTER:FugitiveOutfit", NAPI.Util.ToJson(activeFugitiveOutfit));
+                player.SetSharedData("CHARACTER:LobbyOutfit", NAPI.Util.ToJson(activeLobbyOutfit));
             });
             await NAPI.Task.WaitForMainThread();
         }
@@ -660,9 +677,13 @@ namespace RNC
             {
                 player.SetSharedData("CHARACTER:FugitiveOutfit", NAPI.Util.ToJson(outfit));
             }
-            else
+            else if(teamID == 1)
             {
                 player.SetSharedData("CHARACTER:PoliceOutfit", NAPI.Util.ToJson(outfit));
+            }
+            else
+            {
+                player.SetSharedData("CHARACTER:LobbyOutfit", NAPI.Util.ToJson(outfit));
             }
         }
         
@@ -676,14 +697,18 @@ namespace RNC
 
                 if (teamID == 0)
                     _a.FugitiveOutfitID = outfitID;
-                else _a.CopOutfitID = outfitID;
+                else if (teamID == 1)
+                    _a.CopOutfitID = outfitID;
+                else _a.LobbyClothing = outfitID;
 
                 await context.SaveChangesAsync();
                 NAPI.Task.Run(() =>
                 {
                     if (teamID == 0)
                         EPlayer.GetAccount(player).FugitiveOutfitID = outfitID;
-                    else EPlayer.GetAccount(player).CopOutfitID = outfitID;
+                    else if(teamID == 1)
+                        EPlayer.GetAccount(player).CopOutfitID = outfitID;
+                    else EPlayer.GetAccount(player).LobbyClothing = outfitID;
                     EPlayer.Save(player, false);
                     UpdateActiveOutfitVariable(player, _new, teamID);
                 });
