@@ -6858,13 +6858,6 @@ namespace RNC
         [RemoteEvent("OutfitCreator:SaveActive")]
         public void OutfitEditor_OnSetActive(Player player, int outfitID, int team)
         {
-            if(outfitID == 2) // Minigame outfit
-            {
-                EPlayer.GetAccount(player).LobbyClothing = outfitID;
-                EPlayer.Save(player, false);
-                return;
-            }
-
             Account acc = EPlayer.GetAccount(player);
             Task.Run(async () =>
             {

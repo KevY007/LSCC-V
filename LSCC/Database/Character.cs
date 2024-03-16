@@ -577,10 +577,13 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        SavedOutfit _check = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == (teamID == 1 ? acc.CopOutfitID : acc.FugitiveOutfitID));
+                        SavedOutfit _check = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == (teamID == 0 ? acc.FugitiveOutfitID : acc.CopOutfitID));
                         if (_check == null)
                         {
-                            SavedOutfit _findNewToSet = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == teamID);
+                            int teamToLookFor = teamID;
+                            if (teamID == 2) teamToLookFor = 1; // if they have no lobby outfit set.. look for cop outfit
+
+                            SavedOutfit _findNewToSet = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == acc.SQL_ID && o.Team == teamToLookFor);
                             _check = _findNewToSet;
 
                             Account toUpdateAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == acc.SQL_ID);
@@ -840,6 +843,11 @@ namespace RNC
             {
                 if (!player.HasSharedData("CHARACTER:PoliceOutfit")) return null;
                 return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:PoliceOutfit"));
+            }
+            if (team == 2)
+            {
+                if (!player.HasSharedData("CHARACTER:LobbyOutfit")) return null;
+                return NAPI.Util.FromJson<SavedOutfit>(player.GetSharedData<string>("CHARACTER:LobbyOutfit"));
             }
             return null;
         }
