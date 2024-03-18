@@ -9081,7 +9081,7 @@ namespace RNC
             }
 
             Character.ApplyAppearance(player, Character.GetCharacter(player).SavedAppearance);
-            Character.SetTeamOutfit(player, EPlayer.GetAccount(player).LobbyClothing);
+            Character.SetTeamOutfit(player, 2);
 
             player.SetSharedData("Ping", player.Ping);
             player.SetData("SpawnTick", Environment.TickCount64);
@@ -9357,7 +9357,7 @@ namespace RNC
                     if (arenaID > -1 && lobby != null && lobby.gameStatus != 2) // DM
                     {
                         // New Outfit Shit
-                        Character.SetTeamOutfit(player, acc.LobbyClothing);
+                        Character.SetTeamOutfit(player, 2);
 
                         Random rand = new Random(DateTimeOffset.UtcNow.Millisecond);
 

@@ -427,7 +427,7 @@ namespace RNC
                 Account a = EPlayer.GetAccount(i);
 
                 Character.ApplyAppearance(i, Character.GetCharacter(i).SavedAppearance);
-                Character.SetTeamOutfit(i, a.LobbyClothing);
+                Character.SetTeamOutfit(i, 2);
             }
             if (i.HasData("Spectating") && EPlayer.GetAccount(i).Admin < 1)
             {
@@ -2358,7 +2358,7 @@ namespace RNC
                 if (!Settings.LoggedInPlayers.Contains(player)) Settings.LoggedInPlayers.Add(player);
 
                 Character.ApplyAppearance(player, Character.GetCharacter(player).SavedAppearance);
-                Character.SetTeamOutfit(player, EPlayer.GetAccount(player).LobbyClothing);
+                Character.SetTeamOutfit(player, 2);
 
                 Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
 
