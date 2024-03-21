@@ -1468,6 +1468,7 @@ namespace RNC
         }
         public async static void SetNewDailyChallenges()
         {
+            return;
             using (MainDatabase context = ContextFactory.CreateContext())
             {
                 Random randomizer = new Random();
@@ -2858,14 +2859,7 @@ namespace RNC
             NAPI.TextLabel.CreateTextLabel("Confused? /help or /helpme", new Vector3(120.84272f, -744.534f, 242.15207f), 13.0f, 2.2f, 0, new Color(255, 255, 255, 156), false);
             NAPI.TextLabel.CreateTextLabel("Want to watch the round? /spec", new Vector3(118.04166f, -757.9125f, 242.15215f), 13.0f, 2.2f, 0, new Color(255, 228, 0, 156), false);
 
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    if (await context.DailyChallenges.AsQueryable().CountAsync() <= 0)
-                        Challenge.SetNewDailyChallenges();
-                }
-            });
+
 
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
@@ -3042,10 +3036,9 @@ namespace RNC
                             long seconds = (long)Math.Ceiling(sp.TotalSeconds);
 
                             // since they are all set at the time, it's enough that only one of them expired to re-new them
-                            DailyChallenge dc = await context.DailyChallenges.AsQueryable().FirstOrDefaultAsync(c => c.ExpireTimestamp <= seconds);
+                            /*DailyChallenge dc = await context.DailyChallenges.AsQueryable().FirstOrDefaultAsync(c => c.ExpireTimestamp <= seconds);
                             if (dc != null)
                             {
-                                Challenge.SetNewDailyChallenges();
                                 NAPI.Task.Run(() =>
                                 {
                                     EPlayer.SendMessageToAll("NEW_CHALLENGES");
@@ -3055,7 +3048,7 @@ namespace RNC
                                 {
                                     acc.CompletedDailyChallenge = false;
                                 });
-                            }
+                            }*/
 
                             // runweeklymonthlychecks - will check if a week or month has passed and do shit
                             NAPI.Task.Run(() =>

@@ -9712,17 +9712,6 @@ namespace RNC
             EPlayer.TryAdvanceChallenge(player, type, item);
         }
 
-        [Command("dbgresetchallenges")]
-        public void cmd_dbgresetchallengers(Player player)
-        {
-            if (EPlayer.GetAccount(player).Admin < 6) return;
-
-            EPlayer.SendMessageToAllEx("!{#c387ff}[DAILY CHALLENGES] ~w~New daily challenges are now available! Check ~y~Menu > Profile~w~ for more info.");
-            Task.Run(async () => {
-                Challenge.SetNewDailyChallenges();
-            });
-        }
-
         [Command("unlockitem")]
         public void cmd_unlockitem(Player player, string type, string name, int team)
         {
