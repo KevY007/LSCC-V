@@ -884,6 +884,7 @@ namespace RNC
         public static Dictionary<long, jWeaponData> WeaponData { get; set; } = new Dictionary<long, jWeaponData>();
         public static List<jCarGenData> CarGenData { get; set; } = new List<jCarGenData>();
         public static List<SpawnSet> FreeroamSpawns { get; set; } = new List<SpawnSet>();
+        public static List<ShopVehicleData> CopchaseVehicles { get; set; }
 
         public static bool OOCSlowMode { get; set; } = false;
 
@@ -2735,8 +2736,9 @@ namespace RNC
                 //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3)
                 .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
 
-
-            /* VEHICLES/SELECTION CREATION */
+            #region OLD COPCHASE VEHICLES SYSTEM - DISABLED (Static Vehicles)
+            /*
+            VEHICLES/SELECTION CREATION
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the selection vehicles...");
 
             // Defaults
@@ -2832,6 +2834,18 @@ namespace RNC
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             //new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
             //new CarData(0, "2022 Porsche Cayenne", "cayenneturbo", "package://Artwork/Vehicles/cayenneturbo.png", "Fast+", 60, 80);
+            */
+            #endregion
+
+            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loading shop vehicle data on another thread...");
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Settings.CopchaseVehicles = await context.ShopVehicles.AsQueryable().ToListAsync();
+                    NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loaded shop vehicle data.");
+                }
+            });
 
             if (Settings.Dynamics.Discord)
             {
