@@ -1,4 +1,7 @@
-﻿var global = require('./globals');
+﻿mp.gui.chat.show(false);
+mp.gui.chat.activate(false);
+
+var global = require('./globals');
 const {TranslateMessage: Translate} = require('./Translator');
 mp.players.local.Team = -1;
 mp.game.vehicle.defaultEngineBehaviour = false;
@@ -10,7 +13,13 @@ mp.game.gameplay.setFadeOutAfterDeath(false);
 mp.players.local.setConfigFlag(429, false);
 mp.players.local.setRagdollFlag(2);
 
+mp.events.add("browserDomReady", (browser) => {
+  mp.gui.chat.show(false);
+  if(browser === global.ServerUI){
+    browser.markAsChat();
+  }
 
+});
 
 global.traceLastFunc("Main::LoadIPLs()");
 // where IPL names name of your .ymap file in dlc -> mapping.rpf

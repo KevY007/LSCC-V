@@ -4306,10 +4306,7 @@ mp.events.add(
     },
 
     "playerReady": (player) => {
-        setTimeout(() => {
-            mp.gui.chat.show(false);
-            mp.gui.chat.activate(false);
-            /*
+        setTimeout(() => {            /*
             loginBrowser = mp.browsers.new("package://LoginRegister/index.html"); // Right on connect so it doesn't overlay the notifications.
             loginBrowser.active = false;
             */
@@ -4318,8 +4315,6 @@ mp.events.add(
             global.LastKeyPress = Date.now();
             global.AFKStage = 0;
             global.antiAFKActive = false;
-            mp.gui.chat.show(false);
-            //mp.gui.chat.activate(false);
             setTimeout(() => {
                 if(global.ServerUI) global.ServerUI.markAsChat();
             }, 250);
