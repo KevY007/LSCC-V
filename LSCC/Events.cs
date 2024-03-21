@@ -21,6 +21,7 @@ using GTANetworkAPI;
 using System.Net.Mime;
 using System.Xml.Linq;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
+using System.Reflection.Emit;
 
 namespace RNC
 {
@@ -7488,6 +7489,105 @@ namespace RNC
                 }
             });
             */
+        }
+
+        [RemoteEvent("CCVehicleManager:DeleteVehicle")]
+        public static void OnCCVehicleManagerDeleteVehicle(Player player, int sqlID)
+        {
+            if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    ShopVehicleData veh = await context.ShopVehicles.AsQueryable().FirstOrDefaultAsync(v => v.SQL_ID == sqlID);
+                    if (veh == null) return;
+
+                    context.ShopVehicles.Remove(veh);
+                    await context.SaveChangesAsync();
+
+                    Settings.CopchaseVehicles.Clear();
+                    Settings.CopchaseVehicles = await context.ShopVehicles.AsQueryable().ToListAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"Successfully deleted <strong>{veh.Name.ToUpper()}</strong> from the vehicle shop.", "green", "", false, 3000);
+                        Logs.LogAdmin(player, $"Deleted vehicle {veh.Name.ToUpper()} from the vehicle shop.");
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("CCVehicleManager:UpdateVehicle")]
+        public static void OnCCVehicleManagerUpdateVehicle(Player player, int sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
+        {
+            if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
+
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    ShopVehicleData veh = await context.ShopVehicles.AsQueryable().FirstOrDefaultAsync(v => v.SQL_ID == sqlID);
+                    if (veh == null) return;
+
+                    veh.Name = name;
+                    veh.Model = model;
+                    veh.ImageURL = image;
+                    veh.MaxSpeedKMH = maxSpeed;
+                    veh.LevelRequired = level;
+                    veh.PricePoints = points;
+                    veh.PriceDiamondPoints = diamondPoints;
+                    veh.DonatorLevelRequired = donatorLevel;
+                    veh.Team = team;
+                    await context.SaveChangesAsync();
+
+                    Settings.CopchaseVehicles.Clear();
+                    Settings.CopchaseVehicles = await context.ShopVehicles.AsQueryable().ToListAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"Successfully updated <strong>{name.ToUpper()}</strong> in the vehicle shop.", "green", "", false, 3000);
+                        Logs.LogAdmin(player, $"Updated vehicle {name.ToUpper()} in the vehicle shop. New values: ([PRICE:{points}] [DP PRICE:{diamondPoints}] [LEVEL:{level}] [D. LEVEL:{donatorLevel}] [TEAM:{team}])");
+                    });
+                }
+            });
+        }
+
+        [RemoteEvent("CCVehicleManager:AddVehicle")]
+        public static void OnCCVehicleManagerAddVehicle(Player player, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
+        {
+            if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
+
+            ShopVehicleData shopVehicle = new ShopVehicleData()
+            {
+                Name = name,
+                Model = model,
+                ImageURL = image,
+                MaxSpeedKMH = maxSpeed,
+                LevelRequired = level,
+                DonatorLevelRequired = donatorLevel,
+                PricePoints = points,
+                PriceDiamondPoints = diamondPoints,
+                Team = team
+            };
+
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    await context.ShopVehicles.AddAsync(shopVehicle);
+                    await context.SaveChangesAsync();
+
+                    Settings.CopchaseVehicles.Clear();
+                    Settings.CopchaseVehicles = await context.ShopVehicles.AsQueryable().ToListAsync();
+
+                    NAPI.Task.Run(() =>
+                    {
+                        EPlayer.Notify(player, $"Successfully added <strong>{name.ToUpper()}</strong> to the vehicle shop.", "green", "", false, 3000);
+                        Logs.LogAdmin(player, $"Added vehicle {name.ToUpper()} to the vehicle shop. ([PRICE:{points}] [DP PRICE:{diamondPoints}] [LEVEL:{level}] [D. LEVEL:{donatorLevel}] [TEAM:{team}])");
+                    });
+                }
+            });
         }
 
         [RemoteEvent("ReplaceAFKDriver")]

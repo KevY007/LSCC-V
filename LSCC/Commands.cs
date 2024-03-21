@@ -6450,6 +6450,22 @@ namespace RNC
             }
         }
 
+        [Command("vehiclemanager", Alias = "vehmanager, vmanager, managevehicles")]
+        public void cmd_vehiclemanager(Player player)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 4)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
+            player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
+        }
+
         [Command("checkplayer", "!{#AFAFAF}[USAGE] checkplayer (account name) | Checks & gets all associated accounts with a player")]
         public void cmd_checkplayer(Player player, string accountname)
         {
