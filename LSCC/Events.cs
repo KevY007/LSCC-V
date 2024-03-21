@@ -6441,18 +6441,18 @@ namespace RNC
         public async Task<List<object[]>> Menu_VehicleData(Account _a)
         {
             List<object[]> vehItems = new List<object[]>();
-            foreach (var car in Settings.Cars)
+            foreach (ShopVehicleData car in Settings.CopchaseVehicles)
             {
 
                 string requirements = "[";
                 if (car.LevelRequired > 0)
                     requirements += $"{{\"text\":\"Level {car.LevelRequired}\", \"meets\":{(_a.Level >= car.LevelRequired).ToString().ToLower()}}},";
 
-                if (car.PointsRequired > 0)
-                    requirements += $"{{\"text\":\"{car.PointsRequired} Points\", \"meets\":{(_a.Points >= car.PointsRequired).ToString().ToLower()}}},";
+                if (car.PricePoints > 0)
+                    requirements += $"{{\"text\":\"{car.PricePoints} Points\", \"meets\":{(_a.Points >= car.PricePoints).ToString().ToLower()}}},";
 
-                if (car.DonatorPointsRequired > 0)
-                    requirements += $"{{\"text\":\"{car.DonatorPointsRequired} Donator Points\", \"meets\":{(_a.DonatorPoints >= car.DonatorPointsRequired).ToString().ToLower()}}},";
+                if (car.PriceDiamondPoints > 0)
+                    requirements += $"{{\"text\":\"{car.PriceDiamondPoints} Donator Points\", \"meets\":{(_a.DonatorPoints >= car.PriceDiamondPoints).ToString().ToLower()}}},";
 
                 if (car.DonatorLevelRequired > 0)
                     requirements += $"{{\"text\":\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", \"meets\":{(_a.DonatorLevel >= car.DonatorLevelRequired).ToString().ToLower()}}},";
@@ -6470,10 +6470,10 @@ namespace RNC
                             car.Team,
                             car.Model,
                             car.Name,
-                            car.Image,
+                            car.ImageURL,
                             !isOwnedVeh,
-                            car.Info,
-                            requirements
+                            $"{car.MaxSpeedKMH} KM/H",
+                            requirements 
                 });
             }
 
