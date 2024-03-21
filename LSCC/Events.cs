@@ -7513,6 +7513,8 @@ namespace RNC
                     {
                         EPlayer.Notify(player, $"Successfully deleted <strong>{veh.Name.ToUpper()}</strong> from the vehicle shop.", "green", "", false, 3000);
                         Logs.LogAdmin(player, $"Deleted vehicle {veh.Name.ToUpper()} from the vehicle shop.");
+                        string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
+                        player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
                     });
                 }
             });
@@ -7548,6 +7550,8 @@ namespace RNC
                     {
                         EPlayer.Notify(player, $"Successfully updated <strong>{name.ToUpper()}</strong> in the vehicle shop.", "green", "", false, 3000);
                         Logs.LogAdmin(player, $"Updated vehicle {name.ToUpper()} in the vehicle shop. New values: ([PRICE:{points}] [DP PRICE:{diamondPoints}] [LEVEL:{level}] [D. LEVEL:{donatorLevel}] [TEAM:{team}])");
+                        string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
+                        player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
                     });
                 }
             });
@@ -7585,6 +7589,8 @@ namespace RNC
                     {
                         EPlayer.Notify(player, $"Successfully added <strong>{name.ToUpper()}</strong> to the vehicle shop.", "green", "", false, 3000);
                         Logs.LogAdmin(player, $"Added vehicle {name.ToUpper()} to the vehicle shop. ([PRICE:{points}] [DP PRICE:{diamondPoints}] [LEVEL:{level}] [D. LEVEL:{donatorLevel}] [TEAM:{team}])");
+                        string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
+                        player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
                     });
                 }
             });

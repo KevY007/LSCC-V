@@ -1406,6 +1406,46 @@ function minigameNameToID(name) {
   }
 }
 
+mp.events.add("dialog_vehicles_manager_delete", (id) => {
+  mp.events.callRemote("CCVehicleManager:DeleteVehicle", id);
+});
+mp.events.add("dialog_vehicles_manager_update", (vehicle) => {
+  const v = JSON.parse(vehicle);
+  mp.events.callRemote("CCVehicleManager:UpdateVehicle", v.id, v.name, v.model, v.image, v.speed, v.requirements.level, 
+  v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
+});
+mp.events.add("dialog_vehicles_manager_add", (vehicle) => {
+  const v = JSON.parse(vehicle);
+  mp.events.callRemote("CCVehicleManager:AddVehicle", v.name, v.model, v.image, v.speed, v.requirements.level, 
+  v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
+});
+
+
+mp.events.add("CS_CCVehicleManager:Open", (vehicleData) => {
+  const vehDataJSON = JSON.parse(vehicleData);
+  if(!vehDataJSON) return;
+
+  const arrayForManager = vehDataJSON.map((v) => {
+    return {
+      id:v.SQL_ID,
+      teamId:v.Team,
+      model:v.Model,
+      name:v.Name,
+      image:v.ImageURL,
+      speed:v.MaxSpeedKMH,
+      requirements:{
+        level:v.LevelRequired,
+        diamondPoints:v.PriceDiamondPoints,
+        donatorLevel:v.DonatorLevelRequired,
+        points:v.PricePoints
+      }
+    }
+  });
+
+  if(global.ServerUI) global.ServerUI.call("dialog_vehicles_manager_open", arrayForManager);
+});
+
+
 mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
 
 });
