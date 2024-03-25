@@ -239,6 +239,8 @@ function carryCheck(){
         (global.isHotwiring !== undefined && global.isHotwiring == true)){
         return;
     }
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
     global.carryTarget = mp.players.local.getVariable("CarryingPlayer");
     if(global.carryTarget === -1){
         tryCarryPlayer();

@@ -64,6 +64,8 @@ mp.events.add("OneSecondEvent", () => {
 });
 
 mp.keys.bind(0x42, false, () => {
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
     if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
         (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
         (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) ||

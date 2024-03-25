@@ -1136,6 +1136,18 @@ mp.events.addCommand("bigmapbind", function (bind) {
 
 function ToggleBigMap(state){
 
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
+    if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
+    (global.TeleportEditorOpen !== undefined && global.TeleportEditorOpen == true) ||
+    (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
+    (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
+    (global.ActionMenuActive !== undefined && global.ActionMenuActive == true) || 
+    (global.StationPickerToggled !== undefined && global.StationPickerToggled == true) ||
+    (global.isHotwiring !== undefined && global.isHotwiring == true) || global.isHeliCamActive()){
+        return;
+    }
+
     state = Number(state);
 
     if (Number.isInteger(state) && (state == 0 || state == 1)) {
