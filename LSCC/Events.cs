@@ -7492,7 +7492,7 @@ namespace RNC
         }
 
         [RemoteEvent("CCVehicleManager:DeleteVehicle")]
-        public static void OnCCVehicleManagerDeleteVehicle(Player player, int sqlID)
+        public static void OnCCVehicleManagerDeleteVehicle(Player player, string sqlID)
         {
             if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
 
@@ -7500,7 +7500,7 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    ShopVehicleData veh = await context.ShopVehicles.AsQueryable().FirstOrDefaultAsync(v => v.SQL_ID == sqlID);
+                    ShopVehicleData veh = await context.ShopVehicles.AsQueryable().FirstOrDefaultAsync(v => v.SQL_ID == Guid.Parse(sqlID));
                     if (veh == null) return;
 
                     context.ShopVehicles.Remove(veh);
@@ -7513,15 +7513,13 @@ namespace RNC
                     {
                         EPlayer.Notify(player, $"Successfully deleted <strong>{veh.Name.ToUpper()}</strong> from the vehicle shop.", "green", "", false, 3000);
                         Logs.LogAdmin(player, $"Deleted vehicle {veh.Name.ToUpper()} from the vehicle shop.");
-                        string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
-                        player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
                     });
                 }
             });
         }
 
         [RemoteEvent("CCVehicleManager:UpdateVehicle")]
-        public static void OnCCVehicleManagerUpdateVehicle(Player player, int sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
+        public static void OnCCVehicleManagerUpdateVehicle(Player player, string sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
         {
             if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
 
@@ -7529,9 +7527,10 @@ namespace RNC
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
                 {
-                    ShopVehicleData veh = await context.ShopVehicles.AsQueryable().FirstOrDefaultAsync(v => v.SQL_ID == sqlID);
+                    ShopVehicleData veh = await context.ShopVehicles.AsQueryable().FirstOrDefaultAsync(v => v.SQL_ID == Guid.Parse(sqlID));
                     if (veh == null) return;
 
+                    veh.SQL_ID = Guid.Parse(sqlID);
                     veh.Name = name;
                     veh.Model = model;
                     veh.ImageURL = image;
@@ -7550,20 +7549,19 @@ namespace RNC
                     {
                         EPlayer.Notify(player, $"Successfully updated <strong>{name.ToUpper()}</strong> in the vehicle shop.", "green", "", false, 3000);
                         Logs.LogAdmin(player, $"Updated vehicle {name.ToUpper()} in the vehicle shop. New values: ([PRICE:{points}] [DP PRICE:{diamondPoints}] [LEVEL:{level}] [D. LEVEL:{donatorLevel}] [TEAM:{team}])");
-                        string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
-                        player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
                     });
                 }
             });
         }
 
         [RemoteEvent("CCVehicleManager:AddVehicle")]
-        public static void OnCCVehicleManagerAddVehicle(Player player, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
+        public static void OnCCVehicleManagerAddVehicle(Player player, string sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
         {
             if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
 
             ShopVehicleData shopVehicle = new ShopVehicleData()
             {
+                SQL_ID = Guid.Parse(sqlID),
                 Name = name,
                 Model = model,
                 ImageURL = image,
@@ -7589,8 +7587,6 @@ namespace RNC
                     {
                         EPlayer.Notify(player, $"Successfully added <strong>{name.ToUpper()}</strong> to the vehicle shop.", "green", "", false, 3000);
                         Logs.LogAdmin(player, $"Added vehicle {name.ToUpper()} to the vehicle shop. ([PRICE:{points}] [DP PRICE:{diamondPoints}] [LEVEL:{level}] [D. LEVEL:{donatorLevel}] [TEAM:{team}])");
-                        string vehicleData = NAPI.Util.ToJson(Settings.CopchaseVehicles);
-                        player.TriggerEvent("CS_CCVehicleManager:Open", vehicleData);
                     });
                 }
             });

@@ -1407,23 +1407,28 @@ function minigameNameToID(name) {
 }
 
 mp.events.add("dialog_vehicles_manager_delete", (id) => {
+  mp.events.callRemote(`ServerConsoleOutput`, `Deleted vehicle in DB: ${id}`);
   mp.events.callRemote("CCVehicleManager:DeleteVehicle", id);
 });
 mp.events.add("dialog_vehicles_manager_update", (vehicle) => {
+  mp.events.callRemote(`ServerConsoleOutput`, `Updated vehicle in DB: ${vehicle}`);
   const v = JSON.parse(vehicle);
   mp.events.callRemote("CCVehicleManager:UpdateVehicle", v.id, v.name, v.model, v.image, v.speed, v.requirements.level, 
   v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
 });
 mp.events.add("dialog_vehicles_manager_add", (vehicle) => {
+  mp.events.callRemote(`ServerConsoleOutput`, `Added vehicle to DB: ${vehicle}`);
   const v = JSON.parse(vehicle);
-  mp.events.callRemote("CCVehicleManager:AddVehicle", v.name, v.model, v.image, v.speed, v.requirements.level, 
+  mp.events.callRemote("CCVehicleManager:AddVehicle", v.id, v.name, v.model, v.image, v.speed, v.requirements.level, 
   v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
 });
 
 
 mp.events.add("CS_CCVehicleManager:Open", (vehicleData) => {
+  if(!vehicleData) return;
   const vehDataJSON = JSON.parse(vehicleData);
   if(!vehDataJSON) return;
+  mp.events.callRemote(`ServerConsoleOutput`, `Opened vehicle manager: ${vehicleData}`);
 
   const arrayForManager = vehDataJSON.map((v) => {
     return {

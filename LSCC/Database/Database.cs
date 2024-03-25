@@ -83,7 +83,7 @@ namespace RNC
     public class ShopVehicleData
     {
         [Key]
-        public int SQL_ID { get; set; }
+        public Guid SQL_ID { get; set; }
         public string Name { get; set; }
         public string Model { get; set; }
         public string ImageURL { get; set; }
