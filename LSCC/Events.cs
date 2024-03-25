@@ -6298,14 +6298,14 @@ namespace RNC
         [RemoteEvent("MenuSelectedVehicle")]
         public void OnMenuVehicleSelect(Player player, string model, int team)
         {
-            if (Settings.Cars.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
+            if (Settings.CopchaseVehicles.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
             {
                 EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 2000, "bottomCenter", "replace");
                 return;
             }
 
             Account acc = EPlayer.GetAccount(player);
-            CarData car = Settings.Cars.ToList().Find(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team);
+            ShopVehicleData car = Settings.CopchaseVehicles.ToList().Find(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team);
 
             if (car.Model.Equals("superd")) // discord-exclusive car
             {
@@ -6350,14 +6350,14 @@ namespace RNC
                             EPlayer.Notify(player, Translate(player, "CAR_LEVEL_REQUIRED", car.LevelRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
-                        if (car.DonatorPointsRequired != 0 && car.DonatorPointsRequired > acc.DonatorPoints)
+                        if (car.PriceDiamondPoints != 0 && car.PriceDiamondPoints > acc.DonatorPoints)
                         {
-                            EPlayer.Notify(player, Translate(player, "CAR_DONORPOINTS_REQUIRED", car.DonatorPointsRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "CAR_DONORPOINTS_REQUIRED", car.PriceDiamondPoints), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
-                        if (car.PointsRequired != 0 && car.PointsRequired > acc.Points)
+                        if (car.PricePoints != 0 && car.PricePoints > acc.Points)
                         {
-                            EPlayer.Notify(player, Translate(player, "CAR_POINTS_REQUIRED", car.PointsRequired), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
+                            EPlayer.Notify(player, Translate(player, "CAR_POINTS_REQUIRED", car.PricePoints), "red", "fas fa-lock", false, 3000, "bottomCenter", "replace");
                             return;
                         }
                         if (car.DonatorLevelRequired != 0 && car.DonatorLevelRequired > acc.DonatorLevel)
@@ -6366,11 +6366,11 @@ namespace RNC
                             return;
                         }
 
-                        EPlayer.GivePoints(player, -car.PointsRequired, $"Purchased a vehicle: {car.Name}");
-                        acc.DonatorPoints -= car.DonatorPointsRequired; 
+                        EPlayer.GivePoints(player, -car.PricePoints, $"Purchased a vehicle: {car.Name}");
+                        acc.DonatorPoints -= car.PriceDiamondPoints; 
 
-                        if(car.DonatorPointsRequired > 0)
-                            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -car.DonatorPointsRequired, $"Purchased a car ({car.Name})");
+                        if(car.PriceDiamondPoints > 0)
+                            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -car.PriceDiamondPoints, $"Purchased a car ({car.Name})");
 
                         EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
                         EPlayer.Notify(player, Translate(player, "CAR_PURCHASED", car.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
