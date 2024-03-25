@@ -16,6 +16,7 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace RNC
 {
+
     class Commands : Script
     {
         static string Translate(Player player, string message_code, params object[] args)
