@@ -429,6 +429,11 @@ function ToggleMenu() {
   if (global.MDCActive !== undefined && global.MDCActive == true) {
     global.ToggleMDC();
   }
+
+  
+  if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+  (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
+
   if (
     (global.VehicleSpawnerActive !== undefined &&
       global.VehicleSpawnerActive == true) ||
@@ -1422,7 +1427,9 @@ mp.events.add("dialog_vehicles_manager_add", (vehicle) => {
   mp.events.callRemote("CCVehicleManager:AddVehicle", v.id, v.name, v.model, v.image, v.speed, v.requirements.level, 
   v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
 });
-
+mp.events.add("dialog_vehicles_manager_close", () => {
+  global.vehicleManagerOpen = false;
+})
 
 mp.events.add("CS_CCVehicleManager:Open", (vehicleData) => {
   if(!vehicleData) return;
@@ -1447,6 +1454,7 @@ mp.events.add("CS_CCVehicleManager:Open", (vehicleData) => {
     }
   });
 
+  global.vehicleManagerOpen = true;
   if(global.ServerUI) global.ServerUI.call("dialog_vehicles_manager_open", arrayForManager);
 });
 

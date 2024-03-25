@@ -245,6 +245,8 @@ mp.events.add('actionMenu:close', () => {
 mp.events.add('actionMenu:open', () => {
     if(global.isLoginScreenActive === true) return;
     if(global.isInPunishmentDialog) return;
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
     if(global.chatStatus == true || global.TeleportEditorOpen == true || global.isHeliCamActive() || global.menuToggled == true || global.MDCActive == true || global.scoreboardToggled == true
         || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.StationPickerToggled == true || global.isHotwiring == true || global.ClothingEditorActive == true) return;
 
@@ -743,6 +745,8 @@ mp.keys.bind(0xBF, true, function(){  // /? key
     if(mp.storage.data.menu.HUD !== undefined && mp.storage.data.menu.HUD == false){
         return;
     }
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
     if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
     (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
     (global.ClothingEditorActive !== undefined && global.ClothingEditorActive == true) ||
@@ -796,6 +800,10 @@ mp.keys.bind(0x54, true, function() { // T key
     {
         return;
     }
+    
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
+
     if((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
     (global.TeleportEditorOpen !== undefined && global.TeleportEditorOpen == true) ||
     (global.WeaponEditorActive !== undefined && global.WeaponEditorActive == true) ||
@@ -1256,6 +1264,8 @@ mp.keys.bind(0x75, false, () => {
 
 mp.keys.bind(0x74, false, () => {
     if(global.menuToggled !== undefined && global.menuToggled) return;
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
     if(global.scoreboardToggled == true) return;
     if(Date.now() - global.lastChatToggle >= 500 && global.chatStatus == false && 
         (mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true))
@@ -1701,6 +1711,8 @@ mp.keys.bind(0x71, false, function () {
 });
 
 mp.events.add("OneSecondEvent", () => {
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
     if(global.menuToggled == true || global.VehicleSpawnerActive == true || global.WeaponEditorActive == true || global.ClothingEditorActive == true 
     || global.ActionMenuActive == true || global.StationPickerToggled == true){
         mp.gui.cursor.show(true, true);
@@ -1715,6 +1727,8 @@ function ScoreboardKeyTrigger()
     if(global.menuToggled !== undefined && global.menuToggled) return;
     if(global.chatStatus && !global.scoreboardToggled) return;
     if(global.menuToggled) return;
+    if((global.vehicleManagerOpen !== undefined && global.vehicleManagerOpen == true) || 
+    (global.loadoutManagerOpen !== undefined && global.loadoutManagerOpen == true)) return;
 
     ToggleScoreboard();
 }

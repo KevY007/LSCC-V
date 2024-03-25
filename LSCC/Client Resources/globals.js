@@ -3033,6 +3033,9 @@ let global = {
 
   isInInterior:false,
 
+  vehicleManagerOpen:false,
+  loadoutManagerOpen:false,
+
   heliCam:null,
 
   IsInTutorial:false,
