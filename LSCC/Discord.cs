@@ -502,7 +502,8 @@ namespace RNC
                             {
                                 await EPlayer.UnlockLoadout(target, player, "Negotiator", 0);
                                 await EPlayer.UnlockLoadout(target, player, "Negotiator", 1);
-                                await EPlayer.UnlockVehicle(target, player, "superd", 0);
+                                // TO-DO: Super Diamond bonus vehicle for verifying
+                                //await EPlayer.UnlockVehicle(target, player, "superd", 0);
                             });
                         }
                         else

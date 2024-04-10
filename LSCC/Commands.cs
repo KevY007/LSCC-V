@@ -9729,23 +9729,6 @@ namespace RNC
             EPlayer.TryAdvanceChallenge(player, type, item);
         }
 
-
-        [Command("unlockitem")]
-        public void cmd_unlockitem(Player player, string type, string name, int team)
-        {
-            if (EPlayer.GetAccount(player).Admin < 6) return;
-            Account acc = EPlayer.GetAccount(player);
-            if (type == "loadout")
-            {
-                EPlayer.UnlockLoadout(acc, player, name, team);
-            }
-            else if (type == "car"){
-                EPlayer.UnlockVehicle(acc, player, name, team);
-            }
-            else player.SendChatMessage("~r~/unlockitem [type: loadout/car][loadout name / car model][team 0-fugi or 1-cop]");
-            return;
-        }
-
         [Command("setadmin", "!{#AFAFAF}[USAGE] setadmin (target) (level)", Alias = "makeadmin,setstaff")]
         public void cmd_setadmin(Player player, Player target, int level)
         {

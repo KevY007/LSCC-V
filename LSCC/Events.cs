@@ -5915,26 +5915,28 @@ namespace RNC
             Commands.cmd_weaponeditor(player);
         }
         [RemoteEvent("Menu_OnEditVehicle")]
-        public void OnMenuEditVehicle(Player player, string model, int teamID)
+        public void OnMenuEditVehicle(Player player, string vehicleID)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
+            ShopVehicleData vehicle = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.Equals(Guid.Parse(vehicleID)));
+
             Account _a = EPlayer.GetAccount(player);
             Task.Run(async () =>
             {
-                if (await EPlayer.HasOwnedVehicle(_a, model, teamID))
+                if (await EPlayer.HasOwnedVehicle(_a, vehicle))
                 {
                     NAPI.Task.Run(() =>
                     {
                         player.TriggerEvent("ForceCloseMenu");
-                        if (teamID == 1)
-                            EPlayer.GetAccount(player).CarCop = model;
+                        if (vehicle.Team == 1)
+                            EPlayer.GetAccount(player).CarCop = vehicle.Model;
                         else
-                            EPlayer.GetAccount(player).CarFugitive = model;
+                            EPlayer.GetAccount(player).CarFugitive = vehicle.Model;
 
                         EPlayer.Save(player, false);
-                        Commands.cmd_vtuner(player, (teamID == 1 ? "cop" : "fugitive"));
+                        Commands.cmd_vtuner(player, (vehicle.Team == 1 ? "cop" : "fugitive"));
                     });
                 }
                 else
@@ -6296,16 +6298,12 @@ namespace RNC
         }
 
         [RemoteEvent("MenuSelectedVehicle")]
-        public void OnMenuVehicleSelect(Player player, string model, int team)
+        public void OnMenuVehicleSelect(Player player, string vehicleID)
         {
-            if (Settings.CopchaseVehicles.Where(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team).Count() == 0 || team > 1 || team < 0)
-            {
-                EPlayer.Notify(player, "An unknown error has occured. Bad juju?!", "red", "fas fa-ban", false, 2000, "bottomCenter", "replace");
-                return;
-            }
+            ShopVehicleData car = Settings.CopchaseVehicles.ToList().Find(a => a.SQL_ID.Equals(Guid.Parse(vehicleID)));
+            if (car == null) return;
 
             Account acc = EPlayer.GetAccount(player);
-            ShopVehicleData car = Settings.CopchaseVehicles.ToList().Find(a => a.Model.Equals(model, StringComparison.OrdinalIgnoreCase) && a.Team == team);
 
             if (car.Model.Equals("superd")) // discord-exclusive car
             {
@@ -6317,9 +6315,9 @@ namespace RNC
             }
             Task.Run(async () =>
             {
-                if (await EPlayer.HasOwnedVehicle(acc, model, team))
+                if (await EPlayer.HasOwnedVehicle(acc, car))
                 {
-                    if (team == 0)
+                    if (car.Team == 0)
                     {
                         NAPI.Task.Run(() =>
                         {
@@ -6372,7 +6370,7 @@ namespace RNC
                         if(car.PriceDiamondPoints > 0)
                             Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", -car.PriceDiamondPoints, $"Purchased a car ({car.Name})");
 
-                        EPlayer.UnlockVehicle(acc, player, car.Model, car.Team);
+                        EPlayer.UnlockVehicle(acc, player, car);
                         EPlayer.Notify(player, Translate(player, "CAR_PURCHASED", car.Name), "green", "fas fa-unlock", false, 5000, "bottomCenter", "replace");
 
                         Task.Run(async () =>
@@ -6391,52 +6389,6 @@ namespace RNC
             return;
         }
 
-        public async Task<List<object[]>> Menu_OwnedVehicleData(Account _a)
-        {
-            long queryStartTime = 0;
-            long queryFinishTime = 0;
-
-            queryStartTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            List<CarData> cars = await EPlayer.GetOwnedVehicles(_a);
-            queryFinishTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            LogQueryTime(queryStartTime, queryFinishTime, $"EPlayer.GetOwnedVehicles({_a.Username})");
-            List<object[]> vehItems = new List<object[]>();
-            foreach (var car in cars)
-            {
-                string requirements = "[";
-                if (car.LevelRequired > 0)
-                    requirements += $"{{text:\"Level {car.LevelRequired}\", meets:{(_a.Level >= car.LevelRequired).ToString().ToLower()}}},";
-
-                if (car.PointsRequired > 0)
-                    requirements += $"{{text:\"{car.PointsRequired} Points\", meets:{(_a.Points >= car.PointsRequired).ToString().ToLower()}}},";
-
-                if (car.DonatorPointsRequired > 0)
-                    requirements += $"{{text:\"{car.DonatorPointsRequired} Donator Points\", meets:{(_a.DonatorPoints >= car.DonatorPointsRequired).ToString().ToLower()}}},";
-
-                if (car.DonatorLevelRequired > 0)
-                    requirements += $"{{text:\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", meets:{(_a.DonatorLevel >= car.DonatorLevelRequired).ToString().ToLower()}}},";
-
-                if (requirements.Length < 2)
-                    requirements = "[{text:\"Free\", meets:true}";
-
-                requirements += "]";
-
-
-                bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car.Model, car.Team);
-
-                vehItems.Add(new object[]
-                {
-                            car.Team,
-                            car.Model,
-                            car.Name,
-                            car.Image,
-                            !isOwnedVeh,
-                            car.Info,
-                            requirements
-                });
-            }
-            return vehItems;
-        }
 
         public async Task<List<object[]>> Menu_VehicleData(Account _a)
         {
@@ -6463,7 +6415,7 @@ namespace RNC
                 requirements += "]";
 
 
-                bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car.Model, car.Team);
+                bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car);
 
                 vehItems.Add(new object[]
                 {

@@ -4208,7 +4208,13 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        if (await EPlayer.HasOwnedVehicle(pAcc, carName, 0))
+                        ShopVehicleData car = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(carName));
+                        if(car == null)
+                        {
+                            NAPI.Util.ConsoleOutput($"yeah fuck error it's debug anyways can't find car {carName}");
+                        }
+
+                        if (await EPlayer.HasOwnedVehicle(pAcc, car))
                         {
                             OwnedVehData ownedVeh = await context.OwnedVehicles.AsQueryable().FirstOrDefaultAsync(v => v.AccountSQLID == EPlayer.GetAccount(owner).SQL_ID
                                                     && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));

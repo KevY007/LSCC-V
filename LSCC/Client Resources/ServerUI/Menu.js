@@ -1390,6 +1390,16 @@ mp.events.add("RequestJoinMinigame", (ID) => {
   ToggleMenu();
 });
 
+mp.events.add("mainmenu_inventory_vehicle_buy", (vehicleID) => {
+  mp.events.callRemote("MenuSelectedVehicle", vehicleID);
+});
+mp.events.add("mainmenu_inventory_vehicle_select", (vehicleID) => {
+  mp.events.callRemote("MenuSelectedVehicle", vehicleID);
+});
+mp.events.add("mainmenu_inventory_vehicle_customize", (vehicleID) => {
+  mp.events.callRemote("Menu_OnEditVehicle", vehicleID);
+});
+
 mp.events.add("MenuSelectVehicle", (model, team) => {
   mp.events.callRemote("MenuSelectedVehicle", model, team);
 });

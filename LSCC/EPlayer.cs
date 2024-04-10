@@ -1907,19 +1907,19 @@ namespace RNC
                 return ownedCars;
             }
         }
-        public async static Task<bool> UnlockVehicle(Account acc, Player player, string model, int team)
+        public async static Task<bool> UnlockVehicle(Account acc, Player player, ShopVehicleData vehicle)
         {
             if (!LoggedIn(player)) return false;
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                if (await HasOwnedVehicle(acc, model, team)) return false;
+                if (await HasOwnedVehicle(acc, vehicle)) return false;
 
                 var _new = new OwnedVehData
                 {
                     AccountSQLID = acc.SQL_ID,
-                    Model = model,
-                    Team = team,
+                    Model = vehicle.Model,
+                    Team = vehicle.Team,
                     TimesUsed = 0,
                 };
                 await context.OwnedVehicles.AddAsync(_new);
@@ -1934,9 +1934,9 @@ namespace RNC
 
                 NAPI.Task.Run(() =>
                 {
-                    NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {model}, they now have a total of {totalOwned}/{Settings.Cars.Count} vehicles");
+                    NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {vehicle.Model}, they now have a total of {totalOwned}/{Settings.CopchaseVehicles.Count} vehicles");
 
-                    if (totalOwned >= Settings.Cars.Count)
+                    if (totalOwned >= Settings.CopchaseVehicles.Count)
                         EPlayer.UnlockAchievement(player, "all_vehicles");
                 });
 
@@ -1944,13 +1944,13 @@ namespace RNC
                 return true;
             }
         }
-        public async static Task<bool> HasOwnedVehicle(Account acc, string model, int team)
+        public async static Task<bool> HasOwnedVehicle(Account acc, ShopVehicleData vehicle)
         {
-            if (model == "?" || model.Equals("default", StringComparison.OrdinalIgnoreCase)) return true;
+            if (vehicle.Model == "?" || vehicle.Model.Equals("default", StringComparison.OrdinalIgnoreCase)) return true;
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                if (await context.OwnedVehicles.AsQueryable().CountAsync(a => a.AccountSQLID == acc.SQL_ID && a.Team == team && a.Model.Equals(model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                if (await context.OwnedVehicles.AsQueryable().CountAsync(a => a.AccountSQLID == acc.SQL_ID && a.Team == vehicle.Team && a.Model.Equals(vehicle.Model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
                 return false;
             }
         }
