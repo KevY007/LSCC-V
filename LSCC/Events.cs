@@ -6336,7 +6336,10 @@ namespace RNC
                     List<object[]> vehData = await Menu_VehicleData(acc);
                     NAPI.Task.Run(() =>
                     {
-                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), acc.CarCop, acc.CarFugitive);
+                        string fugitiveCarID = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(acc.CarFugitive)).SQL_ID.ToString();
+                        string copCarID = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(acc.CarFugitive)).SQL_ID.ToString();
+
+                        player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
                     });
                 }
                 else
@@ -6378,7 +6381,10 @@ namespace RNC
                             List<object[]> vehData = await Menu_VehicleData(acc);
                             NAPI.Task.Run(() =>
                             {
-                                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), acc.CarCop, acc.CarFugitive);
+                                string fugitiveCarID = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(acc.CarFugitive)).SQL_ID.ToString();
+                                string copCarID = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(acc.CarFugitive)).SQL_ID.ToString();
+
+                                player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
                             });
                         });
                     });
@@ -6892,7 +6898,10 @@ namespace RNC
 
                         NAPI.Task.Run(() =>
                         {
-                            player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), EPlayer.GetAccount(player).CarCop, EPlayer.GetAccount(player).CarFugitive);
+                            string fugitiveCarID = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(EPlayer.GetAccount(player).CarFugitive)).SQL_ID.ToString();
+                            string copCarID = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(EPlayer.GetAccount(player).CarFugitive)).SQL_ID.ToString();
+
+                            player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
                             player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);                                                 
                             EPlayer.Menu_UpdateAllItems(player);
 

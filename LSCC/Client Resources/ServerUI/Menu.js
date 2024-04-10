@@ -1689,7 +1689,7 @@ mp.events.add(
     if (global.ServerUI) {
       global.ServerUI.call("mainmenu_inventory_vehicles_set", vehicle_items);
       global.ServerUI.call(
-        "mainmenu_inventory_current_vehicles_set",
+        "mainmenu_inventory_selected_vehicles_set",
         currentCopCar,
         currentFugiCar
       );
