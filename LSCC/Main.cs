@@ -2778,16 +2778,9 @@ namespace RNC
                 //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3)
                 .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
 
-<<<<<<< Updated upstream
 
-            /* VEHICLES/SELECTION CREATION */
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the selection vehicles...");
-=======
-            #region OLD COPCHASE VEHICLES SYSTEM - DISABLED (Static Vehicles)
-            /*
-            VEHICLES/SELECTION CREATION
             NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Creating the selection vehicles...");
->>>>>>> Stashed changes
+
 
             // Defaults
             new CarData(0, "Random", "?", "package://Artwork/Vehicles/default.png", "");
@@ -2882,21 +2875,7 @@ namespace RNC
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             //new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
             //new CarData(0, "2022 Porsche Cayenne", "cayenneturbo", "package://Artwork/Vehicles/cayenneturbo.png", "Fast+", 60, 80);
-<<<<<<< Updated upstream
-=======
-            */
-            #endregion
 
-            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Loading shop vehicle data on another thread...");
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    Settings.CopchaseVehicles = await context.ShopVehicles.AsQueryable().ToListAsync();
-                    NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Loaded shop vehicle data.");
-                }
-            });
->>>>>>> Stashed changes
 
             if (Settings.Dynamics.Discord)
             {
@@ -4051,6 +4030,8 @@ namespace RNC
 
         public static bool IsHelicopter(string carModel)
         {
+            if (carModel == null || carModel.Length == 0) return false;
+
             return NAPI.Vehicle.GetVehicleClass((VehicleHash)NAPI.Util.GetHashKey(carModel)) == 15 
                 || carModel.Equals("polmav") 
                 || carModel.Equals("as350");
@@ -4249,17 +4230,7 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-<<<<<<< Updated upstream
                         if (await EPlayer.HasOwnedVehicle(pAcc, carName, 0))
-=======
-                        ShopVehicleData car = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(carName));
-                        if(car == null)
-                        {
-                            NAPI.Util.ConsoleOutputEx($"yeah fuck error it's debug anyways can't find car {carName}");
-                        }
-
-                        if (await EPlayer.HasOwnedVehicle(pAcc, car))
->>>>>>> Stashed changes
                         {
                             OwnedVehData ownedVeh = await context.OwnedVehicles.AsQueryable().FirstOrDefaultAsync(v => v.AccountSQLID == EPlayer.GetAccount(owner).SQL_ID
                                                     && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));

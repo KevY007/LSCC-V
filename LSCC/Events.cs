@@ -21,11 +21,10 @@ using GTANetworkAPI;
 using System.Net.Mime;
 using System.Xml.Linq;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
-<<<<<<< Updated upstream
-=======
+
 using System.Reflection.Emit;
 [assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
->>>>>>> Stashed changes
+
 
 namespace RNC
 {

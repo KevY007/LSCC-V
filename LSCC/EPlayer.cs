@@ -1921,11 +1921,7 @@ namespace RNC
 
                 NAPI.Task.Run(() =>
                 {
-<<<<<<< Updated upstream
                     NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {model}, they now have a total of {totalOwned}/{Settings.Cars.Count} vehicles");
-=======
-                    NAPI.Util.ConsoleOutputEx($"{player.Name} unlocked a {vehicle.Model}, they now have a total of {totalOwned}/{Settings.CopchaseVehicles.Count} vehicles");
->>>>>>> Stashed changes
 
                     if (totalOwned >= Settings.Cars.Count)
                         EPlayer.UnlockAchievement(player, "all_vehicles");
