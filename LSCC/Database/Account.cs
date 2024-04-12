@@ -16,6 +16,7 @@ using System.Security.Cryptography;
 using GTANetworkAPI;
 using System.Linq;
 using System.Numerics;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -201,7 +202,7 @@ namespace RNC
                     await context.SaveChangesAsync();
                     await backup.SaveChangesAsync();
 
-                    NAPI.Util.ConsoleOutput("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
+                    NAPI.Util.ConsoleOutputEx("[ACCOUNT ARCHIVE] " + acc.Username + " has been recovered from the archive.");
                 }
 
             }
@@ -241,7 +242,7 @@ namespace RNC
                                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                                 EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans. (Banned Account: {_accData.Username})");
-                                NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+                                NAPI.Util.ConsoleOutputEx($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
                                 Logs.AddToAdminRecord(_accData.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade under username: {acc.Username}", "Permanent");
 
@@ -269,7 +270,7 @@ namespace RNC
                             player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
-                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+                            NAPI.Util.ConsoleOutputEx($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
 
                             player.SetData("Kicked", true);
@@ -414,7 +415,7 @@ namespace RNC
 
         public async static Task<bool> VerifyEmail(int accountSQLID, string code)
         {
-            NAPI.Util.ConsoleOutput($"[VERIFY] Verifying email for account {accountSQLID} code is {code}");
+            NAPI.Util.ConsoleOutputEx($"[VERIFY] Verifying email for account {accountSQLID} code is {code}");
             using(MainDatabase context = ContextFactory.CreateContext())
             {
                 EmailVerificationRequest _e = await context.EmailVerificationRequests.AsQueryable().FirstOrDefaultAsync(e => e.AccountID == accountSQLID && e.Code == code);
@@ -429,7 +430,7 @@ namespace RNC
                     context.EmailVerificationRequests.RemoveRange(allRequests);
                     Account _a = await context.Accounts.AsQueryable().FirstOrDefaultAsync(acc => acc.SQL_ID == accountSQLID);
                     _a.EmailVerified = true;
-                    NAPI.Util.ConsoleOutput($"[VERIFY] {_a.Username} set verified to TRUE!");
+                    NAPI.Util.ConsoleOutputEx($"[VERIFY] {_a.Username} set verified to TRUE!");
                     await context.SaveChangesAsync();
                     return true;
                 }

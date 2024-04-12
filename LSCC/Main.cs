@@ -20,6 +20,46 @@ using Microsoft.EntityFrameworkCore;
 using BCrypt.Net;
 using RNC.Data;
 using Microsoft.Extensions.Logging;
+using PostSharp.Aspects;
+using PostSharp.Serialization;
+using System.Threading;
+
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
+
+
+[PSerializable] // Use PSerializable instead of Serializable
+public class MethodCallLoggerAttribute : OnMethodBoundaryAspect
+{
+    public static bool LOGGING_ENABLED = true;
+
+    private int counter = 0;
+    private const int LoggingFrequency = 10; // Log every 10th invocation
+
+    public override void OnEntry(MethodExecutionArgs args)
+    {
+        if (!MethodCallLoggerAttribute.LOGGING_ENABLED) return;
+
+            string methodName = args.Method.Name;
+            DateTime timestamp = DateTime.Now;
+
+            if (methodName.Equals(".ctor") || methodName.StartsWith("set_") || methodName.StartsWith("get_") || methodName.Equals("OnUpdate")) return;
+
+            // Get method parameters
+            var parameters = args.Method.GetParameters();
+            var argumentsList = parameters.Select((p, index) =>
+            {
+                string parameterName = p.Name;
+                object argumentValue = args.Arguments.GetArgument(index);
+                return $"{parameterName}: {argumentValue}";
+            });
+
+            // Format arguments as a comma-separated list
+            string argumentsString = string.Join(", ", argumentsList);
+            if (argumentsString.Length > 1000) return; // prevent console logging entire json files
+
+            Console.WriteLine($"[{timestamp}] {methodName}({argumentsString})");
+    }
+}
 
 namespace RNC
 {
@@ -561,7 +601,7 @@ namespace RNC
                 }
                 else
                 {
-                    NAPI.Util.ConsoleOutput("[WEAPONDATA.JSON HARAM?] Could not find key for weapon " + name + " in 'weapondata.json'. (Hash: " + ((uint)weapon).ToString() + ")");
+                    NAPI.Util.ConsoleOutputEx("[WEAPONDATA.JSON HARAM?] Could not find key for weapon " + name + " in 'weapondata.json'. (Hash: " + ((uint)weapon).ToString() + ")");
                     reasonStr = "Unknown";
                 }
 
@@ -837,6 +877,8 @@ namespace RNC
 
     public static class Settings
     {
+        public static bool NAPI_LOGGING = false;
+
         // Static Settings / Const
         public const string Version = "1.2";
         public const int GameRunTime = 390; // Game Running Time in Seconds before STOP
@@ -1166,7 +1208,7 @@ namespace RNC
 
         public static void AddChallengesForPlayer(Player player)
         {
-            NAPI.Util.ConsoleOutput($"{player.Name} fuck challenges");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} fuck challenges");
             return;
 
             string desc = "";
@@ -1192,7 +1234,7 @@ namespace RNC
 
                     if (!areChallengesUpToDate)
                     {
-                        NAPI.Util.ConsoleOutput($"Challenges are not up to date for account {acc.Username}!");
+                        NAPI.Util.ConsoleOutputEx($"Challenges are not up to date for account {acc.Username}!");
                         List<ChallengeData> cdList = new List<ChallengeData>();
                         ChallengeData temp = new ChallengeData();
                         await context.DailyChallenges.AsQueryable().ForEachAsync(dc =>
@@ -1209,7 +1251,7 @@ namespace RNC
                         cdInfo = cdList;
                         string jData = NAPI.Util.ToJson(cdList);
                         acc.ChallengeInfo = jData;
-                        NAPI.Util.ConsoleOutput($"Set up new challenges for {acc.Username} and saving their account now!");
+                        NAPI.Util.ConsoleOutputEx($"Set up new challenges for {acc.Username} and saving their account now!");
                         EPlayer.Save(player, false);
                     }
 
@@ -1499,7 +1541,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            NAPI.Util.ConsoleOutput("(RnC | CHALLENGE) Reached maximum loop value in SetNewDailyChallenges! Breaking it... (500)");
+                            NAPI.Util.ConsoleOutputEx("(RnC | CHALLENGE) Reached maximum loop value in SetNewDailyChallenges! Breaking it... (500)");
                         });
                         break;
                     }
@@ -2255,7 +2297,7 @@ namespace RNC
 
                 File.WriteAllText("racenchase/settings.json", NAPI.Util.ToJson(Settings.Dynamics));
             }
-            catch { NAPI.Util.ConsoleOutput("(RnC | SETTINGS) Failed to save dynamic settings!"); }
+            catch { NAPI.Util.ConsoleOutputEx("(RnC | SETTINGS) Failed to save dynamic settings!"); }
 
             return;
         }
@@ -2270,7 +2312,7 @@ namespace RNC
                     Settings.Dynamics = NAPI.Util.FromJson<DynSet>(File.ReadAllText("racenchase/settings.json"));
                 }
             }
-            catch { NAPI.Util.ConsoleOutput("(RnC | Settings) Failed to read settings.json, permission problem or format?"); }
+            catch { NAPI.Util.ConsoleOutputEx("(RnC | Settings) Failed to read settings.json, permission problem or format?"); }
 
             return;
         }
@@ -2295,29 +2337,29 @@ namespace RNC
 
             });
 
-            NAPI.Util.ConsoleOutput("Server saving & exiting...");
+            NAPI.Util.ConsoleOutputEx("Server saving & exiting...");
         }
 
         [ServerEvent(Event.ResourceStart)]
         public void OnResourceStart()
         {
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring 'racenchase' folder...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Ensuring 'racenchase' folder...");
             System.IO.Directory.CreateDirectory("racenchase");
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring logs folder...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Ensuring logs folder...");
             System.IO.Directory.CreateDirectory("racenchase/logs");
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) ===== Heading towards second stage of startup =====");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) ===== Heading towards second stage of startup =====");
 
             NAPI.Server.SetAutoRespawnAfterDeath(false);
             NAPI.Server.SetAutoSpawnOnConnect(false);
             NAPI.Server.SetGlobalServerChat(false);
             NAPI.Server.SetCommandErrorMessage("!{#FF6347}[!] !{#FFFFFF}This command is invalid, refer to /help for a list.");
 
-            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
+            NAPI.Util.ConsoleOutputEx($"(RnC | STARTUP) Connecting to database & backup database => User {Settings.MySQL_User} for db {Settings.MySQL_Database} on host {Settings.MySQL_Host}");
             ContextFactory.Instance.Database.EnsureCreated();
             //BackupContextFactory.Instance.Database.EnsureCreated();
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Connected to database.");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Connected to database.");
 
             Settings.Lobbies = new List<LobbyData>();
             Settings.Requests = new List<RequestData>();
@@ -2355,13 +2397,13 @@ namespace RNC
             EventManager.Initialize();
 
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Ensuring & loading settings.json...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Ensuring & loading settings.json...");
 
             LoadDynamicSettings();
 
             if (!File.Exists("racenchase/weapondata.json"))
             {
-                NAPI.Util.ConsoleOutput("(RnC | STARTUP) Updating weapondata.json...");
+                NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Updating weapondata.json...");
                 try
                 {
                     using (var client = new WebClient())
@@ -2376,21 +2418,21 @@ namespace RNC
                             File.Delete("racenchase/weapondata.json");
                         }
                     }
-                    catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
+                    catch { NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Failed to clear old weapondata.json, permission problem?"); }
 
                     try
                     {
                         File.Move("racenchase/weapondata.json.tmp", "racenchase/weapondata.json");
                     }
-                    catch { NAPI.Util.ConsoleOutput("(RnC| STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
+                    catch { NAPI.Util.ConsoleOutputEx("(RnC| STARTUP) Failed to update weapondata.json! (Complete final version, 'move' fail)"); }
 
                 }
-                catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
+                catch { NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) [Warning] Failed to update weapondata.json (not critical, using old instead, note that server will crash without one.)"); }
             }
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Created and initialised settings & enums.");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Created and initialised settings & enums.");
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) ===== Heading towards final stage of startup =====");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) ===== Heading towards final stage of startup =====");
 
             GenerateRedeemableCodes();
 
@@ -2401,8 +2443,8 @@ namespace RNC
                     Settings.WeaponData.Add(item.Key, item.Value);
                 }
             }
-            catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
-            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
+            catch { NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Unable to load in weapondata.json! Server will work but it can cause crashes due to component data."); }
+            NAPI.Util.ConsoleOutputEx($"(RnC | STARTUP) Loading in weapondata.json... ({Settings.WeaponData.Count} weapons/entries)");
 
             try
             {
@@ -2411,11 +2453,11 @@ namespace RNC
                     Settings.CarGenData.Add(item);
                 }
             }
-            catch { NAPI.Util.ConsoleOutput("(RnC | STARTUP) Unable to load in CarGens_NoZoneVehicles.json! Server will work but it can cause crashes due to component data."); }
-            NAPI.Util.ConsoleOutput($"(RnC | STARTUP) Loading in CarGens_NoZoneVehicles.json... ({Settings.CarGenData.Count} vehicle spawns/entries)");
+            catch { NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Unable to load in CarGens_NoZoneVehicles.json! Server will work but it can cause crashes due to component data."); }
+            NAPI.Util.ConsoleOutputEx($"(RnC | STARTUP) Loading in CarGens_NoZoneVehicles.json... ({Settings.CarGenData.Count} vehicle spawns/entries)");
 
             /* ACHIEVEMENTS CREATION */
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the achievements...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Creating the achievements...");
 
             new Achievement("discord_verify", "Social Butterfly", "Link your Discord account to your RnC account. (/link)", 0, 0, true);
             new Achievement("first_derby", "Derby Master?", "Win a round in the Derby mode.", 4, 3, true);
@@ -2444,16 +2486,16 @@ namespace RNC
             new Achievement("last_man_standing", "Last Man Standing", "Win a copchase round as the last person alive in your team.", 8, 3, true);
             new Achievement("all_achievements", "Where's my medal?", "Unlock all achievements!", 75, 35, true);
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Created " + Settings.Achievements.Count + " achievements.");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Created " + Settings.Achievements.Count + " achievements.");
 
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the items...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Creating the items...");
             new ItemData(0, "Medkit", "medkit", 10, "Replenishes 60 HP, takes 10 seconds to fully use.", "https://cdn-icons-png.flaticon.com/512/2467/2467977.png");
             new ItemData(1, "Painkiller", "painkiller", 6, "Replenishes 1 HP/second for 40 seconds; you are free to move around.", "https://cdn-icons-png.flaticon.com/512/3437/3437974.png");
             new ItemData(2, "Lockpick", "lockpick", 10, "Allows you to break into locked vehicles; only fugitives can use this item.", "https://cdn-icons-png.flaticon.com/512/4690/4690067.png");
 
             /* PRE-SET STINGERS CREATION */
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the pre-set stingers...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Creating the pre-set stingers...");
 
             new Stinger(1, "Vinewood Hills", "Los Santos Freeway")
                 .Add(new Vector3(864.457458, 104.437248, 69.017662), new Vector3(-3.99996424, 7.74004316, -126.800285), false)
@@ -2584,7 +2626,7 @@ namespace RNC
                 .Add(new Vector3(2383.35547, 1020.03998, 84.0156479), new Vector3(-0, -0, -47.421257), true);
 
             /* DEFAULT LOADOUTS CREATION */
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the loadouts...");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Creating the loadouts...");
 
             new LoadoutData(1, "Default")
                 .Add(WeaponHash.Pistol, "https://assets.gm.miami/gtav/weapons/Pistol-icon.png", "Pistol", 40);
@@ -2736,9 +2778,16 @@ namespace RNC
                 //.Add(WeaponHash.Molotov, "https://assets.gm.miami/gtav/weapons/Molotov-icon.png", "Molotov", 3)
                 .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
 
+<<<<<<< Updated upstream
 
             /* VEHICLES/SELECTION CREATION */
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the selection vehicles...");
+=======
+            #region OLD COPCHASE VEHICLES SYSTEM - DISABLED (Static Vehicles)
+            /*
+            VEHICLES/SELECTION CREATION
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Creating the selection vehicles...");
+>>>>>>> Stashed changes
 
             // Defaults
             new CarData(0, "Random", "?", "package://Artwork/Vehicles/default.png", "");
@@ -2833,10 +2882,25 @@ namespace RNC
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             //new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
             //new CarData(0, "2022 Porsche Cayenne", "cayenneturbo", "package://Artwork/Vehicles/cayenneturbo.png", "Fast+", 60, 80);
+<<<<<<< Updated upstream
+=======
+            */
+            #endregion
+
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Loading shop vehicle data on another thread...");
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    Settings.CopchaseVehicles = await context.ShopVehicles.AsQueryable().ToListAsync();
+                    NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Loaded shop vehicle data.");
+                }
+            });
+>>>>>>> Stashed changes
 
             if (Settings.Dynamics.Discord)
             {
-                NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loading discord plugin.");
+                NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Loading discord plugin.");
 
                 Task.Run(async () =>
                 {
@@ -2844,9 +2908,9 @@ namespace RNC
                 });
 
             }
-            else NAPI.Util.ConsoleOutput("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
+            else NAPI.Util.ConsoleOutputEx("(RnC | OPT) Discord Bot is disabled, live commands and statuses not updated!");
 
-            NAPI.Util.ConsoleOutput($"(RnC | EMAIL) E-mail server data: [HOST:] {Settings.Dynamics.SMTP_HOST} | [FROM:] {Settings.Dynamics.SMTP_EMAIL_FROM}");
+            NAPI.Util.ConsoleOutputEx($"(RnC | EMAIL) E-mail server data: [HOST:] {Settings.Dynamics.SMTP_HOST} | [FROM:] {Settings.Dynamics.SMTP_EMAIL_FROM}");
 
             //Start websocket server
             //Websocket.Start();
@@ -2862,7 +2926,7 @@ namespace RNC
 
 
 
-            NAPI.Util.ConsoleOutput("(RnC | STARTUP) Server startup proceeded:\n");
+            NAPI.Util.ConsoleOutputEx("(RnC | STARTUP) Server startup proceeded:\n");
 
             string admins = "";
             int adminCount = 0;
@@ -2884,18 +2948,18 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             string dateFormat = DateTime.Now.ToString("g");
-                            NAPI.Util.ConsoleOutput("CURRENT DATE: " + dateFormat);
+                            NAPI.Util.ConsoleOutputEx("CURRENT DATE: " + dateFormat);
                             dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextWeekUnix).ToString("g");
-                            NAPI.Util.ConsoleOutput("NEXT WEEK HIT: " + dateFormat);
+                            NAPI.Util.ConsoleOutputEx("NEXT WEEK HIT: " + dateFormat);
                             dateFormat = DateTimeOffset.FromUnixTimeSeconds(Settings.Dynamics.NextMonthUnix).ToString("g");
-                            NAPI.Util.ConsoleOutput("NEXT MONTH HIT: " + dateFormat);
+                            NAPI.Util.ConsoleOutputEx("NEXT MONTH HIT: " + dateFormat);
 
-                            NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
-                            NAPI.Util.ConsoleOutput("[Version]: " + Settings.Version);
-                            NAPI.Util.ConsoleOutput("[Developers]: KevY, CodeName420 (jambredrek)");
-                            NAPI.Util.ConsoleOutput($"[Accounts]: {accountsCnt}");
-                            NAPI.Util.ConsoleOutput($"[Admins]: {admins}");
-                            NAPI.Util.ConsoleOutput("[>===========|Race 'N' Chase|===========<]");
+                            NAPI.Util.ConsoleOutputEx("[>===========|Race 'N' Chase|===========<]");
+                            NAPI.Util.ConsoleOutputEx("[Version]: " + Settings.Version);
+                            NAPI.Util.ConsoleOutputEx("[Developers]: KevY, CodeName420 (jambredrek)");
+                            NAPI.Util.ConsoleOutputEx($"[Accounts]: {accountsCnt}");
+                            NAPI.Util.ConsoleOutputEx($"[Admins]: {admins}");
+                            NAPI.Util.ConsoleOutputEx("[>===========|Race 'N' Chase|===========<]");
 
                             // After all the stuff is set.
                             SaveDynamicSettings();
@@ -2910,7 +2974,7 @@ namespace RNC
                     }
                     catch (Exception ex)
                     {
-                        NAPI.Util.ConsoleOutput("GAY " + ex.ToString());
+                        NAPI.Util.ConsoleOutputEx("GAY " + ex.ToString());
                     }
                 }
             });
@@ -3056,7 +3120,7 @@ namespace RNC
                                 Events.RunWeeklyMonthlyChecks();
                                 SaveDynamicSettings();
                                 ContextFactory.SaveDB();
-                                NAPI.Util.ConsoleOutput("Server auto-saved => " + DateTime.Now.ToString());
+                                NAPI.Util.ConsoleOutputEx("Server auto-saved => " + DateTime.Now.ToString());
                                 Settings.AutoSaveTick = Environment.TickCount64;
                             });
                         }
@@ -3201,7 +3265,7 @@ namespace RNC
                                                 else if (lobby.gameMode == GameModes.BANKROBBERY)
                                                     EPlayer.SendMessageToAll("BANKROB_START", lobby.lobbyId, pCount);
 
-                                                NAPI.Util.ConsoleOutput($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
+                                                NAPI.Util.ConsoleOutputEx($"[TimeUpdate] Game starting in 10 seconds in lobby {lobby.lobbyId}...");
                                                 foreach (Player player in Settings.LoggedInPlayers)
                                                 {
                                                     lock (player)
@@ -3342,14 +3406,14 @@ namespace RNC
                 //        {
                 //            Settings.LastCountUpdate = Environment.TickCount64;
                 //            Discord._client.SetGameAsync($"{RAGE.Entities.Players.Count} Players & {Settings.Lobbies.Where(l => l.gameStatus == 1).Count()} Chases");
-                //            //NAPI.Util.ConsoleOutput("Updated the DISCORD counts.");
+                //            //NAPI.Util.ConsoleOutputEx("Updated the DISCORD counts.");
                 //        }
                 //    });
                 //}
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("[EXCEPTION IN TimeUpdate]: " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("[EXCEPTION IN TimeUpdate]: " + ex.ToString());
             }
             return;
         }
@@ -3409,7 +3473,7 @@ namespace RNC
             EventManager.EventData eData = EventManager.GetEvent((LobbyData.EventLobbyID)lobby.lobbyId);
             if (eData == null)
             {
-                NAPI.Util.ConsoleOutput($"[EVENT-MANAGER] Event for {lobby.lobbyId} was not found!");
+                NAPI.Util.ConsoleOutputEx($"[EVENT-MANAGER] Event for {lobby.lobbyId} was not found!");
                 return false;
             }
 
@@ -3468,7 +3532,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
                         {
                             Player i = ePlayer.Player;
-                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
+                            NAPI.Util.ConsoleOutputEx($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 8, "[EVENT WIN] Bank Robbery | Police | All fugitives were dead");
                             EPlayer.GivePoints(i, 7, "[EVENT WIN] Bank Robbery | Police | All fugitives were dead");
@@ -3489,7 +3553,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 1).ToList())
                         {
                             Player i = ePlayer.Player;
-                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
+                            NAPI.Util.ConsoleOutputEx($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 8, "[EVENT WIN] Bank Robbery | Police | Heist leaders died");
                             EPlayer.GivePoints(i, 6, "[EVENT WIN] Bank Robbery | Police | Heist leaders died");
@@ -3508,7 +3572,7 @@ namespace RNC
                         foreach (EventManager.EventData.EventPlayerData ePlayer in eData.EventPlayers.Where(p => p.Team == 0).ToList())
                         {
                             Player i = ePlayer.Player;
-                            NAPI.Util.ConsoleOutput($"{i.Name} - you won!");
+                            NAPI.Util.ConsoleOutputEx($"{i.Name} - you won!");
                             // Reward
                             EPlayer.GrantXP(i, 10, "[EVENT WIN] Bank Robbery | Fugitive | Fugitives delivered the money");
                             EPlayer.GivePoints(i, 13, "[EVENT WIN] Bank Robbery | Fugitive | Fugitives delivered the money");
@@ -3718,7 +3782,7 @@ namespace RNC
             if (lobby == null || participants.Count == 0) return;
             if(participants.Count < 3)
             {
-                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - at least 4 players are required!");
+                NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - at least 4 players are required!");
                 EventManager.ToggleEvent(LobbyData.EventLobbyID.BankRobbery, false);
                 return;
             }
@@ -3726,7 +3790,7 @@ namespace RNC
             int fugitives = GetFugitivesCount(lobby, participants.Count);
             if(fugitives < 2) // At least 2 fugitives are required for the Bank Robbery mode!
             {
-                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - min. 2 fugitives are required!");
+                NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Bank Robbery could not be started - min. 2 fugitives are required!");
                 EventManager.ToggleEvent(LobbyData.EventLobbyID.BankRobbery, false);
                 return;
             }
@@ -3740,7 +3804,7 @@ namespace RNC
             // Adding fugitives to the Fugitive list in lobby and resetting their data
             while (fugitives > 0)
             {
-                if (infiniteLoopKillswitch > 1000) { NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Stuck picking fugitives (1000 loops), breaking loop."); break; }
+                if (infiniteLoopKillswitch > 1000) { NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Stuck picking fugitives (1000 loops), breaking loop."); break; }
                 infiniteLoopKillswitch++;
                 if (fugitiveListOrdered.Count == 0) break;
 
@@ -4185,7 +4249,17 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
+<<<<<<< Updated upstream
                         if (await EPlayer.HasOwnedVehicle(pAcc, carName, 0))
+=======
+                        ShopVehicleData car = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(carName));
+                        if(car == null)
+                        {
+                            NAPI.Util.ConsoleOutputEx($"yeah fuck error it's debug anyways can't find car {carName}");
+                        }
+
+                        if (await EPlayer.HasOwnedVehicle(pAcc, car))
+>>>>>>> Stashed changes
                         {
                             OwnedVehData ownedVeh = await context.OwnedVehicles.AsQueryable().FirstOrDefaultAsync(v => v.AccountSQLID == EPlayer.GetAccount(owner).SQL_ID
                                                     && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
@@ -4271,18 +4345,18 @@ namespace RNC
             if (lobby == null || CopchasePlayers.Count == 0) return;
             if (map == null)
             {
-                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Failed to start copchase - no map found!");
+                NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Failed to start copchase - no map found!");
                 return;
             }
             if((copSpawns == null || copSpawns.Count == 0) || (fugitiveSpawns == null || fugitiveSpawns.Count == 0))
             {
-                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Failed to start copchase - Map {map.Name} is missing spawns for both teams!");
+                NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Failed to start copchase - Map {map.Name} is missing spawns for both teams!");
                 return;
             }
             int fugitives = GetFugitivesCount(lobby, CopchasePlayers.Count); // GetFugitivesCount calculates number of fugitives from %
             if(fugitives == 0)
             {
-                NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Failed to start copchase - not enough fugitives");
+                NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Failed to start copchase - not enough fugitives");
                 return;
             }
 
@@ -4295,7 +4369,7 @@ namespace RNC
             // Adding fugitives to the Fugitive list in lobby and resetting their data
             while(fugitives > 0)
             {
-                if (infiniteLoopKillswitch > 1000) { NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Stuck picking fugitives (1000 loops), breaking loop."); break; }                infiniteLoopKillswitch++;
+                if (infiniteLoopKillswitch > 1000) { NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Stuck picking fugitives (1000 loops), breaking loop."); break; }                infiniteLoopKillswitch++;
                 if (fugitiveListOrdered.Count == 0) break;
 
                 Player nextFugitive = fugitiveListOrdered.First();
@@ -4387,7 +4461,7 @@ namespace RNC
                         //if (GetMaxSeats(EPlayer.GetAccount(player).CarFugitive) != 0) currentFugiSeats = GetMaxSeats(EPlayer.GetAccount(player).CarFugitive)-1;
                         //else currentFugiSeats = currentFugitiveCar.MaxOccupants-1;
 
-                        NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog] 0 fugitive seats left! Spawned new vehicle for {player.Name}: {currentFugiCarName} with {currentFugiSeats} seats left.");
+                        NAPI.Util.ConsoleOutputEx($"[StartGame - SpawnLog] 0 fugitive seats left! Spawned new vehicle for {player.Name}: {currentFugiCarName} with {currentFugiSeats} seats left.");
                     }
                     else
                     {
@@ -4400,7 +4474,7 @@ namespace RNC
 
                         currentFugiSeats--;
 
-                        NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog] Setting {player.Name} into {currentFugiCarName} seat {seatToSetIn}. This car now has {currentFugiSeats} left!");
+                        NAPI.Util.ConsoleOutputEx($"[StartGame - SpawnLog] Setting {player.Name} into {currentFugiCarName} seat {seatToSetIn}. This car now has {currentFugiSeats} left!");
                     }
                     continue;
                 }
@@ -4596,7 +4670,7 @@ namespace RNC
                 EPlayer.UpdateTeleports(player);
             }
 
-            NAPI.Util.ConsoleOutput($"[Lobby {lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
+            NAPI.Util.ConsoleOutputEx($"[Lobby {lobby.lobbyId}] Mode {ConvertGameMode(lobby.gameMode)} started with {lobby.Cops.Count} Cops & {lobby.Fugitives.Count} fugitives on map {(map == null ? "EVENT" : map.Name)}!");
             DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"**[Lobby {lobby.lobbyId}]** {ConvertGameMode(lobby.gameMode)} started with **{lobby.Cops.Count} Cops** & **{lobby.Fugitives.Count} fugitives** on map *{(map == null ? "EVENT" : map.Name)}*!");
         }
 
@@ -4605,8 +4679,8 @@ namespace RNC
             try
             {
                 LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == lobbyID && l.Enabled == true);
-                if (lobby == null) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyID + "] Lobby is null, could not start the copchase round."); return; }
-                if (lobby.gameStatus == 1) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyID + "] Copchase is already running, failed to start"); return; }
+                if (lobby == null) { NAPI.Util.ConsoleOutputEx("[Lobby " + lobbyID + "] Lobby is null, could not start the copchase round."); return; }
+                if (lobby.gameStatus == 1) { NAPI.Util.ConsoleOutputEx("[Lobby " + lobbyID + "] Copchase is already running, failed to start"); return; }
 
                 // Setting up the default variables
                 lobby.gameStatus = (int)LobbyData.GameStatus.None;
@@ -4632,7 +4706,7 @@ namespace RNC
                 CopchasePlayers.RemoveAll(player => BannedCopchasePlayers.Contains(player));
 
                 copchasePlayerCount = CopchasePlayers.Count;
-                if(copchasePlayerCount < 2) { NAPI.Util.ConsoleOutput("[Lobby " + lobbyID + "] Less than two copchase players in lobby, failed to start."); return; }
+                if(copchasePlayerCount < 2) { NAPI.Util.ConsoleOutputEx("[Lobby " + lobbyID + "] Less than two copchase players in lobby, failed to start."); return; }
 
                 // Checking if event - events go in their own functions for readability & organisation
                 if (lobby.gameMode == GameModes.BANKROBBERY)
@@ -4683,7 +4757,7 @@ namespace RNC
                             }
                             catch(Exception ex)
                             {
-                                NAPI.Util.ConsoleOutput(ex.ToString());
+                                NAPI.Util.ConsoleOutputEx(ex.ToString());
                             }
                         }
                     });
@@ -4693,7 +4767,7 @@ namespace RNC
             }
             catch(Exception ex)
             {
-                NAPI.Util.ConsoleOutput($"[STARTGAME - {lobbyID}] {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"[STARTGAME - {lobbyID}] {ex.ToString()}");
             }
         }
 
@@ -4719,7 +4793,7 @@ namespace RNC
                             {
                                 if (a == null) continue;
                                 a.TriggerEvent("ReportLastSeen", fugi.Name, fugi.Position.X, fugi.Position.Y, fugi.Position.Z);
-                                NAPI.Util.ConsoleOutput($"Reporting last seen to {a.Name}");
+                                NAPI.Util.ConsoleOutputEx($"Reporting last seen to {a.Name}");
                             }
                             catch { }
                         }
@@ -4761,7 +4835,7 @@ namespace RNC
                         fugi.SetSharedData("VisibleBlip", false);
 
                         EPlayer.Notify(fugi, Translate(fugi, "RADAR_INVISIBLE"), "green", "fas fa-walking", false, 3000);
-                        NAPI.Util.ConsoleOutput($"Reporting last seen to {fugi.Name}");
+                        NAPI.Util.ConsoleOutputEx($"Reporting last seen to {fugi.Name}");
                     }
                 }
             }
@@ -5088,7 +5162,7 @@ namespace RNC
                     {
                         if (!player.IsInVehicle)
                         {
-                            NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog | ERROR ({DateTime.Now.ToString("g")})] Fugitive {player.Name} wasn't set in a vehicle!");
+                            NAPI.Util.ConsoleOutputEx($"[StartGame - SpawnLog | ERROR ({DateTime.Now.ToString("g")})] Fugitive {player.Name} wasn't set in a vehicle!");
                         }
                         continue;
                     }
@@ -5096,7 +5170,7 @@ namespace RNC
                     {
                         if (!player.IsInVehicle)
                         {
-                            NAPI.Util.ConsoleOutput($"[StartGame - SpawnLog | ERROR ({DateTime.Now.ToString("g")})] Cop {player.Name} wasn't set in a vehicle!");
+                            NAPI.Util.ConsoleOutputEx($"[StartGame - SpawnLog | ERROR ({DateTime.Now.ToString("g")})] Cop {player.Name} wasn't set in a vehicle!");
                         }
                         continue;
                     }
@@ -5856,7 +5930,7 @@ namespace RNC
                                                                     }
                                                                     catch (Exception ex)
                                                                     {
-                                                                        NAPI.Util.ConsoleOutput($"Failed to set vehicle tunings for {p.Name}: {ex.ToString()}");
+                                                                        NAPI.Util.ConsoleOutputEx($"Failed to set vehicle tunings for {p.Name}: {ex.ToString()}");
                                                                     }
                                                                 });
 
@@ -6031,7 +6105,7 @@ namespace RNC
                                                 Character.SetTeamOutfit(player, 0);
                                             }
                                             catch { }
-                                            NAPI.Util.ConsoleOutput("ZAMN! BankRob fugi outfit fail: " + ex.ToString());
+                                            NAPI.Util.ConsoleOutputEx("ZAMN! BankRob fugi outfit fail: " + ex.ToString());
                                         }
 
                                         EPlayer.Freeze(player, true);
@@ -6278,7 +6352,7 @@ namespace RNC
                                                                     Character.SetTeamOutfit(p, 1);
                                                                 }
                                                                 catch { }
-                                                                NAPI.Util.ConsoleOutput("ZAMN! BANKROB FIB FAIL: " + ex.ToString());
+                                                                NAPI.Util.ConsoleOutputEx("ZAMN! BANKROB FIB FAIL: " + ex.ToString());
                                                             }
                                                         }
                                                     }
@@ -6312,7 +6386,7 @@ namespace RNC
                                                     }
                                                     catch (Exception ex)
                                                     {
-                                                        NAPI.Util.ConsoleOutput("FAIL IN SECOND STAGE OF THAT SWAT SHIT " + ex.ToString());
+                                                        NAPI.Util.ConsoleOutputEx("FAIL IN SECOND STAGE OF THAT SWAT SHIT " + ex.ToString());
                                                     }
                                                 }
                                             }
@@ -6349,7 +6423,7 @@ namespace RNC
                                         }
                                         catch (Exception ex)
                                         {
-                                            NAPI.Util.ConsoleOutput("THIS IS ETERNAL SUFFERING " + ex.ToString());
+                                            NAPI.Util.ConsoleOutputEx("THIS IS ETERNAL SUFFERING " + ex.ToString());
                                         }
                                     }
                                 }
@@ -6690,7 +6764,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput($"[EXCEPTION IN GameUpdate]: {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"[EXCEPTION IN GameUpdate]: {ex.ToString()}");
             }
             return;
         }

@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
 using RNC;
 using Microsoft.EntityFrameworkCore.Query;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -710,6 +711,12 @@ namespace RNC
             }
         }
 
+        
+        public static void ConsoleOutputEx(this GTANetworkMethods.Util util, string output)
+        {
+            if (!Settings.NAPI_LOGGING) return;
+            NAPI.Util.ConsoleOutput(output);
+        }
         public static T GetSharedDataSafe<T>(this Entity player, string key)
         {
             if (player.HasSharedData(key))
@@ -732,7 +739,7 @@ namespace RNC
                     if(typeof(Entity) == typeof(Player))
                     {
                         Player pl = (Player)player;
-                        NAPI.Util.ConsoleOutput($"[GETSHAREDDATA SAFE FAIL] Key {key} on {pl.Name} was of Type: {type.Name}!");
+                        NAPI.Util.ConsoleOutputEx($"[GETSHAREDDATA SAFE FAIL] Key {key} on {pl.Name} was of Type: {type.Name}!");
                     }
                     return default(T);
                 }
@@ -1220,7 +1227,7 @@ namespace RNC
             }
             catch(Exception ex) 
             {
-                NAPI.Util.ConsoleOutput("[EPlayer.SyncComponents null shit] " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("[EPlayer.SyncComponents null shit] " + ex.ToString());
             }
             return;
         }
@@ -1764,7 +1771,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             player.TriggerEvent("sendAutoLoginDataToBrowser", "");
-                            NAPI.Util.ConsoleOutput("Found 0 auto login data");
+                            NAPI.Util.ConsoleOutputEx("Found 0 auto login data");
                         });
                     }
                     else
@@ -1773,7 +1780,7 @@ namespace RNC
                         {
                             autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
                             Account toLogin = autoLoginChecks[0];
-                            NAPI.Util.ConsoleOutput("Sending data: " + toLogin.Username);
+                            NAPI.Util.ConsoleOutputEx("Sending data: " + toLogin.Username);
 
                             player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
                         });
@@ -1914,7 +1921,11 @@ namespace RNC
 
                 NAPI.Task.Run(() =>
                 {
+<<<<<<< Updated upstream
                     NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {model}, they now have a total of {totalOwned}/{Settings.Cars.Count} vehicles");
+=======
+                    NAPI.Util.ConsoleOutputEx($"{player.Name} unlocked a {vehicle.Model}, they now have a total of {totalOwned}/{Settings.CopchaseVehicles.Count} vehicles");
+>>>>>>> Stashed changes
 
                     if (totalOwned >= Settings.Cars.Count)
                         EPlayer.UnlockAchievement(player, "all_vehicles");
@@ -1949,7 +1960,7 @@ namespace RNC
                 {
                     LoadoutData ld = Settings.Loadouts.FirstOrDefault(l => l.Name.ToLower() == ownedDBloadout.Name.ToLower() && l.Team == ownedDBloadout.Team);
                     if (ld != null) ownedLoadouts.Add(ld);
-                    else NAPI.Util.ConsoleOutput($"[OWNED LOADOUTS] Can't find loadout data for name {ownedDBloadout.Name}!");
+                    else NAPI.Util.ConsoleOutputEx($"[OWNED LOADOUTS] Can't find loadout data for name {ownedDBloadout.Name}!");
                 }
 
                 return ownedLoadouts;
@@ -2024,7 +2035,7 @@ namespace RNC
 
                 NAPI.Task.Run(() =>
                 {
-                    NAPI.Util.ConsoleOutput($"{player.Name} unlocked loadout {name}, they now have a total of {totalOwned}/{Settings.Loadouts.Count} loadouts.");
+                    NAPI.Util.ConsoleOutputEx($"{player.Name} unlocked loadout {name}, they now have a total of {totalOwned}/{Settings.Loadouts.Count} loadouts.");
 
                     if (totalOwned >= Settings.Loadouts.Count)
                         EPlayer.UnlockAchievement(player, "all_loadouts");
@@ -2131,12 +2142,12 @@ namespace RNC
                         }
                         catch (Exception ex)
                         {
-                            NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 INSIDE RUN(): " + ex.ToString());
+                            NAPI.Util.ConsoleOutputEx("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 INSIDE RUN(): " + ex.ToString());
                         }
 
                     }, 1000);
                 }
-                catch (Exception ex) { NAPI.Util.ConsoleOutput("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 OUTSIDE RUN(): " + ex.ToString()); }
+                catch (Exception ex) { NAPI.Util.ConsoleOutputEx("EXCEPTION WHEN UNLOCKING REACH_LEVEL_100 OUTSIDE RUN(): " + ex.ToString()); }
             });
             
         }
@@ -2438,7 +2449,7 @@ namespace RNC
             }
             catch(Exception ex)
             {
-                NAPI.Util.ConsoleOutput($"EPLAYER.SPAWN EXCEPTION: {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"EPLAYER.SPAWN EXCEPTION: {ex.ToString()}");
             }
             
         }
@@ -2490,7 +2501,7 @@ namespace RNC
             }
             catch(Exception e)
             {
-                NAPI.Util.ConsoleOutput(e.ToString());
+                NAPI.Util.ConsoleOutputEx(e.ToString());
             }
         }
         
@@ -2529,7 +2540,7 @@ namespace RNC
             }
             catch (Exception e)
             {
-                NAPI.Util.ConsoleOutput(e.ToString());
+                NAPI.Util.ConsoleOutputEx(e.ToString());
 
                 List<Main.SelectedBadgeData> toReturn = new List<Main.SelectedBadgeData>();
                 return toReturn;

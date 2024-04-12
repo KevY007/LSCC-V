@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Text;
 using GTANetworkAPI;
 using RNC.Data;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC.Data
 {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GTANetworkAPI;
 using Microsoft.EntityFrameworkCore;
 using static RNC.Character;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -343,14 +344,14 @@ namespace RNC
                 int AccountSQLID = acc.SQL_ID;
                 if (AccountSQLID == 0)
                 {
-                    NAPI.Util.ConsoleOutput($"Failed to init: acc SQLID is 0! {acc.SQL_ID} {acc.Username}");
+                    NAPI.Util.ConsoleOutputEx($"Failed to init: acc SQLID is 0! {acc.SQL_ID} {acc.Username}");
                     return;
                 }
 
                 Character newCharacter = new Character(player, null, null);
                 if(newCharacter == null)
                 {
-                    NAPI.Util.ConsoleOutput($"[CHARACTER EDITOR] New character was null during char creation!");
+                    NAPI.Util.ConsoleOutputEx($"[CHARACTER EDITOR] New character was null during char creation!");
                 }
 
                 SavedAppearance firstAppearance = new SavedAppearance()
@@ -416,7 +417,7 @@ namespace RNC
 
                             await context.SaveChangesAsync();
 
-                            NAPI.Util.ConsoleOutput($"[CHARACTER] Added entries for {acc.Username}: [Appearance:] {firstAppearance.SQL_ID} | [Police Outfit:] {savedCop.SQL_ID} | [Fugitive Outfit:] {savedFugitive.SQL_ID}");
+                            NAPI.Util.ConsoleOutputEx($"[CHARACTER] Added entries for {acc.Username}: [Appearance:] {firstAppearance.SQL_ID} | [Police Outfit:] {savedCop.SQL_ID} | [Fugitive Outfit:] {savedFugitive.SQL_ID}");
 
                             NAPI.Task.Run(() =>
                             {
@@ -437,13 +438,13 @@ namespace RNC
                     }
                     catch (Exception ex)
                     {
-                        NAPI.Util.ConsoleOutput("Inside try catch char error: " + ex.ToString());
+                        NAPI.Util.ConsoleOutputEx("Inside try catch char error: " + ex.ToString());
                     }
                 });
             }
             catch(Exception ex)
             {
-                NAPI.Util.ConsoleOutput(ex.ToString());
+                NAPI.Util.ConsoleOutputEx(ex.ToString());
             }
         }
 
@@ -599,7 +600,7 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             UpdateActiveOutfitVariable(player, _check, teamID);
-                            NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] {acc.Username} had no active outfit for team {teamID}. It was now assigned to outfit {_check.SQL_ID}!");
+                            NAPI.Util.ConsoleOutputEx($"[OUTFIT-DBG] {acc.Username} had no active outfit for team {teamID}. It was now assigned to outfit {_check.SQL_ID}!");
                             EPlayer.Error(player, $"Your {(teamID == 1 ? "<strong>Police</strong>" : "<strong>Fugitive</strong>")} outfit has been updated & fixed. It will be applied on next respawn.");
                         });
 

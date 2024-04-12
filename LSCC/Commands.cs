@@ -13,6 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -21,6 +22,39 @@ namespace RNC
         static string Translate(Player player, string message_code, params object[] args)
         {
             return Translator.Translate(player, message_code, args);
+        }
+
+        [Command("methodlogging", "!{#AFAFAF}[USAGE] methodlogging", GreedyArg = true)]
+        public void cmd_methodlogging(Player player)
+        {
+
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            MethodCallLoggerAttribute.LOGGING_ENABLED = !MethodCallLoggerAttribute.LOGGING_ENABLED;
+            player.SendChatMessage($"Method Call Logger {(MethodCallLoggerAttribute.LOGGING_ENABLED ? "!{#00FF00}ON" : "!{#FF0000}OFF")}!");
+        }
+        [Command("napilogging", "!{#AFAFAF}[USAGE] napilogging", GreedyArg = true)]
+        public void cmd_napilogging(Player player)
+        {
+
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                player.SendChatMessage(Translate(player, "ERROR_COMMAND_NOT_AUTHORIZED"));
+                return;
+            }
+
+            Settings.NAPI_LOGGING = !Settings.NAPI_LOGGING;
+            player.SendChatMessage($"NAPI ConsoleOutput Logger {(Settings.NAPI_LOGGING ? "!{#00FF00}ON" : "!{#FF0000}OFF")}!");
         }
 
         [Command("serveroptions", "!{#AFAFAF}[USAGE] serveroptions (option) | use 'help' to get all options", GreedyArg = true)]
@@ -1449,11 +1483,11 @@ namespace RNC
                             if(_nameCheck == null)
                             {
                                 await AccountManager.RecoverAccount(account);
-                                NAPI.Util.ConsoleOutput($"Recovering {account.Username}...");
+                                NAPI.Util.ConsoleOutputEx($"Recovering {account.Username}...");
                             }
                             else
                             {
-                                NAPI.Util.ConsoleOutput($"Account {account.Username} {account.SQL_ID} exists in main database! {_nameCheck.Username} {_nameCheck.SQL_ID}");
+                                NAPI.Util.ConsoleOutputEx($"Account {account.Username} {account.SQL_ID} exists in main database! {_nameCheck.Username} {_nameCheck.SQL_ID}");
                             }
                         }
                     }
@@ -1574,7 +1608,7 @@ namespace RNC
 
                     BackupContextFactory.Instance.SaveChanges();
                     ContextFactory.Instance.SaveChanges();
-                    NAPI.Util.ConsoleOutput($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
+                    NAPI.Util.ConsoleOutputEx($"[ACCOUNT ARCHIVE] {archivedAccs} have been archived. Total accounts in archive: {BackupContextFactory.Instance.Accounts.Count()}");
 
                     foreach (Player pl in NAPI.Pools.GetAllPlayers())
                     {
@@ -4137,13 +4171,13 @@ namespace RNC
             {
                 player.SendChatMessage($"X: {player.Position.X} - Y: {player.Position.Y} - Z: {player.Position.Z}");
                 player.SendChatMessage($"Heading: {player.Heading}");
-                NAPI.Util.ConsoleOutput($"{player.Name} Position log: {{ new Vector3({player.Position.X}f, {player.Position.Y}f, {player.Position.Z}f), {player.Heading}f }},");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} Position log: {{ new Vector3({player.Position.X}f, {player.Position.Y}f, {player.Position.Z}f), {player.Heading}f }},");
             }
             else
             {
                 player.SendChatMessage($"vX: {player.Vehicle.Position.X} - vY: {player.Vehicle.Position.Y} - vZ: {player.Vehicle.Position.Z}");
                 player.SendChatMessage($"vHeading: {player.Vehicle.Heading}");
-                NAPI.Util.ConsoleOutput($"{player.Name} Position log: {{ new Vector3({player.Vehicle.Position.X}f, {player.Vehicle.Position.Y}f, {player.Vehicle.Position.Z}f), {player.Vehicle.Heading}f }},");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} Position log: {{ new Vector3({player.Vehicle.Position.X}f, {player.Vehicle.Position.Y}f, {player.Vehicle.Position.Z}f), {player.Vehicle.Heading}f }},");
             }
         }
 
@@ -6560,7 +6594,7 @@ namespace RNC
                     }
                     catch(Exception ex)
                     {
-                        NAPI.Util.ConsoleOutput($"/checkbanevaders error: ${ex.ToString()}");
+                        NAPI.Util.ConsoleOutputEx($"/checkbanevaders error: ${ex.ToString()}");
                         NAPI.Task.Run(() =>
                         {
                             player.SendChatMessage("!{#FF6347}[ERROR] !{#FFFFFF}There was a fatal error. Please notify the devs.");
@@ -6867,7 +6901,7 @@ namespace RNC
             LobbyData newLobby = new LobbyData();
             newLobby.PlayerCreated = true;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} created lobby ID {newLobby.lobbyId}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} created lobby ID {newLobby.lobbyId}");
             player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have created a new lobby with ID " + newLobby.lobbyId + ", /setlobbypassword to lock it.");
             //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} created lobby {newLobby.lobbyId}.**");
 
@@ -6901,7 +6935,7 @@ namespace RNC
             newLobby.gameStatus = 0;
             newLobby.lobbyId = -1;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} deleted lobby ID {lobbyid}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} deleted lobby ID {lobbyid}");
 
             //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} deleted lobby {lobbyid}.**");
 
@@ -6938,7 +6972,7 @@ namespace RNC
             newLobby.Password = password;
             newLobby.LobbyOwnerSQLID = acc.SQL_ID;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} set lobby ID {newLobby.lobbyId} password to {newLobby.Password}");
             player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set password for lobby ID " + lobbyid + " to " + newLobby.Password);
             //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s password to {newLobby.Password}.**");
             
@@ -6965,14 +6999,14 @@ namespace RNC
             if (mode.Equals("standard", StringComparison.OrdinalIgnoreCase))
             {
                 newLobby.gameMode = GameModes.STANDARD;
-                NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to STANDARD.");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} set lobby ID {newLobby.lobbyId} mode to STANDARD.");
                 player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to STANDARD.");
                 //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to STANDARD.**");
             }
             else if (mode.Equals("busted", StringComparison.OrdinalIgnoreCase))
             {
                 newLobby.gameMode = GameModes.BUSTED;
-                NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} mode to BUSTED.");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} set lobby ID {newLobby.lobbyId} mode to BUSTED.");
                 player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set mode for lobby ID " + lobbyid + " to BUSTED.");
                 //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s mode to BUSTED.**");
             }
@@ -7002,7 +7036,7 @@ namespace RNC
 
             newLobby.FugitivePercent = percent;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} set lobby ID {newLobby.lobbyId} percentage to {newLobby.FugitivePercent}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} set lobby ID {newLobby.lobbyId} percentage to {newLobby.FugitivePercent}");
             player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have set fugitive percentage for lobby ID " + lobbyid + " to " + newLobby.FugitivePercent);
             //Discord.SendTextChannel("staff-bot", $"**(Adm/Donor) | {player.Name} set lobby {lobbyid}'s fugitive percentage to {newLobby.FugitivePercent}.**");
 
@@ -7043,7 +7077,7 @@ namespace RNC
 
                 newLobby.Enabled = false;
 
-                NAPI.Util.ConsoleOutput($"{player.Name} disabled lobby ID {newLobby.lobbyId}.");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} disabled lobby ID {newLobby.lobbyId}.");
                 player.SendChatMessage("!{#FF6347}[#] !{#FFFFFF}You have disabled lobby ID " + lobbyid + ".");
                 //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled lobby {lobbyid}.**");
             }
@@ -7051,7 +7085,7 @@ namespace RNC
             {
                 newLobby.Enabled = true;
 
-                NAPI.Util.ConsoleOutput($"{player.Name} enabled lobby ID {newLobby.lobbyId}.");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} enabled lobby ID {newLobby.lobbyId}.");
                 player.SendChatMessage("!{#33C446}[#] !{#FFFFFF}You have enabled lobby ID " + lobbyid + ".");
                 //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled {lobbyid}.**");
             }
@@ -7102,7 +7136,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            NAPI.Util.ConsoleOutput($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
+                            NAPI.Util.ConsoleOutputEx($"{player.Name} enabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
                             RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_ENABLED_MAP", EPlayer.GetAdminName(player), mapBruh.Name)));
                             //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} enabled map {mapBruh.Name}.**");
                         });
@@ -7112,7 +7146,7 @@ namespace RNC
                     {
                         NAPI.Task.Run(() =>
                         {
-                            NAPI.Util.ConsoleOutput($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
+                            NAPI.Util.ConsoleOutputEx($"{player.Name} disabled map {mapBruh.Name} ID {mapBruh.SQL_ID}.");
                             RAGE.Entities.Players.All.ForEach((Player p) => p.SendChatMessage(Translate(p, "ADMIN_DISABLED_MAP", EPlayer.GetAdminName(player), mapBruh.Name)));
                             //Discord.SendTextChannel("staff-bot", $"**(AdmCmd) | {player.Name} disabled map {mapBruh.Name}.**");
                         });
@@ -7164,7 +7198,7 @@ namespace RNC
                         lobby.NextMapID = mapBruh.SQL_ID;
 
 
-                        NAPI.Util.ConsoleOutput($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
+                        NAPI.Util.ConsoleOutputEx($"{player.Name} set lobby {lobby.lobbyId} next map to {mapBruh.Name} ({mapBruh.SQL_ID}).");
 
                         EPlayer.SendMessageInLobby(lobby.lobbyId, "NEXT_MAP_ADMIN", lobby.lobbyId, mapBruh.Name, EPlayer.GetAdminLevelName(EPlayer.GetAccount(player).Admin), EPlayer.Name(player));
 
@@ -11971,7 +12005,7 @@ namespace RNC
             }
             catch (Exception ex) 
             {
-                NAPI.Util.ConsoleOutput($"[SPECOFF ERROR] {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"[SPECOFF ERROR] {ex.ToString()}");
             }
         }
        

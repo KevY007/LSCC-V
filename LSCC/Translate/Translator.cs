@@ -6,6 +6,7 @@ using System.IO;
 using GTANetworkAPI;
 
 using Newtonsoft.Json;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -71,7 +72,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput(ex.ToString());
+                NAPI.Util.ConsoleOutputEx(ex.ToString());
                 return $"[ERROR] Error sending message: {ex.Message} | SEND THIS TO THE DEVS.";
             }
         }
@@ -85,7 +86,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput(ex.ToString());
+                NAPI.Util.ConsoleOutputEx(ex.ToString());
                 return $"[ERROR] Error sending message: {ex.Message} | SEND THIS TO THE DEVS.";
             }
         }

@@ -21,6 +21,11 @@ using GTANetworkAPI;
 using System.Net.Mime;
 using System.Xml.Linq;
 using Microsoft.Extensions.FileSystemGlobbing.Internal.PatternContexts;
+<<<<<<< Updated upstream
+=======
+using System.Reflection.Emit;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
+>>>>>>> Stashed changes
 
 namespace RNC
 {
@@ -43,7 +48,7 @@ namespace RNC
         [RemoteEvent("ServerConsoleOutput")]
         public void ServerConsoleOutput(Player player, string output)
         {
-            NAPI.Util.ConsoleOutput(output);
+            NAPI.Util.ConsoleOutputEx(output);
         }
 
         [RemoteEvent("Translator:SetLanguageServer")]
@@ -54,7 +59,7 @@ namespace RNC
             {
                 if (!EPlayer.LoggedIn(player))
                 {
-                    NAPI.Util.ConsoleOutput($"[TRANSLATOR FAIL] Tried to update {player.Name}'s language in database while they weren't logged in.");
+                    NAPI.Util.ConsoleOutputEx($"[TRANSLATOR FAIL] Tried to update {player.Name}'s language in database while they weren't logged in.");
                     return;
                 }
 
@@ -84,7 +89,7 @@ namespace RNC
         [RemoteEvent("db_sync")]
         public void db_sync(Player player, bool attach, int remoteCarID)
         {
-            NAPI.Util.ConsoleOutput($"Syncing {player.Name} trunk sync for others | attach: {attach.ToString()} | carid {remoteCarID}");
+            NAPI.Util.ConsoleOutputEx($"Syncing {player.Name} trunk sync for others | attach: {attach.ToString()} | carid {remoteCarID}");
             NAPI.Pools.GetAllPlayers().ForEach(pl =>
             {
                 if(pl != player)
@@ -162,7 +167,7 @@ namespace RNC
             DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has joined the server. *(Total online: {RAGE.Entities.Players.Count})*", "Auth");
             //Discord.SendTextChannel("staff-bot", $"**{player.Name} has joined the server.** *(Total online: {RAGE.Entities.Players.Count})*");
 
-            NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+            NAPI.Util.ConsoleOutputEx($"[Connection] {player.Name} has joined the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
             if (player.HasData("Kicked")) return;
 
@@ -198,7 +203,7 @@ namespace RNC
 
                     if (ban != null)
                     {
-                        NAPI.Util.ConsoleOutput($"Found a ban through IP: ${pAddress}, RID: ${pSCID}, HWID: {pSerial}");
+                        NAPI.Util.ConsoleOutputEx($"Found a ban through IP: ${pAddress}, RID: ${pSCID}, HWID: {pSerial}");
                         Account evadeAcc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.SQL_ID == ban.AccountSQLID);
                         string evadeAccountName = evadeAcc.Username;
                         NAPI.Task.Run(() =>
@@ -214,7 +219,7 @@ namespace RNC
                             Logs.AddToAdminRecord(evadeAcc.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade as {player.Name}", "Permanent");
 
                             EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {player.Name} for ban evading as {evadeAccountName}.");
-                            NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
+                            NAPI.Util.ConsoleOutputEx($"[BAN SYSTEM] Kicking {player.Name} as they're banned. (BANID: {ban.SQL_ID} ACCOUNTID: {ban.AccountSQLID})");
 
                             player.SetData("Kicked", true);
                             NAPI.Task.Run(() => { try { player.Kick(); } catch { } }, 1000);
@@ -338,7 +343,7 @@ namespace RNC
             {
                 if (player == null)
                 {
-                    NAPI.Util.ConsoleOutput("OnPlayerWounded - player object was null!? (" + state + ", kID: " + killerID + ")");
+                    NAPI.Util.ConsoleOutputEx("OnPlayerWounded - player object was null!? (" + state + ", kID: " + killerID + ")");
                     return;
                 }
                 if (player.HasSharedData("Wounded") && player.GetSharedDataSafe<int>("Wounded") == state && state != 0) return; // REPEL: Laggers... So it doesn't call twice...
@@ -668,7 +673,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("Exception in OnPlayerWounded: " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("Exception in OnPlayerWounded: " + ex.ToString());
             }
         }
 
@@ -1587,17 +1592,17 @@ namespace RNC
         [RemoteEvent("Clan_OnRequestChangeSetting")]
         public void Clan_OnRequestChangeSetting(Player player, int settingID, int value)
         {
-            NAPI.Util.ConsoleOutput($"{player.Name} changed {settingID} to {value}!");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} changed {settingID} to {value}!");
             Account pAcc = EPlayer.GetAccount(player);
             if (player.GetSharedDataSafe<int>("ClanID") == -1)
             {
-                NAPI.Util.ConsoleOutput("No Clan!");
+                NAPI.Util.ConsoleOutputEx("No Clan!");
                 EPlayer.Error(player, Translate(player, "ERROR_NOT_IN_CLAN_NOCOLOR"));
                 return;
             }
             if (settingID == 1 && player.GetSharedDataSafe<int>("ClanTier") > 0)
             {
-                NAPI.Util.ConsoleOutput("No Authority!");
+                NAPI.Util.ConsoleOutputEx("No Authority!");
                 EPlayer.Error(player, Translate(player, "ERROR_CLAN_NO_AUTHORITY"));
                 return;
             }
@@ -2048,7 +2053,7 @@ namespace RNC
 
                         if (isClanDisbanded)
                         {
-                            NAPI.Util.ConsoleOutput($"CLAN HAS BEEN DISBANDED: {player.Name} LEFT HE WAS TIER {myTier}.");
+                            NAPI.Util.ConsoleOutputEx($"CLAN HAS BEEN DISBANDED: {player.Name} LEFT HE WAS TIER {myTier}.");
                             foreach (Player clanMember in Settings.LoggedInPlayers.Where(pl => pl.HasSharedData("ClanID") && pl.GetSharedDataSafe<int>("ClanID") == clanToSee))
                             {
                                 clanMember.SetSharedData("ClanID", -1);
@@ -2484,7 +2489,7 @@ namespace RNC
         [ServerEvent(Event.PlayerEnterColshape)]
         public void OnPlayerEnterColshape(ColShape shape, Player player)
         {
-            NAPI.Util.ConsoleOutput($"{player.Name} entered shape!");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} entered shape!");
             LobbyData lobby = Settings.Lobbies.FirstOrDefault(l => l.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
             if(lobby != null)
             {
@@ -2552,10 +2557,10 @@ namespace RNC
                 }
                 else
                 {
-                    NAPI.Util.ConsoleOutput($"Lobby gamemode is bank: {(lobby.gameMode == GameModes.BANKROBBERY).ToString()}");
-                    NAPI.Util.ConsoleOutput($"Shape is good: {(shape == lobby.BankRobbery.BankRobberyFinishMarker).ToString()}");
-                    NAPI.Util.ConsoleOutput($"Heist leader: {(player.GetSharedDataSafe<bool>("HeistLeader") == true).ToString()}");
-                    NAPI.Util.ConsoleOutput($"Team: {(player.GetSharedDataSafe<int>("Team") == 0).ToString()}");
+                    NAPI.Util.ConsoleOutputEx($"Lobby gamemode is bank: {(lobby.gameMode == GameModes.BANKROBBERY).ToString()}");
+                    NAPI.Util.ConsoleOutputEx($"Shape is good: {(shape == lobby.BankRobbery.BankRobberyFinishMarker).ToString()}");
+                    NAPI.Util.ConsoleOutputEx($"Heist leader: {(player.GetSharedDataSafe<bool>("HeistLeader") == true).ToString()}");
+                    NAPI.Util.ConsoleOutputEx($"Team: {(player.GetSharedDataSafe<int>("Team") == 0).ToString()}");
                 }
             }
 
@@ -2715,7 +2720,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player))
             {
-                NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server in Login Screen. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+                NAPI.Util.ConsoleOutputEx($"[Connection] {player.Name} has left the server in Login Screen. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
                 return;
             }
             try
@@ -2733,7 +2738,7 @@ namespace RNC
                 {
                     Commands.cmd_specoff(p);
                 }
-                NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+                NAPI.Util.ConsoleOutputEx($"[Connection] {player.Name} has left the server. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
                 foreach (LobbyData bannedFromLobbies in Settings.Lobbies.Where(l => l.BannedPlayers.Contains(player)))
                 {
@@ -2777,7 +2782,7 @@ namespace RNC
                 }
                 catch (Exception ex)
                 {
-                    NAPI.Util.ConsoleOutput(ex.ToString());
+                    NAPI.Util.ConsoleOutputEx(ex.ToString());
                 }
 
                 foreach (var lobby in Settings.Lobbies)
@@ -2909,7 +2914,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("[ON PLAYER DISCONNECT EXCEPTION] " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("[ON PLAYER DISCONNECT EXCEPTION] " + ex.ToString());
             }
         }
 
@@ -2983,7 +2988,7 @@ namespace RNC
             }
             catch(Exception ex)
             {
-                NAPI.Util.ConsoleOutput("OnPlayerDeath: " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("OnPlayerDeath: " + ex.ToString());
             }
             try
             {
@@ -3052,7 +3057,7 @@ namespace RNC
                 {
                     if (killer != null && !killer.IsNull && killer != player)
                     {
-                        NAPI.Util.ConsoleOutput($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
+                        NAPI.Util.ConsoleOutputEx($"[Death] {player.Name} has been killed by {killer.Name} using {(reasonStr == null ? "N/A" : reasonStr)}.");
 
                         if (wepDat != null && wepDat.Group != null)
                             EPlayer.TryAdvanceChallenge(killer, Challenge.ChallengeType.AnyKill, wepDat.Group);
@@ -3232,7 +3237,7 @@ namespace RNC
                     }
                     else
                     {
-                        NAPI.Util.ConsoleOutput($"[Death] {player.Name} has died of {(reasonStr == null ? "N/A" : reasonStr)}.");
+                        NAPI.Util.ConsoleOutputEx($"[Death] {player.Name} has died of {(reasonStr == null ? "N/A" : reasonStr)}.");
                     }
 
                     LobbyData lobby = Settings.Lobbies.Find(lobby => lobby.lobbyId == player.GetSharedDataSafe<int>("InLobby"));
@@ -3501,7 +3506,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("[EXCEPTION IN OnPlayerDeath] " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("[EXCEPTION IN OnPlayerDeath] " + ex.ToString());
             }
         }
 
@@ -3872,7 +3877,7 @@ namespace RNC
                             {
                                 NAPI.Task.Run(() =>
                                 {
-                                    NAPI.Util.ConsoleOutput($"[ANTI BAN EVADE] {player.Name} is linked to a banned account: {banned.Username} ({banned.SQL_ID} | {check.Reason} | {check.DateTime.ToString("g")})!");
+                                    NAPI.Util.ConsoleOutputEx($"[ANTI BAN EVADE] {player.Name} is linked to a banned account: {banned.Username} ({banned.SQL_ID} | {check.Reason} | {check.DateTime.ToString("g")})!");
                                     int cntAdmins = Settings.LoggedInPlayers.Count(p => EPlayer.GetAccount(p).Admin > 0);
                                     if(cntAdmins > 0)
                                     {
@@ -3947,7 +3952,7 @@ namespace RNC
         private static void LogQueryTime(long start, long finish, string info)
         {
             // Disabled for now
-            //NAPI.Util.ConsoleOutput($"[Query Performance] Query \"{info}\" took a total of {(finish-start).ToString()}ms to finish!");
+            //NAPI.Util.ConsoleOutputEx($"[Query Performance] Query \"{info}\" took a total of {(finish-start).ToString()}ms to finish!");
         }
 
         public static void OnPlayerLogin(Player player, Account acc)
@@ -3981,7 +3986,7 @@ namespace RNC
             DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has **logged in** as **{acc.Username}**", "Auth");
             //Discord.SendTextChannel("staff-bot", $"*{player.Name} has logged in as {acc.Username}.*");
 
-            NAPI.Util.ConsoleOutput($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+            NAPI.Util.ConsoleOutputEx($"[Login] {player.Name} has logged in as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
 
             acc.LastHWID = player.Serial;
@@ -4001,7 +4006,7 @@ namespace RNC
                 DiscordData _discordData = new DiscordData();
                 acc.DiscordID = null;
                 acc.DiscordCode = _discordData.DiscordCode;
-                NAPI.Util.ConsoleOutput($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
+                NAPI.Util.ConsoleOutputEx($"[DISCORD INTEGRATION] {player.Name}'s discord data was invalid, generating them new. This is a one time thing, unless discord data is deleted.");
             }
 
             Task.Run(async () =>
@@ -4085,7 +4090,7 @@ namespace RNC
                                     player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                                     EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans. (Banned Account: {_accData.Username})");
-                                    NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+                                    NAPI.Util.ConsoleOutputEx($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
                                     Logs.AddToAdminRecord(_accData.SQL_ID, -1, "Ban Evading", $"Attempted to ban evade under username: {acc.Username}", "Permanent");
                                     player.SetData("Kicked", true);
@@ -4118,7 +4123,7 @@ namespace RNC
                                 player.SendChatMessage("!{#A9C4E4}Server closed the connection.");
 
                                 //EPlayer.SendMessageToAllAdmins($"!{{#FF6347}}ANTI SUS SYSTEM (ASS) has kicked {acc.Username} for ban evading/outstanding bans.");
-                                //NAPI.Util.ConsoleOutput($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
+                                //NAPI.Util.ConsoleOutputEx($"[BAN SYSTEM] Kicking on login: {player.Name} (account name) as they're banned.");
 
 
                                 //player.SetData("Kicked", true);
@@ -4623,7 +4628,7 @@ namespace RNC
         [RemoteEvent("RequestCharImportData")]
         public static void OnRequestCharImportData(Player player)
         {
-            NAPI.Util.ConsoleOutput("Requested char import data");
+            NAPI.Util.ConsoleOutputEx("Requested char import data");
             Character character = Character.GetCharacter(player);
             Character.Appearance appearance = character.CurrentAppearance;
 
@@ -4909,7 +4914,7 @@ namespace RNC
             //Discord.SendTextChannel("staff-bot", $"*{player.Name} has registered.*");
 
             EPlayer.SetDiscordStatus(player, $"Registering as {acc.Username}");
-            NAPI.Util.ConsoleOutput($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
+            NAPI.Util.ConsoleOutputEx($"[Connection] {player.Name} has registered as {acc.Username}. (IP: {player.Address} - Serial: {player.Serial} - SC: {player.SocialClubName})");
 
             player.SetData("LoggedIn", true);
             player.SetData("AccountHandle", acc);
@@ -5031,7 +5036,7 @@ namespace RNC
                         {
                             NAPI.Task.Run(() =>
                             {
-                                NAPI.Util.ConsoleOutput($"Error during login from player with username {username}.");
+                                NAPI.Util.ConsoleOutputEx($"Error during login from player with username {username}.");
                                 player.TriggerEvent("login_ShowInvalidInfo", true);
                             });
                         }
@@ -5041,7 +5046,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("[LOGIN ERROR] Error during auto-login: " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("[LOGIN ERROR] Error during auto-login: " + ex.ToString());
             }
         }
 
@@ -5096,11 +5101,11 @@ namespace RNC
         [RemoteEvent("EmailVerification_SendToEmail")]
         public static void OnEmailVerificationRequestEmail(Player player, string email)
         {
-            NAPI.Util.ConsoleOutput($"SENDING VERIFY EMAIL TO {email}");
+            NAPI.Util.ConsoleOutputEx($"SENDING VERIFY EMAIL TO {email}");
             if (!player.HasData("ACCOUNT:Verification"))
             {
                 EPlayer.Error(player, "Fatal error - no account verification handle found. Reconnect or contact the devs.");
-                NAPI.Util.ConsoleOutput($"{player.Name} had no account verification handle when sending verification email ({email})!");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} had no account verification handle when sending verification email ({email})!");
                 return;
             }
             Account acc = player.GetData<Account>("ACCOUNT:Verification");
@@ -5124,7 +5129,7 @@ namespace RNC
                     _a.Email = email;
                     await context.SaveChangesAsync();
 
-                    NAPI.Util.ConsoleOutput($"Sending verification email to {_a.Username}!!");
+                    NAPI.Util.ConsoleOutputEx($"Sending verification email to {_a.Username}!!");
                     await AccountManager.SendVerificationEmail(_a);
                     NAPI.Task.Run(() =>
                     {
@@ -5155,7 +5160,7 @@ namespace RNC
                     return;
                 }
 
-                NAPI.Util.ConsoleOutput($"[Login Attempt] Username {username} from {player.Name}");
+                NAPI.Util.ConsoleOutputEx($"[Login Attempt] Username {username} from {player.Name}");
                 if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
                 {
                     EPlayer.Error(player, Translate(player, "PLEASE_WAIT_ATTEMPT"), "fas fa-lock");
@@ -5176,7 +5181,7 @@ namespace RNC
                                 if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
-                                    NAPI.Util.ConsoleOutput($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
+                                    NAPI.Util.ConsoleOutputEx($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
                                     if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
                                         if (acc.EmailVerified == false)
@@ -5201,7 +5206,7 @@ namespace RNC
                             {
                                 NAPI.Task.Run(() =>
                                 {
-                                    NAPI.Util.ConsoleOutput($"Error during login from player with username {username}.");
+                                    NAPI.Util.ConsoleOutputEx($"Error during login from player with username {username}.");
                                     player.TriggerEvent("login_ShowInvalidInfo", true);
                                 });
                             }
@@ -5221,7 +5226,7 @@ namespace RNC
                                 if (acc.Password == "") useOldPassword = true;
                                 NAPI.Task.Run(() =>
                                 {
-                                    NAPI.Util.ConsoleOutput($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
+                                    NAPI.Util.ConsoleOutputEx($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
                                     if (AccountManager.Login(acc, password, false, useOldPassword))
                                     {
                                         if (acc.EmailVerified == false)
@@ -5247,7 +5252,7 @@ namespace RNC
                             {
                                 NAPI.Task.Run(() =>
                                 {
-                                    NAPI.Util.ConsoleOutput($"Error during login from player with username {username}.");
+                                    NAPI.Util.ConsoleOutputEx($"Error during login from player with username {username}.");
                                     player.TriggerEvent("login_ShowInvalidInfo", true);
                                 });
                             }
@@ -5258,7 +5263,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("CRINGE LOGIN FAIL: " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("CRINGE LOGIN FAIL: " + ex.ToString());
                 player.TriggerEvent("login_ForceStopLoading");
             }
         }
@@ -5547,7 +5552,7 @@ namespace RNC
         public static void RequestClanTabUpdate(Player player)
         {
             Account acc = EPlayer.GetAccount(player);
-            NAPI.Util.ConsoleOutput($"Requesting clan tab update for {player.Name} [CID: {acc.ClanID}|{acc.ClanTier}]");
+            NAPI.Util.ConsoleOutputEx($"Requesting clan tab update for {player.Name} [CID: {acc.ClanID}|{acc.ClanTier}]");
             Task.Run(async () =>
             {
                 using (MainDatabase context = ContextFactory.CreateContext())
@@ -5603,7 +5608,7 @@ namespace RNC
         public void OnMenuRequestClansPage(Player player, int first, int rows)
         {
             if (player == null) return;
-            NAPI.Util.ConsoleOutput($"Requesting Clans Page: {first} and {rows} rows.");
+            NAPI.Util.ConsoleOutputEx($"Requesting Clans Page: {first} and {rows} rows.");
             player.TriggerEvent("clearMenuClansVariable");
             Task.Run(async () =>
             {
@@ -5611,7 +5616,7 @@ namespace RNC
                 {
                     NAPI.Task.Run(() =>
                     {
-                        NAPI.Util.ConsoleOutput($"Skipping first ${first} clans and taking {rows}!");
+                        NAPI.Util.ConsoleOutputEx($"Skipping first ${first} clans and taking {rows}!");
                     });
                     await context.Clans.AsQueryable().Skip(first).Take(rows).ForEachAsync(async clan =>
                     {
@@ -5628,7 +5633,7 @@ namespace RNC
                         int COTW_Wins = clan.WeekWins;
                         NAPI.Task.Run(() =>
                         {
-                            NAPI.Util.ConsoleOutput($"Now on clan: {clanID} - {clanName}");
+                            NAPI.Util.ConsoleOutputEx($"Now on clan: {clanID} - {clanName}");
                         });
 
                         using (MainDatabase context2 = ContextFactory.CreateContext())
@@ -5970,7 +5975,7 @@ namespace RNC
                 int packagePrice = 0;
                 int donoLevel = 0;
 
-                NAPI.Util.ConsoleOutput($"{player.Name} tried to purchase {packageID}!");
+                NAPI.Util.ConsoleOutputEx($"{player.Name} tried to purchase {packageID}!");
 
                 switch (packageID)
                 {
@@ -6058,7 +6063,7 @@ namespace RNC
             }
             catch(Exception ex)
             {
-                NAPI.Util.ConsoleOutput($"[BIG FATAL ERROR] BUYING RANK: {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"[BIG FATAL ERROR] BUYING RANK: {ex.ToString()}");
             }
         }
 
@@ -6663,11 +6668,11 @@ namespace RNC
         public void OnMenuReportPlayer(Player player, string target, string reason)
         {
             if (!EPlayer.LoggedIn(player)) return;
-            NAPI.Util.ConsoleOutput($"{player.Name} is reporting {target} [unfound yet] for {reason}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} is reporting {target} [unfound yet] for {reason}");
             Player targetPlayer = Settings.LoggedInPlayers.FirstOrDefault(p => p.Name == target);
             if (targetPlayer == null) return;
 
-            NAPI.Util.ConsoleOutput($"{player.Name} is reporting {targetPlayer.Name} for {reason}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name} is reporting {targetPlayer.Name} for {reason}");
             Commands.cmd_report(player, targetPlayer, reason);
         }
 
@@ -6698,7 +6703,7 @@ namespace RNC
                 }
                 catch(Exception ex)
                 {
-                    NAPI.Util.ConsoleOutput(ex.ToString());
+                    NAPI.Util.ConsoleOutputEx(ex.ToString());
                     return;
                 }
             }
@@ -6750,7 +6755,7 @@ namespace RNC
             Character.Outfit fugiFit = new Character.Outfit("Default Fugitive", "", false, 0);
             if (isNew_changeOutfitGender)
             {
-                NAPI.Util.ConsoleOutput($"[CHARACTER EDITOR] {player.Name} ({player.Nametag}) switched gender to FEMALE! Setting them up..");
+                NAPI.Util.ConsoleOutputEx($"[CHARACTER EDITOR] {player.Name} ({player.Nametag}) switched gender to FEMALE! Setting them up..");
                 Character.GetOutfitByTeam(player, 0).Data = NAPI.Util.ToJson(fugiFit);
                 Character.GetOutfitByTeam(player, 0).IsMale = false;
                 Character.GetOutfitByTeam(player, 1).Data = NAPI.Util.ToJson(copFit);
@@ -6951,7 +6956,7 @@ namespace RNC
                             }
                             else
                             {
-                                NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] Failed to fetch outfits for {acc.Username}!");
+                                NAPI.Util.ConsoleOutputEx($"[OUTFIT-DBG] Failed to fetch outfits for {acc.Username}!");
                             }
                      
                         });
@@ -7384,7 +7389,7 @@ namespace RNC
                             await context.SaveChangesAsync();
                             NAPI.Task.Run(() =>
                             {
-                                NAPI.Util.ConsoleOutput("[1 WEEK] Damage logs have been cleared!");
+                                NAPI.Util.ConsoleOutputEx("[1 WEEK] Damage logs have been cleared!");
                             });
                         }
                     });
@@ -7404,7 +7409,7 @@ namespace RNC
             }
             catch (Exception ex)
             {
-                NAPI.Util.ConsoleOutput("Time Checking week/month issue: " + ex.ToString());
+                NAPI.Util.ConsoleOutputEx("Time Checking week/month issue: " + ex.ToString());
             }
         }
 
@@ -7702,7 +7707,7 @@ namespace RNC
                 return;
             }
 
-            NAPI.Util.ConsoleOutput($"[Register Attempt] Username {username} from {player.Name}");
+            NAPI.Util.ConsoleOutputEx($"[Register Attempt] Username {username} from {player.Name}");
             if (Environment.TickCount64 - player.GetData<long>("LastCryptAttempt") < 1000 || EPlayer.LoggedIn(player))
             {
                 EPlayer.Error(player, Translate(player, "PLEASE_WAIT_ATTEMPT"), "fas fa-user");
@@ -7763,7 +7768,7 @@ namespace RNC
                     {
                         if (await context.Accounts.AsQueryable().CountAsync(a => a.RegisterHWID.Equals(pSerial) || a.RegisterRID == pSCID) >= 2)
                         {
-                            NAPI.Util.ConsoleOutput($"(RnC | REGISTER) {username} attempted to register, they have 2 or more accounts already!");
+                            NAPI.Util.ConsoleOutputEx($"(RnC | REGISTER) {username} attempted to register, they have 2 or more accounts already!");
 
                             reachedAccountLimit = true;
                             return;
@@ -7771,8 +7776,8 @@ namespace RNC
                     }
                     catch (Exception ex)
                     {
-                        NAPI.Util.ConsoleOutput("(RnC | REGISTER) Failed the 2+ account check for " + username + "!");
-                        NAPI.Util.ConsoleOutput(ex.ToString());
+                        NAPI.Util.ConsoleOutputEx("(RnC | REGISTER) Failed the 2+ account check for " + username + "!");
+                        NAPI.Util.ConsoleOutputEx(ex.ToString());
                     }
                     finally
                     {
@@ -8315,7 +8320,7 @@ namespace RNC
 
             //target.StopAnimation();
             RequestPlayAnimation(target, "amb@world_human_push_ups@male@exit", "exit", 0, 9);
-            NAPI.Util.ConsoleOutput("OnRevivePlayer " + EPlayer.Name(player) + " " + EPlayer.Name(target));
+            NAPI.Util.ConsoleOutputEx("OnRevivePlayer " + EPlayer.Name(player) + " " + EPlayer.Name(target));
             NAPI.Task.Run(() =>
             {
                 try
@@ -8398,7 +8403,7 @@ namespace RNC
             {
                 player.TriggerEvent("UpdateMenuStatsTab", acc.Email, EPlayer.GetAdminLevelName(acc.Admin, false), acc.Points, acc.DonatorPoints, EPlayer.GetDonatorLevelName(acc.DonatorLevel, false), acc.DerbyWins,
                     acc.Escapes, acc.Arrests, acc.Kills, acc.Deaths, KDR, (acc.MinutesPlayed / 60.0).ToString("N3"), acc.Warns, false);
-                NAPI.Util.ConsoleOutput($"[REQUESTING STATS FOR TAB] Player: {player.Name} | Error: {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"[REQUESTING STATS FOR TAB] Player: {player.Name} | Error: {ex.ToString()}");
             }
         }
 
@@ -8554,7 +8559,7 @@ namespace RNC
             if (target == null) return;
             target.SetSharedData("CuffedBy", "n/a");
 
-            NAPI.Util.ConsoleOutput("StopCuffing " + player.Name);
+            NAPI.Util.ConsoleOutputEx("StopCuffing " + player.Name);
 
             Events.RequestClearAnimation(player);
         }
@@ -8568,7 +8573,7 @@ namespace RNC
 
             player.SetSharedData("ReviveTarget", "n/a");
 
-            NAPI.Util.ConsoleOutput("OnStopReviving " + player.Name);
+            NAPI.Util.ConsoleOutputEx("OnStopReviving " + player.Name);
 
             if (target != null)
                 target.SetSharedData("BeingRevived", false);
@@ -8582,7 +8587,7 @@ namespace RNC
         [RemoteEvent("ScreenshotReceived")]
         public void OnReceiveSS(Player player, int result, string data, int identifier)
         {
-            NAPI.Util.ConsoleOutput(data);
+            NAPI.Util.ConsoleOutputEx(data);
             if (identifier != -1)
             {
                 Player admin = Settings.LoggedInPlayers.Find(a => a.GetSharedDataSafe<int>("SQL_ID") == identifier);
@@ -8603,7 +8608,7 @@ namespace RNC
                     }
                 }
             }
-            NAPI.Util.ConsoleOutput($"{player.Name}'s screenshot result: {result} at: {data} with identifier: {identifier}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name}'s screenshot result: {result} at: {data} with identifier: {identifier}");
             return;
         }
 
@@ -8635,7 +8640,7 @@ namespace RNC
                     }
                 }
             }
-            NAPI.Util.ConsoleOutput($"{player.Name}'s GIF result: {result} at: {data} with identifier: {identifier}");
+            NAPI.Util.ConsoleOutputEx($"{player.Name}'s GIF result: {result} at: {data} with identifier: {identifier}");
             return;
         }
 

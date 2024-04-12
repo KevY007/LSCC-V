@@ -15,6 +15,7 @@ using System.Runtime.InteropServices.ComTypes;
 using Microsoft.Extensions.Logging.Abstractions;
 using System.Net.Mail;
 using System.Threading.Tasks;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -148,7 +149,7 @@ namespace RNC
                     {
                         List<Logs_AdminRecord> _logs = ContextFactory.Instance.Logs_AdminRecords.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
                         string jsonShit = NAPI.Util.ToJson(_logs);
-                        NAPI.Util.ConsoleOutput(jsonShit);
+                        NAPI.Util.ConsoleOutputEx(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -156,7 +157,7 @@ namespace RNC
                     {
                         List<Logs_Admin> _logs = ContextFactory.Instance.Logs_Admin.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
                         string jsonShit = NAPI.Util.ToJson(_logs);
-                        NAPI.Util.ConsoleOutput(jsonShit);
+                        NAPI.Util.ConsoleOutputEx(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -164,7 +165,7 @@ namespace RNC
                     {
                         List<Logs_Session> _logs = ContextFactory.Instance.Logs_Session.AsQueryable().Where(l => l.AccountID == target.SQL_ID).ToList();
                         string jsonShit = NAPI.Util.ToJson(_logs);
-                        NAPI.Util.ConsoleOutput(jsonShit);
+                        NAPI.Util.ConsoleOutputEx(jsonShit);
                         player.TriggerEvent("ReturnLogsToClient", type, jsonShit);
                         break;
                     }
@@ -342,7 +343,7 @@ namespace RNC
         {
             if (!player.HasData("JoinTimeUnix"))
             {
-                NAPI.Util.ConsoleOutput($"[SESSION LOG FAIL] {player.Name} has no Join Time timestamp data!");
+                NAPI.Util.ConsoleOutputEx($"[SESSION LOG FAIL] {player.Name} has no Join Time timestamp data!");
                 return;
             }
 

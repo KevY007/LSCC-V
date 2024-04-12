@@ -9,6 +9,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.ServiceModel.Channels;
 using System.Threading.Tasks;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -1446,7 +1447,7 @@ namespace RNC
         {
             if (user == null)
             {
-                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[DISCORD] Attempted to get SQLID - User was null!"); });
+                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutputEx($"[DISCORD] Attempted to get SQLID - User was null!"); });
                 return -1;
             }
             if (user.Id == 922461597866295397 || user.Id == 1027945798069133443)
@@ -1466,7 +1467,7 @@ namespace RNC
         {
             if (user == null)
             {
-                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutput($"[DISCORD] Attempted to get SQLID - User was null!"); });
+                NAPI.Task.Run(() => { NAPI.Util.ConsoleOutputEx($"[DISCORD] Attempted to get SQLID - User was null!"); });
                 return 0;
             }
             if (user.Id == 922461597866295397 || user.Id == 1027945798069133443) // if GM bot

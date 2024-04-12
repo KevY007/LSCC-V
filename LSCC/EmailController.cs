@@ -4,6 +4,7 @@ using System.Text;
 using System.Net;
 using System.Net.Mail;
 using GTANetworkAPI;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
@@ -23,11 +24,11 @@ namespace RNC
             try
             {
                 smtpClient.Send(message);
-                NAPI.Util.ConsoleOutput($"[E-MAILER] Successfully e-mailed {recipient}.");
+                NAPI.Util.ConsoleOutputEx($"[E-MAILER] Successfully e-mailed {recipient}.");
             }
             catch(Exception ex)
             {
-                NAPI.Util.ConsoleOutput($"[E-MAILER] Failed to send email to {recipient}: {ex.ToString()}");
+                NAPI.Util.ConsoleOutputEx($"[E-MAILER] Failed to send email to {recipient}: {ex.ToString()}");
             }
         }
 

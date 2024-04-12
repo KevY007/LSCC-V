@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using GTANetworkAPI;
+[assembly: MethodCallLogger(AttributeTargetTypes = "RNC.*", AttributeTargetMembers = "*")]
 
 namespace RNC
 {
