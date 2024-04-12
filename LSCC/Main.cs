@@ -4010,6 +4010,8 @@ namespace RNC
 
         public static bool IsHelicopter(string carModel)
         {
+            if (carModel == null || carModel.Length == 0) return false;
+
             return NAPI.Vehicle.GetVehicleClass((VehicleHash)NAPI.Util.GetHashKey(carModel)) == 15 
                 || carModel.Equals("polmav") 
                 || carModel.Equals("as350");
