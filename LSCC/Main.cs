@@ -4704,6 +4704,19 @@ namespace RNC
                                 List<MapSpawn> fugitiveSpawns = mapSpawns.Where(s => s.spawnTeam == 0).ToList();
                                 List<MapSpawn> heliSpawns = mapSpawns.Where(s => s.spawnTeam == 2).ToList();
 
+                                if (policeSpawns == null || policeSpawns.Count == 0
+                                    || fugitiveSpawns == null || fugitiveSpawns.Count == 0
+                                    || heliSpawns == null || heliSpawns.Count == 0)
+                                {
+                                    NAPI.Task.Run(() =>
+                                    {
+                                        EPlayer.SendMessageToAllAdmins($"The map {mapToStart.Name} is missing spawns! Ensure that the map has COP (team 1), FUGITIVE (team 0), and HELI (team 2) spawns! (/mapspawns {mapToStart.SQL_ID})");
+                                        // If a map isn't found, set null as map so it doesn't proceed
+                                        StartCopchase(lobby, CopchasePlayers, null, null, null, null);
+                                    });
+                                    return;
+                                }
+
                                 NAPI.Task.Run(() =>
                                 {
                                     // Once all database operations are complete, start copchase on main thread with all data you fetched
