@@ -114,7 +114,7 @@ function MedkitAction(){
     actionInterval = setInterval(() => {
 
         if(mp.players.local == null || mp.players.local.handle == null) return;
-        if(mp.players.local.getVariable("Wounded") > 0){
+        if(mp.players.local.getVariable("Wounded") > 0 || mp.players.local.getVariable("TasedTill") > Date.now()){
             clearInterval(actionInterval);
             actionInterval = null;
             return;
