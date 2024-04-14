@@ -114,9 +114,20 @@ function MedkitAction(){
     actionInterval = setInterval(() => {
 
         if(mp.players.local == null || mp.players.local.handle == null) return;
-        if(mp.players.local.getVariable("Wounded") > 0 || mp.players.local.getVariable("TasedTill") > Date.now()){
+        if(mp.players.local.getVariable("Wounded") > 0){
             clearInterval(actionInterval);
             actionInterval = null;
+            stopActionTimer();
+            return;
+        }
+        if(mp.players.local.getVariable("TasedTill") > Date.now()){
+            clearInterval(actionInterval);
+            actionInterval = null;
+            mp.events.callRemote("clear_anim");
+            stopActionTimer();
+            setTimeout(() => {
+                mp.events.callLocal("setToRagdoll", 18000, 18000 * 2, 1, false, false, false);
+            }, 1);
             return;
         }
         try{
