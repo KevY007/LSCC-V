@@ -1934,7 +1934,7 @@ namespace RNC
             if (player.GetSharedDataSafe<int>("Wounded") > 0)
             { player.SendChatMessage(Translate(player, "ERROR_WOUNDED")); return; }
 
-            if (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill"))
+            if (player.HasSharedData("TasedTill") && DateTimeOffset.Now.ToUnixTimeMilliseconds() < player.GetSharedDataSafe<long>("TasedTill"))
             { player.SendChatMessage(Translate(player, "ERROR_TASED")); return; }
 
             if (player.HasData("Cuffed"))
@@ -1995,7 +1995,7 @@ namespace RNC
             if (player.GetSharedDataSafe<string>("ActionType") != "none" || player.GetSharedDataSafe<int>("ActionTime") > 0)
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
-            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill")))
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && DateTimeOffset.Now.ToUnixTimeMilliseconds() < player.GetSharedDataSafe<long>("TasedTill")))
             { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             /*if (player.IsInVehicle)
@@ -2035,7 +2035,7 @@ namespace RNC
             if (player.GetSharedDataSafe<string>("ActionType") != "none" || player.GetSharedDataSafe<int>("ActionTime") > 0)
             { player.SendChatMessage(Translate(player, "ERROR_IN_ACTION")); return; }
 
-            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill")))
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && DateTimeOffset.Now.ToUnixTimeMilliseconds() < player.GetSharedDataSafe<long>("TasedTill")))
             { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             if (player.IsInVehicle)
@@ -2059,7 +2059,7 @@ namespace RNC
         [Command("handsup")]
         public void cmd_handsup(Player player)
         {
-            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && Environment.TickCount64 < player.GetSharedDataSafe<long>("TasedTill")))
+            if (player.HasData("Cuffed") || (player.HasSharedData("TasedTill") && DateTimeOffset.Now.ToUnixTimeMilliseconds() < player.GetSharedDataSafe<long>("TasedTill")))
             { player.SendChatMessage(Translate(player, "ERROR_CANT_DO_RIGHT_NOW")); return; }
 
             if (player.IsInVehicle)

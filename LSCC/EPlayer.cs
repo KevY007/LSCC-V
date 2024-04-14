@@ -679,7 +679,7 @@ namespace RNC
                 player.SetSharedData("MuteTime", 0);
                 player.ResetData("DraggingOut");
 
-                player.SetSharedData("TasedTill", Environment.TickCount64);
+                player.SetSharedData("TasedTill", DateTimeOffset.Now.ToUnixTimeMilliseconds());
 
                 player.SetData("TUA_LT", 0);
                 player.SetData("TUA_LP", new Vector3(0.0, 0.0, 0.0)); // AFK CHECKERS

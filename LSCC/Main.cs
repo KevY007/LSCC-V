@@ -4376,7 +4376,8 @@ namespace RNC
                 player.SetSharedData("Collisions", false);
                 player.ResetData("Seatbelt");
                 player.TriggerEvent("ToggleSeatbelt", false);
-                
+                player.SetSharedData("TasedTill", DateTimeOffset.Now.ToUnixTimeMilliseconds());
+
                 EPlayer.Freeze(player, true);
 
                 player.SetData("GPS", false);

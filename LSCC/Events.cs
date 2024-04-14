@@ -8195,7 +8195,7 @@ namespace RNC
                         }
                     }
 
-                    if (target.HasSharedData("TasedTill") && Environment.TickCount64 - (target.GetSharedDataSafe<long>("TasedTill") - 18000) >= 2000)
+                    if (target.HasSharedData("TasedTill") && DateTimeOffset.Now.ToUnixTimeMilliseconds() - (target.GetSharedDataSafe<long>("TasedTill") - 18000) >= 2000)
                     {
                         if (lobby.GameProgress < 60)
                         {
@@ -8205,7 +8205,7 @@ namespace RNC
 
                         int time = 18000;
                         target.TriggerEvent("setToRagdoll", time, time * 2, 1, false, false, false);
-                        target.SetSharedData("TasedTill", Environment.TickCount64 + 18000);
+                        target.SetSharedData("TasedTill", DateTimeOffset.Now.ToUnixTimeMilliseconds() + 18000);
                         target.TriggerEvent("clearTaseAnims", 18000);
 
                         if (lobby.Fugitives.Contains(target))
