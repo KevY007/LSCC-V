@@ -3228,8 +3228,8 @@ const WeaponDamageData = [
         torsoDamage:26,
         limbDamage:20,
         headDamage:52,
-        weapons:[453432689, 3219281620, 1593441988, 584646201, 3218215474, 2285322324, 3523564046, 137902532, 465894841] 
-        // Pistol, Pistol MK2, Combat Pistol, AP Pistol, SNS Pistol, SNS Pistol MK2, Heavy Pistol, Vintage Pistol, Pistol XM3
+        weapons:[453432689, 3219281620, 1593441988, 584646201, 3218215474, 2285322324, 3523564046, 137902532, 465894841, 727643628] 
+        // Pistol, Pistol MK2, Combat Pistol, AP Pistol, SNS Pistol, SNS Pistol MK2, Heavy Pistol, Vintage Pistol, Pistol XM3, Ceramic Pistol
     },
     {
         categoryId:1,
