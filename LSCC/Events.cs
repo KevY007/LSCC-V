@@ -125,6 +125,7 @@ namespace RNC
         {
             if (player.HasData("Kicked")) return;
 
+            Logs.LogSession(player);
             player.SetData("Kicked", true);
             NAPI.Task.Run(() =>
             {
@@ -137,7 +138,6 @@ namespace RNC
                         NAPI.Task.Run(() =>
                         {
                             if (player == null) return;
-                            Logs.LogSession(player);
                             EPlayer.SendMessageToAll("MSGALL_AFK_KICKED", EPlayer.Name(player));
                             player.KickSilent(reason);
                             return;
@@ -146,12 +146,10 @@ namespace RNC
                     }
                     if (silent)
                     {
-                        Logs.LogSession(player);
                         player.KickSilent(reason);
                     }
                     else
                     {
-                        Logs.LogSession(player);
                         player.Kick(reason);
                     }
                 }
