@@ -2352,10 +2352,24 @@ mp.events.add("changeRecoilSmooting", (value) => {
     recoil_smoothing = value;
 })
 
-
+// stop shooting while tased
+mp.events.add("render", () => {
+    mp.game.controls.disableControlAction(32, 24, true);
+    mp.game.controls.disableControlAction(32, 69, true);
+    mp.game.controls.disableControlAction(32, 92, true);
+    mp.game.controls.disableControlAction(32, 106, true);
+    mp.game.controls.disableControlAction(32, 122, true);
+    mp.game.controls.disableControlAction(32, 135, true);
+    mp.game.controls.disableControlAction(32, 142, true);
+    mp.game.controls.disableControlAction(32, 144, true);
+    mp.game.controls.disableControlAction(32, 257, true);
+    mp.game.controls.disableControlAction(32, 346, true);
+});
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
+    if(mp.players.local.getVariable("TasedTill") > Date.now()) return; // if currently tased
+
     if(targetPosition){
         let hitPlayer = false;
         if(targetEntity !== undefined && targetEntity.type == 'player') hitPlayer = true;
@@ -3333,6 +3347,7 @@ const WeaponDamageData = [
 
 mp.events.add("outgoingDamage", (sourceEntity, targetEntity, targetPlayer, weapon, boneIndex, damage) => {
     if(sourceEntity === undefined || sourceEntity === null || sourceEntity.type !== 'player' || sourceEntity !== player) return;
+    if(mp.players.local.getVariable("TasedTill") > Date.now()) return; // if currently tased
 
     const KEY = Date.now();
     // In case of the target being another player
