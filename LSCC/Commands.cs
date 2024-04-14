@@ -6799,7 +6799,7 @@ namespace RNC
             Logs.AddToAdminRecord(EPlayer.GetAccount(target).SQL_ID, EPlayer.GetAccount(player).SQL_ID, "Ban", reason, "N/A");
             // try { Main.Log("admin.txt", $"{DateTime.Now.ToString().Replace(":", "|")}:{player.Name}:ban:{target.Name}:{reason}"); } catch { }
 
-
+            Logs.LogSession(target);
             target.SetData("Kicked", true);
             EPlayer.ShowPunishmentScreen(target, _new.SQL_ID, "ban", player.Name, reason, null, false);
             EPlayer.SendToKickedScreen(target);
@@ -11014,11 +11014,12 @@ namespace RNC
 
                 DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has kicked {target.Name} for {reason}", "Admin");
 
+                Logs.LogSession(target);
                 target.SetData("Kicked", true);
                 EPlayer.ShowPunishmentScreen(target, punishmentID, "kick", player.Name, reason, null, false);
                 EPlayer.SendToKickedScreen(target);
             }
-
+            
         }
 
         [Command("ojail", "!{#AFAFAF}[USAGE] ojail (target) (minutes) (reason)", GreedyArg = true)]
