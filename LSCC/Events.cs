@@ -807,6 +807,7 @@ namespace RNC
         [RemoteEvent("clear_anim")]
         public static void RequestClearAnimation(Player player)
         {
+            player.ResetData("Handsup");
             RAGE.Entities.Players.All.Where(a => a.Dimension == player.Dimension && a.Position.DistanceTo(player.Position) < 200.0).ToList().ForEach((Player act) =>
             {
                 if (player.HasData("LastAnimDict"))
@@ -8583,6 +8584,7 @@ namespace RNC
                 && p.GetSharedDataSafe<int>("Team") == 0
                 && p.GetData<bool>("Cuffed") == false
                 && !p.IsInVehicle
+                && (p.GetSharedDataSafe<long>("TasedTill") > DateTimeOffset.Now.ToUnixTimeMilliseconds() || p.HasData("Handsup")) // is cuffed or hands are up
                 && p.GetSharedDataSafe<string>("CuffedBy").Equals("n/a") // making sure the fugitive isnt being cuffed by someone else
             );
             if (target == null) return;
