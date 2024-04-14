@@ -2361,6 +2361,12 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         if(targetEntity !== undefined && targetEntity.type == 'player') hitPlayer = true;
         mp.events.callRemote("AC_WeaponShot:BulletTrace", targetPosition.x, targetPosition.y, targetPosition.z, hitPlayer);
     }
+    if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && global.chaseRunning)
+    {
+        mp.events.callRemote("GivePlayerShotTag");
+    }
+    if(global.chaseRunning && mp.players.local.Team == 0 || mp.players.local.Team == 1)
+        mp.events.callRemote("SetShotsFired", true);
 
     ShotStats.TotalFired++;
 
@@ -2628,13 +2634,6 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         let gunName = (gunData ? gunData.Name : "Unknown");
         mp.events.callRemote("ShotListen_SendInfo", gunName, "nothing", shotListenData.playerHitsInRow);
     }
-
-    if(mp.players.local.getVariable("HasShot") == false && player.getVariable("Team") == 0 && global.chaseRunning)
-    {
-        mp.events.callRemote("GivePlayerShotTag");
-    }
-    if(global.chaseRunning && mp.players.local.Team == 0 || mp.players.local.Team == 1)
-        mp.events.callRemote("SetShotsFired", true);
 });
 
 let damageNametagTimeout = null;
