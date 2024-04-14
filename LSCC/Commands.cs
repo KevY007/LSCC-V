@@ -51,8 +51,10 @@ namespace RNC
                         player.SendChatMessage(Translate(player, "ERROR_MAX_IN_LOBBY_NUM"));
                         return;
                     }
-
-                    Settings.Dynamics.MaxInLobby = value;
+                    foreach(LobbyData l in Settings.Lobbies.Where(lob => lob.LobbyOwnerSQLID == -1)) // for every SERVER lobby
+                    {
+                        l.MaxPlayers = value;
+                    }
 
                     Main.SaveDynamicSettings();
 
@@ -4738,7 +4740,7 @@ namespace RNC
                 }
             }
 
-            if (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == lobbyid) >= Settings.Dynamics.MaxInLobby && EPlayer.GetAccount(player).Admin < 1)
+            if (Settings.LoggedInPlayers.Count(a => a.GetSharedDataSafe<int>("InLobby") == lobbyid) >= lobby.MaxPlayers && EPlayer.GetAccount(player).Admin < 1)
             {
                 //player.SendChatMessage("!{#FF6347}[!] !{#FFFFFF}That lobby is full!");
                 EPlayer.Notify(player, Translate(player, "ERROR_LOBBY_FULL"), "red", "fas fa-lock", false, 1000, "bottomCenter", "replace");
