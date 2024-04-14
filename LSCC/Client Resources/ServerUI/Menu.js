@@ -1665,6 +1665,7 @@ mp.events.add(
 mp.events.add(
   "UpdateMenuVehicles",
   (vehicles, currentCopCar, currentFugiCar) => {
+    mp.events.callRemote("ServerConsoleOutput", `"UpdateMenuVehicles" -> ${vehicles} | ${currentCopCar} | ${currentFugiCar}`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
@@ -1673,20 +1674,22 @@ mp.events.add(
     for (let i = 0; i < menuItems.length; i++) {
       //if(menuItems[i][2] == "Random") continue;
 
-      eval(`var requirements_json = ${menuItems[i][6]}`);
+      eval(`var requirements_json = ${menuItems[i][7]}`);
 
       vehicle_items.push({
-        id: i,
-        teamId: menuItems[i][0],
-        model: menuItems[i][1],
-        name: menuItems[i][2],
-        image: menuItems[i][3],
-        owned: !menuItems[i][4], // menuItems[i][4] = "locked" | locked = !owned
-        speed: menuItems[i][2] !== "Random" ? menuItems[i][5] : "Random",
+        id: menuItems[i][0],
+        teamId: menuItems[i][1],
+        model: menuItems[i][2],
+        name: menuItems[i][3],
+        image: menuItems[i][4],
+        owned: !menuItems[i][5], // menuItems[i][4] = "locked" | locked = !owned
+        speed: menuItems[i][3] !== "Random" ? menuItems[i][6] : "Random",
         requirements: requirements_json,
       });
     }
     if (global.ServerUI) {
+      mp.events.callRemote("ServerConsoleOutput", `"mainmenu_inventory_vehicles_set" -> ${JSON.stringify(vehicle_items)}`);
+      mp.events.callRemote("ServerConsoleOutput", `"mainmenu_inventory_selected_vehicles_set" -> cop: ${currentCopCar} | fugi: ${currentFugiCar}`);
       global.ServerUI.call("mainmenu_inventory_vehicles_set", vehicle_items);
       global.ServerUI.call(
         "mainmenu_inventory_selected_vehicles_set",

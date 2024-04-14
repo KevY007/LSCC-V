@@ -6401,37 +6401,20 @@ namespace RNC
             List<object[]> vehItems = new List<object[]>();
             foreach (ShopVehicleData car in Settings.CopchaseVehicles)
             {
-
-                string requirements = "[";
-                if (car.LevelRequired > 0)
-                    requirements += $"{{\"text\":\"Level {car.LevelRequired}\", \"meets\":{(_a.Level >= car.LevelRequired).ToString().ToLower()}}},";
-
-                if (car.PricePoints > 0)
-                    requirements += $"{{\"text\":\"{car.PricePoints} Points\", \"meets\":{(_a.Points >= car.PricePoints).ToString().ToLower()}}},";
-
-                if (car.PriceDiamondPoints > 0)
-                    requirements += $"{{\"text\":\"{car.PriceDiamondPoints} Donator Points\", \"meets\":{(_a.DonatorPoints >= car.PriceDiamondPoints).ToString().ToLower()}}},";
-
-                if (car.DonatorLevelRequired > 0)
-                    requirements += $"{{\"text\":\"{EPlayer.GetDonatorLevelName(car.DonatorLevelRequired)}\", \"meets\":{(_a.DonatorLevel >= car.DonatorLevelRequired).ToString().ToLower()}}},";
-
-                if (requirements.Length < 2)
-                    requirements = "[{\"text\":\"Free\", \"meets\":true}";
-
-                requirements += "]";
-
+                string requirements = $"{{level:{car.LevelRequired}, diamondPoints:{car.PriceDiamondPoints}, points:{car.PricePoints}, donatorLevel:{car.DonatorLevelRequired}}}";
 
                 bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car);
 
                 vehItems.Add(new object[]
                 {
+                            car.SQL_ID,
                             car.Team,
                             car.Model,
                             car.Name,
                             car.ImageURL,
                             !isOwnedVeh,
-                            $"{car.MaxSpeedKMH} KM/H",
-                            requirements 
+                            car.MaxSpeedKMH,
+                            requirements
                 });
             }
 
@@ -6589,6 +6572,8 @@ namespace RNC
                 }
 
                 weaponString += "]";
+
+                //    string requirements = $"{{ level:{loadout.LevelRequired}, points:{loadout.PointsRequired}, diamondPoints:{loadout.DonatorPointsRequired}, donatorLevel:{loadout.DonatorLevelRequired} }}";
 
                 string requirements = "[";
                 if (loadout.LevelRequired > 0)
