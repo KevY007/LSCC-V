@@ -1404,7 +1404,10 @@ mp.events.add("MenuSelectVehicle", (model, team) => {
   mp.events.callRemote("MenuSelectedVehicle", model, team);
 });
 
-mp.events.add("MenuSelectLoadout", (name, team) => {
+mp.events.add("mainmenu_inventory_loadout_buy", (name, team) => {
+  mp.events.callRemote("MenuSelectedLoadout", name, team);
+});
+mp.events.add("mainmenu_inventory_loadout_select", (name, team) => {
   mp.events.callRemote("MenuSelectedLoadout", name, team);
 });
 
@@ -1572,7 +1575,7 @@ mp.events.add("mainmenu_store_buy_rank", (id) => {
 mp.events.add("mainmenu_inventory_items_item_buy", (id) => {
   mp.events.callRemote("Menu_RequestBuyItem", id);
 });
-mp.events.add("MenuCustomizeLoadout", () => {
+mp.events.add("mainmenu_inventory_loadouts_customize", () => {
   mp.events.callRemote("Menu_OnWeaponEditor");
 });
 mp.events.add("MenuCustomizeVehicle", (model, teamID) => {
@@ -1729,7 +1732,7 @@ mp.events.add(
 
       global.ServerUI.call("mainmenu_inventory_loadouts_set", loadout_items);
       global.ServerUI.call(
-        "mainmenu_inventory_current_loadouts_set",
+        "mainmenu_inventory_selected_loadouts_set",
         copLoadout,
         fugiLoadout
       );
