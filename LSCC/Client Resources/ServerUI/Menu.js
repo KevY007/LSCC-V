@@ -1694,10 +1694,11 @@ mp.events.add(
       mp.events.callRemote("ServerConsoleOutput", `"mainmenu_inventory_vehicles_set" -> ${JSON.stringify(vehicle_items)}`);
       mp.events.callRemote("ServerConsoleOutput", `"mainmenu_inventory_selected_vehicles_set" -> cop: ${currentCopCar} | fugi: ${currentFugiCar}`);
       global.ServerUI.call("mainmenu_inventory_vehicles_set", vehicle_items);
+
       global.ServerUI.call(
         "mainmenu_inventory_selected_vehicles_set",
-        currentCopCar,
-        currentFugiCar
+        currentCopCar.toString(),
+        currentFugiCar.toString()
       );
     }
   }
