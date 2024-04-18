@@ -43,6 +43,7 @@ if (
   mp.storage.data.menu.chatSize = 1.0;
   mp.storage.data.menu.chatHeight = 1.0;
   mp.storage.data.menu.chatWidth = 1.0;
+  mp.storage.data.menu.chatPersistentInput = false;
 
   mp.storage.flush();
 }
@@ -977,6 +978,14 @@ function updateMenuSettingsTab() {
             ],
           },
           {
+            id: 40,
+            type: 1,
+            name: "persistentinput",
+            label: "Persistent Input",
+            description:
+              "Toggles whether chatbox input should stay after closing chat or not.",
+          },
+          {
             id: 13,
             type: 1,
             name: "oocauto",
@@ -1212,6 +1221,11 @@ function updateMenuSettingsTab() {
       39,
       (mp.storage.data.menu.chatWidth*100).toString()
     );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      40,
+      mp.storage.data.menu.chatPersistentInput
+    );
 
     // global.ServerUI.call(
     //   "mainmenu_setting_value_set",
@@ -1356,6 +1370,10 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
   else if(id == 39){
     mp.storage.data.menu.chatWidth = Number(value)/100;
     global.ServerUI.call("hud_chat_width_multiplier", mp.storage.data.menu.chatWidth);
+  }
+  else if(id == 40){
+    mp.storage.data.menu.chatPersistentInput = value;
+    global.ServerUI.call("hud_chat_keep_input_on_close", mp.storage.data.menu.chatPersistentInput);
   }
 
   if (global.ServerUI != null) {

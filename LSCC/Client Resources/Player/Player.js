@@ -4618,6 +4618,9 @@ function setStorageDataVars(){
     global.ServerUI.call("hud_chat_height_multiplier", mp.storage.data.menu.chatHeight);
     global.ServerUI.call("hud_chat_width_multiplier", mp.storage.data.menu.chatWidth);
 
+    if(mp.storage.data.menu.chatPersistentInput === undefined) mp.storage.data.menu.chatPersistentInput = false;
+    global.ServerUI.call("hud_chat_keep_input_on_close", mp.storage.data.menu.chatPersistentInput);
+
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;
     }
