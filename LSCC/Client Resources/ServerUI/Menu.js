@@ -1799,7 +1799,6 @@ mp.events.add(
 mp.events.add(
   "UpdateMenuVehicles",
   (vehicles, currentCopCar, currentFugiCar) => {
-    mp.events.callRemote("ServerConsoleOutput", `"UpdateMenuVehicles" -> ${vehicles} | ${currentCopCar} | ${currentFugiCar}`);
 
     // Vehicle Data
     // Model, Name, Background, Energy, Price, Locked
@@ -1822,15 +1821,14 @@ mp.events.add(
       });
     }
     if (global.ServerUI) {
-      mp.events.callRemote("ServerConsoleOutput", `"mainmenu_inventory_vehicles_set" -> ${JSON.stringify(vehicle_items)}`);
-      mp.events.callRemote("ServerConsoleOutput", `"mainmenu_inventory_selected_vehicles_set" -> cop: ${currentCopCar} | fugi: ${currentFugiCar}`);
       global.ServerUI.call("mainmenu_inventory_vehicles_set", vehicle_items);
 
-      global.ServerUI.call(
-        "mainmenu_inventory_selected_vehicles_set",
-        currentCopCar.toString(),
-        currentFugiCar.toString()
-      );
+        global.ServerUI.call(
+          "mainmenu_inventory_selected_vehicles_set",
+          currentFugiCar.toString(),
+          currentCopCar.toString()
+        );
+    
     }
   }
 );
@@ -1865,8 +1863,8 @@ mp.events.add(
       global.ServerUI.call("mainmenu_inventory_loadouts_set", loadout_items);
       global.ServerUI.call(
         "mainmenu_inventory_selected_loadouts_set",
-        copLoadout,
-        fugiLoadout
+        fugiLoadout,
+        copLoadout
       );
     }
   }
