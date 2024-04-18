@@ -8,6 +8,7 @@ function checkHackedWeapons(){
         if(mp.players.local.weapon !== 2725352035 && mp.players.local.weapon !== 0){
             if(Date.now() - lastHackedWeaponMessageSent > 15000){
                 mp.events.callRemote("AC_SendWeaponHackAlert", mp.players.local.weapon.toString(), 0);
+                mp.events.callRemote("ServerConsoleOutput", `(${new Date().toUTCString()}) [AntiCheat - Weapon Hacks] ${mp.players.local.name} might be hacking. Weapon data: ${mp.players.local.getVariable("AC_WeaponData")} | Hacked gun: ${mp.players.local.weapon.toString()} | Type: 0`);
                 lastHackedWeaponMessageSent = Date.now();
             }
         }
@@ -19,6 +20,7 @@ function checkHackedWeapons(){
         if(mp.players.local.weapon !== 2725352035 && mp.players.local.weapon !== 0){
             if(Date.now() - lastHackedWeaponMessageSent > 15000){
                 mp.events.callRemote("AC_SendWeaponHackAlert", mp.players.local.weapon.toString(), 1);
+                mp.events.callRemote("ServerConsoleOutput", `(${new Date().toUTCString()}) [AntiCheat - Weapon Hacks] ${mp.players.local.name} might be hacking. Weapon data: ${mp.players.local.getVariable("AC_WeaponData")} | Hacked gun: ${mp.players.local.weapon.toString()} | Type: 1`);
                 lastHackedWeaponMessageSent = Date.now();
             }
         }
@@ -27,6 +29,10 @@ function checkHackedWeapons(){
 }
 mp.events.add('TwoSecondsEvent', () => {
     checkHackedWeapons();
+});
+
+mp.events.addDataHandler('AC_WeaponData', function(entity, value, oldValue){
+    mp.events.callRemote("ServerConsoleOutput", `(${new Date().toUTCString()}) [AntiCheat - Weapon Hacks] ${mp.players.local.name}'s weapon data is now: ${value} | Old data: ${oldValue}`);
 });
 
 

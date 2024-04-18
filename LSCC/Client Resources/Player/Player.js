@@ -1207,8 +1207,6 @@ mp.events.add("TwoSecondsEvent", () => {
     }, 500);
 });
 
-
-
 mp.events.addDataHandler('PlayerSquadID', function(entity, value, oldValue){
     entity.SquadID = value;
 
