@@ -4611,6 +4611,13 @@ function setStorageDataVars(){
         mp.storage.data.chat.fontsizenew = 1.0;
     }
 
+    if(mp.storage.data.menu.chatSize === undefined) mp.storage.data.menu.chatSize = 1.0;
+    if(mp.storage.data.menu.chatHeight === undefined) mp.storage.data.menu.chatHeight = 1.0;
+    if(mp.storage.data.menu.chatWidth === undefined) mp.storage.data.menu.chatWidth = 1.0;
+    global.ServerUI.call("hud_chat_size_multiplier", mp.storage.data.menu.chatSize);
+    global.ServerUI.call("hud_chat_height_multiplier", mp.storage.data.menu.chatHeight);
+    global.ServerUI.call("hud_chat_width_multiplier", mp.storage.data.menu.chatWidth);
+
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;
     }

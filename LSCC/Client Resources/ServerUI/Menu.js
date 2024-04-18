@@ -40,6 +40,9 @@ if (
   mp.storage.data.menu.ChatAccessibility = false;
   mp.storage.data.menu.ShowDamageIndicator = true;
   mp.storage.data.menu.digitalHPAR = true;
+  mp.storage.data.menu.chatSize = 1.0;
+  mp.storage.data.menu.chatHeight = 1.0;
+  mp.storage.data.menu.chatWidth = 1.0;
 
   mp.storage.flush();
 }
@@ -873,6 +876,107 @@ function updateMenuSettingsTab() {
         icon: "fa-duotone fa-messages",
         settings: [
           {
+            id: 37,
+            type: 2,
+            name: "chat_size",
+            label: "Chat Scale",
+            description:
+              "Changes overall chat size.",
+            default: "Default",
+            options: [
+              {
+                label: "Tiny",
+                value: "50",
+              },
+              {
+                label: "Small",
+                value: "75",
+              },
+              {
+                label: "Default",
+                value: "100",
+              },
+              {
+                label: "Large",
+                value: "150",
+              },
+              {
+                label: "Huge",
+                value: "200",
+              },
+            ],
+          },
+          {
+            id: 38,
+            type: 2,
+            name: "chat_height_size",
+            label: "Chat Height",
+            description:
+              "Changes chat height size; bigger height size equals more messages shown on screen",
+            default: "Default",
+            options: [
+              {
+                label: "Tiny",
+                value: "50",
+              },
+              {
+                label: "Small",
+                value: "75",
+              },
+              {
+                label: "Default",
+                value: "100",
+              },
+              {
+                label: "Large",
+                value: "150",
+              },
+              {
+                label: "Huge",
+                value: "200",
+              },
+              {
+                label: "Massive",
+                value: "250",
+              },
+            ],
+          },
+          {
+            id: 39,
+            type: 2,
+            name: "chat_width_size",
+            label: "Chat Width",
+            description:
+              "Changes chat width size.",
+            default: "Default",
+            options: [
+              {
+                label: "Tiny",
+                value: "60",
+              },
+              {
+                label: "Small",
+                value: "80",
+              },
+              {
+                label: "Default",
+                value: "100",
+              },
+              {
+                label: "Large",
+                value: "180",
+              },
+              {
+                label: "Huge",
+                value: "230",
+              },
+              {
+                label: "Massive",
+                value: "290",
+              },
+            ],
+          },
+          {
             id: 13,
             type: 1,
             name: "oocauto",
@@ -1093,6 +1197,21 @@ function updateMenuSettingsTab() {
       36,
       mp.storage.data.menu.ownNametag.toString()
     );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      37,
+      (mp.storage.data.menu.chatSize*100).toString()
+    );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      38,
+      (mp.storage.data.menu.chatHeight*100).toString()
+    );
+    global.ServerUI.call(
+      "mainmenu_setting_value_set",
+      39,
+      (mp.storage.data.menu.chatWidth*100).toString()
+    );
 
     // global.ServerUI.call(
     //   "mainmenu_setting_value_set",
@@ -1225,6 +1344,18 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
   }
   else if(id == 36){
     mp.storage.data.menu.ownNametag = Number(value);
+  }
+  else if(id == 37){
+    mp.storage.data.menu.chatSize = Number(value)/100;
+    global.ServerUI.call("hud_chat_size_multiplier", mp.storage.data.menu.chatSize);
+  }
+  else if(id == 38){
+    mp.storage.data.menu.chatHeight = Number(value)/100;
+    global.ServerUI.call("hud_chat_height_multiplier", mp.storage.data.menu.chatHeight);
+  }
+  else if(id == 39){
+    mp.storage.data.menu.chatWidth = Number(value)/100;
+    global.ServerUI.call("hud_chat_width_multiplier", mp.storage.data.menu.chatWidth);
   }
 
   if (global.ServerUI != null) {
