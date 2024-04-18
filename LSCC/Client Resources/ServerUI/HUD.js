@@ -1876,7 +1876,7 @@ mp.events.add("render", () => {
                 wasWeaponShownInHud = true;
             }   
 
-            if(global.ServerUI) global.ServerUI.call("hud_info_current_weapon_set", {
+            if(global.ServerUI) global.ServerUI.call("hud_info_weapon_current_weapon_set", {
                 name: wepData.Name,
                 ammoInClip: ammoClip,
                 ammo: (ammoWeapon + (clipSize-ammoClip)),

@@ -178,12 +178,7 @@ mp.events.add("RememberMe_Toggle", (value) => {
   mp.storage.flush();
 });
 
-mp.events.add("setAuthDonators", (donorList) => {
-  eval(`var authDonators = ${donorList}`);
-  mp.events.callRemote("ServerConsoleOutput", donorList);
-  if(global.ServerUI) global.ServerUI.call("auth_donators_set", authDonators);
-});
-mp.events.add('showLoginBrowser', (state) => {
+mp.events.add('showLoginBrowser', (state, donatorList) => {
     setTimeout(() => {
         if(global.ServerUI != null)
         {      
@@ -203,6 +198,15 @@ mp.events.add('showLoginBrowser', (state) => {
                 if(mp.storage.data.menu.rememberMe17 !== undefined && mp.storage.data.menu.rememberMe17 === true){
                   mp.events.callRemote("requestQuickLoginForgotUsernameData"); // If 'Remember Me' is checked, auto-login the user.
                 }
+
+                setTimeout(() => {
+                  if(donatorList){
+                    eval(`var authDonators = ${donatorList}`);
+                    mp.events.callRemote(`ServerConsoleOutput`, `Donators set: ${authDonators.toString()}`)
+                    if(global.ServerUI) global.ServerUI.call("auth_donators_set", authDonators);
+                  }
+                }, 100);
+               
 
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
@@ -227,7 +231,7 @@ mp.events.add('showLoginBrowser', (state) => {
             global.ServerUI = global.InitializeServerUI();
             if(global.ServerUI) global.ServerUI.active = true;
             setTimeout(() => {
-                mp.events.callLocal("showLoginBrowser", state);
+                mp.events.callLocal("showLoginBrowser", state, donatorList);
             }, 1000);
         }
 

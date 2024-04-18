@@ -1830,8 +1830,7 @@ namespace RNC
                         {
                             if (show_login)
                             {
-                                player.TriggerEvent("showLoginBrowser", true);
-                                player.TriggerEvent("setAuthDonators", donorList);
+                                player.TriggerEvent("showLoginBrowser", true, donorList);
                             }
 
                             player.TriggerEvent("InitiateCustomChat");
