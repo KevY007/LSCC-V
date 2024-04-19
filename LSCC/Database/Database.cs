@@ -141,8 +141,10 @@ namespace RNC
         [Key]
         public int SQL_ID { get; set; }
         public int AccountSQLID { get; set; }
-        public string Model { get; set; }
-        public int Team { get; set; }
+        public string VehicleSQLID { get; set; }
+
+        //public string Model { get; set; } // Unused - to be removed after migration
+        //public int Team { get; set; } // Unused - to be removed after migration
         public int TimesUsed { get; set; }
     }
     public class PlayerTunings

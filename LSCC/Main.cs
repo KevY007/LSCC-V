@@ -4011,7 +4011,7 @@ namespace RNC
         {
             Account acc = EPlayer.GetAccount(owner);
 
-            string carName = "police";
+            string carName = EPlayer.GetCarModelFromSQLID(owner, 1); 
             int col1 = 0;
             int col2 = 111;
             float enginePower = 1.0f;
@@ -4142,10 +4142,10 @@ namespace RNC
         public static Vehicle CreateFugitiveVehicle(Player owner, Vector3 spawnPosition, float spawnHeading, LobbyData lobby)
         {
             float enginePower = 1.0f;
-            string carName = "washington";
+            string carName = EPlayer.GetCarModelFromSQLID(owner, 0);
             string vehSpeedClass = "Average";
 
-            if (EPlayer.GetAccount(owner).CarFugitive.Length < 3)
+            if (carName.Length < 3)
             {
                 switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 5))
                 {
@@ -4173,7 +4173,7 @@ namespace RNC
             }
             else
             {
-                carName = EPlayer.GetAccount(owner).CarFugitive;
+                carName = EPlayer.GetCarModelFromSQLID(owner, 0);
 
                 Account pAcc = EPlayer.GetAccount(owner);
                 // incrementing times this police vehicle was used
@@ -4181,7 +4181,7 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        ShopVehicleData car = Settings.CopchaseVehicles.FirstOrDefault(c => c.Model.Equals(carName));
+                        ShopVehicleData car = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.Equals(carName));
                         if(car == null)
                         {
                             NAPI.Util.ConsoleOutput($"yeah fuck error it's debug anyways can't find car {carName}");
@@ -4190,7 +4190,7 @@ namespace RNC
                         if (await EPlayer.HasOwnedVehicle(pAcc, car))
                         {
                             OwnedVehData ownedVeh = await context.OwnedVehicles.AsQueryable().FirstOrDefaultAsync(v => v.AccountSQLID == EPlayer.GetAccount(owner).SQL_ID
-                                                    && v.Model.Equals(carName, StringComparison.OrdinalIgnoreCase));
+                                                    && v.VehicleSQLID == car.SQL_ID.ToString());
                             if (ownedVeh != null)
                                 ownedVeh.TimesUsed++;
 
@@ -4381,7 +4381,7 @@ namespace RNC
                         player.Position = spawnVector.Around(10.0f);
 
                         currentFugitiveCar = CreateFugitiveVehicle(player, spawnVector, spawn.spawnA, lobby);
-                        currentFugiCarName = EPlayer.GetAccount(player).CarFugitive;
+                        currentFugiCarName = EPlayer.GetCarModelFromSQLID(player, 0);
 
                         // Setting leftover seats to Max-1 since one is already taken by the driver, pro maths
 
@@ -4429,7 +4429,7 @@ namespace RNC
                         KeyValuePair<int, Vehicle> clanVehicle = PairedClanVehicles.FirstOrDefault(p => p.Key == clanID);
                         if(clanVehicle.Equals(default(KeyValuePair<int, Vehicle>))) // if null
                         {
-                            carModel = EPlayer.GetAccount(player).CarCop;
+                            carModel = EPlayer.GetCarModelFromSQLID(player, 1);
                             Vehicle policeClanCar = null;
                             if (IsHelicopter(carModel)) // If helicopter, use the helicopter spawn index
                             {
@@ -4459,7 +4459,7 @@ namespace RNC
                             {
                                 PairedClanVehicles.Remove(clanVehicle);
 
-                                carModel = EPlayer.GetAccount(player).CarCop;
+                                carModel = EPlayer.GetCarModelFromSQLID(player, 1);
                                 Vehicle policeClanCar = null;
                                 if (IsHelicopter(carModel))
                                 {
@@ -4499,7 +4499,7 @@ namespace RNC
                         KeyValuePair<int, Vehicle> squadVehicle = PairedSquadVehicles.FirstOrDefault(p => p.Key == squadID);
                         if (squadVehicle.Equals(default(KeyValuePair<int, Vehicle>))) // if null
                         {
-                            carModel = EPlayer.GetAccount(player).CarCop;
+                            carModel = EPlayer.GetCarModelFromSQLID(player, 1);
                             Vehicle policeSquadCar = null;
                             if (IsHelicopter(carModel)) // If helicopter, use the helicopter spawn index
                             {
@@ -4529,7 +4529,7 @@ namespace RNC
                             {
                                 PairedSquadVehicles.Remove(squadVehicle);
 
-                                carModel = EPlayer.GetAccount(player).CarCop;
+                                carModel = EPlayer.GetCarModelFromSQLID(player, 1);
                                 Vehicle policeSquadCar = null;
                                 if (IsHelicopter(carModel))
                                 {

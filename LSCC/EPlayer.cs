@@ -1874,16 +1874,6 @@ namespace RNC
 
             return (xp >= GetMaxLevelXP(level) ? true : false);
         }
-        public async static Task<List<string>> GetOwnedVehicles(Account acc, int team)
-        {
-            List<string> ownedCars = new List<string>();
-            using (MainDatabase context = ContextFactory.CreateContext())
-            {
-                var cars = await context.OwnedVehicles.AsQueryable().Where(a => a.AccountSQLID == acc.SQL_ID && a.Team == team).ToListAsync();
-                foreach (var item in cars) ownedCars.Add(item.Model);
-                return ownedCars;
-            }
-        }
 
         public async static Task<bool> UnlockVehicle(Account acc, Player player, ShopVehicleData vehicle)
         {
@@ -1896,8 +1886,7 @@ namespace RNC
                 var _new = new OwnedVehData
                 {
                     AccountSQLID = acc.SQL_ID,
-                    Model = vehicle.Model,
-                    Team = vehicle.Team,
+                    VehicleSQLID = vehicle.SQL_ID.ToString(),
                     TimesUsed = 0,
                 };
                 await context.OwnedVehicles.AddAsync(_new);
@@ -1905,18 +1894,19 @@ namespace RNC
                 EPlayer.UnlockAchievement(player, "first_vehicle");
                 await context.SaveChangesAsync();
 
-                List<string> ccars = await GetOwnedVehicles(acc, 1);
-                List<string> fcars = await GetOwnedVehicles(acc, 0);
+                // FOR 'UNLOCK ALL VEHICLES' ACHIEVEMENT = MIGHT NEED REWRITE AS WELL AS ACHIEVEMENTS AS A WHOLE
+                //List<string> ccars = await GetOwnedVehicles(acc, 1);
+                //List<string> fcars = await GetOwnedVehicles(acc, 0);
 
-                int totalOwned = ccars.Count + fcars.Count + 2;
+                //int totalOwned = ccars.Count + fcars.Count + 2;
 
-                NAPI.Task.Run(() =>
-                {
-                    NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {vehicle.Model}, they now have a total of {totalOwned}/{Settings.CopchaseVehicles.Count} vehicles");
-
-                    if (totalOwned >= Settings.CopchaseVehicles.Count)
-                        EPlayer.UnlockAchievement(player, "all_vehicles");
-                });
+                //NAPI.Task.Run(() =>
+                //{
+                //    NAPI.Util.ConsoleOutput($"{player.Name} unlocked a {vehicle.Model}, they now have a total of {totalOwned}/{Settings.CopchaseVehicles.Count} vehicles");
+                //
+                //    if (totalOwned >= Settings.CopchaseVehicles.Count)
+                //        EPlayer.UnlockAchievement(player, "all_vehicles");
+                //});
 
 
                 return true;
@@ -1928,9 +1918,45 @@ namespace RNC
 
             using (MainDatabase context = ContextFactory.CreateContext())
             {
-                if (await context.OwnedVehicles.AsQueryable().CountAsync(a => a.AccountSQLID == acc.SQL_ID && a.Team == vehicle.Team && a.Model.Equals(vehicle.Model, StringComparison.OrdinalIgnoreCase)) > 0) return true;
+                if (await context.OwnedVehicles.AsQueryable().CountAsync(a => a.AccountSQLID == acc.SQL_ID && a.VehicleSQLID == vehicle.SQL_ID.ToString()) > 0) return true;
                 return false;
             }
+        }
+
+        // Returns '?' if invalid vehicle is unequipped
+        public static string GetCarModelFromSQLID(Player player, int team)
+        {
+            if(team == 0)
+            {
+                string cID = EPlayer.GetAccount(player).CarFugitive;
+                ShopVehicleData cData = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.ToString().Equals(cID));
+                if(cData == null)
+                {
+                    if(cID.Length > 3) // to avoid error message when they have random/default car selected
+                        EPlayer.Error(player, "Your selected fugitive vehicle <strong>no longer exists in the shop</strong> and is INVALID. Please equip a different vehicle.");
+                    return "?";
+                }
+                else
+                {
+                    return cData.Model;
+                }
+            }
+            if (team == 1)
+            {
+                string cID = EPlayer.GetAccount(player).CarCop;
+                ShopVehicleData cData = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.ToString().Equals(cID));
+                if (cData == null)
+                {
+                    if(cID.Length > 3) // to avoid error message when they have random/default car selected
+                        EPlayer.Error(player, "Your selected police vehicle <strong>no longer exists in the shop</strong> and is INVALID. Please equip a different vehicle.");
+                    return "?";
+                }
+                else
+                {
+                    return cData.Model;
+                }
+            }
+            return "?";
         }
 
         public async static Task<List<LoadoutData>> GetOwnedLoadouts(Account acc)

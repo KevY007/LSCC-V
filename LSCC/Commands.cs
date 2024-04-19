@@ -7912,7 +7912,7 @@ namespace RNC
                                 target.SetSharedData("FugitiveChance", target.GetSharedDataSafe<float>("FugitiveChance") + 1.0f);
 
                                 int clanID = EPlayer.GetAccount(target).ClanID;
-                                string carModel = EPlayer.GetAccount(target).CarCop;
+                                string carModel = EPlayer.GetCarModelFromSQLID(target, 1);
 
                                 // Normal car spawning, no partners
                                 Vehicle noPartnerCar = null;
@@ -8257,115 +8257,6 @@ namespace RNC
             return;
         }
 
-        [Command("fuckupdb")]
-        public void cmd_fuckupdb(Player player)
-        {
-            if (!EPlayer.LoggedIn(player))
-                return;
-
-            if (EPlayer.GetAccount(player).Admin < 6)
-            {
-                return;
-            }
-
-            player.SendChatMessage("~g~[>] ~w~You have initiated the process of adding dummy accounts to the database.");
-
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    int max_id = context.Accounts.Max(a => a.SQL_ID);
-                    for (int i = max_id; i < max_id + 100000; i++)
-                    {
-                        var _newAcc = new Account
-                        {
-                            Email = "[]",
-                            Password = "[]",
-                            Salt = "[]",
-                            Username = $"leo_is_gay_{i}",
-                            DiscordID = null,
-                            DiscordCode = new DiscordData().DiscordCode,
-                            UsedDiscordPerks = false,
-                            ChallengeInfo = "[]",
-                            AutoLogin = true,
-                            Admin = 0,
-                            RegisterHWID = "[]",
-                            RegisterIP = "[]",
-                            RegisterRID = 123123,
-                            RegisterSC = "[]",
-                            LastHWID = "[]",
-                            LastIP = "[]",
-                            LastRID = 123123,
-                            LastSC = "[]",
-                            MuteTime = 0,
-                            MuteReason = "N/A",
-                            JailTime = 0,
-                            JailReason = "N/A",
-                            DerbyWins = 0,
-                            Level = 1,
-                            Medkits = 0,
-                            Painkillers = 0,
-                            Language = -1,
-                            XP = 1,
-                            Escapes = 0,
-                            Arrests = 0,
-                            Kills = 1,
-                            Deaths = 1,
-                            MinutesPlayed = 1.0,
-                            LastSessionMins = 0.0,
-                            DonatorPoints = 0,
-                            Points = 10,
-                            Warns = 0,
-                            Suspended = 0,
-                            DonatorLevel = 0,
-                            LobbyClothing = -1,
-                            LoadoutCop = "?",
-                            LoadoutFugitive = "?",
-                            CarCop = "?",
-                            CarFugitive = "?",
-                            WeaponComponents = "[]",
-                            MOTD = "none",
-                            RegisterDate = DateTime.Now,
-                            LastLogin = DateTime.Now,
-                            Character = "{}",
-                            PurchasedAmmo = "{}",
-                            ChallengeStreak = 0,
-                            CompletedDailyChallenge = false,
-                            Namechanges = 0,
-                            ClanTier = -1,
-                            ClanID = -1
-                        };
-                        await context.Accounts.AddAsync(_newAcc);
-
-                        var _newVeh = new OwnedVehData
-                        {
-                            AccountSQLID = i,
-                            Model = "golf dva",
-                            Team = 0,
-                            TimesUsed = 0,
-                        };
-                        await context.OwnedVehicles.AddAsync(_newVeh);
-
-                        var _newWep = new OwnedLoadoutData
-                        {
-                            AccountSQLID = i,
-                            Name = "rambo",
-                            Team = 1,
-                            TimesUsed = 0
-                        };
-                        await context.OwnedLoadouts.AddAsync(_newWep);
-
-                        await context.SaveChangesAsync();
-                        if (i % 1000 == 0)
-                        {
-                            Console.WriteLine($"[DUMMY ACCOUNTS] Progress: {i}/{max_id + 100000}");
-                        }
-                    }
-                }
-            });
-            player.SendChatMessage("~g~[>] ~w~This is done asynchronously so it should not freeze the server [main thread].");
-            player.SendChatMessage("~g~[>] ~w~It will probably take a while to add all accounts! It saves database often.");
-        }
 
         private void editdmarena_OnValidateDmArena(Player player, string options, KeyValuePair<CustomDMArenas, bool> arena)
         {
