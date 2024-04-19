@@ -577,36 +577,6 @@ namespace RNC
         }
     };
 
-    public class CarData
-    {
-        public int Team { get; set; }
-        public string Model { get; set; }
-        public string Name { get; set; }
-        public string Image { get; set; }
-        public int LevelRequired { get; set; }
-        public int PointsRequired { get; set; }
-        public int DonatorPointsRequired { get; set; }
-        public int DonatorLevelRequired { get; set; }
-        public string Info { get; set; }
-        public CarData(int team, string name, string model, string image, string info, int level = 0, int points = 0, int donorpoints = 0, int donator = 0)
-        {
-            this.Team = team;
-            this.Name = name;
-            this.LevelRequired = level;
-            this.PointsRequired = points;
-            this.DonatorPointsRequired = donorpoints;
-            this.DonatorLevelRequired = donator;
-            this.Model = model;
-            this.Image = image;
-            this.Info = info;
-
-            if (model != "?")
-                Challenge.CopchaseVehicles.Add(name); // adding this model to the list of possible vehicles for a copchase challenge
-
-            Settings.Cars.Add(this);
-        }
-    };
-
     public class MOTDData
     {
         public string AdminName { get; set; }
@@ -880,7 +850,6 @@ namespace RNC
         public static long LastCountUpdate { get; set; }
         public static bool OOC { get; set; }
         public static List<LoadoutData> Loadouts { get; set; } = new List<LoadoutData>();
-        public static List<CarData> Cars { get; set; }
         public static Dictionary<long, jWeaponData> WeaponData { get; set; } = new Dictionary<long, jWeaponData>();
         public static List<jCarGenData> CarGenData { get; set; } = new List<jCarGenData>();
         public static List<SpawnSet> FreeroamSpawns { get; set; } = new List<SpawnSet>();
@@ -1289,12 +1258,13 @@ namespace RNC
                                                 break;
                                             case ChallengeType.CopchaseVehicle:
                                                 {
-                                                    CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
-                                                    string veh = "";
-                                                    if (cdt == null) { veh = c.Item; }
-                                                    else veh = cdt.Name;
+                                                    //CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                                                    //string veh = "";
+                                                    //if (cdt == null) { veh = c.Item; }
+                                                    //else veh = cdt.Name;
 
-                                                    desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                                                    //desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                                                    desc = $"Disabled! Sorry bozo.";
                                                 }
                                                 break;
                                             case ChallengeType.Win:
@@ -1405,12 +1375,14 @@ namespace RNC
                                         break;
                                     case ChallengeType.CopchaseVehicle:
                                         {
-                                            CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
-                                            string veh = "";
-                                            if (cdt == null) { veh = c.Item; }
-                                            else veh = cdt.Name;
+                                            //CarData cdt = Settings.Cars.FirstOrDefault(t => t.Model == c.Item);
+                                            //string veh = "";
+                                            //if (cdt == null) { veh = c.Item; }
+                                            //else veh = cdt.Name;
+                                            //
+                                            //desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
 
-                                            desc = $"Play {c.Target} copchase rounds with >> {c.Item} << set as your vehicle.";
+                                            desc = $"Disabled! Sorry bozo.";
                                         }
                                         break;
                                     case ChallengeType.Win:
@@ -2325,7 +2297,6 @@ namespace RNC
             Settings.LoggedInPlayers = new List<Player>();
             Settings.AdminVehicles = new List<Vehicle>();
             Settings.Loadouts = new List<LoadoutData>();
-            Settings.Cars = new List<CarData>();
             Settings.FreeroamSpawns = new List<SpawnSet>();
 
             Settings.WeaponData = new Dictionary<long, jWeaponData>();
@@ -4223,18 +4194,18 @@ namespace RNC
                             if (ownedVeh != null)
                                 ownedVeh.TimesUsed++;
 
-                            CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 0);
-                            if (cardata != null)
-                            {
-                                EPlayer.TryAdvanceChallenge(owner, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
-                                vehSpeedClass = cardata.Info;
-                            }
-                            else
-                            {
-                                if (carName != "pursport")
-                                    vehSpeedClass = "Average";
-                                else vehSpeedClass = "Fast+";
-                            }
+                            //CarData cardata = Settings.Cars.FirstOrDefault(crd => crd.Model == carName && crd.Team == 0);
+                            //if (cardata != null)
+                            //{
+                            //    EPlayer.TryAdvanceChallenge(owner, Challenge.ChallengeType.CopchaseVehicle, cardata.Name);
+                            //    vehSpeedClass = cardata.Info;
+                            //}
+                            //else
+                            //{
+                            //    if (carName != "pursport")
+                            //        vehSpeedClass = "Average";
+                            //    else vehSpeedClass = "Fast+";
+                            //}
                         }
                     }
                 });

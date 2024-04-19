@@ -1884,28 +1884,7 @@ namespace RNC
                 return ownedCars;
             }
         }
-        public async static Task<List<CarData>> GetOwnedVehicles(Account acc)
-        {
-            List<CarData> ownedCars = new List<CarData>();
 
-            List<CarData> defaults = Settings.Cars.Where(l => l.Name == "Random").ToList();
-            ownedCars.AddRange(defaults);
-
-            using (MainDatabase context = ContextFactory.CreateContext())
-            {
-                List<OwnedVehData> ownedDBcars = await context.OwnedVehicles.AsQueryable().Where(a => a.AccountSQLID == acc.SQL_ID).ToListAsync();
-
-                foreach(OwnedVehData ownedDBcar in ownedDBcars)
-                {
-                    CarData car = Settings.Cars.FirstOrDefault(c => c.Model == ownedDBcar.Model && c.Team == ownedDBcar.Team);
-                    if(car != null)
-                    {
-                        ownedCars.Add(car);
-                    }
-                }
-                return ownedCars;
-            }
-        }
         public async static Task<bool> UnlockVehicle(Account acc, Player player, ShopVehicleData vehicle)
         {
             if (!LoggedIn(player)) return false;
