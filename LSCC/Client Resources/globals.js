@@ -2971,6 +2971,7 @@ const TATTOO_DATA = [
   }
 ];
 function updateBiometricsPosition(){
+  var x = 10; var y = 25;
   var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
   var bottom = ((resolution.y - (global.getMinimapAnchor().bottomY * resolution.y)) + y);
   var left = ((global.getMinimapAnchor().leftX * resolution.x) + x);
