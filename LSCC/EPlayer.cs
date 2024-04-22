@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Cryptography.X509Certificates;
 using RNC;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Security.Cryptography;
 
 namespace RNC
 {
@@ -1926,37 +1927,41 @@ namespace RNC
         // Returns '?' if invalid vehicle is unequipped
         public static string GetCarModelFromSQLID(Player player, int team)
         {
-            if(team == 0)
+            NAPI.Util.ConsoleOutput($"Calling GetCarModelFROMSQLID({player.Name}, {team})");
+            if (team == 0)
             {
                 string cID = EPlayer.GetAccount(player).CarFugitive;
                 ShopVehicleData cData = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.ToString().Equals(cID));
                 if(cData == null)
                 {
+                    NAPI.Util.ConsoleOutput($"cData is NULL! ({player.Name} id: {cID} team {team})");
                     if(cID.Length > 3) // to avoid error message when they have random/default car selected
                         EPlayer.Error(player, "Your selected fugitive vehicle <strong>no longer exists in the shop</strong> and is INVALID. Please equip a different vehicle.");
                     return "?";
                 }
                 else
                 {
+                    NAPI.Util.ConsoleOutput($"returning {cData.Model} ({player.Name} id: {cID} team {team})");
                     return cData.Model;
                 }
             }
-            if (team == 1)
+            else
             {
                 string cID = EPlayer.GetAccount(player).CarCop;
                 ShopVehicleData cData = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.ToString().Equals(cID));
                 if (cData == null)
                 {
-                    if(cID.Length > 3) // to avoid error message when they have random/default car selected
+                    NAPI.Util.ConsoleOutput($"cData is NULL! ({player.Name} id: {cID} team {team})");
+                    if (cID.Length > 3) // to avoid error message when they have random/default car selected
                         EPlayer.Error(player, "Your selected police vehicle <strong>no longer exists in the shop</strong> and is INVALID. Please equip a different vehicle.");
                     return "?";
                 }
                 else
                 {
+                    NAPI.Util.ConsoleOutput($"returning {cData.Model} ({player.Name} id: {cID} team {team})");
                     return cData.Model;
                 }
             }
-            return "?";
         }
 
         public async static Task<List<LoadoutData>> GetOwnedLoadouts(Account acc)

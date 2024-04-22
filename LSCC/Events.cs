@@ -5933,9 +5933,9 @@ namespace RNC
                     {
                         player.TriggerEvent("ForceCloseMenu");
                         if (vehicle.Team == 1)
-                            EPlayer.GetAccount(player).CarCop = vehicle.Model;
+                            EPlayer.GetAccount(player).CarCop = vehicle.SQL_ID.ToString();
                         else
-                            EPlayer.GetAccount(player).CarFugitive = vehicle.Model;
+                            EPlayer.GetAccount(player).CarFugitive = vehicle.SQL_ID.ToString();
 
                         EPlayer.Save(player, false);
                         Commands.cmd_vtuner(player, (vehicle.Team == 1 ? "cop" : "fugitive"));

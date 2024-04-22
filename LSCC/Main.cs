@@ -4011,7 +4011,8 @@ namespace RNC
         {
             Account acc = EPlayer.GetAccount(owner);
 
-            string carName = EPlayer.GetCarModelFromSQLID(owner, 1); 
+            string carName = EPlayer.GetCarModelFromSQLID(owner, 1);
+            NAPI.Util.ConsoleOutput($"Spawning vehicle for {owner.Name}: {carName}");
             int col1 = 0;
             int col2 = 111;
             float enginePower = 1.0f;
@@ -4021,7 +4022,7 @@ namespace RNC
             float spawnHeading = 0.0f;
 
             // Class 15 = helicopters
-            if (IsHelicopter(acc.CarCop))
+            if (IsHelicopter(carName))
             {
                 if(spawnIndex >= heliSpawns.Count) spawnIndex = 0;
                 spawnPosition = new Vector3(heliSpawns[spawnIndex].spawnX, heliSpawns[spawnIndex].spawnY, heliSpawns[spawnIndex].spawnZ);
@@ -4035,7 +4036,7 @@ namespace RNC
                 spawnHeading = policeSpawns[spawnIndex].spawnA;
             }
 
-            if(acc.CarCop.Length < 3)
+            if(carName.Length < 3)
             {
                 switch (new Random(DateTimeOffset.UtcNow.Millisecond).Next(0, 3))
                 {
@@ -4058,7 +4059,7 @@ namespace RNC
             }
             else
             {
-                carName = acc.CarCop;
+                carName = EPlayer.GetCarModelFromSQLID(owner, 1);
                 // To add: increment times police car was used
                 switch (carName)
                 {
@@ -4085,7 +4086,12 @@ namespace RNC
             pVehicle.Locked = true;
             pVehicle.SetSharedData("DirtLevel", 0.0);
             pVehicle.SetSharedData("Team", 1);
-            pVehicle.SetSharedData("SpeedInfo", vehSpeedClass);
+
+            ShopVehicleData _cd = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.ToString().Equals(acc.CarCop));
+            if(_cd != null)
+                pVehicle.SetSharedData("SpeedInfo", _cd.MaxSpeedKMH.ToString());
+            else
+                pVehicle.SetSharedData("SpeedInfo", "175");
 
             pVehicle.SetSharedData("Collisions", false);
             if (enginePower > 1.0f) pVehicle.SetSharedData("vInitialDriveForce", enginePower);
@@ -4143,6 +4149,7 @@ namespace RNC
         {
             float enginePower = 1.0f;
             string carName = EPlayer.GetCarModelFromSQLID(owner, 0);
+            NAPI.Util.ConsoleOutput($"Spawning vehicle for {owner.Name}: {carName}");
             string vehSpeedClass = "Average";
 
             if (carName.Length < 3)
@@ -4223,7 +4230,13 @@ namespace RNC
             pVehicle.Locked = false;
             pVehicle.SetSharedData("DirtLevel", 0.0);
             pVehicle.SetSharedData("Team", 0);
-            pVehicle.SetSharedData("SpeedInfo", vehSpeedClass);
+
+            ShopVehicleData _cd = Settings.CopchaseVehicles.FirstOrDefault(c => c.SQL_ID.ToString().Equals(EPlayer.GetAccount(owner).CarFugitive));
+            if (_cd != null)
+                pVehicle.SetSharedData("SpeedInfo", _cd.MaxSpeedKMH.ToString());
+            else
+                pVehicle.SetSharedData("SpeedInfo", "175");
+
             lobby.Vehicles.Add(pVehicle);
             pVehicle.SetSharedData("Collisions", false);
 
@@ -4789,56 +4802,66 @@ namespace RNC
             int team = vehicle.GetSharedDataSafe<int>("Team");
             string speedClass = vehicle.GetSharedDataSafe<string>("SpeedInfo");
 
-            if (team == 0) // Fugitive vehicles
+            int maxSpeed = 0;
+            bool success = int.TryParse(speedClass, out maxSpeed);
+            if (success)
             {
-                switch (speedClass)
-                {
-                    case "Slow":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(145 / 3.6));
-                        break;
-                    case "Slow+":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(158 / 3.6));
-                        break;
-                    case "Average":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(163 / 3.6));
-                        break;
-                    case "Average+":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(168 / 3.6));
-                        break;
-                    case "Fast":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(175 / 3.6));
-                        break;
-                    case "Fast+":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(180 / 3.6));
-                        break;
-                }
-                return;
+                NAPI.Util.ConsoleOutput($"Set vehicle speed to {maxSpeed} ({speedClass})!");
+                vehicle.SetSharedData("vMaxSpeed", (float)(maxSpeed / 3.6));
             }
-            if(team == 1) // Police vehicles
+            else // For old system where classes were "average", "fast+" etc to avoid crashes and errors until fully fixed
             {
-                switch (speedClass)
+                NAPI.Util.ConsoleOutput($"Failed to parse {speedClass} to int.");
+                if (team == 0) // Fugitive vehicles
                 {
-                    case "Slow":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(180 / 3.6));
-                        break;
-                    case "Slow+":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(183 / 3.6));
-                        break;
-                    case "Average":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(185 / 3.6));
-                        break;
-                    case "Average+":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(188 / 3.6));
-                        break;
-                    case "Fast":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(190 / 3.6));
-                        break;
-                    case "Fast+":
-                        vehicle.SetSharedData("vMaxSpeed", (float)(196 / 3.6));
-                        break;
+                    switch (speedClass)
+                    {
+                        case "Slow":
+                            break;
+                        case "Slow+":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(158 / 3.6));
+                            break;
+                        case "Average":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(163 / 3.6));
+                            break;
+                        case "Average+":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(168 / 3.6));
+                            break;
+                        case "Fast":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(175 / 3.6));
+                            break;
+                        case "Fast+":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(180 / 3.6));
+                            break;
+                    }
+                    return;
                 }
-                return;
-            }
+                if (team == 1) // Police vehicles
+                {
+                    switch (speedClass)
+                    {
+                        case "Slow":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(180 / 3.6));
+                            break;
+                        case "Slow+":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(183 / 3.6));
+                            break;
+                        case "Average":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(185 / 3.6));
+                            break;
+                        case "Average+":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(188 / 3.6));
+                            break;
+                        case "Fast":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(190 / 3.6));
+                            break;
+                        case "Fast+":
+                            vehicle.SetSharedData("vMaxSpeed", (float)(196 / 3.6));
+                            break;
+                    }
+                    return;
+                }
+            }   
         }
 
         // Used in normal copchase, no need to use this in events such as bank robbery since they use custom logic

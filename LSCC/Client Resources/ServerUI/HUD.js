@@ -74,28 +74,7 @@ function firstLetterUpper(string) {
   }
 
 // https://github.com/glitchdetector/fivem-minimap-anchor
-function getMinimapAnchor() {
-    let sfX = 1.0 / 20.0;
-    let sfY = 1.0 / 20.0;
-    let safeZone = mp.game.graphics.getSafeZoneSize();
-    let aspectRatio = mp.game.graphics.getScreenAspectRatio(false);
-    let resolution = mp.game.graphics.getScreenActiveResolution(0, 0);
-    let scaleX = 1.0 / resolution.x;
-    let scaleY = 1.0 / resolution.y;
 
-    let minimap = {
-        width: scaleX * (resolution.x / (4 * aspectRatio)),
-        height: scaleY * (resolution.y / 5.674),
-        scaleX: scaleX,
-        scaleY: scaleY,
-        leftX: scaleX * (resolution.x * (sfX * (Math.abs(safeZone - 1.0) * 10))),
-        bottomY: 1.0 - scaleY * (resolution.y * (sfY * (Math.abs(safeZone - 1.0) * 10))),
-    };
-
-    minimap.rightX = minimap.leftX + minimap.width;
-    minimap.topY = minimap.bottomY - minimap.height;
-    return minimap;
-}
 
 
 
@@ -1118,8 +1097,8 @@ mp.events.add('browserDomReady', (browser) => {
         if(global.ServerUI) global.ServerUI.call("hud_minilist_items_set", []);
 
         // Initialize miniHUD
-        miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
-        miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
+        miniHUDVars["bottom"] = ((resolution.y - (global.getMinimapAnchor().bottomY * resolution.y)) + 0);
+        miniHUDVars["left"] = ((global.getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
         if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
 
@@ -1310,7 +1289,7 @@ mp.events.add("UpdateRateEvent", () => {
     let streetName = "N/A";
     let zoneName = "N/A";
     if (mp.game.invoke(Natives.IS_RADAR_ENABLED) && !mp.game.invoke(Natives.IS_RADAR_HIDDEN)) {
-        minimap = getMinimapAnchor();
+        minimap = global.getMinimapAnchor();
 
         /*
         const position = mp.players.local.position;
@@ -2004,12 +1983,12 @@ mp.events.add("render", () => {
 
         if(mp.players.local.getVariable("pLogged") !== undefined && mp.players.local.getVariable("pLogged") == true)
         {       
-            if ((resolution.x != mp.game.graphics.getScreenActiveResolution(0,0).x || miniHUDVars["left"] != (((getMinimapAnchor().rightX * resolution.x) + 10)) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0)) && global.ServerUI != null)
+            if ((resolution.x != mp.game.graphics.getScreenActiveResolution(0,0).x || miniHUDVars["left"] != (((global.getMinimapAnchor().rightX * resolution.x) + 10)) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0)) && global.ServerUI != null)
             {
                 resolution = mp.game.graphics.getScreenActiveResolution(0,0);
                 
-                miniHUDVars["bottom"] = ((resolution.y - (getMinimapAnchor().bottomY * resolution.y)) + 0);
-                miniHUDVars["left"] = ((getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
+                miniHUDVars["bottom"] = ((resolution.y - (global.getMinimapAnchor().bottomY * resolution.y)) + 0);
+                miniHUDVars["left"] = ((global.getMinimapAnchor().rightX * resolution.x) + 10) + ((mp.storage.data.menu.alwaysExpandedMap == true) ? 162 : 0);
 
 
                 if(global.ServerUI) global.ServerUI.call("hud_minilist_position_set", `${miniHUDVars["left"]}px`, `${miniHUDVars["bottom"]}px`);
