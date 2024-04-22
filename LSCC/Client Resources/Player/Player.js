@@ -4713,6 +4713,8 @@ function setStorageDataVars(){
     else{
         global.digitalHPAR = mp.storage.data.menu.digitalHPAR;
     }
+    global.ServerUI.call("hud_biometrics_toggle", global.digitalHPAR);
+    global.ServerUI.call("hud_biometrics_position_set", '36px', '40px');
 
 
     if(mp.storage.data.menu.VoiceMode !== undefined){

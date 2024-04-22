@@ -1251,6 +1251,11 @@ mp.events.add('ToggleHud', (toggle) => {
         global.digitalHPAR = false;
     }
 
+    if(global.ServerUI){
+        global.ServerUI.call("hud_biometrics_toggle", global.digitalHPAR);
+        global.ServerUI.call("hud_biometrics_position_set", '36px', '40px');    
+    }
+
     if(global.ServerUI)
         global.ServerUI.call("hud_weapon_fire_mode_toggle", toggle);
 
@@ -2155,20 +2160,8 @@ mp.events.add('render', () => {
     if(!global.digitalHPAR) return;
 
     let HPvar = mp.players.local.getHealth();
-    mp.game.graphics.drawText(`HP: ${HPvar}`, [hparpos.hpx, hparpos.hpy], {
-        font:4,
-        color:(HPvar > 25 ? [87, 163, 86, 255] : [172, 29, 29, 255]),
-        scale: [0.4, 0.4],
-        outline:true,
-        centre:true
-    });
-    mp.game.graphics.drawText(`AR: ${mp.players.local.getArmour()}`, [hparpos.arx, hparpos.ary], {
-        font:4,
-        color:[69, 144, 184, 255],
-        scale: [0.4, 0.4],
-        outline:true,
-        centre:true
-    });
+    let ARvar = mp.players.local.getArmour();
+    if(global.ServerUI) global.ServerUI.call("hud_biometrics_set", ARvar, HPvar);
 });
 
 
