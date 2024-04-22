@@ -878,104 +878,42 @@ function updateMenuSettingsTab() {
         settings: [
           {
             id: 37,
-            type: 2,
+            type: 4,
             name: "chat_size",
             label: "Chat Scale",
             description:
               "Changes overall chat size.",
-            default: "Default",
-            options: [
-              {
-                label: "Tiny",
-                value: "50",
-              },
-              {
-                label: "Small",
-                value: "75",
-              },
-              {
-                label: "Default",
-                value: "100",
-              },
-              {
-                label: "Large",
-                value: "150",
-              },
-              {
-                label: "Huge",
-                value: "200",
-              },
-            ],
+            default: 100,
+            value:100,
+            min:50,
+            max:200,
+            interval:1
           },
           {
             id: 38,
-            type: 2,
+            type: 4,
             name: "chat_height_size",
             label: "Chat Height",
             description:
               "Changes chat height size; bigger height size equals more messages shown on screen",
-            default: "Default",
-            options: [
-              {
-                label: "Tiny",
-                value: "50",
-              },
-              {
-                label: "Small",
-                value: "75",
-              },
-              {
-                label: "Default",
-                value: "100",
-              },
-              {
-                label: "Large",
-                value: "150",
-              },
-              {
-                label: "Huge",
-                value: "200",
-              },
-              {
-                label: "Massive",
-                value: "250",
-              },
-            ],
+            default: 100,
+            value:100,
+            min:50,
+            max:250,
+            interval:1
           },
           {
             id: 39,
-            type: 2,
+            type: 4,
             name: "chat_width_size",
             label: "Chat Width",
             description:
               "Changes chat width size.",
-            default: "Default",
-            options: [
-              {
-                label: "Tiny",
-                value: "60",
-              },
-              {
-                label: "Small",
-                value: "80",
-              },
-              {
-                label: "Default",
-                value: "100",
-              },
-              {
-                label: "Large",
-                value: "180",
-              },
-              {
-                label: "Huge",
-                value: "230",
-              },
-              {
-                label: "Massive",
-                value: "290",
-              },
-            ],
+            default: 100,
+            value:100,
+            min:60,
+            max:290,
+            interval:1
           },
           {
             id: 40,
