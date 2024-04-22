@@ -1232,7 +1232,7 @@ mp.events.add('ToggleHud', (toggle) => {
 
     if(global.ServerUI){
         global.ServerUI.call("hud_biometrics_toggle", global.digitalHPAR);
-        global.ServerUI.call("hud_biometrics_position_set", '36px', '40px');    
+        global.updateBiometricsPosition(); 
     }
 
     if(global.ServerUI)

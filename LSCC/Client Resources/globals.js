@@ -2970,7 +2970,20 @@ const TATTOO_DATA = [
       ]
   }
 ];
+function updateBiometricsPosition(){
+  var resolution = mp.game.graphics.getScreenActiveResolution(0,0);
+  var bottom = ((resolution.y - (global.getMinimapAnchor().bottomY * resolution.y)) + y);
+  var left = ((global.getMinimapAnchor().leftX * resolution.x) + x);
 
+  if(resolution.y >= 1440 && resolution.y < 2160){
+      bottom += 10;
+  }
+  else if(resolution.y >= 2160){
+      bottom += 20;
+  }
+
+  global.ServerUI.call("hud_biometrics_position_set", `${left}px`, `${bottom}px`);
+}
 function getMinimapAnchor() {
   let sfX = 1.0 / 20.0;
   let sfY = 1.0 / 20.0;
@@ -3132,5 +3145,6 @@ let global = {
   isHoldingSniper,
   enterExitCheck,
   getMinimapAnchor,
+  updateBiometricsPosition
 };
 exports = global;

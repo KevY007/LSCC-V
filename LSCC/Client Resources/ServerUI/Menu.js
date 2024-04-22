@@ -1353,7 +1353,7 @@ mp.events.add("mainmenu_setting_change", (id, value) => {
     mp.storage.data.menu.digitalHPAR = value;
     global.digitalHPAR = value;
     global.ServerUI.call("hud_biometrics_toggle", global.digitalHPAR);
-    global.ServerUI.call("hud_biometrics_position_set", '36px', '40px');
+    global.updateBiometricsPosition();
   }
   else if(id == 35){
     changeEnterExitBind(value);
