@@ -518,6 +518,7 @@ namespace RNC
                 player.ResetData("Dead");
                 player.SetSharedData("DonatorPoints", 0);
                 player.SetSharedData("Invincible", false);
+                player.SetSharedData("BODY_WEAPONS", "");
                 player.SetSharedData("ShowDamaged", false);
                 player.SetSharedData("IsChatOpen", false);
                 player.SetSharedData("SquadID", -1);
