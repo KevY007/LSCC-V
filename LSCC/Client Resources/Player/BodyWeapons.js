@@ -45,7 +45,25 @@ mp.events.add("cwb", () => {
     mp.events.callRemote(`ServerConsoleOutput`, JSON.stringify(BODY_WEAPON_DATA));
 });
 
-mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
+mp.events.add("entityStreamIn", (entity) => {
+    if(entity.type !== 'player') return;
+    const value = entity.getVariable("BODY_WEAPONS");
+    if(!value) return;
+
+    onBodyWeaponsLoad(entity, value);
+});
+mp.events.add("entityStreamOut", (entity) => {
+    if(entity.type !== 'player') return;
+    bodyWeaponsUnload(entity);
+});
+
+function bodyWeaponsUnload(entity){
+    const entityData = BODY_WEAPON_DATA.filter(w => w.entity.remoteId === entity.remoteId);
+    if(entityData)
+        removeBodyWeapons(entityData);
+}
+
+function onBodyWeaponsLoad(entity, value){
     if(entity.type !== 'player') return;
     if(!value) return;
 
@@ -76,6 +94,10 @@ mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
         }
    
     });
+}
+
+mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
+    onBodyWeaponsLoad(entity, value);
 });
 
 function toggleWeaponVisible(entity, weaponhash, visible){

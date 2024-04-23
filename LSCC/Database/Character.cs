@@ -105,6 +105,13 @@ namespace RNC
                 return;
             }
 
+            if(wepDat.Group == "GROUP_HEAVY" || wepDat.Group == "GROUP_MELEE" 
+                || wepDat.Group == "GROUP_PISTOL" || wepDat.Group == "GROUP_PETROLCAN"
+                || wepDat.Group == "GROUP_THROWN")
+            {
+                return;
+            }
+
             List<BodyWeapon> weapons = GetBodyWeapons(player);
             if (weapons == null)
                 weapons = new List<BodyWeapon>();
