@@ -265,6 +265,24 @@ namespace RNC
             }
         }
 
+        [RemoteEvent("OnWeaponSwitch")]
+        public void OnWeaponSwitch(Player player, string oldWeapon, string newWeapon)
+        {
+            NAPI.Util.ConsoleOutput($"Weapon Switched.");
+            if (!EPlayer.LoggedIn(player)) return;
+            try
+            {
+                uint oldW = uint.Parse(oldWeapon);
+                uint newW = uint.Parse(newWeapon);
+                BodyWeapon.SetWeaponVisible(player, (WeaponHash)oldW, true);
+                BodyWeapon.SetWeaponVisible(player, (WeaponHash)newW, false);
+            }
+            catch
+            {
+                NAPI.Util.ConsoleOutput($"Weapon Switch failed! L bozo L bozo (old {oldWeapon} new {newWeapon} player {player.Name})");
+            }
+        }
+
         [ServerEvent(Event.PlayerWeaponSwitch)]
         public void OnPlayerWeaponSwitch(Player player, WeaponHash oldWeapon, WeaponHash newWeapon)
         {
@@ -277,6 +295,9 @@ namespace RNC
             {
                 try
                 {
+                    BodyWeapon.SetWeaponVisible(player, oldWeapon, true);
+                    BodyWeapon.SetWeaponVisible(player, newWeapon, false);
+
                     if (newWeapon == WeaponHash.Flashlight)
                     {
                         player.SetSharedData("FlashlightEquipped", true);

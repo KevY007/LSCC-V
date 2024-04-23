@@ -11,6 +11,7 @@ namespace RNC
 {
     public class BodyWeapon : Script
     {
+        public BodyWeapon() { }
         public string WeaponHash { get; set; }
         public string ModelHash { get; set; }
         public bool IsVisible { get; set; }
@@ -24,33 +25,61 @@ namespace RNC
         {
             List<BodyWeapon> weapons = GetBodyWeapons(player);
             if (weapons == null) return;
-
-            BodyWeapon _wep = weapons.FirstOrDefault(w => w.WeaponHash.Equals(weaponHash.ToString()));
+            BodyWeapon _wep = weapons.FirstOrDefault(w => w.WeaponHash.Equals(((uint)weaponHash).ToString()));
             if (_wep == null) return;
-
+            weapons.Remove(_wep);
             _wep.IsVisible = visible;
+            weapons.Add(_wep);
             SetBodyWeapons(player, weapons);
         }
         public static void UpdateBodyWeapons(Player player)
         {
-            if (!player.HasSharedData("AC_WeaponData")) return;
-            List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedDataSafe<string>("AC_WeaponData"));
-            List<BodyWeapon> bodyWeapons = GetBodyWeapons(player);
-            
-            if(bodyWeapons != null) // step 1: remove weapons that are no longer in player inventory
+            try
             {
-                foreach(BodyWeapon weapon in bodyWeapons)
+                if (!player.HasSharedData("AC_WeaponData")) return;
+                List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedDataSafe<string>("AC_WeaponData"));
+                List<BodyWeapon> bodyWeapons = GetBodyWeapons(player);
+
+                if (bodyWeapons != null) // step 1: remove weapons that are no longer in player inventory
                 {
-                    if (!weapons.Contains((WeaponHash)uint.Parse(weapon.WeaponHash))) // if player no longer has this weapon, remove it
+                    foreach (BodyWeapon weapon in bodyWeapons)
                     {
-                        RemoveBodyWeapon(player, (WeaponHash)uint.Parse(weapon.WeaponHash));
+                        try
+                        {
+                            if (!weapons.Contains((WeaponHash)uint.Parse(weapon.WeaponHash))) // if player no longer has this weapon, remove it
+                            {
+                                RemoveBodyWeapon(player, (WeaponHash)uint.Parse(weapon.WeaponHash));
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            NAPI.Util.ConsoleOutput(ex.ToString());
+                        }
+                    }
+                }
+                foreach (WeaponHash weapon in weapons) // step 2: add weapons that aren't on body but are in inventory
+                {
+                    try
+                    {
+                        if (bodyWeapons != null)
+                        {
+                            BodyWeapon _w = bodyWeapons.FirstOrDefault(w => w.WeaponHash.Equals(weapon.ToString()));
+                            if (_w == null) AddBodyWeapon(player, weapon);
+                        }
+                        else
+                        {
+                            AddBodyWeapon(player, weapon);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        NAPI.Util.ConsoleOutput(ex.ToString());
                     }
                 }
             }
-            foreach(WeaponHash weapon in weapons) // step 2: add weapons that aren't on body but are in inventory
+            catch(Exception ex)
             {
-                BodyWeapon _w = bodyWeapons.FirstOrDefault(w => w.WeaponHash.Equals(weapon.ToString()));
-                if (_w == null) AddBodyWeapon(player, weapon);
+                NAPI.Util.ConsoleOutput(ex.ToString());
             }
         }
 
@@ -59,7 +88,7 @@ namespace RNC
             List<BodyWeapon> weapons = GetBodyWeapons(player);
             if (weapons == null) return;
 
-            BodyWeapon _wep = weapons.FirstOrDefault(w => w.WeaponHash.Equals(weaponHash.ToString()));
+            BodyWeapon _wep = weapons.FirstOrDefault(w => w.WeaponHash.Equals(((uint)weaponHash).ToString()));
             if (_wep == null) return;
 
             weapons.Remove(_wep);
@@ -79,7 +108,7 @@ namespace RNC
             if (weapons == null)
                 weapons = new List<BodyWeapon>();
 
-            BodyWeapon _new = new BodyWeapon(weaponHash.ToString(), wepDat.ModelHashKey, true);
+            BodyWeapon _new = new BodyWeapon(((uint)weaponHash).ToString(), wepDat.ModelHashKey, true);
             weapons.Add(_new);
             SetBodyWeapons(player, weapons);
         }
@@ -87,6 +116,7 @@ namespace RNC
         {
             if (player == null) { return; }
             string weaponDataStr = NAPI.Util.ToJson(weapons);
+            NAPI.Util.ConsoleOutput($"Setting {player.Name}'s body weapons to {weaponDataStr}");
             player.SetSharedData("BODY_WEAPONS", weaponDataStr);
         }
         private static List<BodyWeapon> GetBodyWeapons(Player player)

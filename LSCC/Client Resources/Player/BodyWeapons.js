@@ -1,20 +1,21 @@
+var global = require('./globals');
 const BODY_WEAPON_DATA = [];
 
 const PistolAttachmentPos = new mp.Vector3(0.02, 0.06, 0.1);
 const PistolAttachmentRot = new mp.Vector3(-100.0, 0.0, 0.0);
-const PistolAttachmentBone = 51826;
+const PistolAttachmentBone = 14;
 
 const SMGAttachmentPos = new mp.Vector3(0.08, 0.03, -0.1);
 const SMGAttachmentRot = new mp.Vector3(-80.77, 0.0, 0.0);
-const SMGAttachmentBone = 58271;
+const SMGAttachmentBone = 2;
 
 const ShotgunAttachmentPos = new mp.Vector3(-0.1, -0.15, 0.11);
 const ShotgunAttachmentRot = new mp.Vector3(-180.0, 0.0, 0.0);
-const ShotgunAttachmentBone = 24818;
+const ShotgunAttachmentBone = 38;
 
 const RifleAttachmentPos = new mp.Vector3(-0.1, -0.15, -0.13);
 const RifleAttachmentRot = new mp.Vector3(0.0, 0.0, 3.5);
-const RifleAttachmentBone = 24818;
+const RifleAttachmentBone = 38;
 
 /*
 Every weapon has its own object stored in the BODY_WEAPON_DATA array. The script will sync objects based on this array.
@@ -86,9 +87,11 @@ function updateBodyWeapon(entity, oldData, newData, newServerData){
     }
 }
 function removeBodyWeapons(array){
+    mp.events.callRemote(`ServerConsoleOutput`, `Called removeBodyWeapons(${JSON.stringify(array)})`);
     for(var i = 0 ; i < array.length ; i++){
         const bWeapon = array[i];
         if(bWeapon.object){
+            mp.events.callRemote(`ServerConsoleOutput`, `Destroying object ${bWeapon.objectHash} | ${bWeapon.object.handle}`);
             bWeapon.object.destroy();
         }
 
@@ -98,13 +101,57 @@ function removeBodyWeapons(array){
 }
 function addBodyWeapons(entity, array){
     const weaponsToAdd = [];
-    array.foreach(sData => {
+    array.forEach(sData => {
         var object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
             rotation:entity.rotation,
-            alpha:255,
+            alpha:0,
             dimension:entity.dimension
         });
         setTimeout(() => {
+            const gunData = global.weaponData.find(w => Number(w.Hash) == Number(sData.WeaponHash));
+            let category = "Assault Rifles";
+            if(gunData) category = gunData.Type;
+
+            switch(category){
+                case "Handguns":
+                    object.attachTo(entity.handle, PistolAttachmentBone, PistolAttachmentPos.x, PistolAttachmentPos.y, PistolAttachmentPos.z,
+                                                   PistolAttachmentRot.x, PistolAttachmentRot.y, PistolAttachmentRot.z,
+                                                   false, true, true, true, 1, true);
+                    break;
+                case "Submachine Guns":
+                    object.attachTo(entity.handle, SMGAttachmentBone, SMGAttachmentPos.x, SMGAttachmentPos.y, SMGAttachmentPos.z,
+                        SMGAttachmentRot.x, SMGAttachmentRot.y, SMGAttachmentRot.z,
+                        false, true, true, true, 1, true);
+                    break;
+                case "Shotguns":
+                    object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
+                        ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
+                        false, true, true, true, 1, true);        
+                    break;
+                case "Assault Rifles":
+                    object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                        RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                        false, true, true, true, 1, true);
+                    break;
+                case "Machine Guns":
+                    object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                        RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                        false, true, true, true, 1, true);
+                    break;
+                case "Sniper Rifles":
+                    object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                        RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                        false, true, true, true, 1, true);
+                    break;
+                default:
+                    object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
+                        ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
+                        false, true, true, true, 1, true); 
+                    break;
+            }
+            object.setAlpha(255);
+
+            //(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
             const obj = {
                 entity:entity,
                 weaponHash:sData.WeaponHash,

@@ -192,6 +192,10 @@ mp.events.add('render', () => {
     }
 
     if(mp.players.local.weapon != lastWeapon){
+        // custom weapon switch func cuz ragemp's doesnt work? idk
+        mp.events.callRemote("OnWeaponSwitch", lastWeapon.toString(), mp.players.local.weapon.toString());
+
+
         lastWeapon = mp.players.local.weapon;
         holster_aimDisabled = true;
         clearTimeout(holsterAnimTimeout);
@@ -4604,18 +4608,6 @@ mp.events.add("TwoSecondsEvent", () => {
     mp.players.local.setConfigFlag(438, true);
 
     mp.events.callRemote("RemoveIsDamaged");
-});
-
-let shottyObj = undefined;
-mp.events.add("shotty", () => {
-    shottyObj = mp.objects.new(mp.game.joaat("w_sg_pumpshotgun"), mp.players.local.position, {
-        rotation:mp.players.local.rotation,
-        alpha:255,
-        dimension:mp.players.local.dimension
-    });
-    setTimeout(() => {
-        shottyObj.attachTo(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
-    }, 200);
 });
 
 function setStorageDataVars(){
