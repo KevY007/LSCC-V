@@ -2408,8 +2408,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
         }
 
+        let isCrouching = false, isAiming = false;
         if(gunType !== "Shotguns"){
-            let isCrouching = false, isAiming = false;
             if(mp.players.local.getStealthMovement() == true){
                 shakeValue = shakeValue/2.25; // slightly more accurate when crouching
                 isCrouching = true;
