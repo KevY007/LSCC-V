@@ -53,7 +53,7 @@ mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
     // find all weapon data belonging to this entity
     const entityData = BODY_WEAPON_DATA.filter(w => w.entity.remoteId === entity.remoteId);
     entityData.forEach(wData => {
-        const thisWeapon = sWeaponData.find(w => w.WeaponHash == wData.weaponHash);
+         const thisWeapon = sWeaponData.find(w => w.WeaponHash == wData.weaponHash);
         if(thisWeapon){
             const comparisonObj = {
                 entity:entity, 
@@ -79,6 +79,7 @@ mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
 });
 
 function updateBodyWeapon(entity, oldData, newData, newServerData){
+
     if(oldData.isVisible == true && newData.isVisible == false){
         removeBodyWeapons([oldData]);
     }
@@ -87,11 +88,9 @@ function updateBodyWeapon(entity, oldData, newData, newServerData){
     }
 }
 function removeBodyWeapons(array){
-    mp.events.callRemote(`ServerConsoleOutput`, `Called removeBodyWeapons(${JSON.stringify(array)})`);
     for(var i = 0 ; i < array.length ; i++){
         const bWeapon = array[i];
-        if(bWeapon.object){
-            mp.events.callRemote(`ServerConsoleOutput`, `Destroying object ${bWeapon.objectHash} | ${bWeapon.object.handle}`);
+        if(bWeapon && bWeapon.object && mp.objects.exists(bWeapon.object)){
             bWeapon.object.destroy();
         }
 
@@ -100,57 +99,60 @@ function removeBodyWeapons(array){
     }
 }
 function addBodyWeapons(entity, array){
-    const weaponsToAdd = [];
     array.forEach(sData => {
-        var object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
-            rotation:entity.rotation,
-            alpha:0,
-            dimension:entity.dimension
-        });
+        var object = undefined;
+        if(sData.IsVisible){
+            object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
+                rotation:entity.rotation,
+                alpha:0,
+                dimension:entity.dimension
+            });
+        }
         setTimeout(() => {
-            const gunData = global.weaponData.find(w => Number(w.Hash) == Number(sData.WeaponHash));
-            let category = "Assault Rifles";
-            if(gunData) category = gunData.Type;
-
-            switch(category){
-                case "Handguns":
-                    object.attachTo(entity.handle, PistolAttachmentBone, PistolAttachmentPos.x, PistolAttachmentPos.y, PistolAttachmentPos.z,
-                                                   PistolAttachmentRot.x, PistolAttachmentRot.y, PistolAttachmentRot.z,
-                                                   false, true, true, true, 1, true);
-                    break;
-                case "Submachine Guns":
-                    object.attachTo(entity.handle, SMGAttachmentBone, SMGAttachmentPos.x, SMGAttachmentPos.y, SMGAttachmentPos.z,
-                        SMGAttachmentRot.x, SMGAttachmentRot.y, SMGAttachmentRot.z,
-                        false, true, true, true, 1, true);
-                    break;
-                case "Shotguns":
-                    object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
-                        ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
-                        false, true, true, true, 1, true);        
-                    break;
-                case "Assault Rifles":
-                    object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
-                        RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
-                        false, true, true, true, 1, true);
-                    break;
-                case "Machine Guns":
-                    object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
-                        RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
-                        false, true, true, true, 1, true);
-                    break;
-                case "Sniper Rifles":
-                    object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
-                        RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
-                        false, true, true, true, 1, true);
-                    break;
-                default:
-                    object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
-                        ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
-                        false, true, true, true, 1, true); 
-                    break;
+            if(sData.IsVisible && object && mp.objects.exists(object) && object.handle){
+                const gunData = global.weaponData.find(w => Number(w.Hash) == Number(sData.WeaponHash));
+                let category = "Assault Rifles";
+                if(gunData) category = gunData.Type;
+    
+                switch(category){
+                    case "Handguns":
+                        object.attachTo(entity.handle, PistolAttachmentBone, PistolAttachmentPos.x, PistolAttachmentPos.y, PistolAttachmentPos.z,
+                                                       PistolAttachmentRot.x, PistolAttachmentRot.y, PistolAttachmentRot.z,
+                                                       false, true, true, true, 1, true);
+                        break;
+                    case "Submachine Guns":
+                        object.attachTo(entity.handle, SMGAttachmentBone, SMGAttachmentPos.x, SMGAttachmentPos.y, SMGAttachmentPos.z,
+                            SMGAttachmentRot.x, SMGAttachmentRot.y, SMGAttachmentRot.z,
+                            false, true, true, true, 1, true);
+                        break;
+                    case "Shotguns":
+                        object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
+                            ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
+                            false, true, true, true, 1, true);        
+                        break;
+                    case "Assault Rifles":
+                        object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                            RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                            false, true, true, true, 1, true);
+                        break;
+                    case "Machine Guns":
+                        object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                            RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                            false, true, true, true, 1, true);
+                        break;
+                    case "Sniper Rifles":
+                        object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                            RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                            false, true, true, true, 1, true);
+                        break;
+                    default:
+                        object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
+                            ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
+                            false, true, true, true, 1, true); 
+                        break;
+                }
+                object.setAlpha(255);
             }
-            object.setAlpha(255);
-
             //(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
             const obj = {
                 entity:entity,
@@ -159,19 +161,18 @@ function addBodyWeapons(entity, array){
                 isVisible:sData.IsVisible,
                 object:object
             };
-            weaponsToAdd.push(obj);
+            BODY_WEAPON_DATA.push(obj);
         }, 200);
     });
-
-    for(var i = 0 ; i < weaponsToAdd.length ; i++){
-        BODY_WEAPON_DATA.push(weaponsToAdd[i]);
-    }
 }
 
 
 function compareObject(obj1, obj2){
-    return ((obj1.entity.remoteId === obj2.entity.remoteId)
-            && (obj1.weaponHash === obj2.weaponHash)
-            && (obj1.objectHash === obj2.objectHash)
-            && (obj1.isVisible === obj2.isVisible));
+
+    var cond1 = (obj1.entity.remoteId === obj2.entity.remoteId);
+    var cond2 = (obj1.weaponHash === obj2.weaponHash);
+    var cond3 = (obj1.objectHash === obj2.objectHash);
+    var cond4 = (obj1.isVisible === obj2.isVisible);
+
+     return (cond1 && cond2 && cond3 && cond4);
 }

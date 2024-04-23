@@ -108,7 +108,7 @@ namespace RNC
             if (weapons == null)
                 weapons = new List<BodyWeapon>();
 
-            BodyWeapon _new = new BodyWeapon(((uint)weaponHash).ToString(), wepDat.ModelHashKey, true);
+            BodyWeapon _new = new BodyWeapon(((uint)weaponHash).ToString(), wepDat.ModelHashKey, false);
             weapons.Add(_new);
             SetBodyWeapons(player, weapons);
         }

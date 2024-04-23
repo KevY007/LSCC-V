@@ -276,6 +276,7 @@ namespace RNC
                 uint newW = uint.Parse(newWeapon);
                 BodyWeapon.SetWeaponVisible(player, (WeaponHash)oldW, true);
                 BodyWeapon.SetWeaponVisible(player, (WeaponHash)newW, false);
+
             }
             catch
             {
