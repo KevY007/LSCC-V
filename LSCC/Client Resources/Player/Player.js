@@ -257,7 +257,6 @@ mp.events.add('render', () => {
 
 let recoil_LastShotTime = 0;
 let recoil_ShotsInBurst = 0;
-let recoil_goingUp = true;
 
 var tasePreview = false;
 
@@ -265,7 +264,6 @@ mp.events.add("render", () => {
 
     if(recoil_ShotsInBurst > 0 && (Date.now() - recoil_LastShotTime > 300)){
         recoil_ShotsInBurst = 0;
-        recoil_goingUp = true;
     }
 
     if(player.getVariable("Team") == 1){  
@@ -2472,10 +2470,18 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         
         const val = shakeValue;
         const headval = (getRandomInt(0, 10) > 5 ? (val/3) : -(val/3));
-        const pitchval = campos.x + shakeValue;
+        const pitchval = (campos.x + val);
+        const headingtoset = (camhead+headval);
         //const pitchval = campos.x + (recoil_goingUp === true ? shakeValue : (-1-shakeValue));
-        mp.game.cam.setGameplayCamRelativePitch(pitchval, recoil_smoothing);
-        mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
+        if((campos.x+val) < campos.x){
+            mp.events.callRemote(`ServerConsoleOutput`, `[RECOIL-DBG] ${mp.players.local.name}'s recoil started going downwards! 
+            | val: ${val} | pitchval: ${pitchval} | campos.x: ${campos.x} | shakeValue: ${shakeValue} 
+            | crouched: ${isCrouching.toString()} | aiming: ${isAiming.toString()}`);
+        }
+        else{
+            mp.game.cam.setGameplayCamRelativePitch(pitchval, recoil_smoothing);
+        }
+        mp.game.cam.setGameplayCamRelativeHeading(headingtoset);
         recoil_LastShotTime = Date.now();
         //mp.game.cam.shakeGameplayCam('JOLT_SHAKE', shakeValue/2);
     }
@@ -4714,7 +4720,7 @@ function setStorageDataVars(){
         global.digitalHPAR = mp.storage.data.menu.digitalHPAR;
     }
     global.ServerUI.call("hud_biometrics_toggle", global.digitalHPAR);
-    global.ServerUI.call("hud_biometrics_position_set", '36px', '40px');
+    global.updateBiometricsPosition();
 
 
     if(mp.storage.data.menu.VoiceMode !== undefined){
