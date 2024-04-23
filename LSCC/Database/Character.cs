@@ -9,6 +9,105 @@ using static RNC.Character;
 
 namespace RNC
 {
+    public class BodyWeapon : Script
+    {
+        public string WeaponHash { get; set; }
+        public string ModelHash { get; set; }
+        public bool IsVisible { get; set; }
+        public BodyWeapon(string weaponHash, string modelHash, bool isVisible)
+        {
+            this.WeaponHash = weaponHash;
+            this.ModelHash = modelHash;
+            this.IsVisible = isVisible;
+        }
+        public static void SetWeaponVisible(Player player, WeaponHash weaponHash, bool visible)
+        {
+            List<BodyWeapon> weapons = GetBodyWeapons(player);
+            if (weapons == null) return;
+
+            BodyWeapon _wep = weapons.FirstOrDefault(w => w.WeaponHash.Equals(weaponHash.ToString()));
+            if (_wep == null) return;
+
+            _wep.IsVisible = visible;
+            SetBodyWeapons(player, weapons);
+        }
+        public static void UpdateBodyWeapons(Player player)
+        {
+            if (!player.HasSharedData("AC_WeaponData")) return;
+            List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedDataSafe<string>("AC_WeaponData"));
+            List<BodyWeapon> bodyWeapons = GetBodyWeapons(player);
+            
+            if(bodyWeapons != null) // step 1: remove weapons that are no longer in player inventory
+            {
+                foreach(BodyWeapon weapon in bodyWeapons)
+                {
+                    if (!weapons.Contains((WeaponHash)uint.Parse(weapon.WeaponHash))) // if player no longer has this weapon, remove it
+                    {
+                        RemoveBodyWeapon(player, (WeaponHash)uint.Parse(weapon.WeaponHash));
+                    }
+                }
+            }
+            foreach(WeaponHash weapon in weapons) // step 2: add weapons that aren't on body but are in inventory
+            {
+                BodyWeapon _w = bodyWeapons.FirstOrDefault(w => w.WeaponHash.Equals(weapon.ToString()));
+                if (_w == null) AddBodyWeapon(player, weapon);
+            }
+        }
+
+        private static void RemoveBodyWeapon(Player player, WeaponHash weaponHash)
+        {
+            List<BodyWeapon> weapons = GetBodyWeapons(player);
+            if (weapons == null) return;
+
+            BodyWeapon _wep = weapons.FirstOrDefault(w => w.WeaponHash.Equals(weaponHash.ToString()));
+            if (_wep == null) return;
+
+            weapons.Remove(_wep);
+            SetBodyWeapons(player, weapons);
+        }
+        private static void AddBodyWeapon(Player player, WeaponHash weaponHash)
+        {
+            jWeaponData wepDat = new jWeaponData();
+
+            if (!Settings.WeaponData.TryGetValue((long)weaponHash, out wepDat))
+            {
+                NAPI.Util.ConsoleOutput($"Failed to add body weapon {weaponHash.ToString()} for {player.Name} as it wasn't found in weapon data.");
+                return;
+            }
+
+            List<BodyWeapon> weapons = GetBodyWeapons(player);
+            if (weapons == null)
+                weapons = new List<BodyWeapon>();
+
+            BodyWeapon _new = new BodyWeapon(weaponHash.ToString(), wepDat.ModelHashKey, true);
+            weapons.Add(_new);
+            SetBodyWeapons(player, weapons);
+        }
+        private static void SetBodyWeapons(Player player, List<BodyWeapon> weapons)
+        {
+            if (player == null) { return; }
+            string weaponDataStr = NAPI.Util.ToJson(weapons);
+            player.SetSharedData("BODY_WEAPONS", weaponDataStr);
+        }
+        private static List<BodyWeapon> GetBodyWeapons(Player player)
+        {
+            if (player == null) { return null; }
+            if (player.GetSharedDataSafe<string>("BODY_WEAPONS") == "") { return null; }
+
+            string weaponDataStr = player.GetSharedDataSafe<string>("BODY_WEAPONS");
+            try
+            {
+                List<BodyWeapon> bodyWeapons = NAPI.Util.FromJson<List<BodyWeapon>>(weaponDataStr);
+                return bodyWeapons;
+            }
+            catch
+            {
+                NAPI.Util.ConsoleOutput($"Failed to parse body weapon JSON data for {player.Name} ({weaponDataStr}).");
+                return null;
+            }
+        }
+    }
+
     public class Character : Script
     {
         public class HeadOverlayData

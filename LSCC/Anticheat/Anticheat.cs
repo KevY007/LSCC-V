@@ -23,6 +23,7 @@ namespace RNC
             }
 
             player.GiveWeapon(weapon, ammo);
+            BodyWeapon.UpdateBodyWeapons(player);
         }
         public static void RemoveAllWeaponsAC(this Player player)
         {
@@ -30,6 +31,7 @@ namespace RNC
             player.SetSharedData("AC_WeaponData", NAPI.Util.ToJson(weapons));
 
             player.RemoveAllWeapons();
+            BodyWeapon.UpdateBodyWeapons(player);
         }
         public static void RemoveWeaponAC(this Player player, WeaponHash weapon)
         {
@@ -41,6 +43,7 @@ namespace RNC
             }
 
             player.RemoveWeapon(weapon);
+            BodyWeapon.UpdateBodyWeapons(player);
         }
 
         public static void AC_ForceRemoveTracer(Player target, int id)
