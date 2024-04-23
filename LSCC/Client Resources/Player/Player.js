@@ -2364,6 +2364,15 @@ mp.events.add("render", () => {
     }
 });
 
+var RECOIL_LOGGING = false;
+mp.events.addCommand("recoil_logging", () => {
+ 
+    RECOIL_LOGGING = !RECOIL_LOGGING;
+
+    mp.events.callLocal("HUDNotify", `Recoil debug data will ${RECOIL_LOGGING ? "now" : "no longer"} be printed into console.`, "blue", "fas fa-check", false, 
+        5000, "bottomCenter", "replace");
+});
+
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
     if(mp.players.local.getVariable("TasedTill") > Date.now()) return; // if currently tased
@@ -2429,8 +2438,8 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
             }
         }
 
+        let isCrouching = false, isAiming = false;
         if(gunType !== "Shotguns"){
-            let isCrouching = false, isAiming = false;
             if(mp.players.local.getStealthMovement() == true){
                 shakeValue = shakeValue/2.25; // slightly more accurate when crouching
                 isCrouching = true;
@@ -2456,12 +2465,6 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         }
 
         recoil_ShotsInBurst++;
-        if(gunType !== "Handguns" && gunType !== "Shotguns"){
-            if(recoil_ShotsInBurst % 10 === 0){
-                recoil_goingUp = !recoil_goingUp;
-            }
-        }
-
         if(global.isAntiPeekOn){
             shakeValue = shakeValue * 4; // double recoil if anti-peek is active
         }
@@ -2473,7 +2476,7 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         const pitchval = (campos.x + val);
         const headingtoset = (camhead+headval);
         //const pitchval = campos.x + (recoil_goingUp === true ? shakeValue : (-1-shakeValue));
-        if((campos.x+val) < campos.x){
+        if(((campos.x+val) < campos.x) || RECOIL_LOGGING == true){
             mp.events.callRemote(`ServerConsoleOutput`, `[RECOIL-DBG] ${mp.players.local.name}'s recoil started going downwards! 
             | val: ${val} | pitchval: ${pitchval} | campos.x: ${campos.x} | shakeValue: ${shakeValue} 
             | crouched: ${isCrouching.toString()} | aiming: ${isAiming.toString()}`);
