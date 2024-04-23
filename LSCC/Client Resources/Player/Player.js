@@ -2366,7 +2366,8 @@ mp.events.add("render", () => {
 
 var RECOIL_LOGGING = false;
 mp.events.addCommand("recoil_logging", () => {
- 
+    if(mp.players.local.getVariable("Admin") < 1) return;
+
     RECOIL_LOGGING = !RECOIL_LOGGING;
 
     mp.events.callLocal("HUDNotify", `Recoil debug data will ${RECOIL_LOGGING ? "now" : "no longer"} be printed into console.`, "blue", "fas fa-check", false, 
