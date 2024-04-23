@@ -253,8 +253,14 @@ function loadBankRobberyPeds(){
 
         const brPed = ped;
         if(!brPed) return;
-        brPed.ped.setInvincible(true);
-        brPed.ped.taskPlayAnim(pedData.animDictionary, pedData.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+        if(brPed.ped){
+            brPed.ped.setInvincible(true);
+            brPed.ped.taskPlayAnim(pedData.animDictionary, pedData.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+        }
+        else{
+            brPed.setInvincible(true);
+            brPed.taskPlayAnim(pedData.animDictionary, pedData.animClip, 8.0, 1.0, -1, 1, 1.0, false, false, false);
+        }
 
         BR_PEDS.push({
             ped:ped,
