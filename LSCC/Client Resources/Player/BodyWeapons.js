@@ -1,5 +1,5 @@
 var global = require('./globals');
-const BODY_WEAPON_DATA = [];
+var BODY_WEAPON_DATA = [];
 
 const PistolAttachmentPos = new mp.Vector3(0.02, 0.06, 0.1);
 const PistolAttachmentRot = new mp.Vector3(-100.0, 0.0, 0.0);
@@ -41,6 +41,10 @@ object example:
 
 */
 
+mp.events.add("cwb", () => {
+    mp.events.callRemote(`ServerConsoleOutput`, JSON.stringify(BODY_WEAPON_DATA));
+});
+
 mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
     if(entity.type !== 'player') return;
     if(!value) return;
@@ -48,45 +52,76 @@ mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
     const sWeaponData = JSON.parse(value); // server weapon data
     // weapon hash, object hash, is visible
 
-    const weaponsToRemove = [];
-
     // find all weapon data belonging to this entity
     const entityData = BODY_WEAPON_DATA.filter(w => w.entity.remoteId === entity.remoteId);
-    entityData.forEach(wData => {
-         const thisWeapon = sWeaponData.find(w => w.WeaponHash == wData.weaponHash);
-        if(thisWeapon){
-            const comparisonObj = {
-                entity:entity, 
-                weaponHash:thisWeapon.WeaponHash, 
-                objectHash:thisWeapon.ModelHash, 
-                isVisible:thisWeapon.IsVisible
-            };
-            if(!compareObject(comparisonObj, wData)){
-                updateBodyWeapon(entity, wData, comparisonObj, thisWeapon);
-            }
+
+    // add new weapons which don't exist in entityData yet - start off INVISIBLE
+    const newWeapons = sWeaponData.filter(sw => !entityData.find(ew => ew.weaponHash == sw.WeaponHash));
+    addBodyWeapons(entity, newWeapons);
+    mp.events.callRemote('ServerConsoleOutput', `added ${JSON.stringify(newWeapons)}`);
+    // weapons which the entity doesn't have anymore
+    const oldWeapons = entityData.filter(ew => !sWeaponData.find(sw => sw.WeaponHash == ew.weaponHash));
+    removeBodyWeapons(oldWeapons);
+    mp.events.callRemote('ServerConsoleOutput', `removed ${JSON.stringify(oldWeapons)}`);
+
+    const currentlyVisible = entityData.find(ew => ew.isVisible == true);
+    mp.events.callRemote('ServerConsoleOutput', `current visible: ${(currentlyVisible ? JSON.stringify(currentlyVisible) : "null")}`);
+    const newVisible = sWeaponData.find(sw => sw.IsVisible == true);
+    mp.events.callRemote('ServerConsoleOutput', `new visible: ${(newVisible ? JSON.stringify(newVisible) : "null")}`);
+
+    if(currentlyVisible){
+        // check if it's still visible
+        const sd = sWeaponData.find(w => w.WeaponHash == currentlyVisible.weaponHash);
+        if(sd.IsVisible == true){
+            BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == currentlyVisible.weaponHash).isVisible = true;
+            setTimeout(() => {
+                toggleWeaponVisible(entity, currentlyVisible.weaponHash, true);
+            }, 255);
         }
         else{
-            // if this weapon no longer exists in sWeaponData, it will be removed
-            weaponsToRemove.push(wData);
+            BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == currentlyVisible.weaponHash).isVisible = false;
+            setTimeout(() => {
+                toggleWeaponVisible(entity, currentlyVisible.weaponHash, false);
+            }, 255);
+
+            if(newVisible){
+                BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == newVisible.WeaponHash).isVisible = true;         
+                setTimeout(() => {
+                    toggleWeaponVisible(entity, newVisible.WeaponHash, true);
+                }, 255);
+            }
         }
-    });
+    }
+    else{
+        if(newVisible){
+            BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == newVisible.WeaponHash).isVisible = true;         
+            setTimeout(() => {
+                toggleWeaponVisible(entity, newVisible.WeaponHash, true);
+            }, 255);
+        }
+    }
 
-    // filter all server weapons where searching for their hash and entity remote id in body weapon data returns NULL aka not found
-    const weaponsToAdd = sWeaponData.filter(w => !(BODY_WEAPON_DATA.find(wd => wd.weaponHash == w.WeaponHash && wd.entity.remoteId == entity.remoteId)));
-
-    addBodyWeapons(entity, weaponsToAdd);
-    removeBodyWeapons(weaponsToRemove);
+    const areAnyVisible = sWeaponData.find(w => w.IsVisible == true);
+    if(!areAnyVisible){
+        mp.events.callRemote(`ServerConsoleOutput`, `NO GUNS ARE CURRENTLY VISIBLE NIGGER, SETTING ALL TO FALSE!!!`);
+        BODY_WEAPON_DATA.map((w) => {
+            if(w.entity.remoteId == entity.remoteId) return {...w, isVisible:false};
+        })
+    }
 });
 
-function updateBodyWeapon(entity, oldData, newData, newServerData){
+function toggleWeaponVisible(entity, weaponhash, visible){
+    mp.events.callRemote(`ServerConsoleOutput`, `Setting ${weaponhash} visbility to ${visible.toString()}`);
+    const bWeapon = BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == weaponhash);
+    if(!bWeapon || !bWeapon.object || !mp.objects.exists(bWeapon.object)){
+        mp.events.callRemote(`ServerConsoleOutput`, `bweapon object is non-existenti9e4rhng89urteh98`);
+        return;
+    }
 
-    if(oldData.isVisible == true && newData.isVisible == false){
-        removeBodyWeapons([oldData]);
-    }
-    if(oldData.isVisible == false && newData.isVisible == true){
-        addBodyWeapons(entity, [newServerData]);
-    }
+    BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == weaponhash).isVisible = visible;
+    bWeapon.object.setAlpha((visible ? 255 : 0));
 }
+
 function removeBodyWeapons(array){
     for(var i = 0 ; i < array.length ; i++){
         const bWeapon = array[i];
@@ -100,69 +135,74 @@ function removeBodyWeapons(array){
 }
 function addBodyWeapons(entity, array){
     array.forEach(sData => {
-        var object = undefined;
-        if(sData.IsVisible){
-            object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
+            var object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
                 rotation:entity.rotation,
                 alpha:0,
                 dimension:entity.dimension
-            });
-        }
-        setTimeout(() => {
-            if(sData.IsVisible && object && mp.objects.exists(object) && object.handle){
-                const gunData = global.weaponData.find(w => Number(w.Hash) == Number(sData.WeaponHash));
-                let category = "Assault Rifles";
-                if(gunData) category = gunData.Type;
-    
-                switch(category){
-                    case "Handguns":
-                        object.attachTo(entity.handle, PistolAttachmentBone, PistolAttachmentPos.x, PistolAttachmentPos.y, PistolAttachmentPos.z,
-                                                       PistolAttachmentRot.x, PistolAttachmentRot.y, PistolAttachmentRot.z,
-                                                       false, true, true, true, 1, true);
-                        break;
-                    case "Submachine Guns":
-                        object.attachTo(entity.handle, SMGAttachmentBone, SMGAttachmentPos.x, SMGAttachmentPos.y, SMGAttachmentPos.z,
-                            SMGAttachmentRot.x, SMGAttachmentRot.y, SMGAttachmentRot.z,
-                            false, true, true, true, 1, true);
-                        break;
-                    case "Shotguns":
-                        object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
-                            ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
-                            false, true, true, true, 1, true);        
-                        break;
-                    case "Assault Rifles":
-                        object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
-                            RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
-                            false, true, true, true, 1, true);
-                        break;
-                    case "Machine Guns":
-                        object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
-                            RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
-                            false, true, true, true, 1, true);
-                        break;
-                    case "Sniper Rifles":
-                        object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
-                            RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
-                            false, true, true, true, 1, true);
-                        break;
-                    default:
-                        object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
-                            ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
-                            false, true, true, true, 1, true); 
-                        break;
+            });     
+            setTimeout(() => {
+                if(object && mp.objects.exists(object) && object.handle){
+                    const gunData = global.weaponData.find(w => Number(w.Hash) == Number(sData.WeaponHash));
+                    let category = "Assault Rifles";
+                    if(gunData) category = gunData.Type;
+        
+                    switch(category){
+                        case "Handguns":
+                            object.attachTo(entity.handle, PistolAttachmentBone, PistolAttachmentPos.x, PistolAttachmentPos.y, PistolAttachmentPos.z,
+                                                           PistolAttachmentRot.x, PistolAttachmentRot.y, PistolAttachmentRot.z,
+                                                           false, true, true, true, 1, true);
+                            break;
+                        case "Submachine Guns":
+                            object.attachTo(entity.handle, SMGAttachmentBone, SMGAttachmentPos.x, SMGAttachmentPos.y, SMGAttachmentPos.z,
+                                SMGAttachmentRot.x, SMGAttachmentRot.y, SMGAttachmentRot.z,
+                                false, true, true, true, 1, true);
+                            break;
+                        case "Shotguns":
+                            object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
+                                ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
+                                false, true, true, true, 1, true);        
+                            break;
+                        case "Assault Rifles":
+                            object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                                RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                                false, true, true, true, 1, true);
+                            break;
+                        case "Machine Guns":
+                            object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                                RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                                false, true, true, true, 1, true);
+                            break;
+                        case "Sniper Rifles":
+                            object.attachTo(entity.handle, RifleAttachmentBone, RifleAttachmentPos.x, RifleAttachmentPos.y, RifleAttachmentPos.z,
+                                RifleAttachmentRot.x, RifleAttachmentRot.y, RifleAttachmentRot.z,
+                                false, true, true, true, 1, true);
+                            break;
+                        default:
+                            object.attachTo(entity.handle, ShotgunAttachmentBone, ShotgunAttachmentPos.x, ShotgunAttachmentPos.y, ShotgunAttachmentPos.z,
+                                ShotgunAttachmentRot.x, ShotgunAttachmentRot.y, ShotgunAttachmentRot.z,
+                                false, true, true, true, 1, true); 
+                            break;
+                    }
                 }
-                object.setAlpha(255);
-            }
-            //(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
-            const obj = {
-                entity:entity,
-                weaponHash:sData.WeaponHash,
-                objectHash:sData.ModelHash,
-                isVisible:sData.IsVisible,
-                object:object
-            };
-            BODY_WEAPON_DATA.push(obj);
-        }, 200);
+                //(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
+                const obj = {
+                    entity:entity,
+                    weaponHash:sData.WeaponHash,
+                    objectHash:sData.ModelHash,
+                    isVisible:sData.IsVisible,
+                    object:object
+                };
+                const check = BODY_WEAPON_DATA.find(w => obj.entity.remoteId == w.entity.remoteId && obj.weaponHash == w.weaponHash);
+                if(check){
+                    if(object && mp.objects.exists(object))
+                        object.destroy();
+
+                    mp.events.callRemote(`ServerConsoleOutput`, `PREVENT DUPLICATE ENTREEEE`);
+                    return; // prevent duplicates i hope
+                }
+                else
+                    BODY_WEAPON_DATA.push(obj);
+            }, 200);      
     });
 }
 

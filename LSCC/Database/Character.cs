@@ -96,6 +96,7 @@ namespace RNC
         }
         private static void AddBodyWeapon(Player player, WeaponHash weaponHash)
         {
+
             jWeaponData wepDat = new jWeaponData();
 
             if (!Settings.WeaponData.TryGetValue((long)weaponHash, out wepDat))
@@ -108,6 +109,9 @@ namespace RNC
             if (weapons == null)
                 weapons = new List<BodyWeapon>();
 
+            BodyWeapon _check = weapons.FirstOrDefault(w => w.WeaponHash.Equals(((uint)weaponHash).ToString()));
+            if (_check != null) return;
+
             BodyWeapon _new = new BodyWeapon(((uint)weaponHash).ToString(), wepDat.ModelHashKey, false);
             weapons.Add(_new);
             SetBodyWeapons(player, weapons);
@@ -116,7 +120,6 @@ namespace RNC
         {
             if (player == null) { return; }
             string weaponDataStr = NAPI.Util.ToJson(weapons);
-            NAPI.Util.ConsoleOutput($"Setting {player.Name}'s body weapons to {weaponDataStr}");
             player.SetSharedData("BODY_WEAPONS", weaponDataStr);
         }
         private static List<BodyWeapon> GetBodyWeapons(Player player)

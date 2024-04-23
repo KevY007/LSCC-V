@@ -268,7 +268,7 @@ namespace RNC
         [RemoteEvent("OnWeaponSwitch")]
         public void OnWeaponSwitch(Player player, string oldWeapon, string newWeapon)
         {
-            NAPI.Util.ConsoleOutput($"Weapon Switched.");
+            NAPI.Util.ConsoleOutput($"{DateTime.Now.ToString()} Weapon Switched.");
             if (!EPlayer.LoggedIn(player)) return;
             try
             {
