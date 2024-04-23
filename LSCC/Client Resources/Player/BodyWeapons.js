@@ -53,65 +53,32 @@ mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
     // weapon hash, object hash, is visible
 
     // find all weapon data belonging to this entity
-    const entityData = BODY_WEAPON_DATA.filter(w => w.entity.remoteId === entity.remoteId);
+    const oldentityData = BODY_WEAPON_DATA.filter(w => w.entity.remoteId === entity.remoteId);
 
     // add new weapons which don't exist in entityData yet - start off INVISIBLE
-    const newWeapons = sWeaponData.filter(sw => !entityData.find(ew => ew.weaponHash == sw.WeaponHash));
+    const newWeapons = sWeaponData.filter(sw => !oldentityData.find(ew => ew.weaponHash == sw.WeaponHash));
     addBodyWeapons(entity, newWeapons);
-    mp.events.callRemote('ServerConsoleOutput', `added ${JSON.stringify(newWeapons)}`);
     // weapons which the entity doesn't have anymore
-    const oldWeapons = entityData.filter(ew => !sWeaponData.find(sw => sw.WeaponHash == ew.weaponHash));
+    const oldWeapons = oldentityData.filter(ew => !sWeaponData.find(sw => sw.WeaponHash == ew.weaponHash));
     removeBodyWeapons(oldWeapons);
-    mp.events.callRemote('ServerConsoleOutput', `removed ${JSON.stringify(oldWeapons)}`);
 
-    const currentlyVisible = entityData.find(ew => ew.isVisible == true);
-    mp.events.callRemote('ServerConsoleOutput', `current visible: ${(currentlyVisible ? JSON.stringify(currentlyVisible) : "null")}`);
-    const newVisible = sWeaponData.find(sw => sw.IsVisible == true);
-    mp.events.callRemote('ServerConsoleOutput', `new visible: ${(newVisible ? JSON.stringify(newVisible) : "null")}`);
-
-    if(currentlyVisible){
-        // check if it's still visible
-        const sd = sWeaponData.find(w => w.WeaponHash == currentlyVisible.weaponHash);
-        if(sd.IsVisible == true){
-            BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == currentlyVisible.weaponHash).isVisible = true;
-            setTimeout(() => {
-                toggleWeaponVisible(entity, currentlyVisible.weaponHash, true);
-            }, 255);
+    const entityData = BODY_WEAPON_DATA.filter(w => w.entity.remoteId === entity.remoteId);
+    const shouldBeVisible = sWeaponData.find(w => w.IsVisible == true);
+    entityData.forEach(eData => {
+        if((shouldBeVisible && shouldBeVisible.WeaponHash == eData.weaponHash) || entity.weapon == 2725352035){
+            toggleWeaponVisible(entity, eData.weaponHash, true);
         }
         else{
-            BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == currentlyVisible.weaponHash).isVisible = false;
-            setTimeout(() => {
-                toggleWeaponVisible(entity, currentlyVisible.weaponHash, false);
-            }, 255);
-
-            if(newVisible){
-                BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == newVisible.WeaponHash).isVisible = true;         
-                setTimeout(() => {
-                    toggleWeaponVisible(entity, newVisible.WeaponHash, true);
-                }, 255);
-            }
+            if(entity.weapon == eData.weaponHash)
+                toggleWeaponVisible(entity, eData.weaponHash, false);
+            else
+                toggleWeaponVisible(entity, eData.weaponHash, true);
         }
-    }
-    else{
-        if(newVisible){
-            BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == newVisible.WeaponHash).isVisible = true;         
-            setTimeout(() => {
-                toggleWeaponVisible(entity, newVisible.WeaponHash, true);
-            }, 255);
-        }
-    }
-
-    const areAnyVisible = sWeaponData.find(w => w.IsVisible == true);
-    if(!areAnyVisible){
-        mp.events.callRemote(`ServerConsoleOutput`, `NO GUNS ARE CURRENTLY VISIBLE NIGGER, SETTING ALL TO FALSE!!!`);
-        BODY_WEAPON_DATA.map((w) => {
-            if(w.entity.remoteId == entity.remoteId) return {...w, isVisible:false};
-        })
-    }
+   
+    });
 });
 
 function toggleWeaponVisible(entity, weaponhash, visible){
-    mp.events.callRemote(`ServerConsoleOutput`, `Setting ${weaponhash} visbility to ${visible.toString()}`);
     const bWeapon = BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == weaponhash);
     if(!bWeapon || !bWeapon.object || !mp.objects.exists(bWeapon.object)){
         mp.events.callRemote(`ServerConsoleOutput`, `bweapon object is non-existenti9e4rhng89urteh98`);
@@ -119,7 +86,7 @@ function toggleWeaponVisible(entity, weaponhash, visible){
     }
 
     BODY_WEAPON_DATA.find(w => w.entity.remoteId == entity.remoteId && w.weaponHash == weaponhash).isVisible = visible;
-    bWeapon.object.setAlpha((visible ? 255 : 0));
+    mp.game.entity.setAlpha(bWeapon.object.handle, (visible ? 255 : 0), false);
 }
 
 function removeBodyWeapons(array){
@@ -197,12 +164,11 @@ function addBodyWeapons(entity, array){
                     if(object && mp.objects.exists(object))
                         object.destroy();
 
-                    mp.events.callRemote(`ServerConsoleOutput`, `PREVENT DUPLICATE ENTREEEE`);
                     return; // prevent duplicates i hope
                 }
                 else
                     BODY_WEAPON_DATA.push(obj);
-            }, 200);      
+            }, 1000);      
     });
 }
 
