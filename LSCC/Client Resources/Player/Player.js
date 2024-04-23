@@ -2341,6 +2341,15 @@ mp.events.add("changeRecoilSmooting", (value) => {
 })
 
 
+var RECOIL_LOGGING = false;
+mp.events.addCommand("recoil_logging", () => {
+    if(mp.players.local.getVariable("Admin") < 1) return;
+
+    RECOIL_LOGGING = !RECOIL_LOGGING;
+
+    mp.events.callLocal("HUDNotify", `Recoil debug data will ${RECOIL_LOGGING ? "now" : "no longer"} be printed into console.`, "blue", "fas fa-check", false, 
+        5000, "bottomCenter", "replace");
+});
 
 mp._events.add("playerWeaponShot", (targetPosition, targetEntity) => 
 {
@@ -2446,6 +2455,12 @@ mp._events.add("playerWeaponShot", (targetPosition, targetEntity) =>
         mp.game.cam.setGameplayCamRelativeHeading(camhead + headval);
         recoil_LastShotTime = Date.now();
         //mp.game.cam.shakeGameplayCam('JOLT_SHAKE', shakeValue/2);
+
+        if(RECOIL_LOGGING == true){
+            mp.events.callRemote(`ServerConsoleOutput`, `[RECOIL-DBG] ${mp.players.local.name}'s recoil started going downwards! 
+            | val: ${val} | pitchval: ${pitchval} | campos.x: ${campos.x} | shakeValue: ${shakeValue} 
+            | crouched: ${isCrouching.toString()} | aiming: ${isAiming.toString()}`);
+        }
     }
     else{
         let value = 0.3;
