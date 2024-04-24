@@ -1755,7 +1755,8 @@ namespace RNC
                 List<Account> autoLoginChecks = await context.Accounts.AsQueryable().Where(a => a.LastHWID == pserial &&
                                                                           a.LastRID == scid &&
                                                                           a.LastSC == scname &&
-                                                                          a.AutoLogin == true).ToListAsync();
+                                                                          a.AutoLogin == true &&
+                                                                          a.RememberMe == true).ToListAsync();
 
                 if (autoLoginChecks.Count <= 0)
                 {

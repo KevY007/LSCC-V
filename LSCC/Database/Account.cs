@@ -104,6 +104,7 @@ namespace RNC
         public string SelectedBadgeData { get; set; }
         public bool ClanPartnering { get; set; }
         public bool ClanTag { get; set; }
+        public bool RememberMe { get; set; }
 
         public string TattooList { get; set; }
 
@@ -327,6 +328,7 @@ namespace RNC
 
             var _new = new Account
             {
+                RememberMe = false,
                 Email = email,
                 Password = newPass,
                 OldPassword = "",

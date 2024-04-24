@@ -174,11 +174,6 @@ mp.events.add('finishAccountHwidCheck', (status) => {
   }
 });
 
-mp.events.add("RememberMe_Toggle", (value) => {
-  mp.storage.data.menu.rememberMeNew = value;
-  mp.storage.flush();
-});
-
 mp.events.add('showLoginBrowser', (state, donatorList, isQuickLogin) => {
     setTimeout(() => {
         if(global.ServerUI != null)
@@ -308,11 +303,6 @@ mp.events.add("PasswordResetResult", (result) => {
 
 mp.events.add("browser_ServerConsole", (msg) => mp.events.callRemote("ServerConsoleOutput", msg));
 
-mp.events.add("auth_reset_rememberMe", () => {
-  mp.storage.data.menu.rememberMeNew = false;
-  mp.storage.flush();
-});
-
 mp.events.add("onOpenChatbox", (toggle) =>
 {
     if(toggle === true && ((global.VehicleSpawnerActive !== undefined && global.VehicleSpawnerActive == true) ||
@@ -353,10 +343,7 @@ mp.events.add("auth_reset_password", (code, newPassword) => {
   // Code here
 });
 mp.events.add('auth_login', (username, password, rememberMe) => {
-    mp.events.callRemote('OnPlayerLoginAttempt', username, password);
-
-    mp.storage.data.menu.rememberMeNew = rememberMe;
-    mp.storage.flush();
+    mp.events.callRemote('OnPlayerLoginAttempt', username, password, rememberMe);
 });
 
 mp.events.add('auth_register', (username, email, password, confirmPass) => {
@@ -373,26 +360,6 @@ mp.events.add('requestAutoLoginData', () => {
     mp.events.callRemote("OnRequestAutoLoginData");
 });
 
-var quickLoginUsername = "";
-mp.events.add('sendAutoLoginDataToBrowser', (data) => {
-    if(mp.storage.data.menu.rememberMeNew == undefined || mp.storage.data.menu.rememberMeNew === false) return;
-
-    setTimeout(() => {
-        if(mp.storage.data.menu.rememberMeNew == undefined || mp.storage.data.menu.rememberMeNew === false) return;
-
-        if(data.length > 2){
-            //if(global.ServerUI) global.ServerUI.call(`auth_quick_login_set`, data);
-            quickLoginUsername = data;
-            global.ServerUI.call('auth_quick_login_toggle', true);
-        }
-    }, 500);
-});
-
-mp.events.add('auth_quick_login', () => {
-    if(mp.storage.data.menu.rememberMeNew == undefined || mp.storage.data.menu.rememberMeNew === false) return;
-    
-    mp.events.callRemote("OnAutoLoginAttempt", quickLoginUsername);
-});
 
 mp.events.add('requestForgotUsernameServer', () => {
     mp.events.callRemote("OnRequestForgotUsername");

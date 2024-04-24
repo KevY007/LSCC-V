@@ -527,7 +527,9 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
 
-            player.TriggerEvent("auth_reset_rememberMe");
+            EPlayer.GetAccount(player).RememberMe = false;
+            EPlayer.Save(player, false);
+
             player.SendChatMessage("!{#ff6347}[!] ~w~You are being logged out and reconnected.");
             NAPI.Task.Run(() =>
             {

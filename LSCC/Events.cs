@@ -134,7 +134,8 @@ namespace RNC
                 {
                     if (reason == "AFK")
                     {
-                        player.TriggerEvent("RememberMe_Toggle", false);
+                        EPlayer.GetAccount(player).RememberMe = false;
+                        EPlayer.Save(player, false);
                         NAPI.Task.Run(() =>
                         {
                             if (player == null) return;
@@ -5158,7 +5159,7 @@ namespace RNC
         }
 
         [RemoteEvent("OnPlayerLoginAttempt")]
-        public static void OnPlayerLoginAttempt(Player player, string username, string password)
+        public static void OnPlayerLoginAttempt(Player player, string username, string password, bool rememberMe)
         {
             try
             {
@@ -5197,6 +5198,9 @@ namespace RNC
                             {
                                 bool useOldPassword = false;
                                 if (acc.Password == "") useOldPassword = true;
+
+                                bool loginSuccess = false;
+
                                 NAPI.Task.Run(() =>
                                 {
                                     NAPI.Util.ConsoleOutput($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
@@ -5211,6 +5215,7 @@ namespace RNC
                                         else
                                         {
                                             OnPlayerLogin(player, acc);
+                                            loginSuccess = true;
                                         }
                                         return;
                                     }
@@ -5219,6 +5224,12 @@ namespace RNC
                                         player.TriggerEvent("login_ShowInvalidInfo", true);
                                     }
                                 });
+                                await NAPI.Task.WaitForMainThread();
+                                if (loginSuccess)
+                                {
+                                    acc.RememberMe = rememberMe;
+                                    await context.SaveChangesAsync();
+                                }
                             }
                             else
                             {
@@ -5242,6 +5253,7 @@ namespace RNC
                             {
                                 bool useOldPassword = false;
                                 if (acc.Password == "") useOldPassword = true;
+                                bool loginSuccess = false;
                                 NAPI.Task.Run(() =>
                                 {
                                     NAPI.Util.ConsoleOutput($"{acc.Username} email verified: {acc.EmailVerified.ToString()}");
@@ -5256,6 +5268,7 @@ namespace RNC
                                         else
                                         { 
                                             OnPlayerLogin(player, acc);
+                                            loginSuccess = true;
                                         }
                                         return;
                                     }
@@ -5264,7 +5277,12 @@ namespace RNC
                                         player.TriggerEvent("login_ShowInvalidInfo", true);
                                     }
                                 });
-
+                                await NAPI.Task.WaitForMainThread();
+                                if (loginSuccess)
+                                {
+                                    acc.RememberMe = rememberMe;
+                                    await context.SaveChangesAsync();
+                                }
                             }
                             else
                             {
@@ -7426,39 +7444,6 @@ namespace RNC
             writer.Flush();
             writer.Close();
             return;
-        }
-
-        [RemoteEvent("Server_ToggleAutoLogin")]
-        public static void ToggleAutoLogin(Player player, bool toggle)
-        {
-            Account acc = EPlayer.GetAccount(player);
-            acc.AutoLogin = toggle;
-            EPlayer.Save(player, false);
-
-            if (toggle)
-                EPlayer.Notify(player, Translate(player, "AUTO_LOGIN_ON"), "green", "fa-solid fa-user-check", true, 4000);
-            else
-                EPlayer.Notify(player, Translate(player, "AUTO_LOGIN_OFF"), "red", "fa-solid fa-user-xmark", true, 4000);
-
-            /*
-            Task.Run(async () =>
-            {
-                using (MainDatabase context = ContextFactory.CreateContext())
-                {
-                    Account acc = await context.Accounts.AsQueryable().FirstOrDefaultAsync(a => a.Username.Equals(player.Name, StringComparison.OrdinalIgnoreCase));
-                    if (acc == null) return;
-                    acc.AutoLogin = toggle;
-
-                    NAPI.Task.Run(() =>
-                    {
-                        if (toggle)
-                            EPlayer.Notify(player, "You turned Auto Login on! You will no longer need to enter your login info on this account.", "green", "fa-solid fa-user-check", true, 4000);
-                        else
-                            EPlayer.Notify(player, "You turned Auto Login off! You will now have to enter your login info when you connect.", "red", "fa-solid fa-user-xmark", true, 4000);
-                    });
-                }
-            });
-            */
         }
 
         [RemoteEvent("CCVehicleManager:DeleteVehicle")]
