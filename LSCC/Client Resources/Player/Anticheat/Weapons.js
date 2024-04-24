@@ -31,10 +31,6 @@ mp.events.add('TwoSecondsEvent', () => {
     checkHackedWeapons();
 });
 
-mp.events.addDataHandler('AC_WeaponData', function(entity, value, oldValue){
-    mp.events.callRemote("ServerConsoleOutput", `(${new Date().toUTCString()}) [AntiCheat - Weapon Hacks] ${mp.players.local.name}'s weapon data is now: ${value} | Old data: ${oldValue}`);
-});
-
 
 // Bullet Tracing for Aimbot checking
 var bulletLineData = [];

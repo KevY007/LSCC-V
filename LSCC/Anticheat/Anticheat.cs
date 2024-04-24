@@ -23,6 +23,7 @@ namespace RNC
             }
 
             player.GiveWeapon(weapon, ammo);
+
             BodyWeapon.UpdateBodyWeapons(player);
         }
         public static void RemoveAllWeaponsAC(this Player player)

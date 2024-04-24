@@ -3147,8 +3147,10 @@ namespace RNC
                 }
             }
 
+            player.SetSharedData("WeaponAC:BypassUntil", DateTimeOffset.Now.ToUnixTimeMilliseconds() + 5000);
+            player.SetSharedData("global.WeaponEditorActive", true);
             //player.SetSharedData("InWeaponEditor", true);
-            foreach(KeyValuePair<long, string> weapon in Main.WeaponReasons)
+            foreach (KeyValuePair<long, string> weapon in Main.WeaponReasons)
             {
                 player.GiveWeaponAC((WeaponHash)weapon.Key, 1);
             }

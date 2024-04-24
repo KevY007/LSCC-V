@@ -521,6 +521,7 @@ namespace RNC
                 player.SetSharedData("BODY_WEAPONS", "");
                 player.SetSharedData("ShowDamaged", false);
                 player.SetSharedData("IsChatOpen", false);
+                player.SetSharedData("WeaponAC:BypassUntil", 0);
                 player.SetSharedData("SquadID", -1);
                 player.SetData("SpawnTick", Environment.TickCount64);
                 player.ResetData("AccountHandle");

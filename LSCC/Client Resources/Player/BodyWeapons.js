@@ -134,7 +134,8 @@ function removeBodyWeapons(array){
 function addBodyWeapons(entity, array){
     mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] streaming in ${entity.name}'s weapons: ${JSON.stringify(array)}`);
     array.forEach(sData => {
-            var object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
+            var object = mp.objects.new(mp.game.joaat(sData.ModelHash), 
+                new mp.Vector3(entity.position.x, entity.position.y, entity.position.z-10), {
                 rotation:entity.rotation,
                 alpha:(sData.IsVisible == true ? 255 : 0),
                 dimension:entity.dimension

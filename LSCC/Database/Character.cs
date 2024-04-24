@@ -37,6 +37,7 @@ namespace RNC
             try
             {
                 if (!player.HasSharedData("AC_WeaponData")) return;
+                if (player.GetSharedDataSafe<bool>("global.WeaponEditorActive") == true) return;
                 List<WeaponHash> weapons = NAPI.Util.FromJson<List<WeaponHash>>(player.GetSharedDataSafe<string>("AC_WeaponData"));
                 List<BodyWeapon> bodyWeapons = GetBodyWeapons(player);
 
