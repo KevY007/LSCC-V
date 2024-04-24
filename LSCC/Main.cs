@@ -160,96 +160,7 @@ namespace RNC
 
         public Lobby_StingerData() { }
     }
-    public class CarData
-    {
-        public int Team { get; set; }
-        public string Model { get; set; }
-        public string Name { get; set; }
-        public string Image { get; set; }
-        public int LevelRequired { get; set; }
-        public int PointsRequired { get; set; }
-        public int DonatorPointsRequired { get; set; }
-        public int DonatorLevelRequired { get; set; }
-        public string Info { get; set; }
-        public CarData(int team, string name, string model, string image, string info, int level = 0, int points = 0, int donorpoints = 0, int donator = 0)
-        {
-            this.Team = team;
-            this.Name = name;
-            this.LevelRequired = level;
-            this.PointsRequired = points;
-            this.DonatorPointsRequired = donorpoints;
-            this.DonatorLevelRequired = donator;
-            this.Model = model;
-            this.Image = image;
-            this.Info = info;
-
-            int speed = 0;
-            if(team == 0)
-            {
-                switch (info)
-                {
-                    case "Slow":
-                        speed = 155;
-                        break;
-                    case "Slow+":
-                        speed = 158;
-                        break;
-                    case "Average":
-                        speed = 163;
-                        break;
-                    case "Average+":
-                        speed = 168;
-                        break;
-                    case "Fast":
-                        speed = 175;
-                        break;
-                    case "Fast+":
-                        speed = 180;
-                        break;
-                }
-            }
-            else
-            {
-                switch (info)
-                {
-                    case "Slow":
-                        speed = 180;
-                        break;
-                    case "Slow+":
-                        speed = 183;
-                        break;
-                    case "Average":
-                        speed = 185;
-                        break;
-                    case "Average+":
-                        speed = 188;
-                        break;
-                    case "Fast":
-                        speed = 190;
-                        break;
-                    case "Fast+":
-                        speed = 196;
-                        break;
-                }
-            }
-
-            ShopVehicleData _dt = new ShopVehicleData()
-            {
-                Name = name,
-                Model = model,
-                Team = team,
-                DonatorLevelRequired = donator,
-                PriceDiamondPoints = donorpoints,
-                PricePoints = points,
-                LevelRequired = level,
-                ImageURL = image,
-                MaxSpeedKMH = speed
-            };
-            MainDatabase db = ContextFactory.CreateContext();
-            db.ShopVehicles.Add(_dt);
-            db.SaveChanges();
-        }
-    };
+   
     public class EventManager
     {
         public class EventData
@@ -2798,7 +2709,7 @@ namespace RNC
                 .Add(WeaponHash.Pistol50, "https://assets.gm.miami/gtav/weapons/Pistol.50-icon.png", "Pistol .50", 40);
 
             #region OLD COPCHASE VEHICLES SYSTEM - DISABLED (Static Vehicles)
-            
+            /*
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Creating the selection vehicles...");
 
             // Defaults
@@ -2894,7 +2805,7 @@ namespace RNC
             new CarData(0, "ZR350", "zr350", "package://Artwork/Vehicles/zr350.png", "Fast", 40, 70);
             //new CarData(0, "Golf Mk6", "golfmk6", "package://Artwork/Vehicles/golfmk6.png", "Fast+", 50, 85);
             //new CarData(0, "2022 Porsche Cayenne", "cayenneturbo", "package://Artwork/Vehicles/cayenneturbo.png", "Fast+", 60, 80);
-            
+            */
             #endregion
 
             NAPI.Util.ConsoleOutput("(RnC | STARTUP) Loading shop vehicle data on another thread...");
