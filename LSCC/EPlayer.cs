@@ -1748,42 +1748,26 @@ namespace RNC
             Events.OnStopPlayerAction(player, reason);
         }
 
-        public static void SendAutoLoginData(Player player)
+        public async static Task<Account> AutoLoginCheck(Player player, string scname, ulong scid, string pserial)
         {
-            string scname = player.SocialClubName;
-            ulong scid = player.SocialClubId;
-            string pserial = player.Serial;
-            Task.Run(async () =>
+            using (MainDatabase context = ContextFactory.CreateContext())
             {
-                using (MainDatabase context = ContextFactory.CreateContext())
+                List<Account> autoLoginChecks = await context.Accounts.AsQueryable().Where(a => a.LastHWID == pserial &&
+                                                                          a.LastRID == scid &&
+                                                                          a.LastSC == scname &&
+                                                                          a.AutoLogin == true).ToListAsync();
+
+                if (autoLoginChecks.Count <= 0)
                 {
-                    List<Account> autoLoginChecks = await context.Accounts.AsQueryable().Where(a => a.LastHWID == pserial &&
-                                                                              a.LastRID == scid &&
-                                                                              a.LastSC == scname &&
-                                                                              a.AutoLogin == true).ToListAsync();
-
-                    if (autoLoginChecks.Count <= 0)
-                    {
-                        NAPI.Task.Run(() =>
-                        {
-                            player.TriggerEvent("sendAutoLoginDataToBrowser", "");
-                            NAPI.Util.ConsoleOutput("Found 0 auto login data");
-                        });
-                    }
-                    else
-                    {
-                        NAPI.Task.Run(() =>
-                        {
-                            autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
-                            Account toLogin = autoLoginChecks[0];
-                            NAPI.Util.ConsoleOutput("Sending data: " + toLogin.Username);
-
-                            player.TriggerEvent("sendAutoLoginDataToBrowser", toLogin.Username);
-                        });
-                    }
+                    return null;
                 }
-            });
-            
+                else
+                {
+                    autoLoginChecks.Sort((x, y) => y.LastLogin.CompareTo(x.LastLogin)); // sort by date, descending
+                    Account toLogin = autoLoginChecks[0];
+                    return toLogin;
+                }
+            }
         }
         public static void SendForgotUsernameData(Player player)
         {
@@ -1815,34 +1799,64 @@ namespace RNC
 
         public static void LoginBrowserSetup(Player player, bool show_login = true)
         {
+            string scname = player.SocialClubName;
+            ulong scid = player.SocialClubId;
+            string pserial = player.Serial;
+
             Task.Run(async () =>
             {
-                using(MainDatabase context = ContextFactory.CreateContext())
+                Account isQuickLogin = await EPlayer.AutoLoginCheck(player, scname, scid, pserial);
+                if (isQuickLogin == null)
                 {
-                    List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Take(30).ToListAsync();
-                    string donorList = "[";
-                    foreach (Account donor in donors)
+                    using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        donorList += $"\"{donor.Username}\",";
-                    }
-                    donorList += "]";
+                        List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Take(30).ToListAsync();
+                        string donorList = "[";
+                        foreach (Account donor in donors)
+                        {
+                            donorList += $"\"{donor.Username}\",";
+                        }
+                        donorList += "]";
 
+                        NAPI.Task.Run(() =>
+                        {
+                            NAPI.Task.Run(() =>
+                            {
+                                if (show_login)
+                                {
+                                    player.TriggerEvent("showLoginBrowser", true, donorList);
+                                }
+
+                                player.TriggerEvent("InitiateCustomChat");
+                                player.TriggerEvent("TogglePlayerChat", false);
+                            }, 500);
+
+                            SetDiscordStatus(player, "On login screen");
+                            ResetPlayerData(player);
+                        });
+                    }
+                }
+                else
+                {
                     NAPI.Task.Run(() =>
                     {
+                       
                         NAPI.Task.Run(() =>
                         {
                             if (show_login)
                             {
-                                player.TriggerEvent("showLoginBrowser", true, donorList);
+                                player.TriggerEvent("showLoginBrowser", true, "[]", true);
+                                NAPI.Task.Run(() =>
+                                {
+                                    Events.OnPlayerLogin(player, isQuickLogin, true);
+                                }, 1000);
                             }
-
                             player.TriggerEvent("InitiateCustomChat");
                             player.TriggerEvent("TogglePlayerChat", false);
                         }, 500);
-
-                        SetDiscordStatus(player, "On login screen");
+                        SetDiscordStatus(player, "Quickly logging in...");
                         ResetPlayerData(player);
-                    });          
+                    });
                 }
             });
 

@@ -179,7 +179,7 @@ mp.events.add("RememberMe_Toggle", (value) => {
   mp.storage.flush();
 });
 
-mp.events.add('showLoginBrowser', (state, donatorList) => {
+mp.events.add('showLoginBrowser', (state, donatorList, isQuickLogin) => {
     setTimeout(() => {
         if(global.ServerUI != null)
         {      
@@ -187,28 +187,24 @@ mp.events.add('showLoginBrowser', (state, donatorList) => {
             if(global.ServerUI) global.ServerUI.call('hud_toggle', false);
             if(global.ServerUI) global.ServerUI.call(`mainmenu_toggle`, false); 
             if(state){
-                mp.game.graphics.transitionToBlurred(1000);
-                mp.players.local.freezePosition(true);
-
-                mp.events.callRemote('Auth_ConfirmAccountBySerial');
-                if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
-                global.isLoginScreenActive = true;
-                global.ServerUI.call('auth_quick_login_toggle', false);
-                toggleLoginScene(true);
-
-                if(mp.storage.data.menu.rememberMeNew !== undefined && mp.storage.data.menu.rememberMeNew === true){
-                  mp.events.callRemote("requestQuickLoginForgotUsernameData"); // If 'Remember Me' is checked, auto-login the user.
-                }
-
-                setTimeout(() => {
-                  if(donatorList){
-                    eval(`var authDonators = ${donatorList}`);
-                    mp.events.callRemote(`ServerConsoleOutput`, `Donators set: ${authDonators.toString()}`)
-                    if(global.ServerUI) global.ServerUI.call("auth_donators_set", authDonators);
-                  }
-                }, 100);
                
 
+                mp.events.callRemote('Auth_ConfirmAccountBySerial');
+                if(!isQuickLogin){
+                  mp.game.graphics.transitionToBlurred(1000);
+                  mp.players.local.freezePosition(true);
+                  if(global.ServerUI) global.ServerUI.call(`auth_toggle`, true);
+                  global.isLoginScreenActive = true;
+                  global.ServerUI.call('auth_quick_login_toggle', false);
+                  toggleLoginScene(true);
+                  setTimeout(() => {
+                    if(donatorList){
+                      eval(`var authDonators = ${donatorList}`);
+                      mp.events.callRemote(`ServerConsoleOutput`, `Donators set: ${authDonators.toString()}`)
+                      if(global.ServerUI) global.ServerUI.call("auth_donators_set", authDonators);
+                    }
+                  }, 100);
+                }
                 mp.events.callLocal("actionMenu:removeAllItems");
             }
             else{
@@ -224,7 +220,7 @@ mp.events.add('showLoginBrowser', (state, donatorList) => {
                 }
                 if(global.ServerUI) global.ServerUI.markAsChat();
             }
-            if(!global.IsInTutorial)
+            if(!global.IsInTutorial && !isQuickLogin)
                 mp.gui.cursor.show(state, state);
         }
         else{
@@ -232,11 +228,37 @@ mp.events.add('showLoginBrowser', (state, donatorList) => {
             global.ServerUI = global.InitializeServerUI();
             if(global.ServerUI) global.ServerUI.active = true;
             setTimeout(() => {
-                mp.events.callLocal("showLoginBrowser", state, donatorList);
+                mp.events.callLocal("showLoginBrowser", state, donatorList, isQuickLogin);
             }, 1000);
         }
 
     }, 500);
+});
+
+mp.events.add("QuickLogin_InitializeHUD", () => {
+  if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
+  global.isLoginScreenActive = false;
+  if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+  if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
+  if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+  if(global.ServerUI) global.ServerUI.markAsChat();
+  mp.events.callLocal("ToggleHud", true);
+  setTimeout(() => {
+    global.isLoginScreenActive = false;
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+    if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
+    if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+    if(global.ServerUI) global.ServerUI.markAsChat();
+    mp.events.callLocal("ToggleHud", true);
+  }, 2000);
+  setTimeout(() => {
+    global.isLoginScreenActive = false;
+    if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+    if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
+    if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+    if(global.ServerUI) global.ServerUI.markAsChat();
+    mp.events.callLocal("ToggleHud", true);
+  }, 5000);
 });
 
 // Preventing mouse hiding in the login screen

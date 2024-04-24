@@ -3975,8 +3975,13 @@ namespace RNC
             //NAPI.Util.ConsoleOutput($"[Query Performance] Query \"{info}\" took a total of {(finish-start).ToString()}ms to finish!");
         }
 
-        public static void OnPlayerLogin(Player player, Account acc)
+        public static void OnPlayerLogin(Player player, Account acc, bool isQuickLogin = false)
         {
+            if(isQuickLogin == true)
+            {
+                player.TriggerEvent("QuickLogin_InitializeHUD");
+            }
+
             long queryStartTime = 0;
             long queryFinishTime = 0;
 
@@ -5068,13 +5073,6 @@ namespace RNC
             {
                 NAPI.Util.ConsoleOutput("[LOGIN ERROR] Error during auto-login: " + ex.ToString());
             }
-        }
-
-        [RemoteEvent("requestQuickLoginForgotUsernameData")]
-        public static void OnRequestQuickLoginForgotUsername(Player player)
-        {
-            EPlayer.SendAutoLoginData(player);
-            EPlayer.SendForgotUsernameData(player);
         }
 
         [RemoteEvent("EmailVerification_VerifyCode")]

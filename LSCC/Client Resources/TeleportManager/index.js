@@ -13,7 +13,7 @@ mp.events.add("TeleportEditor:Open", (editTp) => {
 
     mp.gui.cursor.show(true, true);
     global.TeleportEditorOpen = true;
-    mp.events.callLocal("ToggleHud", false);
+    mp.events.callLocal("", false);
 });
 mp.events.add("TeleportEditor:SearchResultAction", (isEdit, tpID) => {
     const tp = global.TeleportData.find(t => t.SQL_ID == tpID);
