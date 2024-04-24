@@ -45,10 +45,18 @@ mp.events.add("cwb", () => {
     mp.events.callRemote(`ServerConsoleOutput`, JSON.stringify(BODY_WEAPON_DATA));
 });
 
+mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
+    bodyWeaponsUnload(mp.players.local);
+    const value = mp.players.local.getVariable("BODY_WEAPONS");
+    if(!value) return;
+    onBodyWeaponsLoad(mp.players.local, value);
+});
+
 mp.events.add("entityStreamIn", (entity) => {
     if(entity.type !== 'player') return;
     const value = entity.getVariable("BODY_WEAPONS");
     if(!value) return;
+    if(entity.dimension !== mp.players.local.dimension) return;
 
     onBodyWeaponsLoad(entity, value);
 });
@@ -66,6 +74,7 @@ function bodyWeaponsUnload(entity){
 function onBodyWeaponsLoad(entity, value){
     if(entity.type !== 'player') return;
     if(!value) return;
+    if(entity.dimension !== mp.players.local.dimension) return;
 
     const sWeaponData = JSON.parse(value); // server weapon data
     // weapon hash, object hash, is visible
@@ -123,10 +132,11 @@ function removeBodyWeapons(array){
     }
 }
 function addBodyWeapons(entity, array){
+    mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] streaming in ${entity.name}'s weapons: ${JSON.stringify(array)}`);
     array.forEach(sData => {
             var object = mp.objects.new(mp.game.joaat(sData.ModelHash), entity.position, {
                 rotation:entity.rotation,
-                alpha:0,
+                alpha:(sData.IsVisible == true ? 255 : 0),
                 dimension:entity.dimension
             });     
             setTimeout(() => {
@@ -175,6 +185,7 @@ function addBodyWeapons(entity, array){
                 }
                 //(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
                 mp.game.entity.setCollision(object.handle, false, true);
+                mp.events.callRemote(`ServerConsoleOutput`, `[${mp.players.local.name}] creating ${entity.name}'s object handle: ${object.handle} (${sData.ModelHash})`);
                 const obj = {
                     entity:entity,
                     weaponHash:sData.WeaponHash,
