@@ -2321,7 +2321,7 @@ mp.events.add("render", () => {
             {
                 currentRollCooldownTimestamp = (Date.now() + 1000);
                 rollShootCooldownActive = true;
-                if(global.ServerUI) global.ServerUI.call('notification_send', Translate("SHOOTING_COOLDOWN"), 'warning', 1000);
+                //if(global.ServerUI) global.ServerUI.call('notification_send', Translate("SHOOTING_COOLDOWN"), 'warning', 1000);
             }
         }
     }

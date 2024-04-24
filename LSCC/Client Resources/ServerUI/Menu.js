@@ -514,6 +514,10 @@ function ToggleMenu() {
   }
 }
 
+mp.events.add("mainmenu_inventory_vehicles_manager_open", () => {
+  mp.events.callRemote("OpenVehicleManager");
+});
+
 mp.keys.bind(0x4d, false, ToggleMenu);
 /*
 mp.keys.bind(
@@ -1537,7 +1541,6 @@ mp.events.add("CS_CCVehicleManager:Open", (vehicleData) => {
   if(!vehicleData) return;
   const vehDataJSON = JSON.parse(vehicleData);
   if(!vehDataJSON) return;
-  mp.events.callRemote(`ServerConsoleOutput`, `Opened vehicle manager: ${vehicleData}`);
 
   const arrayForManager = vehDataJSON.map((v) => {
     return {

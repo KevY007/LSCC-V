@@ -120,6 +120,12 @@ namespace RNC
             }
         }*/
 
+        [RemoteEvent("OpenVehicleManager")]
+        public void OpenVehicleManager(Player player)
+        {
+            Commands.cmd_vehiclemanager(player);
+        }
+
         [RemoteEvent("KickPlayer")]
         public void KickPlayer(Player player, string reason, bool silent)
         {

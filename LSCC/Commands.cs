@@ -6458,7 +6458,7 @@ namespace RNC
         }
 
         [Command("vehiclemanager", Alias = "vehmanager, vmanager, managevehicles")]
-        public void cmd_vehiclemanager(Player player)
+        public static void cmd_vehiclemanager(Player player)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
