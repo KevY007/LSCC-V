@@ -1811,7 +1811,11 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Take(30).ToListAsync();
+                        int totalUsersCount = await context.Accounts.AsQueryable().CountAsync(u => u.DonatorLevel > 0 && u.DonatorStatus == true);
+                        var random = new Random();
+                        var offset = random.Next(0, totalUsersCount - 30 + 1); // Ensure we can take 'count' users
+
+                        List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Skip(offset).Take(30).ToListAsync();
                         string donorList = "[";
                         foreach (Account donor in donors)
                         {
