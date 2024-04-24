@@ -27,6 +27,7 @@ const BankRobHostageData = [
         "heading": -13.687548,
         "skin":"a_f_y_business_04"
     },
+    /*
     {
         "animDictionary": "amb@code_human_cower@female",
         "animClip": "idle_a",
@@ -41,6 +42,7 @@ const BankRobHostageData = [
         "heading": -137.23442,
         "skin":"a_m_o_genstreet_01"
     },
+    */
     {
         "animDictionary": "anim@heists@ornate_bank@hostages@hit",
         "animClip": "hit_loop_ped_d",
