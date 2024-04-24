@@ -174,7 +174,7 @@ function addBodyWeapons(entity, array){
                     }
                 }
                 //(mp.players.local.handle, 36, -0.1, -0.15, 0.11, -180.0, 0.0, 0.0, false, true, true, true, 1, true);
-                mp.game.entity.setCollision(object.handle, false, false);
+                mp.game.entity.setCollision(object.handle, false, true);
                 const obj = {
                     entity:entity,
                     weaponHash:sData.WeaponHash,
