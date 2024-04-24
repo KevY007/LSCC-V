@@ -6452,7 +6452,7 @@ namespace RNC
                 string requirements = $"{{level:{car.LevelRequired}, diamondPoints:{car.PriceDiamondPoints}, points:{car.PricePoints}, donatorLevel:{car.DonatorLevelRequired}}}";
 
                 bool isOwnedVeh = await EPlayer.HasOwnedVehicle(_a, car);
-
+                if(car.Status == ShopVehicleData.ShopVehicleStatus.Public || isOwnedVeh)
                 vehItems.Add(new object[]
                 {
                             car.SQL_ID,
@@ -7480,7 +7480,7 @@ namespace RNC
         }
 
         [RemoteEvent("CCVehicleManager:UpdateVehicle")]
-        public static void OnCCVehicleManagerUpdateVehicle(Player player, string sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
+        public static void OnCCVehicleManagerUpdateVehicle(Player player, string sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team, int status)
         {
             if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
 
@@ -7501,6 +7501,7 @@ namespace RNC
                     veh.PriceDiamondPoints = diamondPoints;
                     veh.DonatorLevelRequired = donatorLevel;
                     veh.Team = team;
+                    veh.Status = (ShopVehicleData.ShopVehicleStatus)status;
                     await context.SaveChangesAsync();
 
                     Settings.CopchaseVehicles.Clear();
@@ -7516,7 +7517,7 @@ namespace RNC
         }
 
         [RemoteEvent("CCVehicleManager:AddVehicle")]
-        public static void OnCCVehicleManagerAddVehicle(Player player, string sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team)
+        public static void OnCCVehicleManagerAddVehicle(Player player, string sqlID, string name, string model, string image, int maxSpeed, int level, int donatorLevel, int points, int diamondPoints, int team, int status)
         {
             if (player == null || !EPlayer.LoggedIn(player) || EPlayer.GetAccount(player).Admin < 4) return;
 
@@ -7531,6 +7532,7 @@ namespace RNC
                 DonatorLevelRequired = donatorLevel,
                 PricePoints = points,
                 PriceDiamondPoints = diamondPoints,
+                Status = (ShopVehicleData.ShopVehicleStatus)status,
                 Team = team
             };
 

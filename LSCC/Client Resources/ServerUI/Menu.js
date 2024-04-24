@@ -1525,13 +1525,13 @@ mp.events.add("dialog_vehicles_manager_update", (vehicle) => {
   mp.events.callRemote(`ServerConsoleOutput`, `Updated vehicle in DB: ${vehicle}`);
   const v = JSON.parse(vehicle);
   mp.events.callRemote("CCVehicleManager:UpdateVehicle", v.id, v.name, v.model, v.image, v.speed, v.requirements.level, 
-  v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
+  v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId, v.status);
 });
 mp.events.add("dialog_vehicles_manager_add", (vehicle) => {
   mp.events.callRemote(`ServerConsoleOutput`, `Added vehicle to DB: ${vehicle}`);
   const v = JSON.parse(vehicle);
   mp.events.callRemote("CCVehicleManager:AddVehicle", v.id, v.name, v.model, v.image, v.speed, v.requirements.level, 
-  v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId);
+  v.requirements.donatorLevel, v.requirements.points, v.requirements.diamondPoints, v.teamId, v.status);
 });
 mp.events.add("dialog_vehicles_manager_close", () => {
   global.vehicleManagerOpen = false;
@@ -1550,6 +1550,7 @@ mp.events.add("CS_CCVehicleManager:Open", (vehicleData) => {
       name:v.Name,
       image:v.ImageURL,
       speed:v.MaxSpeedKMH,
+      status:v.Status,
       requirements:{
         level:v.LevelRequired,
         diamondPoints:v.PriceDiamondPoints,

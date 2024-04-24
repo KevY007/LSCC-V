@@ -82,6 +82,11 @@ namespace RNC
 
     public class ShopVehicleData
     {
+        public enum ShopVehicleStatus{
+            Public = 0,
+            Private = 1,
+        }
+
         [Key]
         public Guid SQL_ID { get; set; }
         public string Name { get; set; }
@@ -93,6 +98,7 @@ namespace RNC
         public int PriceDiamondPoints { get; set; }
         public int DonatorLevelRequired { get; set; }
         public int Team { get; set; }
+        public ShopVehicleStatus Status { get; set; }
     }
 
     public class Clan
