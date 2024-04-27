@@ -47,14 +47,14 @@ mp.events.add("cwb", () => {
 
 mp.events.add("onDimensionChange", (oldDimension, newDimension) => {
     bodyWeaponsUnload(mp.players.local);
-    const value = mp.players.local.getVariable("BODY_WEAPONS");
+    const value = mp.players.local.getVariable("BODY_WEAPONS_DISABLED");
     if(!value) return;
     onBodyWeaponsLoad(mp.players.local, value);
 });
 
 mp.events.add("entityStreamIn", (entity) => {
     if(entity.type !== 'player') return;
-    const value = entity.getVariable("BODY_WEAPONS");
+    const value = entity.getVariable("BODY_WEAPONS_DISABLED");
     if(!value) return;
     if(entity.dimension !== mp.players.local.dimension) return;
 
@@ -105,7 +105,7 @@ function onBodyWeaponsLoad(entity, value){
     });
 }
 
-mp.events.addDataHandler("BODY_WEAPONS", (entity, value, oldValue) => {
+mp.events.addDataHandler("BODY_WEAPONS_DISABLED", (entity, value, oldValue) => {
     onBodyWeaponsLoad(entity, value);
 });
 

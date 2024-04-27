@@ -1795,7 +1795,6 @@ namespace RNC
                     });
                 }
             });
-            
         }
 
         public static void LoginBrowserSetup(Player player, bool show_login = true)
