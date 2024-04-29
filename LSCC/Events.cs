@@ -9224,6 +9224,7 @@ namespace RNC
 
                 if (acc.JailTime > 0)
                 {
+                    EPlayer.LobbySceneToggle(player, false);
                     EPlayer.SetDiscordStatus(player, $"In jail as {player.Name}");
 
                     player.SetSharedData("AutoJoin", false);
@@ -9271,6 +9272,7 @@ namespace RNC
 
                 if (player.GetSharedDataSafe<int>("InLobby") == -3) // Freeroam
                 {
+                    EPlayer.LobbySceneToggle(player, false);
 
                     SpawnSet spawnCoords = new SpawnSet(0, 1061.547f, -720.113f, 56.786f, 130.497f);
 
@@ -9301,6 +9303,7 @@ namespace RNC
 
                 if (player.GetSharedDataSafe<int>("InLobby") == -4) // Derby
                 {
+                    EPlayer.LobbySceneToggle(player, false);
                     player.TriggerEvent("SetTimeWeather", 12, 0, 0, 0);
                     player.TriggerEvent("showHPBars", 0); // Never show HP Bars.
 
@@ -9422,6 +9425,7 @@ namespace RNC
 
                     if (arenaID > -1 && lobby != null && lobby.gameStatus != 2) // DM
                     {
+                        EPlayer.LobbySceneToggle(player, false);
                         // New Outfit Shit
                         Character.SetTeamOutfit(player, 2);
 
@@ -9545,6 +9549,7 @@ namespace RNC
                 }
                 else if (player.GetSharedDataSafe<int>("InLobby") == -6)
                 {
+                    EPlayer.LobbySceneToggle(player, false);
                     player.RemoveAllWeaponsAC();
 
                     player.TriggerEvent("SetActorInvulnerable", false);

@@ -2483,7 +2483,6 @@ namespace RNC
                 NAPI.Player.SpawnPlayer(player, VecSpawn);
 
                 //EPlayer.Freeze(player, false);
-                EPlayer.Freeze(player, true);
                 EPlayer.LobbySceneToggle(player, true);
 
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));
@@ -2508,17 +2507,20 @@ namespace RNC
                 Vector3 lcr = Settings.LobbyCameraRot;
                 player.TriggerEvent("CreatePlayerCamera", lcp.X, lcp.Y, lcp.Z, lcr.X, lcr.Y, lcr.Z, 50, false);
                 EPlayer.Freeze(player, true);
-                NAPI.Task.Run(() =>
+                player.TriggerEvent("LobbyCamera:Toggle", true);
+                /*NAPI.Task.Run(() =>
                 {
                     if (player == null) return;
                     player.Position = Settings.PlayerLobbySpawn;
                     player.Heading = Settings.LobbyHeading;
                     EPlayer.Freeze(player, true);
-                }, 100);
+                }, 100);*/
             }
             else
             {
+                EPlayer.Freeze(player, false);
                 player.TriggerEvent("DestroyPlayerCamera");
+                player.TriggerEvent("LobbyCamera:Toggle", false);
             }
         }
 
