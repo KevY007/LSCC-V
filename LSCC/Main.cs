@@ -958,7 +958,7 @@ namespace RNC
             new Vector3(-2178.0002f, 3192.4473f, 32.81012f),
             new Vector3(-2174.1008f, 3189.9727f, 32.81012f),
         };
-        public static Vector3 LobbyCameraPos = new Vector3(-2179.066f, 3185.256f, 33.15612f);
+        public static Vector3 LobbyCameraPos = new Vector3(-2179.066f, 3185.756f, 33.15612f);
         public static Vector3 LobbyCameraRot = new Vector3(4f, 0f, -30f);
 
 
