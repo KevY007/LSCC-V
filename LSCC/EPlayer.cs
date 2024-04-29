@@ -2389,7 +2389,8 @@ namespace RNC
                 Character.ApplyAppearance(player, Character.GetCharacter(player).SavedAppearance);
                 Character.SetTeamOutfit(player, 2);
 
-                Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
+                //Vector3 SpawnArea = Settings.LobbySpawns.OrderBy(c => Guid.NewGuid()).First();
+                Vector3 SpawnArea = Settings.PlayerLobbySpawn;
 
                 player.TriggerEvent("DestroyPlayerCamera");
                 player.TriggerEvent("TogglePlayerChat", true);
@@ -2481,7 +2482,10 @@ namespace RNC
 
                 NAPI.Player.SpawnPlayer(player, VecSpawn);
 
-                EPlayer.Freeze(player, false);
+                //EPlayer.Freeze(player, false);
+                EPlayer.Freeze(player, true);
+                EPlayer.LobbySceneToggle(player, true);
+
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));
                 EPlayer.Save(player, false);
 
@@ -2493,6 +2497,29 @@ namespace RNC
                 NAPI.Util.ConsoleOutput($"EPLAYER.SPAWN EXCEPTION: {ex.ToString()}");
             }
             
+        }
+
+        public static void LobbySceneToggle(Player player, bool toggle)
+        {
+            if (toggle)
+            {
+                player.Heading = Settings.LobbyHeading;
+                Vector3 lcp = Settings.LobbyCameraPos;
+                Vector3 lcr = Settings.LobbyCameraRot;
+                player.TriggerEvent("CreatePlayerCamera", lcp.X, lcp.Y, lcp.Z, lcr.X, lcr.Y, lcr.Z, 50, false);
+                EPlayer.Freeze(player, true);
+                NAPI.Task.Run(() =>
+                {
+                    if (player == null) return;
+                    player.Position = Settings.PlayerLobbySpawn;
+                    player.Heading = Settings.LobbyHeading;
+                    EPlayer.Freeze(player, true);
+                }, 100);
+            }
+            else
+            {
+                player.TriggerEvent("DestroyPlayerCamera");
+            }
         }
 
         public static void SendMessageInLobby(int lobbyid, string message_code, params object[] args)

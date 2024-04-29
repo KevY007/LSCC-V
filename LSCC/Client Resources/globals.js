@@ -7,6 +7,62 @@ function isHeliCamActive(){
   return true;
 }
 
+
+let camera = null;
+let camera_moveable = false;
+let camera_lastmove = Date.now();
+let moveToCam = null;
+
+function destroyCam() {
+  if (!camera) return;
+  global.traceLastFunc(`[Players] Disable Cam`);
+
+  camera.setActive(false);
+  mp.game.cam.renderScriptCams(false, true, 0, true, true);
+  camera.destroy();
+  camera = null;
+}
+function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
+  global.traceLastFunc(`[Players] Create Cam`);
+
+  camera = mp.cameras.new("Cam", { x, y, z }, { x: rx, y: ry, z: rz }, viewangle);
+  camera_moveable = moveable;
+
+  camera.setActive(true);
+  mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
+}
+function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
+  global.traceLastFunc(`[Players] Move Cam`);
+  if(!camera) return;
+  if(moveToCam != null){
+      moveToCam.setActive(false);
+      moveToCam.destroy();
+      moveToCam = null;
+  }
+  moveToCam = mp.cameras.new("MoveToCam", {x, y, z}, { x: rx, y: ry, z: rz}, newviewangle);
+  camera.shake('HAND_SHAKE', 0.4);
+
+  const {x:oX, y:oY, z:oZ} = camera.getCoord();
+  const {x:oXR, y:oYR, z:oZR} = camera.getRot(2);
+
+  setTimeout(() => {
+      if(!camera)
+          createCam(x,y,z,rx,ry,rz, newviewangle, true);
+
+      if(camera)
+          camera.setActiveWithInterp(moveToCam.handle, time, 1, 1);
+  }, 100);
+
+  setTimeout(() => {
+      if(camera){
+          destroyCam();
+          createCam(x,y,z,rx,ry,rz, newviewangle, true);
+          moveCam(oX, oY, oZ, oXR, oYR, oZR, time, newviewangle);
+      }
+  }, time-1);
+  
+}
+
 function traceLastFunc(iStr)
 {
     mp.storage.data.lastFn = iStr;
@@ -3122,6 +3178,11 @@ let global = {
   lastMapBind:0x50,
   curMapBind:0x50,
 
+  camera,
+  camera_moveable,
+  camera_lastmove,
+  moveToCam,
+
   CommandsDataJSON,
   weaponData,
   boneData,
@@ -3146,6 +3207,9 @@ let global = {
   isHoldingSniper,
   enterExitCheck,
   getMinimapAnchor,
-  updateBiometricsPosition
+  updateBiometricsPosition,
+  createCam,
+  moveCam,
+  destroyCam
 };
 exports = global;

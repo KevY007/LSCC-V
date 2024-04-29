@@ -1,10 +1,6 @@
 ﻿var global = require('./globals');
   const {TranslateMessage: Translate} = require('./Translator');
 
-let camera = null;
-let camera_moveable = false;
-let camera_lastmove = Date.now();
-let moveToCam = null;
 
 const player = mp.players.local;
 let localPlayer = mp.players.local;
@@ -876,46 +872,6 @@ mp.keys.bind(0x4C, false, function() {
 //     }
 // });
 
-function createCam(x, y, z, rx, ry, rz, viewangle, moveable = false) {
-    global.traceLastFunc(`[Players] Create Cam`);
-
-    camera = mp.cameras.new("Cam", { x, y, z }, { x: rx, y: ry, z: rz }, viewangle);
-    camera_moveable = moveable;
-
-    camera.setActive(true);
-    mp.game.cam.renderScriptCams(true, true, 20000000000000000000000000, false, false);
-}
-function moveCam(x, y, z, rx, ry, rz, time, newviewangle){
-    global.traceLastFunc(`[Players] Move Cam`);
-    if(!camera) return;
-    if(moveToCam != null){
-        moveToCam.setActive(false);
-        moveToCam.destroy();
-        moveToCam = null;
-    }
-    moveToCam = mp.cameras.new("MoveToCam", {x, y, z}, { x: rx, y: ry, z: rz}, newviewangle);
-    camera.shake('HAND_SHAKE', 0.4);
-
-    const {x:oX, y:oY, z:oZ} = camera.getCoord();
-    const {x:oXR, y:oYR, z:oZR} = camera.getRot(2);
-
-    setTimeout(() => {
-        if(!camera)
-            createCam(x,y,z,rx,ry,rz, newviewangle, true);
-
-        if(camera)
-            camera.setActiveWithInterp(moveToCam.handle, time, 1, 1);
-    }, 100);
-
-    setTimeout(() => {
-        if(camera){
-            destroyCam();
-            createCam(x,y,z,rx,ry,rz, newviewangle, true);
-            moveCam(oX, oY, oZ, oXR, oYR, oZR, time, newviewangle);
-        }
-    }, time-1);
-    
-}
 
 mp.events.add("SetVehicleLights", (vehicle, state) => vehicle.setLights(state));
 
@@ -976,7 +932,7 @@ mp.events.add("render", () => {
     mp.game.invoke('0x475768A975D5AD17', player.handle, 4) ? mp.game.invoke('0x5C8B2F450EE4328E', player.handle, false) :  mp.game.invoke('0x5C8B2F450EE4328E', player.handle, true);
 
     // FOR VEH TUNER
-    if(camera != null && camera.isActive() && camera.isRendering() && camera_moveable == true && !global.chatStatus && !mp.gui.cursor.visible)
+    if(global.camera != null && global.camera.isActive() && global.camera.isRendering() && global.camera_moveable == true && !global.chatStatus && !mp.gui.cursor.visible)
     {
         mp.game.controls.disableAllControlActions(2); // DISABLE ALL CONTROLS
         mp.game.controls.enableControlAction(2, 172, true); // MENU KEYS START (FOR CONTROLLING, SELECTING ETC)
@@ -1006,33 +962,33 @@ mp.events.add("render", () => {
         let LMB = mp.game.controls.getDisabledControlNormal(2, 24);
         let RMB = mp.game.controls.getDisabledControlNormal(2, 25);
         
-        if(LMB != 0.0 && Date.now() - camera_lastmove >= 500)
+        if(LMB != 0.0 && Date.now() - global.camera_lastmove >= 500)
         {
             mp.events.callRemote("TunerSwitch", 0);
-            camera_lastmove = Date.now();
+            global.camera_lastmove = Date.now();
         }
-        if(RMB != 0.0 && Date.now() - camera_lastmove >= 500)
+        if(RMB != 0.0 && Date.now() - global.camera_lastmove >= 500)
         {
             mp.events.callRemote("TunerSwitch", 1);
-            camera_lastmove = Date.now();
+            global.camera_lastmove = Date.now();
         }
 
-        let currentRot = camera.getRot(2);
+        let currentRot = global.camera.getRot(2);
         currentRot = new mp.Vector3(currentRot.x - y, 0.0, currentRot.z - x);
 
-        camera.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
+        global.camera.setRot(currentRot.x, currentRot.y, currentRot.z, 2);
 
         if (zoomIn > 0)
         {
-            let currentFov = camera.getFov();
+            let currentFov = global.camera.getFov();
             currentFov -= zoomIn;
-            camera.setFov(currentFov);
+            global.camera.setFov(currentFov);
         } 
         else if (zoomOut > 0)
         {
-            let currentFov = camera.getFov();
+            let currentFov = global.camera.getFov();
             currentFov += zoomOut;
-            camera.setFov(currentFov);
+            global.camera.setFov(currentFov);
         }
     }
 
@@ -1065,15 +1021,7 @@ mp.events.add("render", () => {
     }
 });
 
-function destroyCam() {
-    if (!camera) return;
-    global.traceLastFunc(`[Players] Disable Cam`);
 
-    camera.setActive(false);
-    mp.game.cam.renderScriptCams(false, true, 0, true, true);
-    camera.destroy();
-    camera = null;
-}
 
 mp.events.addCommand("updaterate", function (rate) {
     rate = Number(rate);
@@ -4323,7 +4271,7 @@ mp.events.add(
         }
     },
 
-    "DestroyPlayerCamera": () => destroyCam(),
+    "DestroyPlayerCamera": () => global.destroyCam(),
 
     "SetPlayerFrozen": (status) => {
         player.freezePosition(status);
@@ -4335,11 +4283,11 @@ mp.events.add(
     },
 
     "CreatePlayerCamera": (x, y, z, rx, ry, rz, viewangle, moveable = false) => {
-        createCam(x, y, z, rx, ry, rz, viewangle, moveable);
+        global.createCam(x, y, z, rx, ry, rz, viewangle, moveable);
     },
 
     "MovePlayerCamera": (x, y, z, rx, ry, rz, time, hz1, hz2) => {
-        moveCam(x, y, z, rx, ry, rz, time, hz1, hz2);
+        global.moveCam(x, y, z, rx, ry, rz, time, hz1, hz2);
     },
 
     "SetDiscordStatus": (serverName, status) => {
@@ -4628,12 +4576,15 @@ function setStorageDataVars(){
     if(mp.storage.data.menu.chatSize === undefined) mp.storage.data.menu.chatSize = 1.0;
     if(mp.storage.data.menu.chatHeight === undefined) mp.storage.data.menu.chatHeight = 1.0;
     if(mp.storage.data.menu.chatWidth === undefined) mp.storage.data.menu.chatWidth = 1.0;
-    global.ServerUI.call("hud_chat_size_multiplier", mp.storage.data.menu.chatSize);
-    global.ServerUI.call("hud_chat_height_multiplier", mp.storage.data.menu.chatHeight);
-    global.ServerUI.call("hud_chat_width_multiplier", mp.storage.data.menu.chatWidth);
+    if(global.ServerUI){
+        global.ServerUI.call("hud_chat_size_multiplier", mp.storage.data.menu.chatSize);
+        global.ServerUI.call("hud_chat_height_multiplier", mp.storage.data.menu.chatHeight);
+        global.ServerUI.call("hud_chat_width_multiplier", mp.storage.data.menu.chatWidth);
+    }
+
 
     if(mp.storage.data.menu.chatPersistentInput === undefined) mp.storage.data.menu.chatPersistentInput = false;
-    global.ServerUI.call("hud_chat_keep_input_on_close", mp.storage.data.menu.chatPersistentInput);
+    if(global.ServerUI) global.ServerUI.call("hud_chat_keep_input_on_close", mp.storage.data.menu.chatPersistentInput);
 
     if(mp.storage.data.menu.Speedo == undefined){
         mp.storage.data.menu.Speedo = true;

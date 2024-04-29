@@ -865,7 +865,6 @@ namespace RNC
         public static int DCMentionPlayers { get; set; }
 
 
-
         public static class Timers
         {
             public static long GameUpdate_Tick { get; set; }
@@ -949,6 +948,19 @@ namespace RNC
             new Vector3(452.88248f, -985.1788f, 26.67423f),
             new Vector3(461.93222f, -990.7201f, 24.91487f),
         };
+
+        public static float LobbyHeading = 150.0f;
+        public static Vector3 PlayerLobbySpawn = new Vector3(-2177.0222f, 3189.3906f, 32.81012f);
+        public static Vector3[] NPCLobbySpawn = new Vector3[]
+        {
+            new Vector3(-2175.4155f, 3189.461f, 32.81012f), 
+            new Vector3(-2177.4106f, 3190.6226f, 32.81012f),
+            new Vector3(-2178.0002f, 3192.4473f, 32.81012f),
+            new Vector3(-2174.1008f, 3189.9727f, 32.81012f),
+        };
+        public static Vector3 LobbyCameraPos = new Vector3(-2179.066f, 3185.256f, 33.15612f);
+        public static Vector3 LobbyCameraRot = new Vector3(4f, 0f, -30f);
+
 
         public static object[] VectorJail = { new Vector3(2061.5889f, 2967.7412f, -67.30185f), 53f };
 
