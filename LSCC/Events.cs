@@ -6906,6 +6906,7 @@ namespace RNC
         [RemoteEvent("Menu_RequestTabData")]
         public void OnPlayerRequestMenuTabData(Player player, string tab)
         {
+            NAPI.Util.ConsoleOutput($"tab data {tab} {player.Name}");
             if (!EPlayer.LoggedIn(player)) return;
             Account acc = EPlayer.GetAccount(player);
             switch (tab)

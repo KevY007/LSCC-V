@@ -1840,6 +1840,76 @@ mp.events.add(
   }
 );
 
+const MENU_GAMEMODES = [
+  {
+    id: 1,
+    name: "Copchase",
+    description: "Chase or be chased! — assume the role of a Cop or Fugitive.",
+    banner: "https://cloud.cybershoke.net/img/modes/2/DM.jpg?1713562853",
+    video:
+      "https://cloud.cybershoke.net/img/modes/2/mp4/DEATHMATCH.mp4?1713562853",
+    players: 5,
+  },
+  {
+    id: 2,
+    name: "Busted!",
+    description: "A driving-oriented version of Copchase where the fugitives must maintain their distance from the cops to win.",
+    banner: "https://cloud.cybershoke.net/img/modes/2/DM.jpg?1713562853",
+    video:
+      "https://cloud.cybershoke.net/img/modes/2/mp4/DEATHMATCH.mp4?1713562853",
+    players: 5,
+  },
+  {
+    id: 3,
+    name: "Deathmatch",
+    description: "Shoot everything that moves! — Free for All shootouts.",
+    banner: "https://cloud.cybershoke.net/img/modes/2/DM.jpg?1713562853",
+    video:
+      "https://cloud.cybershoke.net/img/modes/2/mp4/DEATHMATCH.mp4?1713562853",
+    players: 69,
+  },
+  {
+    id: 4,
+    name: "Freeroam",
+    description: "Spawn cars, guns, fly around, teleport, have fun with friends — the only limit is your imagination!",
+    banner: "https://cloud.cybershoke.net/img/modes/2/DM.jpg?1713562853",
+    video:
+      "https://cloud.cybershoke.net/img/modes/2/mp4/DEATHMATCH.mp4?1713562853",
+    players: 10,
+  },    
+  {
+    id: 5,
+    name: "Derby",
+    description: "Stay on the platform for as long as possible to win.",
+    banner: "https://cloud.cybershoke.net/img/modes/2/DM.jpg?1713562853",
+    video:
+      "https://cloud.cybershoke.net/img/modes/2/mp4/DEATHMATCH.mp4?1713562853",
+    players: 10,
+  }, 
+];
+mp.events.add("mainmenu_play_gamemode_selector_open", () => {
+  if(global.ServerUI)
+    global.ServerUI.call("dialog_gamemode_selector_open", MENU_GAMEMODES);
+});
+mp.events.add("dialog_gamemode_selector_gamemode_select", (gamemodeID) => {
+  const gamemode = MENU_GAMEMODES.find(g => g.id == gamemodeID);
+  if(!gamemode) return;
+
+  if(global.ServerUI)
+  global.ServerUI.call("mainmenu_play_gamemode_set", gamemode.name);
+});
+mp.events.add("mainmenu_play_matchmaking_start", () => {
+  if(!global.ServerUI) return;
+
+  global.ServerUI.call("mainmenu_play_matchmaking_toggle", true);
+  global.ServerUI.call("mainmenu_play_matchmaking_status_set", 0);
+});
+mp.events.add("mainmenu_play_matchmaking_cancel", () => {
+  if(!global.ServerUI) return;
+
+  global.ServerUI.call("mainmenu_play_matchmaking_toggle", false);
+});
+
 mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
 
   // Lobby Data
