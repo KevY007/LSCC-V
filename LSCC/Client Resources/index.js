@@ -210,9 +210,10 @@ mp.events.add('showLoginBrowser', (state, donatorList, isQuickLogin) => {
                 if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
                 global.isLoginScreenActive = false;
                 if(!global.IsInTutorial){
-                    if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
-                    if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
-                    if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
+                    mp.events.callLocal("QuickLogin_InitializeHUD");
+                    //if(global.ServerUI) global.ServerUI.call('hud_toggle', true);
+                    //if(global.ServerUI) global.ServerUI.call('hud_minilist', true);
+                    //if(global.ServerUI) global.ServerUI.call("hud_minilist_toggle", true);
                 }
                 if(global.ServerUI) global.ServerUI.markAsChat();
             }
@@ -232,6 +233,19 @@ mp.events.add('showLoginBrowser', (state, donatorList, isQuickLogin) => {
 });
 
 mp.events.add("QuickLogin_InitializeHUD", () => {
+  mp.game.graphics.transitionToBlurred(1);
+  mp.game.graphics.transitionFromBlurred(1000);
+  setTimeout(() => {
+    mp.events.callLocal("ForceOpenMenu");
+  }, 500);
+  setTimeout(() => {
+    mp.events.callLocal("ForceOpenMenu");
+  }, 2000);
+  setTimeout(() => {
+    mp.events.callLocal("ForceOpenMenu");
+  }, 5000);
+  return;
+
   if(global.ServerUI) global.ServerUI.call(`auth_toggle`, false);
   global.isLoginScreenActive = false;
   if(global.ServerUI) global.ServerUI.call('hud_toggle', true);

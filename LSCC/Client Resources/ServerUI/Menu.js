@@ -267,11 +267,19 @@ mp.keys.bind(0x1b, true, function () {
   }
 });
 
+mp.events.add("ForceOpenMenu", () => {
+  if (global.menuToggled == false) {
+    ToggleMenu();
+  }
+  if (global.ServerUI) global.ServerUI.call("mainmenu_toggle", true);
+  mp.gui.cursor.show(true, true);
+});
 mp.events.add("ForceCloseMenu", () => {
   if (global.menuToggled == true) {
     ToggleMenu();
   }
   if (global.ServerUI) global.ServerUI.call("mainmenu_toggle", false);
+  mp.gui.cursor.show(false, false);
 });
 
 mp.events.add(

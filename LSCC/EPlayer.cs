@@ -1810,34 +1810,46 @@ namespace RNC
                 {
                     using (MainDatabase context = ContextFactory.CreateContext())
                     {
-                        int totalUsersCount = await context.Accounts.AsQueryable().CountAsync(u => u.DonatorLevel > 0 && u.DonatorStatus == true);
-                        var random = new Random();
-                        var offset = random.Next(0, totalUsersCount - 30 + 1); // Ensure we can take 'count' users
-
-                        List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Skip(offset).Take(30).ToListAsync();
-                        string donorList = "[";
-                        foreach (Account donor in donors)
+                        string donorList = "";
+                        try
                         {
-                            donorList += $"\"{donor.Username}\",";
-                        }
-                        donorList += "]";
+                            int totalUsersCount = await context.Accounts.AsQueryable().CountAsync(u => u.DonatorLevel > 0 && u.DonatorStatus == true);
 
-                        NAPI.Task.Run(() =>
+                            var random = new Random();
+                            var offset = random.Next(0, totalUsersCount - 30 + 1); // Ensure we can take 'count' users
+
+                            List<Account> donors = await context.Accounts.AsQueryable().Where(a => a.DonatorLevel > 0 && a.DonatorStatus == true).OrderBy(g => new Guid()).Skip(offset).Take(30).ToListAsync();
+                            donorList = "[";
+                            foreach (Account donor in donors)
+                            {
+                                donorList += $"\"{donor.Username}\",";
+                            }
+                            donorList += "]";
+                        }
+                        catch
+                        {
+                            NAPI.Util.ConsoleOutput("Failed to fetch 30 donors from DB");
+                            donorList = "[]";
+                        }
+                        finally
                         {
                             NAPI.Task.Run(() =>
                             {
-                                if (show_login)
+                                NAPI.Task.Run(() =>
                                 {
-                                    player.TriggerEvent("showLoginBrowser", true, donorList);
-                                }
+                                    if (show_login)
+                                    {
+                                        player.TriggerEvent("showLoginBrowser", true, donorList);
+                                    }
 
-                                player.TriggerEvent("InitiateCustomChat");
-                                player.TriggerEvent("TogglePlayerChat", false);
-                            }, 500);
+                                    player.TriggerEvent("InitiateCustomChat");
+                                    player.TriggerEvent("TogglePlayerChat", false);
+                                }, 500);
 
-                            SetDiscordStatus(player, "On login screen");
-                            ResetPlayerData(player);
-                        });
+                                SetDiscordStatus(player, "On login screen");
+                                ResetPlayerData(player);
+                            });
+                        }
                     }
                 }
                 else

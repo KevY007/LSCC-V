@@ -9268,7 +9268,7 @@ namespace RNC
 
                 EPlayer.SetColor(player, new Color(255, 255, 255, 255));
 
-                player.TriggerEvent("ToggleHud", true);
+                //player.TriggerEvent("ToggleHud", true);
 
                 if (player.GetSharedDataSafe<int>("InLobby") == -3) // Freeroam
                 {
