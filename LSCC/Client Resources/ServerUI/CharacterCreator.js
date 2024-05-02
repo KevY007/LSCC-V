@@ -15,7 +15,7 @@ var CURRENT_OUTFIT_DATA = {};
 mp.events.add("mainmenu_character_outfit_add", (activeTeam) => {
     mp.events.callRemote("OutfitCreator:Create", activeTeam);
 });
-mp.events.add("mainmenu_character_outfits_outfit_select", (id, team) => {
+mp.events.add("mainmenu_character_outfit_select", (id, team) => {
     mp.events.callRemote("OutfitCreator:SaveActive", id, team);
 });
 mp.events.add("mainmenu_character_outfit_edit", (id, team) => {

@@ -432,6 +432,9 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
     case "settings":
       updateMenuSettingsTab();
       break;
+    default:
+      mp.events.callRemote("Menu_RequestTabData", tab);
+      break;
   }
 });
 
