@@ -2366,7 +2366,7 @@ namespace RNC
                 }
 
                 // Minigame outfit set
-                player.TriggerEvent("OutfitCreator:SetActive", 2, EPlayer.GetAccount(player).LobbyClothing);
+                //player.TriggerEvent("OutfitCreator:SetActive", 2, EPlayer.GetAccount(player).LobbyClothing);
 
                 player.TriggerEvent("Bleeding:SetActive", false);
                 player.TriggerEvent("EVENT:ClearObjectiveBlips");

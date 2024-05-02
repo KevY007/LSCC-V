@@ -12,15 +12,17 @@ var CURRENT_OUTFIT_DATA = {};
 
 // OUTFITS
 // Menu -> Clientside
-mp.events.add("mainmenu_inventory_outfits_create", (activeTeam) => {
+mp.events.add("mainmenu_character_outfit_add", (activeTeam) => {
     mp.events.callRemote("OutfitCreator:Create", activeTeam);
 });
-mp.events.add("mainmenu_inventory_outfits_set_active", (id, team) => {
+mp.events.add("mainmenu_character_outfits_outfit_select", (id, team) => {
     mp.events.callRemote("OutfitCreator:SaveActive", id, team);
-
 });
-mp.events.add("mainmenu_inventory_outfits_edit", (id, team) => {
+mp.events.add("mainmenu_character_outfit_edit", (id, team) => {
     mp.events.callRemote("OutfitCreator:Edit", id, team);
+});
+mp.events.add("mainmenu_character_outfit_remove", (id) => {
+    mp.events.callRemote("OutfitCreator:Remove", id);
 });
 
 function getRealPropID(uiID){
@@ -121,11 +123,11 @@ mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
     const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
 
 
-    if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set", outfits);
+    if(global.ServerUI) global.ServerUI.call("mainmenu_character_outfits_set", outfits);
 });
-mp.events.add("OutfitCreator:SetActive", (id, team) => { // Loading defaults
+mp.events.add("OutfitCreator:SetActive", (fugiID, copID) => { // Loading defaults
 
-    if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set_active", id, team);
+    if(global.ServerUI) global.ServerUI.call("mainmenu_character_selected_outfits_set", fugiID, copID);
 });
 
 

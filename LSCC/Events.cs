@@ -6663,6 +6663,50 @@ namespace RNC
             Commands.cmd_report(player, targetPlayer, reason);
         }
 
+        [RemoteEvent("OutfitCreator:Remove")]
+        public void OutfitEditor_OnRemove(Player player, int outfitID)
+        {
+            if (!EPlayer.LoggedIn(player)) return;
+
+            Account acc = EPlayer.GetAccount(player);
+            int accSQLID = EPlayer.GetAccount(player).SQL_ID;
+            Task.Run(async () =>
+            {
+                using(MainDatabase context = ContextFactory.CreateContext())
+                {
+                    SavedOutfit fit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID);
+                    if (fit == null) return;
+
+                    int fitTeam = fit.Team;
+                    int anyLeftover = await context.SavedOutfits.AsQueryable().CountAsync(o => o.AccountID == accSQLID && o.Team == fitTeam);
+                    if(anyLeftover == 1) // if there's only 1 outfit of this criteria (would be 0 after deleted) don't let him
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "You can't delete this outfit because there are no outfits to replace it!");
+                            return;
+                        });
+                        return;
+                    }
+
+                    context.SavedOutfits.Remove(fit);
+                    await context.SaveChangesAsync();
+
+                    SavedOutfit replacementFit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.AccountID == accSQLID && o.Team == fitTeam);
+                    if(replacementFit == null) return;
+
+                    await Character.SetActiveOutfit(player, acc, replacementFit.SQL_ID, replacementFit.Team);
+                    NAPI.Task.Run(() =>
+                    {
+                        Character.ApplyOutfit(player, replacementFit.IsMale, replacementFit.Team, replacementFit);
+
+                        EPlayer.Notify(player, "Outfit deleted successfully! A replacement outfit has been set.", "green", "success", false, 4000);
+                    });
+
+                }
+            });
+        }
+
         [RemoteEvent("OutfitCreator:OnChangeType")]
         public void OutfitEditor_OnChangeType(Player player, int type, bool isProp)
         {
@@ -6942,8 +6986,7 @@ namespace RNC
                             if(fits_found == true)
                             {
                                 player.TriggerEvent("OutfitCreator:SetOutfits", NAPI.Util.ToJson(outfitData));
-                                player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, 0);
-                                player.TriggerEvent("OutfitCreator:SetActive", activeCopOutfitID, 1);
+                                player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, activeCopOutfitID, acc.LobbyClothing);
                             }
                             else
                             {
