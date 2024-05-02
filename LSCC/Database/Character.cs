@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
 using GTANetworkAPI;
@@ -829,7 +830,14 @@ namespace RNC
                 player.SetSharedData("CHARACTER:LobbyOutfit", NAPI.Util.ToJson(outfit));
             }
         }
-        
+        public async static Task<SavedOutfit> GetOutfitByID(int outfitID)
+        {
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                SavedOutfit outfit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID);
+                return outfit;
+            }
+        }
 
         public async static Task<SavedOutfit> SetActiveOutfit(Player player, Account account, int outfitID, int teamID)
         {

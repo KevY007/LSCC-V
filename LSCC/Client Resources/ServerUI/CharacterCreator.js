@@ -18,8 +18,8 @@ mp.events.add("mainmenu_character_outfit_add", (activeTeam) => {
 mp.events.add("mainmenu_character_outfit_select", (id, team) => {
     mp.events.callRemote("OutfitCreator:SaveActive", id, team);
 });
-mp.events.add("mainmenu_character_outfit_edit", (id, team) => {
-    mp.events.callRemote("OutfitCreator:Edit", id, team);
+mp.events.add("mainmenu_character_outfit_edit", (id) => {
+    mp.events.callRemote("OutfitCreator:Edit", id);
 });
 mp.events.add("mainmenu_character_outfit_remove", (id) => {
     mp.events.callRemote("OutfitCreator:Remove", id);
@@ -120,14 +120,14 @@ mp.events.add("clothing_editor_save", (value) => {
 // Server -> Clientside
 mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
     const outfitArray = JSON.parse(outfitData);
-    const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
+    const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, teamId:outfit.Team }; });
 
 
     if(global.ServerUI) global.ServerUI.call("mainmenu_character_outfits_set", outfits);
 });
-mp.events.add("OutfitCreator:SetActive", (fugiID, copID) => { // Loading defaults
+mp.events.add("OutfitCreator:SetActive", (fugiID, copID, minigameID) => { // Loading defaults
 
-    if(global.ServerUI) global.ServerUI.call("mainmenu_character_selected_outfits_set", fugiID, copID);
+    if(global.ServerUI) global.ServerUI.call("mainmenu_character_selected_outfits_set", fugiID, copID, minigameID);
 });
 
 

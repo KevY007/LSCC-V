@@ -6699,6 +6699,7 @@ namespace RNC
                     NAPI.Task.Run(() =>
                     {
                         Character.ApplyOutfit(player, replacementFit.IsMale, replacementFit.Team, replacementFit);
+                        UpdateMenuTabData(player, "character");
 
                         EPlayer.Notify(player, "Outfit deleted successfully! A replacement outfit has been set.", "green", "success", false, 4000);
                     });
@@ -6894,6 +6895,7 @@ namespace RNC
         [RemoteEvent("OutfitCreator:SaveActive")]
         public void OutfitEditor_OnSetActive(Player player, int outfitID, int team)
         {
+            NAPI.Util.ConsoleOutput("selected fit " + outfitID + " " + team);
             Account acc = EPlayer.GetAccount(player);
             Task.Run(async () =>
             {
@@ -6903,19 +6905,20 @@ namespace RNC
                     NAPI.Task.Run(() =>
                     {
                         Character.ApplyOutfit(player, outfit.IsMale, outfit.Team, outfit);
+                        UpdateMenuTabData(player, "character");
                     });
                 }
                 else
                 {
                     NAPI.Task.Run(() =>
                     {
-                        EPlayer.Error(player, $"<strong>FATAL ERROR:</strong> Outfit not found! (Send this to devs: <strong>ID: {outfitID} | Team: {team} | Acc ID: {acc.SQL_ID}</strong>)");
+                        EPlayer.Error(player, $"<strong>FATAL ERROR:</strong> Outfit not found! (Send this to devs: <strong>ID: {team} | Acc ID: {acc.SQL_ID}</strong>)");
                     });
                 }
             });
         }
         [RemoteEvent("OutfitCreator:Edit")]
-        public void OutfitEditor_OnEdit(Player player, int outfitID, int team)
+        public void OutfitEditor_OnEdit(Player player, int outfitID)
         {
             if (EventManager.IsPlayerInAnyEvent(player)) return;
             Account acc = EPlayer.GetAccount(player);
@@ -6926,10 +6929,10 @@ namespace RNC
                     SavedOutfit savedOutfit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.AccountID == acc.SQL_ID);
                     if (savedOutfit != null)
                     {
-                        await Character.SetActiveOutfit(player, acc, savedOutfit.SQL_ID, team);
+                        await Character.SetActiveOutfit(player, acc, savedOutfit.SQL_ID, savedOutfit.Team);
                         NAPI.Task.Run(() =>
                         {
-                            Character.ApplyOutfit(player, savedOutfit.IsMale, team, savedOutfit);
+                            Character.ApplyOutfit(player, savedOutfit.IsMale, savedOutfit.Team, savedOutfit);
                             EPlayer.Notify(player, "You are now <strong>editing</strong> outfit " + savedOutfit.SQL_ID, "yellow", "icon", false, 3000);
 
                             Character.OpenOutfitEditor(player, savedOutfit);
@@ -6948,7 +6951,7 @@ namespace RNC
         }
 
         [RemoteEvent("Menu_RequestTabData")]
-        public void OnPlayerRequestMenuTabData(Player player, string tab)
+        public void UpdateMenuTabData(Player player, string tab)
         {
             NAPI.Util.ConsoleOutput($"tab data {tab} {player.Name}");
             if (!EPlayer.LoggedIn(player)) return;
@@ -6958,8 +6961,61 @@ namespace RNC
                 case "play":
                     UpdatePlayRoomData(player);
                     break;
-                case "clan":
+                case "clans":
                     player.TriggerEvent("CS_UpdateStatsVars");
+                    break;
+                case "vehicles":
+                    Task.Run(async () =>
+                    {
+                        List<object[]> vehData = await Menu_VehicleData(acc);
+
+                        NAPI.Task.Run(() =>
+                        {
+                            string fugitiveCarID = EPlayer.GetAccount(player).CarFugitive;
+                            string copCarID = EPlayer.GetAccount(player).CarCop;
+
+                            player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
+                        });
+                    });
+                    break;
+                case "loadouts":
+                    Task.Run(async () =>
+                    {
+                        List<object[]> loadoutData = await Menu_LoadoutData(acc);
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
+
+
+                        });
+                    });
+                    break;
+                case "items":
+                    EPlayer.Menu_UpdateAllItems(player);
+                    break;
+                case "character":
+                    Task.Run(async () =>
+                    {
+                        bool fits_found = true;
+                        List<SavedOutfit> outfitData = await Character.GetOutfits(acc);
+                        if (outfitData == null) fits_found = false;
+                        int activeFugiOutfitID = acc.FugitiveOutfitID;
+                        int activeCopOutfitID = acc.CopOutfitID;
+
+                        NAPI.Task.Run(() =>
+                        {
+                            if (fits_found == true)
+                            {
+                                player.TriggerEvent("OutfitCreator:SetOutfits", NAPI.Util.ToJson(outfitData));
+                                player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, activeCopOutfitID, acc.LobbyClothing);
+                            }
+                            else
+                            {
+                                NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] Failed to fetch outfits for {acc.Username}!");
+                            }
+
+                        });
+                    });
                     break;
                 case "inventory":
                     Task.Run(async () =>
@@ -6981,7 +7037,7 @@ namespace RNC
 
                             player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
                             player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);                                                 
-                            EPlayer.Menu_UpdateAllItems(player);
+                            
 
                             if(fits_found == true)
                             {

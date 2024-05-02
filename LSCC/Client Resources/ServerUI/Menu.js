@@ -393,7 +393,7 @@ settings
 mp.events.add("mainmenu_tab_request_data", (tab) => {
   // store inventory play wiki settings profile clans
   switch (tab) {
-    case "clan":
+    case "clans":
       if (global.ServerUI) {
         global.ServerUI.call(
           "mainmenu_clan_my_clan_public_set",
