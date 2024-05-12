@@ -2353,20 +2353,20 @@ mp.events.add("changeRecoilSmooting", (value) => {
 })
 
 // stop shooting while tased
-mp.events.add("render", () => {
-    if(mp.players.local.getVariable("TasedTill") > Date.now()){
-        mp.game.controls.disableControlAction(32, 24, true);
-        mp.game.controls.disableControlAction(32, 69, true);
-        mp.game.controls.disableControlAction(32, 92, true);
-        mp.game.controls.disableControlAction(32, 106, true);
-        mp.game.controls.disableControlAction(32, 122, true);
-        mp.game.controls.disableControlAction(32, 135, true);
-        mp.game.controls.disableControlAction(32, 142, true);
-        mp.game.controls.disableControlAction(32, 144, true);
-        mp.game.controls.disableControlAction(32, 257, true);
-        mp.game.controls.disableControlAction(32, 346, true);
-    }
-});
+// mp.events.add("render", () => {
+//     if(mp.players.local.getVariable("TasedTill") > Date.now()){
+//         mp.game.controls.disableControlAction(32, 24, true);
+//         mp.game.controls.disableControlAction(32, 69, true);
+//         mp.game.controls.disableControlAction(32, 92, true);
+//         mp.game.controls.disableControlAction(32, 106, true);
+//         mp.game.controls.disableControlAction(32, 122, true);
+//         mp.game.controls.disableControlAction(32, 135, true);
+//         mp.game.controls.disableControlAction(32, 142, true);
+//         mp.game.controls.disableControlAction(32, 144, true);
+//         mp.game.controls.disableControlAction(32, 257, true);
+//         mp.game.controls.disableControlAction(32, 346, true);
+//     }
+// });
 
 var RECOIL_LOGGING = false;
 mp.events.addCommand("recoil_logging", () => {
