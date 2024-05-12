@@ -9456,11 +9456,11 @@ namespace RNC
             }
             else if(team.Equals("cop", StringComparison.OrdinalIgnoreCase))
             {
-                vehicleModel = EPlayer.GetAccount(player).CarCop;
+                vehicleModel = EPlayer.GetCarModelFromSQLID(player, 1);
             }
             else if(team.Equals("fugitive", StringComparison.OrdinalIgnoreCase))
             {
-                vehicleModel = EPlayer.GetAccount(player).CarFugitive;
+                vehicleModel = EPlayer.GetCarModelFromSQLID(player, 0);
             }
             else
             {
