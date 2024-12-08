@@ -118,14 +118,14 @@ mp.events.add("clothing_editor_save", (value) => {
 // Server -> Clientside
 mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
     const outfitArray = JSON.parse(outfitData);
-    const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
+    const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, teamId:outfit.Team }; });
 
 
-    if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set", outfits);
+    if(global.ServerUI) global.ServerUI.call("mainmenu_character_outfits_set", outfits);
 });
 mp.events.add("OutfitCreator:SetActive", (id, team) => { // Loading defaults
 
-    if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set_active", id, team);
+    if(global.ServerUI) global.ServerUI.call("mainmenu_character_selected_outfits_set", id, team);
 });
 
 

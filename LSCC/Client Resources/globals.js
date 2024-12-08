@@ -72,7 +72,7 @@ function UpdateStatsVars(entity, all = true){
                   tag:player.getVariable("ClanTag")
                 }
               };
-              global.ServerUI.call("set_user", user_object);
+              global.ServerUI.call("user_set", user_object);
 
               global.ServerUI.call("mainmenu_clan_my_clan_public_set", player.getVariable("ClanPublic")); // Public value 1 == public | 0 == invite-only
               global.ServerUI.call("mainmenu_clan_my_clan_force_tag_set", player.getVariable("ForceClanTag"));

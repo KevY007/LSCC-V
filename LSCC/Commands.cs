@@ -11405,6 +11405,23 @@ namespace RNC
             }
         }
 
+        [Command("mrinspector", GreedyArg = true)]
+        public void cmd_mrinspector(Player player, Player target)
+        {
+            if (!EPlayer.LoggedIn(player))
+                return;
+
+            if (EPlayer.GetAccount(player).Admin < 6)
+            {
+                return;
+            }
+            else
+            {
+                target.TriggerEvent("mrinspector_start");
+                player.SendChatMessage("Mr Inspector is inspecting " + target.Name);
+            }
+        }
+
         [Command("slap", "!{#AFAFAF}[USAGE] slap (target)", GreedyArg = true)]
         public void cmd_slap(Player player, Player target)
         {

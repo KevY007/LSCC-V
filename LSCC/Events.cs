@@ -5356,7 +5356,7 @@ namespace RNC
             }
             else
             {
-                if (password.Length > 1)
+                if (password != null && password.Length > 1)
                     Commands.cmd_switchlobby(player, $"{lobbyID} {password}");
                 else
                     Commands.cmd_switchlobby(player, $"{lobbyID}");
@@ -6113,40 +6113,23 @@ namespace RNC
 
 
         [RemoteEvent("Menu_OnBuyNamechange")]
-        public void OnMenuBuyNamechange(Player player, int packageID)
+        public void OnMenuBuyNamechange(Player player, int number, int cost)
         {
             if (!EPlayer.LoggedIn(player))
                 return;
 
-            int namechangeNumber = 0;
-            int packagePrice = 0;
+            int namechangeNumber = number;
 
-            switch (packageID)
+            if (EPlayer.GetAccount(player).DonatorPoints < cost)
             {
-                case 0:
-                    packagePrice = 100;
-                    namechangeNumber = 1;
-                    break;
-                case 1:
-                    packagePrice = 450;
-                    namechangeNumber = 5;
-                    break;
-                case 2:
-                    packagePrice = 800;
-                    namechangeNumber = 10;
-                    break;
-            }
-
-            if (EPlayer.GetAccount(player).DonatorPoints < packagePrice)
-            {
-                EPlayer.Error(player, Translate(player, "ERROR_NOT_ENOUGH_POINTS", EPlayer.GetAccount(player).DonatorPoints - packagePrice));
+                EPlayer.Error(player, Translate(player, "ERROR_NOT_ENOUGH_POINTS", EPlayer.GetAccount(player).DonatorPoints - cost));
                 return;
             }
 
 
-            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", packagePrice, $"Purchased {namechangeNumber} NAMECHANGE{(namechangeNumber > 1 ? "S" : "")}");
+            Logs.LogTransaction(EPlayer.GetAccount(player).SQL_ID, "Diamond Points", cost, $"Purchased {namechangeNumber} NAMECHANGE{(namechangeNumber > 1 ? "S" : "")}");
             EPlayer.GetAccount(player).Namechanges += namechangeNumber;
-            EPlayer.GetAccount(player).DonatorPoints -= packagePrice;
+            EPlayer.GetAccount(player).DonatorPoints -= cost;
             EPlayer.Save(player, false);
             EPlayer.Notify(player, Translate(player, "REDEEM_SUCCESS", $"~y~Namechange (x{namechangeNumber})"), "green", "", true, 3000);
         }
@@ -6387,6 +6370,8 @@ namespace RNC
                         string fugitiveCarID = EPlayer.GetAccount(player).CarFugitive;
                         string copCarID = EPlayer.GetAccount(player).CarCop;
 
+                        player.TriggerEvent("UpdateMenuActiveVehicles", copCarID, fugitiveCarID);
+
                         player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
                     });
                 }
@@ -6432,6 +6417,7 @@ namespace RNC
                                 string fugitiveCarID = EPlayer.GetAccount(player).CarFugitive;
                                 string copCarID = EPlayer.GetAccount(player).CarCop;
 
+                                player.TriggerEvent("UpdateMenuActiveVehicles", copCarID, fugitiveCarID);
                                 player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
                             });
                         });
@@ -6513,6 +6499,7 @@ namespace RNC
                     List<object[]> loadoutData = await Menu_LoadoutData(acc);
                     NAPI.Task.Run(() =>
                     {
+                        player.TriggerEvent("UpdateMenuActiveLoadouts", acc.LoadoutCop, acc.LoadoutFugitive);
                         player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), acc.LoadoutCop, acc.LoadoutFugitive);
                     });
                 }
@@ -6555,6 +6542,7 @@ namespace RNC
                             List<object[]> loadoutData = await Menu_LoadoutData(acc);
                             NAPI.Task.Run(() =>
                             {
+                                player.TriggerEvent("UpdateMenuActiveLoadouts", acc.LoadoutCop, acc.LoadoutFugitive);
                                 player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), acc.LoadoutCop, acc.LoadoutFugitive);
 
                             });
@@ -6908,6 +6896,7 @@ namespace RNC
         {
             if (!EPlayer.LoggedIn(player)) return;
             Account acc = EPlayer.GetAccount(player);
+            NAPI.Util.ConsoleOutput(tab);
             switch (tab)
             {
                 case "play":
@@ -6916,29 +6905,40 @@ namespace RNC
                 case "clan":
                     player.TriggerEvent("CS_UpdateStatsVars");
                     break;
-                case "inventory":
+                case "loadouts":
                     Task.Run(async () =>
                     {
                         List<object[]> loadoutData = await Menu_LoadoutData(acc);
+                        NAPI.Task.Run(() =>
+                        {
+                            player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);
+                        });
+                    });
+                    break;
+                case "vehicles":
+                    Task.Run(async () =>
+                    {
                         List<object[]> vehData = await Menu_VehicleData(acc);
-
+                        NAPI.Task.Run(() =>
+                        {
+                            string fugitiveCarID = EPlayer.GetAccount(player).CarFugitive;
+                            string copCarID = EPlayer.GetAccount(player).CarCop;
+                            player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
+                            });
+                    });
+                    break;
+                case "character":
+                    Task.Run(async () =>
+                    {
 
                         bool fits_found = true;
                         List<SavedOutfit> outfitData = await Character.GetOutfits(acc);
                         if (outfitData == null) fits_found = false;
                         int activeFugiOutfitID = outfitData.FirstOrDefault(o => o.IsActive == true && o.Team == 0).SQL_ID;
                         int activeCopOutfitID = outfitData.FirstOrDefault(o => o.IsActive == true && o.Team == 1).SQL_ID;
-
                         NAPI.Task.Run(() =>
                         {
-                            string fugitiveCarID = EPlayer.GetAccount(player).CarFugitive;
-                            string copCarID = EPlayer.GetAccount(player).CarCop;
-
-                            player.TriggerEvent("UpdateMenuVehicles", NAPI.Util.ToJson(vehData), copCarID, fugitiveCarID);
-                            player.TriggerEvent("UpdateMenuLoadouts", NAPI.Util.ToJson(loadoutData), EPlayer.GetAccount(player).LoadoutCop, EPlayer.GetAccount(player).LoadoutFugitive);                                                 
-                            EPlayer.Menu_UpdateAllItems(player);
-
-                            if(fits_found == true)
+                            if (fits_found == true)
                             {
                                 player.TriggerEvent("OutfitCreator:SetOutfits", NAPI.Util.ToJson(outfitData));
                                 player.TriggerEvent("OutfitCreator:SetActive", activeFugiOutfitID, 0);
@@ -6948,9 +6948,11 @@ namespace RNC
                             {
                                 NAPI.Util.ConsoleOutput($"[OUTFIT-DBG] Failed to fetch outfits for {acc.Username}!");
                             }
-                     
                         });
                     });
+                    break;
+                case "items":
+                    EPlayer.Menu_UpdateAllItems(player);
                     break;
                 /*
             case "inventory":

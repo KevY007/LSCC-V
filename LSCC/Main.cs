@@ -938,16 +938,22 @@ namespace RNC
             "yosemite"
         };
 
+        /*
+codename Position log: { new Vector3(501.75168f, 5604.61f, 797.9103f), -141.566f },
+codename Position log: { new Vector3(504.73343f, 5597.3438f, 796.21185f), 128.26848f },
+codename Position log: { new Vector3(485.14035f, 5585.0215f, 793.6694f), -102.255356f },
+codename Position log: { new Vector3(451.66824f, 5574.355f, 796.4932f), -75.19456f },
+codename Position log: { new Vector3(482.83795f, 5563.656f, 789.48346f), 7.156658f },
+         */
+
+
         public static Vector3[] LobbySpawns = new Vector3[]
         {
-            new Vector3(435.16357f, -983.11615f, 30.689608f),
-            new Vector3(441.00525f, -976.70306f, 30.689604f),
-            new Vector3(447.96674f, -987.3671f, 30.689596f),
-            new Vector3(451.5091f, -982.6244f, 30.689596f),
-            new Vector3(459.29898f, -985.8472f, 30.689606f),
-            new Vector3(439.45166f, -994.0734f, 30.689585f),
-            new Vector3(452.88248f, -985.1788f, 26.67423f),
-            new Vector3(461.93222f, -990.7201f, 24.91487f),
+            new Vector3(501.75168f, 5604.61f, 797.9103f),
+            new Vector3(504.73343f, 5597.3438f, 796.21185f),
+            new Vector3(485.14035f, 5585.0215f, 793.6694f),
+            new Vector3(451.66824f, 5574.355f, 796.4932f),
+            new Vector3(482.83795f, 5563.656f, 789.48346f)
         };
 
         public static object[] VectorJail = { new Vector3(2061.5889f, 2967.7412f, -67.30185f), 53f };

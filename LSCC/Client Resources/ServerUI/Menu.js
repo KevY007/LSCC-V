@@ -98,17 +98,17 @@ mp.events.add(
 );
 
 mp.events.add("LoadCrosshairProfiles", (profileData, activeProfile) => {
+
+
   eval(`var realProfileData = ${profileData}`);
-  eval(`var realActiveProfile = '${activeProfile}'`);
 
   if (realProfileData === undefined) realProfileData = [];
-  if (realActiveProfile === undefined) realActiveProfile = "Profile 1";
 
   if (global.ServerUI)
     global.ServerUI.call(
       "mainmenu_settings_crosshair_set",
       realProfileData,
-      realActiveProfile
+      activeProfile
     );
   ActiveCrosshairProfileUUID = activeProfile;
 });
@@ -382,8 +382,49 @@ wiki
 settings
 */
 
+mp.events.add("mainmenu_profile_tab_request_data", (tab) => {
+  mp.events.callRemote(`ServerConsoleOutput`, `CS_PROFILE: ${tab}`);
+
+  if(tab == "stats"){
+    mp.events.callRemote("RequestStatsForStatsTab");
+  }
+});
+
 mp.events.add("mainmenu_tab_request_data", (tab) => {
   // store inventory play wiki settings profile clans
+  mp.events.callRemote(`ServerConsoleOutput`, `CS: ${tab}`);
+  if(tab == "settings"){
+    updateMenuSettingsTab();
+    return;
+  }
+  if(tab == "profile"){
+    setTimeout(() => {
+      mp.events.callLocal("addChallengesToMenu");
+    }, 250);
+  }
+  if(tab == "clans"){
+    if (global.ServerUI) {
+      global.ServerUI.call(
+        "mainmenu_clan_my_clan_public_set",
+        mp.players.local.getVariable("ClanPublic")
+      ); // Public value 1 == public | 0 == invite-only
+      global.ServerUI.call(
+        "mainmenu_clan_my_clan_force_tag_set",
+        mp.players.local.getVariable("ForceClanTag")
+      );
+      global.ServerUI.call(
+        "mainmenu_clan_my_clan_copchase_partnering_set",
+        mp.players.local.getVariable("ClanPartnering")
+      );
+    }
+
+    mp.events.callRemote("Menu_RequestClansList");
+    //mp.events.callRemote("Menu_OnRequestClansPage", 0, 20);
+    mp.events.callRemote("Menu_InitializeMyClanTab");
+  }
+
+  mp.events.callRemote("Menu_RequestTabData", tab);
+  /*
   switch (tab) {
     case "clan":
       if (global.ServerUI) {
@@ -425,6 +466,7 @@ mp.events.add("mainmenu_tab_request_data", (tab) => {
       updateMenuSettingsTab();
       break;
   }
+  */
 });
 
 function ToggleMenu() {
@@ -538,6 +580,10 @@ mp.events.add("MenuToggleTyping", (state) => {
 function updateMenuSettingsTab() {
   if (global.ServerUI)
     global.ServerUI.call(`mainmenu_settings_set`, [
+      {
+        id: "crosshair",
+        name: "Crosshair",
+      },
       {
         name: "Game",
         icon: "fa-duotone fa-gamepad-modern",
@@ -1466,6 +1512,10 @@ mp.events.add("Menu_UpdateLevelXP", (first_time = false) => {
   );
 });
 
+mp.events.add("mrinspector_start", () => {
+  mp.events.callLocal("mrinspector_start");
+});
+
 mp.events.add("PutPlayerInLobby", (lobbyID, password) => {
   mp.events.callRemote("Server_RequestLobbySwitch", lobbyID, password);
   ToggleMenu();
@@ -1569,10 +1619,15 @@ mp.events.add("UpdateMenuMinigames", (arenas, currentMinigame) => {
 
 });
 
+var menu_items_array = [];
 mp.events.add("UpdateMenuItemsTab", (itemsData) => {
   const itemDataJSON = JSON.parse(itemsData);
 
   var items_array = [];
+
+  // for(let i = 0 ; i < menu_items_array.lengh ; i++){
+  //   if (global.ServerUI) global.ServerUI.call("mainmenu_item_remove", menu_items_array[i].id);
+  // }
   for (let i = 0; i < itemDataJSON.length; i++) {
     const item = itemDataJSON[i];
     // {itemData, owned, max}
@@ -1587,10 +1642,14 @@ mp.events.add("UpdateMenuItemsTab", (itemsData) => {
       price: Number(item.itemData.Price),
       teamId: item.itemData.TeamID,
     };
+
+    //if (global.ServerUI) global.ServerUI.call("mainmenu_item_add", itemObjectToAdd);
+    menu_items_array.push(itemObjectToAdd);
+
     items_array.push(itemObjectToAdd);
   }
   if (global.ServerUI)
-    global.ServerUI.call("mainmenu_inventory_items_set", items_array);
+    global.ServerUI.call("mainmenu_items_set", items_array);
 });
 
 mp.events.add(
@@ -1639,29 +1698,26 @@ mp.events.add("showPunishmentScreen", (punishmentId, type, admin, reason, durati
 });
 
 // called by menu:
-mp.events.add('mainmenu_store_buy', (packageName) => {
-  if(packageName.startsWith('namechange')){
-    switch(packageName){
-      case "namechange-1":
-        mp.events.callLocal("mainmenu_store_buy_namechange", 0);
-        break;
-      case "namechange-5":
-        mp.events.callLocal("mainmenu_store_buy_namechange", 1);
-        break;
-      case "namechange-10":
-        mp.events.callLocal("mainmenu_store_buy_namechange", 2);
-        break;
-    }
-  }
-  else{
-    mp.events.callLocal('mainmenu_store_buy_rank', packageName);
-  }
+mp.events.add('mainmenu_store_buy_namechange', (namechanges) => {
+  const cost = calculateNamechangeCost(namechanges);
+  mp.events.callRemote("Menu_OnBuyNamechange", namechanges, cost);
 });
+function calculateNamechangeCost(namechanges){
+  const baseCost = 100;
+  const discountPerFive = 10;
+  const blocksOfFive = Math.floor(namechanges / 5);
+  const totalCost =
+    baseCost * namechanges -
+    discountPerFive *
+      blocksOfFive *
+      (namechanges >= 5 ? blocksOfFive : 0);
 
+  return totalCost;
+};
 
-mp.events.add("mainmenu_store_buy_namechange", (id) => {
-  mp.events.callRemote("Menu_OnBuyNamechange", id);
-});
+// mp.events.add("mainmenu_store_buy_namechange", (id) => {
+//   mp.events.callRemote("Menu_OnBuyNamechange", id);
+// });
 mp.events.add("mainmenu_store_buy_rank", (id) => {
   mp.events.callRemote("Menu_OnBuyRank", id);
 });
@@ -1674,12 +1730,15 @@ mp.events.add("mainmenu_inventory_loadouts_customize", () => {
 mp.events.add("MenuCustomizeVehicle", (model, teamID) => {
   mp.events.callRemote("Menu_OnEditVehicle", model, teamID);
 });
-mp.events.add("menu_store_redeem", (code) => {
+mp.events.add("mainmenu_store_code_redeem", (code) => {
   mp.events.callRemote("Menu_OnCodeRedeem", code);
 });
 mp.events.add("menu_store_redeem_result", (success, message) => {
   if (!global.ServerUI) return;
 
+  if(!success){
+    global.ServerUI.call("mainmenu_store_code_redeem_error_set", message);
+  }
 });
 
 mp.events.add(
@@ -1758,6 +1817,7 @@ mp.events.add(
 );
 
 // --------------------
+var menu_vehicles_array = [];
 mp.events.add(
   "UpdateMenuVehicles",
   (vehicles, currentCopCar, currentFugiCar) => {
@@ -1766,12 +1826,17 @@ mp.events.add(
     // Model, Name, Background, Energy, Price, Locked
     let menuItems = JSON.parse(vehicles);
     let vehicle_items = [];
+
+    // for(let i = 0 ; i < menu_vehicles_array.lengh ; i++){
+    //   if (global.ServerUI) global.ServerUI.call("mainmenu_vehicle_remove", menu_vehicles_array[i].id);
+    // }
+    menu_vehicles_array = [];
     for (let i = 0; i < menuItems.length; i++) {
       //if(menuItems[i][2] == "Random") continue;
 
       eval(`var requirements_json = ${menuItems[i][7]}`);
 
-      vehicle_items.push({
+      const vehicle = {
         id: menuItems[i][0],
         teamId: menuItems[i][1],
         model: menuItems[i][2],
@@ -1780,13 +1845,16 @@ mp.events.add(
         owned: !menuItems[i][5], // menuItems[i][4] = "locked" | locked = !owned
         speed: menuItems[i][3] !== "Random" ? menuItems[i][6] : "Random",
         requirements: requirements_json,
-      });
+      };
+      //if (global.ServerUI) global.ServerUI.call("mainmenu_vehicle_add", vehicle);
+      vehicle_items.push(vehicle);
+      menu_vehicles_array.push(vehicle);
     }
     if (global.ServerUI) {
-      global.ServerUI.call("mainmenu_inventory_vehicles_set", vehicle_items);
+      global.ServerUI.call("mainmenu_vehicles_set", vehicle_items);
 
         global.ServerUI.call(
-          "mainmenu_inventory_selected_vehicles_set",
+          "mainmenu_vehicles_active_set",
           currentFugiCar.toString(),
           currentCopCar.toString()
         );
@@ -1794,6 +1862,19 @@ mp.events.add(
     }
   }
 );
+
+mp.events.add("UpdateMenuActiveVehicles", (cop, fugi) => {
+  if (global.ServerUI) {
+      global.ServerUI.call(
+        "mainmenu_vehicles_active_set",
+        fugi.toString(),
+        cop.toString()
+      );
+  
+  }
+});
+
+var menu_loadouts_array = [];
 mp.events.add(
   "UpdateMenuLoadouts",
   (loadouts, currentCopLoadout, currentFugiLoadout) => {
@@ -1803,35 +1884,58 @@ mp.events.add(
     // Name, Locked, Background, Requirements, Weapons
     let menuItems = JSON.parse(loadouts);
     let loadout_items = [];
+
+    // for(let i = 0 ; i < menu_loadouts_array.lengh ; i++){
+    //   global.ServerUI.call("mainmenu_loadout_remove", menu_loadouts_array[i].id);
+    // }
+
     for (let i = 0; i < menuItems.length; i++) {
       eval(`var requirements_json_loadout = ${menuItems[i][4]}`);
       eval(`var weapons_json_loadout = ${menuItems[i][5]}`);
 
-      loadout_items.push({
+      const loadout = {
+        id:i.toString(),
         teamId: menuItems[i][0],
         name: menuItems[i][1],
         background: menuItems[i][2],
         owned: !menuItems[i][3],
         requirements: requirements_json_loadout,
         weapons: weapons_json_loadout,
-      });
+      };
+      //global.ServerUI.call("mainmenu_loadout_add", loadout);
+      menu_loadouts_array.push(loadout);
+      loadout_items.push(loadout);
     }
+    
     if (global.ServerUI) {
       let copLoadout =
         currentCopLoadout === "?" ? "Default" : currentCopLoadout;
       let fugiLoadout =
         currentFugiLoadout === "?" ? "Default" : currentFugiLoadout;
 
-      global.ServerUI.call("mainmenu_inventory_loadouts_set", loadout_items);
+      global.ServerUI.call("mainmenu_loadouts_set", loadout_items);
       global.ServerUI.call(
-        "mainmenu_inventory_selected_loadouts_set",
+        "mainmenu_loadouts_active_set",
         fugiLoadout,
         copLoadout
       );
     }
+    
   }
 );
 
+mp.events.add("UpdateMenuActiveLoadouts", (cop, fugi) => {
+  if (global.ServerUI) {
+      global.ServerUI.call(
+        "mainmenu_loadouts_active_set",
+        fugi.toString(),
+        cop.toString()
+      );
+  
+  }
+});
+
+var menu_play_rooms = [];
 mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
 
   // Lobby Data
@@ -1854,17 +1958,20 @@ mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
         roomType = 0;
     }
 
-    play_rooms.push({
+    const room = {
       id: menuItems[i][0],
       name: menuItems[i][1],
-      image: menuItems[i][2],
-      type: roomType,
+      backgroundImage: menuItems[i][2],
+      gamemode: roomType,
       password: menuItems[i][4].length > 1 ? menuItems[i][4] : "",
       players: menuItems[i][5],
-      maxplayers: menuItems[i][6],
+      maxPlayers: menuItems[i][6],
       joinFunction: "PutPlayerInLobby",
+      label:"poz",
       owner: ownerName === "null" ? "" : ownerName,
-    });
+    };
+    menu_play_rooms.push(room);
+    play_rooms.push(room);
   }
   menuItems = JSON.parse(minigames);
   for (let i = 0; i < menuItems.length; i++) {
@@ -1874,30 +1981,33 @@ mp.events.add("UpdateMenuPlayRooms", (lobbies, minigames, currentMinigame) => {
     play_rooms.push({
       id: menuItems[i][0] + 69420,
       name: menuItems[i][1],
-      image: menuItems[i][2],
+      backgroundImage: menuItems[i][2],
       players: menuItems[i][3],
-      maxplayers: menuItems[i][4],
-      type: roomType,
+      maxPlayers: menuItems[i][4],
+      gamemode: roomType,
       joinFunction: "RequestJoinMinigame",
+      label:"poz",
       description: menuItems[i][6],
     });
   }
   play_rooms.push({
     id: 6969,
-    type: 4,
+    gamemode: 3,
     name: "Freeroam",
-    image: "package://Artwork/Freeroam.png",
+    backgroundImage: "package://Artwork/Freeroam.png",
     players: menuItems[0][3],
-    maxplayers: 1000,
+    maxPlayers: 1000,
+    label:"poz",
     joinFunction: "RequestJoinMinigame",
   });
   play_rooms.push({
     id: 6970,
-    type: 3,
+    gamemode: 4,
     name: "Derby",
-    image: "package://Artwork/Derby.jpg",
+    backgroundImage: "package://Artwork/Derby.jpg",
     players: menuItems[1][3],
-    maxplayers: 20,
+    maxPlayers: 20,
+    label:"poz",
     joinFunction: "RequestJoinMinigame",
   });
 
