@@ -62,7 +62,6 @@ require("./ServerUI/Menu.js");
 require("./ServerUI/Logs.js");
 require("./ServerUI/CharacterCreator.js");
 require("./ServerUI/Tutorial.js");
-require("./ServerUI/XMR.js");
 require("./TeleportManager/index.js");
 require("./WeaponFiringMode/index.js");
 require("./charcreator/index.js");
