@@ -6858,6 +6858,52 @@ namespace RNC
                 }
             });
         }
+
+        [RemoteEvent("AppearanceEditor:Edit")]
+        public void AppearanceEditor_Edit(Player player)
+        {
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
+            Commands.cmd_char(player, "edit");
+        }
+        [RemoteEvent("AppearanceEditor:Reset")]
+        public void AppearanceEditor_Reset(Player player)
+        {
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
+            Commands.cmd_char(player, "reset confirm");
+        }
+
+        // OutfitCreator:Remove
+        [RemoteEvent("OutfitCreator:Remove")]
+        public void OutfitEditor_OnRemove(Player player, int outfitID, int team)
+        {
+            if (EventManager.IsPlayerInAnyEvent(player)) return;
+            Account acc = EPlayer.GetAccount(player);
+            Task.Run(async () =>
+            {
+                using (MainDatabase context = ContextFactory.CreateContext())
+                {
+                    SavedOutfit savedOutfit = await context.SavedOutfits.AsQueryable().FirstOrDefaultAsync(o => o.SQL_ID == outfitID && o.AccountID == acc.SQL_ID);
+                    if (savedOutfit != null)
+                    {
+                        Character.RemoveOutfit(player, savedOutfit);
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Notify(player, "You have removed outfit " + savedOutfit.SQL_ID, "red", "icon", false, 3000);
+
+                        });
+                    }
+                    else
+                    {
+                        NAPI.Task.Run(() =>
+                        {
+                            EPlayer.Error(player, "<strong>FATAL ERROR:</strong> Outfit not found!");
+                        });
+                    }
+                }
+
+            });
+        }
+
         [RemoteEvent("OutfitCreator:Edit")]
         public void OutfitEditor_OnEdit(Player player, int outfitID, int team)
         {

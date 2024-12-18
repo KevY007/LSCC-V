@@ -476,6 +476,9 @@ namespace RNC
                 await context.SaveChangesAsync();
             }
         }
+
+      
+
         public static void InitializeCharacter(Player player, Account acc)
         {
             try
@@ -604,6 +607,15 @@ namespace RNC
         {
             Appearance _a = NAPI.Util.FromJson<Appearance>(appearance.Data);
             OpenAppearanceEditor(player, _a);
+        }
+
+        public async static void RemoveOutfit(Player player, SavedOutfit outfit)
+        {
+            using (MainDatabase context = ContextFactory.CreateContext())
+            {
+                context.SavedOutfits.Remove(outfit);
+                await context.SaveChangesAsync();
+            }
         }
 
         public static void OpenOutfitEditor(Player player, SavedOutfit outfit)
