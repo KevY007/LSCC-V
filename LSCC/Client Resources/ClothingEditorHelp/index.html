@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Clothing Editor Help for Police Clothing IDs</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+        body{
+            margin:0px;
+            max-height: 100%;
+            max-width: 100%;
+        }
+        .panel{
+
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 10px;
+
+            font-family: "Inter", sans-serif;
+            color:white;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="male" class="panel">
+        <p><span style="font-weight: 700;">SHIRTS: </span>55, 316, 317, 318, 319, 320</p>
+        <p><span style="font-weight: 700;">PANTS: </span>35, 121</p>
+        <p><span style="font-weight: 700;">UNDERSHIRTS: </span>15, 58, 59, 122, 129, 130, 131, 153, 154, 170</p>
+        <p><span style="font-weight: 700;">DECALS: </span>70, 207, 208, 209, 210</p>
+        <p><span style="font-weight: 700;">ARMORS: </span>53, 54, 55, 57</p>
+        <p><span style="font-weight: 700;">ACCESSORIES: </span>125, 128, 133, 146, 147, 148</p>
+        <p><span style="font-weight: 700;">TORSO: </span>0, 4, 17-24, 30, 31, 32, 33, 55, 56</p>
+        <p><span style="font-weight: 700;">HATS: </span>46, 115, 123, 124, 125, 126, 141, 142, 143</p>
+    </div>
+    <div id="female" class="panel">
+        <p><span style="font-weight: 600;">SHIRTS: </span>48, 327, 328, 329, 330, 331</p>
+        <p><span style="font-weight: 600;">PANTS: </span>34, 127</p>
+        <p><span style="font-weight: 600;">UNDERSHIRTS: </span>15, 35, 36, 152, 159, 160, 161, 189, 190</p>
+        <p><span style="font-weight: 600;">DECALS: </span>79, 223, 224, 225, 226</p>
+        <p><span style="font-weight: 600;">ARMORS: </span>2-13, 53, 54, 55</p>
+        <p><span style="font-weight: 600;">ACCESSORIES: </span>95, 98, 102, 115, 116, 117</p>
+        <p><span style="font-weight: 600;">TORSO: </span>0, 3, 18, 19, 20, 23, 33, 36</p>
+        <p><span style="font-weight: 600;">HATS: </span>45, 122, 123, 124, 125, 140, 141, 142</p>
+    </div>
+
+    <script>
+        var femalePanel = null;
+        var malePanel = null;
+
+        document.addEventListener("DOMContentLoaded", () => {
+            femalePanel = document.getElementById("female");
+            malePanel = document.getElementById("male");
+
+            femalePanel.style.display = 'none';
+            malePanel.style.display = 'block';
+        });
+        mp.events.add("toggle_panel", (panel) => {
+            if(panel === "male"){
+                femalePanel.style.display = 'none';
+                malePanel.style.display = 'block';
+            }
+            else{
+                malePanel.style.display = 'none';
+                femalePanel.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

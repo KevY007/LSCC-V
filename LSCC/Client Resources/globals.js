@@ -992,6 +992,10 @@ function InitializeHotwireDOM(){
     global.HotwireDOM = mp.browsers.new("package://hotwire_game/index.html");
     global.HotwireDOM.active = false;
 }
+function InitializeClothingEditorHelpDOM(){
+    global.ClothingEditorHelpDOM = mp.browsers.new("package://ClothingEditorHelp/index.html");
+    global.ClothingEditorHelpDOM.active = false;
+}
 function getClosestVehicle(position) {
     try {
       let closest = 50;
@@ -3109,6 +3113,7 @@ let global = {
   isLockpicking:false,
   isHotwiring:false,
   HotwireDOM:false,
+  ClothingEditorHelpDOM:null,
   ClothingEditorDOM:null,
   ClothingEditorActive:false,
   ActionMenuActive:false,
@@ -3140,6 +3145,7 @@ let global = {
   InitializeMDC,
   InitializeWeaponEditor,
   InitializeHotwireDOM,
+  InitializeClothingEditorHelpDOM,
   AddCustomVehiclesToSpawner,
   calcDist,
   InitializeServerUI,

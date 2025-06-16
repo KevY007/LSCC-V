@@ -22,6 +22,16 @@ mp.events.add("mainmenu_inventory_outfits_set_active", (id, team) => {
 mp.events.add("mainmenu_inventory_outfits_edit", (id, team) => {
     mp.events.callRemote("OutfitCreator:Edit", id, team);
 });
+mp.events.add("mainmenu_character_outfit_remove", (id, team) => {
+    mp.events.callRemote("OutfitCreator:Remove", id, team);
+});
+
+mp.events.add("mainmenu_character_edit_appearance", () => {
+    mp.events.callRemote("AppearanceEditor:Edit");
+});
+mp.events.add("mainmenu_character_reset_appearance", () => {
+    mp.events.callRemote("AppearanceEditor:Reset");
+});
 
 function getRealPropID(uiID){
     const prop = PropTypeMappings.find(p => p.uiID == uiID);
@@ -35,6 +45,40 @@ function getPropUIID(realID){
 }
 
 mp.events.add("clothing_editor_change_id", (value) => {
+    const isDonator = (mp.players.local.hasVariable("Donator") && mp.players.local.getVariable("Donator") >= 3);
+    const isMale = OUTFIT_EDITOR_DATA.isMale;
+    const team = OUTFIT_EDITOR_DATA.team;
+
+    if(!isDonator && team === 1){
+        if(isMale){
+            if(!ALLOWED_POLICE_CLOTHING_MALE[`${CURRENT_EDIT_ITEM.index}`].includes(value)){
+                mp.events.callLocal("screenNotify", `This clothing item (ID ${value}) is for Gold Donators only on the Police team!`, "error", "bottom-center");
+                return;
+            }
+        }
+        else{
+              if(!ALLOWED_POLICE_CLOTHING_FEMALE[`${CURRENT_EDIT_ITEM.index}`].includes(value)){
+                mp.events.callLocal("screenNotify", `This clothing item (ID ${value}) is for Gold Donators only on the Police team!`, "error", "bottom-center");
+                return;
+            }
+        }
+    }
+    if(team === 0){
+        if(isMale){
+            if(ALLOWED_POLICE_CLOTHING_MALE[`${CURRENT_EDIT_ITEM.index}`].includes(value)){
+                mp.events.callLocal("screenNotify", `This clothing item (ID ${value}) is only available for the Police team!`, "error", "bottom-center");
+                return;
+            }
+        }
+        else{
+              if(ALLOWED_POLICE_CLOTHING_FEMALE[`${CURRENT_EDIT_ITEM.index}`].includes(value)){
+                mp.events.callLocal("screenNotify", `This clothing item (ID ${value}) is only available for the Police team!`, "error", "bottom-center");
+                return;
+            }
+        }        
+    }
+
+
     CURRENT_EDIT_ITEM = {...CURRENT_EDIT_ITEM, drawable:value};
 
     if(CURRENT_EDIT_ITEM.isProp){
@@ -104,6 +148,9 @@ mp.events.add("clothing_editor_change_type", (value) => {
 mp.events.add("clothing_editor_close", (value) => {
     mp.gui.cursor.show(false, false);
 
+      if(global.ClothingEditorHelpDOM){
+        global.ClothingEditorHelpDOM.active = false; 
+    }
     mp.events.callRemote("CharacterEditor:CloseEvent");
 });
 mp.events.add("clothing_editor_save", (value) => {
@@ -115,11 +162,10 @@ mp.events.add("clothing_editor_save", (value) => {
 });
 
 
-// Server -> Clientside
+// Server -> Clientsidelju
 mp.events.add("OutfitCreator:SetOutfits", (outfitData) => { // Loading outfits
     const outfitArray = JSON.parse(outfitData);
     const outfits = outfitArray.map((outfit) => { return {id:outfit.SQL_ID, team:outfit.Team }; });
-
 
     if(global.ServerUI) global.ServerUI.call("mainmenu_inventory_outfits_set", outfits);
 });
@@ -149,6 +195,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
 
                 const data = CLOTHING_EDITOR_LIMITS_MALE["police_donator"][idToCheck.toString()];
+
                 if(data){
                     min_drawable = data.min;
 
@@ -163,11 +210,13 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                         max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
+                
             }
             else{
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
 
                 const data = CLOTHING_EDITOR_LIMITS_MALE["fugitive_donator"][idToCheck.toString()];
+
                 if(data){
                     min_drawable = data.min;
 
@@ -182,6 +231,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                         max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
+                
             }
         }
         else{
@@ -189,6 +239,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
 
                 const data = CLOTHING_EDITOR_LIMITS_MALE["police"][idToCheck.toString()];
+
                 if(data){
                     min_drawable = data.min;
 
@@ -203,6 +254,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                         max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
+                
             }
             else{
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
@@ -230,7 +282,8 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
             if(team == 1){
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
 
-                const data = CLOTHING_EDITOR_LIMITS_MALE["police_donator"][idToCheck.toString()];
+                const data = CLOTHING_EDITOR_LIMITS_FEMALE["police_donator"][idToCheck.toString()];
+
                 if(data){
                     min_drawable = data.min;
 
@@ -245,11 +298,13 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                         max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
+                
             }
             else{
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
 
-                const data = CLOTHING_EDITOR_LIMITS_MALE["fugitive_donator"][idToCheck.toString()];
+                const data = CLOTHING_EDITOR_LIMITS_FEMALE["fugitive_donator"][idToCheck.toString()];
+
                 if(data){
                     min_drawable = data.min;
 
@@ -264,6 +319,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                         max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
+                
             }
         }
         else{
@@ -271,6 +327,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
 
                 const data = CLOTHING_EDITOR_LIMITS_FEMALE["police"][idToCheck.toString()];
+
                 if(data){
                     min_drawable = data.min;
 
@@ -285,6 +342,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                         max_drawable = mp.players.local.getNumberOfDrawableVariations(componentID);
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
+                
             }
             else{
                 var idToCheck = (isProp ? getPropUIID(componentID) : componentID);
@@ -305,7 +363,7 @@ function onOutfitCreatorChangeType(componentID, inputID, inputTexture, isProp){
                     else max_drawable = mp.players.local.getNumberOfPropDrawableVariations(componentID)
                 }
             }            
-        }       
+        }
     }
 
     // const max_drawable = (isProp ? 
@@ -342,6 +400,10 @@ mp.events.add("OutfitCreator:OpenEditor", (inputID, inputTexture, isMale, team) 
     CURRENT_OUTFIT_DATA = JSON.parse(mp.players.local.getVariable("OUTFIT:Editing"));
     if(!CURRENT_OUTFIT_DATA) return;
 
+    if(global.ClothingEditorHelpDOM && team == 1){
+        global.ClothingEditorHelpDOM.active = true;
+        global.ClothingEditorHelpDOM.call("toggle_panel", (isMale ? "male" : "female"));   
+    }
 
     if(global.ServerUI) global.ServerUI.call("dialog_clothing_editor_open", inputID, inputTexture, {
         id:{
@@ -409,6 +471,7 @@ mp.events.add("CharacterEditor:DestroyScene", () => {
     mp.players.local.clearTasksImmediately();
 });
 
+/*
 const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, max -2 means all/limit
     "police":{ // this category's max values need updating if custom fugitive clothes are ever added.
         "-5":{min:-1, max:-2}, // bracelets
@@ -429,6 +492,49 @@ const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, m
         "10":{min:-1, max:240}, // decals
         "11":{min:535, max:654}, // tops
     },
+*/
+const ALLOWED_POLICE_CLOTHING_MALE = {
+    "11":[55, 316, 317, 318, 319, 320], // tops
+    "10":[70, 207, 208, 209, 210], // decals
+    "4":[35, 121], // pants
+    "8":[15, 58, 59, 122, 129, 130, 131, 153, 154, 170], // undershirts
+    "9":[53, 54, 55, 57], // armors
+    "7":[125, 128, 133, 146, 147, 148], // accessories
+    "3":[0, 4, 17, 18, 19, 20, 21, 22, 23, 24, 30, 31, 32, 33, 55, 56], // torso
+    "0":[46, 115, 123, 124, 125, 126, 141, 142, 143], // hats
+}
+const ALLOWED_POLICE_CLOTHING_FEMALE = {
+    "11":[48, 327, 328, 329, 330, 331],
+    "10":[79, 223, 224, 225, 226],
+    "4":[34, 127],
+    "8":[15, 35, 36, 152, 159, 160, 161, 189, 190],
+    "9":[2,3,4,5,6,7,8,9,10,11,12,13, 53, 54, 55],
+    "7":[95, 98, 102, 115, 116, 117],
+    "3":[0, 3, 18, 19, 20, 23, 33, 36],
+    "0":[45, 122, 123, 124, 125, 140, 141, 142],
+}
+
+
+const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, max -2 means all/limit
+    "police":{ // this category's max values need updating if custom fugitive clothes are ever added.
+        "-5":{min:-1, max:-2}, // bracelets
+        "-4":{min:-1, max:-2}, // watches
+        "-3":{min:-1, max:-2}, // ears
+        "-2":{min:-1, max:-2}, // glasses
+        "-1":{min:195, max:-2}, // hats
+        "0":{min:0, max:0}, // head
+        "1":{min:-1, max:-1}, // masks - set to anything for donators
+        "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
+        "3":{min:0, max:-2}, // torsos
+        "4":{min:0, max:217}, // pants
+        "5":{min:0, max:-2}, // bags/hands
+        "6":{min:25, max:25}, // shoes
+        "7":{min:0, max:-2}, // accessories
+        "8":{min:0, max:-2}, // undershirts
+        "9":{min:-1, max:-2}, // armors
+        "10":{min:-1, max:227}, // decals
+        "11":{min:0, max:587}, // tops
+    },
     "police_donator":{
         "-5":{min:-1, max:-2}, // bracelets
         "-4":{min:-1, max:-2}, // watches
@@ -439,33 +545,33 @@ const CLOTHING_EDITOR_LIMITS_FEMALE = { // min -1 means -1 aka can be nothing, m
         "1":{min:-1, max:-2}, // masks - set to anything for donators
         "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
         "3":{min:0, max:-2}, // torsos
-        "4":{min:0, max:-2}, // pants
+        "4":{min:0, max:217}, // pants
         "5":{min:0, max:-2}, // bags/hands
-        "6":{min:1, max:-2}, // shoes
+        "6":{min:1, max:161}, // shoes
         "7":{min:-1, max:-2}, // accessories
         "8":{min:0, max:-2}, // undershirts
         "9":{min:-1, max:-2}, // armors
-        "10":{min:-1, max:-2}, // decals
-        "11":{min:0, max:-2}, // tops        
+        "10":{min:-1, max:227}, // decals
+        "11":{min:0, max:587}, // tops       
     },
     "fugitive_donator":{
         "-5":{min:-1, max:-2}, // bracelets
         "-4":{min:-1, max:-2}, // watches
         "-3":{min:-1, max:-2}, // ears
         "-2":{min:-1, max:-2}, // glasses
-        "-1":{min:-1, max:195}, // hats
+        "-1":{min:-1, max:-2}, // hats
         "0":{min:0, max:0}, // head
         "1":{min:-1, max:-2}, // masks - set to anything for donators
         "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
         "3":{min:0, max:-2}, // torsos
-        "4":{min:0, max:190}, // pants
-        "5":{min:0, max:110}, // bags/hands
-        "6":{min:1, max:-2}, // shoes
-        "7":{min:-1, max:142}, // accessories
-        "8":{min:0, max:244}, // undershirts
-        "9":{min:-1, max:57}, // armors
-        "10":{min:-1, max:186}, // decals
-        "11":{min:0, max:533}, // tops        
+        "4":{min:0, max:217}, // pants
+        "5":{min:0, max:-2}, // bags/hands
+        "6":{min:1, max:161}, // shoes
+        "7":{min:-1, max:-2}, // accessories
+        "8":{min:0, max:-2}, // undershirts
+        "9":{min:-1, max:-2}, // armors
+        "10":{min:-1, max:227}, // decals
+        "11":{min:0, max:587}, // tops       
     },
     "fugitive":{
         "-5":{min:-1, max:-2}, // bracelets
@@ -493,19 +599,19 @@ const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max
         "-4":{min:-1, max:-2}, // watches
         "-3":{min:-1, max:-2}, // ears
         "-2":{min:-1, max:-2}, // glasses
-        "-1":{min:195, max:-2}, // hats
+        "-1":{min:-1, max:-2}, // hats
         "0":{min:0, max:0}, // head
         "1":{min:-1, max:-1}, // masks - set to anything for donators
         "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
         "3":{min:0, max:-2}, // torsos
-        "4":{min:177, max:197}, // pants
-        "5":{min:111, max:156}, // bags/hands
+        "4":{min:0, max:202}, // pants
+        "5":{min:-1, max:-2}, // bags/hands
         "6":{min:25, max:25}, // shoes
-        "7":{min:175, max:197}, // accessories
-        "8":{min:0, max:258}, // undershirts
-        "9":{min:-1, max:104}, // armors
-        "10":{min:-1, max:208}, // decals
-        "11":{min:499, max:572}, // tops
+        "7":{min:-1, max:-2}, // accessories
+        "8":{min:0, max:-2}, // undershirts
+        "9":{min:-1, max:-2}, // armors
+        "10":{min:-1, max:211}, // decals
+        "11":{min:0, max:543}, // tops
     },
     "police_donator":{
         "-5":{min:-1, max:-2}, // bracelets
@@ -517,33 +623,33 @@ const CLOTHING_EDITOR_LIMITS_MALE = { // min -1 means -1 aka can be nothing, max
         "1":{min:-1, max:-2}, // masks - set to anything for donators
         "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
         "3":{min:0, max:-2}, // torsos
-        "4":{min:0, max:-2}, // pants
+        "4":{min:0, max:202}, // pants
         "5":{min:0, max:-2}, // bags/hands
-        "6":{min:1, max:-2}, // shoes
+        "6":{min:1, max:154}, // shoes
         "7":{min:-1, max:-2}, // accessories
         "8":{min:0, max:-2}, // undershirts
         "9":{min:-1, max:-2}, // armors
-        "10":{min:-1, max:-2}, // decals
-        "11":{min:0, max:-2}, // tops        
+        "10":{min:-1, max:211}, // decals
+        "11":{min:0, max:543}, // tops        
     },
     "fugitive_donator":{
         "-5":{min:-1, max:-2}, // bracelets
         "-4":{min:-1, max:-2}, // watches
         "-3":{min:-1, max:-2}, // ears
         "-2":{min:-1, max:-2}, // glasses
-        "-1":{min:-1, max:196}, // hats
+        "-1":{min:-1, max:-2}, // hats
         "0":{min:0, max:0}, // head
         "1":{min:-1, max:-2}, // masks - set to anything for donators
         "2":{min:0, max:0}, // hairs - set in character appearance editor bruv
         "3":{min:0, max:-2}, // torsos
-        "4":{min:0, max:176}, // pants
-        "5":{min:0, max:110}, // bags/hands
-        "6":{min:1, max:-2}, // shoes
-        "7":{min:-1, max:174}, // accessories
-        "8":{min:0, max:198}, // undershirts
-        "9":{min:-1, max:57}, // armors
-        "10":{min:-1, max:169}, // decals
-        "11":{min:0, max:494}, // tops        
+        "4":{min:0, max:202}, // pants
+        "5":{min:0, max:-2}, // bags/hands
+        "6":{min:1, max:154}, // shoes
+        "7":{min:-1, max:-2}, // accessories
+        "8":{min:0, max:-2}, // undershirts
+        "9":{min:-1, max:-2}, // armors
+        "10":{min:-1, max:211}, // decals
+        "11":{min:0, max:543}, // tops      
     },
     "fugitive":{
         "-5":{min:-1, max:-2}, // bracelets

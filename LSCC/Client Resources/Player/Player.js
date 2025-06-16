@@ -4542,6 +4542,7 @@ mp.events.add("OnPlayerLoginRegister", () => {
     setTimeout(() => {
         global.InitializeHotwireDOM();
         global.AddCustomVehiclesToSpawner()
+        global.InitializeClothingEditorHelpDOM()
     }, 700);
     setTimeout(() => {
         global.InitializeClothingEditorDOM();
