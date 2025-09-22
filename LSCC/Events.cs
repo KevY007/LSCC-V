@@ -3845,6 +3845,7 @@ namespace RNC
                     {
                         _target.Password = password;
                         _target.Salt = salt;
+                        _target.RememberMe = false;
                         _target.ForcePasswordChange = false;
                     }
 
