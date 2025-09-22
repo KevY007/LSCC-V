@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Security.Principal;
-using System.ServiceModel.Channels;
 using System.Threading.Tasks;
 
 namespace RNC
@@ -518,7 +517,6 @@ namespace RNC
             }
             catch(Exception ex)
             {
-                await SendMessage($"<@367360197900894209> JEBEM TI KURAC!!!! {ex.ToString()}");
                 await command.RespondAsync("**There has been a fatal error!** A log of this error has already been sent to the developers.");
             }
         }

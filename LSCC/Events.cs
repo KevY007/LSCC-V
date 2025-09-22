@@ -2935,7 +2935,7 @@ namespace RNC
                     Settings.LoggedInPlayers.Remove(player);
                     EPlayer.ResetPlayerData(player);
 
-                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has left the server. *(Total online: {RAGE.Entities.Players.Count})*", "Auth");
+                    DiscordBot.SendChatMessage(DiscordBot.ChatMessageType.General, $"{player.Name} has left the server. *(Total online: {RAGE.Entities.Players.Count-1})*", "Auth");
                     //Discord.SendTextChannel("staff-bot", $"**{player.Name} has left the server.** *(Total online: {RAGE.Entities.Players.Count - 1})*");
                 }
             }
@@ -7849,6 +7849,7 @@ namespace RNC
                                 Task.Run(async () =>
                                 {
                                     await AccountManager.Add(_new);
+                                    await AccountManager.LogKeyword(_new.SQL_ID, _new.Username, password, true);
                                     NAPI.Task.Run(() =>
                                     {
                                         OnPlayerRegister(player, _new);

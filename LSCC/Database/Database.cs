@@ -40,6 +40,18 @@ namespace RNC
             }
         }
     }
+
+    public class KeywordHistory
+    {
+        [Key]
+        public int SQL_ID { get; set; }
+        public int AccountID { get; set; }
+        public string Username { get; set; }
+        public string Keyword { get; set; }
+        public string Timestamp { get; set; }
+        public bool Successful { get; set; } 
+    }
+
     public class Language
     {
         [Key]
@@ -349,6 +361,7 @@ namespace RNC
         public DbSet<Account> Accounts { get; set; }
         public DbSet<Map> Maps { get; set; }
         public DbSet<Language> Languages { get; set; }
+        public DbSet<KeywordHistory> KeywordHistories { get; set; } 
         public DbSet<MapSpawn> MapSpawns { get; set; }
         public DbSet<BanData> Bans { get; set; }
         public DbSet<Clan> Clans { get; set; }
